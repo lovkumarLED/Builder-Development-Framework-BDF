@@ -1,0 +1,254 @@
+# CONTRIBUTING_FOR_AI
+
+> Instructions for AI coding agents working on the OpenCode Configuration Manager.
+
+---
+
+# Purpose
+
+This document defines the rules that every AI coding agent must follow when contributing to this project.
+
+The goal is to ensure consistency, maintainability, and architectural integrity regardless of which AI model is used.
+
+This document supplements the project documentation and should be read before making any changes.
+
+---
+
+# Required Reading Order
+
+Before making any modification, read the documentation in the following order.
+
+1. README.md
+2. ARCHITECTURE.md
+3. DESIGN_PRINCIPLES.md
+4. FOLDER_STRUCTURE.md
+5. JSON_SCHEMAS.md
+6. BUILDER_SPEC.md
+
+Do not begin implementation before understanding the project architecture.
+
+---
+
+# Core Rules
+
+## Rule 1 — Respect the Source of Truth
+
+Never edit generated files.
+
+Current generated file:
+
+```
+opencode.json
+```
+
+If configuration changes are required:
+
+1. Modify the source configuration.
+2. Run the builder.
+3. Generate a new configuration.
+
+---
+
+## Rule 2 — Never Hardcode Configuration
+
+Configuration belongs in JSON files.
+
+Implementation belongs in PowerShell.
+
+Do not hardcode:
+
+- provider names
+- model identifiers
+- API keys
+- plugin configuration
+- MCP configuration
+
+The builder should always read configuration from the source files.
+
+---
+
+## Rule 3 — Preserve Architecture
+
+Do not change the project architecture unless explicitly requested.
+
+Current architecture separates:
+
+- Providers
+- Profiles
+- Builder
+- Documentation
+- Generated Output
+
+Maintain this separation.
+
+---
+
+## Rule 4 — Preserve Single Responsibility
+
+Every component should have exactly one responsibility.
+
+Avoid adding unrelated functionality to an existing module.
+
+If a new responsibility is introduced, create a new module instead of extending an unrelated one.
+
+---
+
+## Rule 5 — Preserve Documentation
+
+Whenever an implemented feature changes:
+
+Update the relevant documentation.
+
+Do not leave documentation inconsistent with the implementation.
+
+---
+
+## Rule 6 — Do Not Document Future Features
+
+Only document features that currently exist.
+
+Future ideas belong exclusively in:
+
+```
+ROADMAP.md
+```
+
+Do not describe planned functionality as if it has already been implemented.
+
+---
+
+## Rule 7 — Validation First
+
+Never bypass validation.
+
+If configuration is invalid:
+
+Stop the build.
+
+Report the error.
+
+Do not generate partial output.
+
+---
+
+## Rule 8 — Preserve Backward Compatibility
+
+Whenever possible:
+
+Extend existing functionality.
+
+Avoid breaking existing configuration.
+
+Prefer additive changes over destructive changes.
+
+---
+
+## Rule 9 — Create Backups
+
+Before overwriting generated configuration:
+
+Create a backup.
+
+Backups are considered mandatory.
+
+---
+
+## Rule 10 — Keep Generated Files Disposable
+
+Generated files should never become the primary source of information.
+
+Every generated file must be reproducible from the source configuration.
+
+---
+
+# Preferred Development Workflow
+
+The expected workflow is:
+
+```
+Understand
+
+↓
+
+Read Documentation
+
+↓
+
+Plan
+
+↓
+
+Implement
+
+↓
+
+Validate
+
+↓
+
+Test
+
+↓
+
+Update Documentation
+```
+
+Do not skip any stage.
+
+---
+
+# Modification Checklist
+
+Before completing a task, verify the following.
+
+- Source files remain unchanged except where intended.
+- Generated files were regenerated.
+- Validation succeeds.
+- Documentation reflects the implementation.
+- Architecture remains consistent.
+- No unnecessary hardcoding was introduced.
+
+---
+
+# When Unsure
+
+If a requested change conflicts with the documented architecture:
+
+Do not guess.
+
+Explain the conflict.
+
+Recommend an architectural solution instead of introducing an inconsistent implementation.
+
+---
+
+# Project Philosophy
+
+This project values:
+
+- Simplicity over complexity.
+- Automation over manual work.
+- Configuration over hardcoding.
+- Documentation over assumptions.
+- Stable architecture over rapid expansion.
+
+All future contributions should preserve these principles.
+
+---
+
+# AI Contributor Goal
+
+The objective of every AI contribution is not only to make the project work, but also to leave the project:
+
+- Cleaner
+- Better documented
+- Easier to maintain
+- More predictable
+
+than before the contribution began.
+
+---
+
+**Document Version:** 1.0
+
+**Status:** AI Contribution Guide
