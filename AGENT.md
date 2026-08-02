@@ -220,6 +220,19 @@ Every contribution should move the project closer to that goal.
 
 ---
 
+# Session Workflow
+
+For every new task:
+
+1. Read AGENT.md.
+2. Follow the required documentation reading order.
+3. Summarize your understanding of the project.
+4. Explain your implementation plan.
+5. Wait for approval before modifying code.
+6. Implement in small, reviewable steps unless explicitly asked for a complete implementation.
+
+---
+
 # Final Rule
 
 If documentation and implementation disagree:
