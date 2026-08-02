@@ -86,7 +86,7 @@ The following diagram illustrates the overall system structure.
                          │
                          ▼
 
-                build-opencode.ps1
+                build-opencode-v2.ps1
 
                          │
                          ▼
@@ -351,10 +351,10 @@ The current architecture intentionally limits functionality to reduce complexity
 
 Current constraints include:
 
-- One provider
-- One active profile
+- One active profile at build time
+- One provider definition (dynamic loading supported)
 - One generated configuration
-- One builder
+- One active builder
 
 These constraints simplify development and provide a stable foundation for future expansion.
 
@@ -378,9 +378,6 @@ Future architectural improvements will be introduced only after the current impl
 
 The following are intentionally outside the current architecture.
 
-- Multiple active providers
-- Dynamic provider loading
-- Multiple profile selection
 - Advanced validation
 
 These features are considered future enhancements and are not part of the current implementation.

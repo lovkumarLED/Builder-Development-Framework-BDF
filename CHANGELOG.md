@@ -48,6 +48,63 @@ Example
 
 ---
 
+# Version 2.0.0
+
+## Status
+
+Current
+
+## Date
+
+```
+2026-08-03
+```
+
+## Summary
+
+Builder V2 implementation.
+
+---
+
+## Added
+
+- Dynamic profile selection.
+- Dynamic provider loading.
+- Optional profile sections.
+- Improved validation.
+- Better console output.
+- Improved error reporting.
+
+---
+
+## Changed
+
+- The current builder is now `build-opencode-v2.ps1`.
+- The previous builder is retained as a legacy script.
+- Models are injected into every active provider.
+- Optional profile sections are merged only when present.
+
+---
+
+## Documentation
+
+Updated
+
+- BUILDER_SPEC.md
+- ARCHITECTURE.md
+- FOLDER_STRUCTURE.md
+- TESTING.md
+- ROADMAP.md
+- CHANGELOG.md
+
+---
+
+## Breaking Changes
+
+None
+
+---
+
 # Version 1.0.0
 
 ## Status
@@ -142,7 +199,8 @@ ROADMAP.md
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 1.0.0 | Current | Initial project implementation |
+| 2.0.0 | Current | Builder V2 implementation |
+| 1.0.0 | Legacy | Initial project implementation |
 
 ---
 

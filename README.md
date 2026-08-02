@@ -19,6 +19,8 @@ This approach makes the configuration easier to maintain, easier to extend, and 
 - Modular configuration architecture
 - OmniRoute provider integration
 - Profile-based configuration
+- Dynamic profile selection
+- Dynamic provider loading
 - Separate model management
 - Separate plugin management
 - Separate MCP management
@@ -66,6 +68,8 @@ The documentation is split into multiple files.
 - OpenCode configuration management
 - OmniRoute provider
 - Profile-based configuration
+- Dynamic profile selection
+- Dynamic provider loading
 - Automatic configuration builder
 - Backup system
 - Project documentation
@@ -75,7 +79,6 @@ The documentation is split into multiple files.
 The following features are planned but **are not currently part of the project**:
 
 - Additional providers
-- Multiple profile selection
 - Advanced validation
 - Extended CLI features
 
@@ -132,6 +135,6 @@ Planned work is documented separately in `ROADMAP.md`.
 
 ---
 
-**Version:** 1.0
+**Version:** 2.0
 
 Documentation Status: Current Implementation

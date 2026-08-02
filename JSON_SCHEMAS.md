@@ -112,7 +112,7 @@ If validation fails, the build process must terminate immediately.
 
 - Model identifiers must be unique.
 - Every model must contain valid configuration.
-- The builder copies this object directly into the selected provider.
+- The builder copies this object directly into every active provider.
 
 ---
 

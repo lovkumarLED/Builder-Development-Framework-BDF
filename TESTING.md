@@ -59,7 +59,7 @@ OpenCode
 Configuration Builder
 
 ```
-build-opencode.ps1
+build-opencode-v2.ps1
 ```
 
 Provider
@@ -72,6 +72,12 @@ Profile
 
 ```
 default
+```
+
+Profile Selection
+
+```
+-Profile default
 ```
 
 ---
@@ -152,7 +158,7 @@ profiles/default/mcp.json
 
 providers/omniroute.json
 
-scripts/build-opencode.ps1
+scripts/build-opencode-v2.ps1
 ```
 
 ### Expected Result
@@ -280,16 +286,14 @@ Verify that the builder starts successfully.
 Run the builder.
 
 ```powershell
-.\build-opencode.ps1
+.\build-opencode-v2.ps1
 ```
 
 or
 
 ```powershell
-.\build-opencode.ps1 default
+.\build-opencode-v2.ps1 -Profile default
 ```
-
-depending on the current implementation.
 
 ### Expected Result
 
@@ -313,11 +317,15 @@ BLD-002
 
 ### Purpose
 
-Verify that the builder loads the active profile correctly.
+Verify that the builder loads the selected profile correctly.
 
 ### Procedure
 
 Execute the builder.
+
+```powershell
+.\build-opencode-v2.ps1 -Profile default
+```
 
 Observe the console output.
 
@@ -506,6 +514,38 @@ The generated configuration is identical.
 ### Failure Result
 
 Different output indicates non-deterministic builder behavior.
+
+---
+
+## Test ID
+
+```
+BLD-008
+```
+
+### Purpose
+
+Verify that a partial profile builds successfully.
+
+### Procedure
+
+Execute the builder with a profile that contains only settings.json.
+
+```powershell
+.\build-opencode-v2.ps1 -Profile minimal
+```
+
+### Expected Result
+
+The build completes successfully.
+
+Optional sections are reported as skipped.
+
+The generated configuration contains the provider section.
+
+### Failure Result
+
+The builder fails because optional profile files are missing.
 
 ---
 

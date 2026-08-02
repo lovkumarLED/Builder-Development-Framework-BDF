@@ -66,10 +66,12 @@ The builder SHALL NOT
 
 # Inputs
 
-The builder reads configuration from the following locations.
+The builder reads configuration from the selected profile.
+
+The profile is chosen at invocation time.
 
 ```
-profiles/default/
+profiles/<profile>/
 
 settings.json
 
@@ -79,6 +81,12 @@ plugins.json
 
 mcp.json
 ```
+
+`settings.json` is required.
+
+`models.json`, `plugins.json`, and `mcp.json` are optional.
+
+Only the sections that exist are merged into the generated configuration.
 
 and
 
@@ -146,22 +154,34 @@ No stage may be skipped.
 
 # Stage 1 — Load Profile
 
-The builder begins by loading the active profile.
+The builder begins by loading the profile selected at invocation time.
 
-Current implementation
+The profile is passed as a parameter.
+
+```
+-Profile <profile-name>
+```
+
+The default profile is
 
 ```
 default
 ```
 
+Example
+
+```
+build-opencode-v2.ps1 -Profile default
+```
+
 The builder loads
 
-- settings.json
-- models.json
-- plugins.json
-- mcp.json
+- settings.json (required)
+- models.json (optional)
+- plugins.json (optional)
+- mcp.json (optional)
 
-The build stops immediately if any required file is missing.
+The build stops immediately if settings.json is missing.
 
 ### Why
 
@@ -213,11 +233,15 @@ Before generating the configuration, the builder validates the project.
 
 Validation includes
 
-- Required files exist.
+- The selected profile exists.
+- settings.json exists.
 - JSON syntax is valid.
-- Required objects exist.
-- Provider identifier is valid.
-- Required sections are present.
+- `activeProviders` exists and is an array.
+- `activeProviders` contains at least one provider.
+- Provider files exist.
+- Provider identifier matches the provider filename.
+- The provider section is present.
+- At least one provider was loaded.
 
 The build must stop immediately when validation fails.
 
@@ -284,6 +308,10 @@ MCP
 
 Generated Configuration
 ```
+
+Models are injected into every active provider.
+
+Plugins and MCP sections are merged only when the corresponding profile file exists.
 
 Each section is merged exactly once.
 
@@ -418,8 +446,9 @@ The current builder intentionally supports only the functionality required by th
 
 Implemented
 
-- Single provider
-- Single profile
+- Dynamic provider loading
+- Dynamic profile selection
+- Optional profile sections
 - Single generated configuration
 - Backup creation
 - Configuration validation
@@ -499,7 +528,13 @@ Current Builder
 Version
 
 ```
-V1
+V2
+```
+
+Script
+
+```
+build-opencode-v2.ps1
 ```
 
 Status

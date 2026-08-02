@@ -31,7 +31,7 @@ This roadmap is intended to guide future development while keeping the overall p
 Current Version
 
 ```
-1.0.0
+2.0.0
 ```
 
 Current Status
@@ -45,7 +45,9 @@ The project currently provides:
 - Modular configuration
 - Provider abstraction
 - Profile abstraction
-- Configuration builder
+- Configuration builder (V2)
+- Dynamic profile selection
+- Dynamic provider loading
 - Backup system
 - Documentation framework
 
@@ -75,15 +77,15 @@ Completed work includes:
 
 ---
 
-## Phase 2 — Builder Improvements
+## Phase 2 — Builder Improvements ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
-Objectives
+Completed work includes:
 
 - Dynamic provider loading.
 - Dynamic profile selection.
@@ -92,11 +94,11 @@ Objectives
 - Improved error reporting.
 - Cleaner internal builder architecture.
 
-Success Criteria
+The implementation is documented in:
 
-- Builder supports multiple providers without code modification.
-- Builder selects profiles dynamically.
-- Validation is fully centralized.
+```
+BUILDER_SPEC.md
+```
 
 ---
 

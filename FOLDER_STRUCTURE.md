@@ -134,13 +134,23 @@ Contains profile-specific configuration.
 
 Profiles define the configuration that will be merged into the final OpenCode configuration.
 
-The current implementation contains a single profile.
+The builder selects the profile at invocation time.
 
 ```
 profiles/
 
 default/
+
+coding/
+
+experimental/
+
+minimal/
 ```
+
+The `default` profile is fully configured.
+
+Additional profiles contain only `settings.json` and contribute their provider selection to the build.
 
 ---
 
@@ -267,12 +277,18 @@ Contains automation scripts.
 The primary script is the OpenCode configuration builder.
 
 ```
+build-opencode-v2.ps1
+```
+
+The previous builder is retained as a legacy script.
+
+```
 build-opencode.ps1
 ```
 
 ---
 
-## build-opencode.ps1
+## build-opencode-v2.ps1
 
 Purpose
 
@@ -285,6 +301,12 @@ Responsibilities
 - Create backup.
 - Merge configuration.
 - Generate output.
+
+Supports
+
+- Dynamic profile selection.
+- Dynamic provider loading.
+- Optional profile sections.
 
 The builder never edits source configuration files.
 
