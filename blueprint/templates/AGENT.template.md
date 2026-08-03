@@ -1,6 +1,12 @@
+# AGENT Template
+
+> Template: AI agent entry point. Becomes `AGENT.md`.
+
+---
+
 # AGENT
 
-> Entry point for all AI agents working on the OpenCode Configuration Manager.
+> Entry point for all AI agents working on {{PROJECT_NAME}}.
 
 ---
 
@@ -18,9 +24,9 @@ Every AI agent should read this document first.
 
 # Project Overview
 
-The OpenCode Configuration Manager is a modular configuration generation system.
+{{PROJECT_NAME}} is a modular configuration generation system.
 
-Its purpose is to generate a valid `opencode.json` from a set of smaller configuration files.
+Its purpose is to generate a valid `{{GENERATED_ARTIFACT}}` from a set of smaller configuration files.
 
 The architecture separates:
 
@@ -33,97 +39,12 @@ The generated configuration should never become the source of truth.
 
 ---
 
-# Blueprint Framework
-
-Generic engineering knowledge shared by every builder project lives in:
-
-```
-blueprint/
-```
-
-Start with:
-
-```
-blueprint/FRAMEWORK.md
-```
-
-The blueprint describes the reusable engineering process.
-
-This documentation describes the OpenCode-specific implementation.
-
-When a concept appears in both, the project document defines the OpenCode-specific behavior and the blueprint defines the generic principle.
-
----
-
-# Session Continuity
-
-Work spans multiple sessions.
-
-Context windows reset between sessions; the session files preserve memory.
-
-At session start:
-
-- Read `_agent/SESSION_WORKFLOW.md`.
-- Read `_agent/SESSION_LOG.md`.
-- Check the `Next:` line of the most recent entry.
-
-At session end:
-
-- Follow `_agent/SESSION_WORKFLOW.md`.
-- Write the session summary to `_agent/SESSION_LOG.md`.
-- Never delete or overwrite existing entries.
-
----
-
-# Project State
-
-`PROJECT_STATE.md` is the living snapshot of the repository.
-
-It must always reflect the current repository state.
-
-## Major Refactor Definition
-
-A major refactor is any change that:
-
-- Adds, removes, moves, or renames files or folders.
-- Changes the architecture or documentation structure.
-- Changes how components connect to one another.
-- Introduces or removes an entire system.
-
-Minor documentation fixes and small updates do not count as major refactors.
-
-## Regeneration Rule
-
-After every major refactor:
-
-1. Regenerate `PROJECT_STATE.md` from the current repository state.
-2. Keep the 15-section structure exactly as defined in the template.
-3. Do not ask for confirmation before regenerating.
-4. Confirm the update with: Project state updated.
-5. Never leave `PROJECT_STATE.md` stale.
-
-## Template
-
-The generic template lives in:
-
-```
-blueprint/templates/PROJECT_STATE.template.md
-```
-
-When the template changes, the blueprint version must be updated.
-
----
-
 # Read Order
 
 Before making any modification, read the documentation in the following order.
 
 ```
 README.md
-
-↓
-
-PROJECT_STATE.md
 
 ↓
 
@@ -159,19 +80,19 @@ Only after understanding these documents should an AI modify code or configurati
 The following files are the authoritative project sources.
 
 ```
-profiles/
+{{CONFIG_SOURCE_DIR}}/
 
-providers/
+{{PROVIDER_DIR}}/
 
-scripts/
+{{SCRIPTS_DIR}}/
 
-docs/
+{{DOCS_DIR}}/
 ```
 
 The following file is generated automatically.
 
 ```
-opencode.json
+{{GENERATED_ARTIFACT}}
 ```
 
 Never edit generated files manually.
@@ -195,9 +116,9 @@ An AI agent SHOULD:
 
 An AI agent MUST NOT:
 
-- Edit `opencode.json` manually.
+- Edit `{{GENERATED_ARTIFACT}}` manually.
 - Introduce undocumented architecture.
-- Hardcode configuration values that belong in JSON.
+- Hardcode configuration values that belong in configuration files.
 - Modify unrelated files.
 - Remove documentation without justification.
 - Implement features that are only listed in `ROADMAP.md`.
@@ -262,7 +183,6 @@ Whenever implementation changes:
 - Update the changelog for completed work.
 - Remove completed items from the roadmap.
 - Keep documents consistent with one another.
-- Regenerate `PROJECT_STATE.md` after every major refactor.
 
 ---
 
@@ -331,6 +251,6 @@ Consistency is more important than speed.
 
 ---
 
-**Document Version:** 1.2
+**Document Version:** {{DOC_VERSION}}
 
 **Status:** Active AI Entry Guide

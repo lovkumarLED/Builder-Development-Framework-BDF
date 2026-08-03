@@ -48,11 +48,169 @@ Example
 
 ---
 
-# Version 2.0.0
+# Version 2.0.3
 
 ## Status
 
 Current
+
+## Date
+
+```
+2026-08-03
+```
+
+## Summary
+
+Documentation infrastructure: added the project state system.
+
+---
+
+## Added
+
+- `PROJECT_STATE.md` with the 15-section living state snapshot.
+- `blueprint/templates/PROJECT_STATE.template.md` generic template.
+- Project state section in AGENT.md.
+- Project state regeneration rules.
+
+---
+
+## Changed
+
+- AGENT.md now requires `PROJECT_STATE.md` regeneration after every major refactor.
+- AGENT.md read order now includes `PROJECT_STATE.md`.
+- `_agent/SESSION_WORKFLOW.md` now reads `PROJECT_STATE.md` at session start and regenerates it at session end after a major refactor.
+
+---
+
+## Documentation
+
+Updated
+
+- AGENT.md
+- README.md
+- FOLDER_STRUCTURE.md
+- ROADMAP.md
+- CHANGELOG.md
+- _agent/SESSION_WORKFLOW.md
+- blueprint/VERSION.md
+- blueprint/templates/README.md
+
+---
+
+## Breaking Changes
+
+None
+
+---
+
+# Version 2.0.2
+
+## Status
+
+Current
+
+## Date
+
+```
+2026-08-03
+```
+
+## Summary
+
+Documentation infrastructure: added the session continuity system.
+
+---
+
+## Added
+
+- `_agent/SESSION_WORKFLOW.md` with session start, end, and log rules.
+- `_agent/SESSION_LOG.md` with the session history.
+- Session continuity section in AGENT.md.
+
+---
+
+## Changed
+
+- AGENT.md now guides agents to read session files at session start and write them at session end.
+
+---
+
+## Documentation
+
+Updated
+
+- AGENT.md
+- FOLDER_STRUCTURE.md
+- CHANGELOG.md
+
+---
+
+## Breaking Changes
+
+None
+
+---
+
+# Version 2.0.1
+
+## Status
+
+Previous
+
+## Date
+
+```
+2026-08-03
+```
+
+## Summary
+
+Documentation architecture: added the reusable Blueprint Framework.
+
+---
+
+## Added
+
+- `blueprint/` folder containing the reusable engineering process.
+- Blueprint documentation templates.
+- Blueprint versioning.
+- Project generation workflow.
+- Migration guide.
+- Reusable lessons document.
+
+---
+
+## Changed
+
+- README.md now describes the two-layer documentation architecture.
+- AGENT.md points to the Blueprint Framework for generic engineering knowledge.
+- FOLDER_STRUCTURE.md documents the `blueprint/` and `AI/` folders.
+
+---
+
+## Documentation
+
+Updated
+
+- README.md
+- AGENT.md
+- FOLDER_STRUCTURE.md
+- CHANGELOG.md
+
+---
+
+## Breaking Changes
+
+None
+
+---
+
+# Version 2.0.0
+
+## Status
+
+Previous
 
 ## Date
 
@@ -109,7 +267,7 @@ None
 
 ## Status
 
-Current
+Legacy
 
 ## Summary
 
@@ -199,7 +357,10 @@ ROADMAP.md
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.0.0 | Current | Builder V2 implementation |
+| 2.0.3 | Current | Project state system |
+| 2.0.2 | Previous | Session continuity system |
+| 2.0.1 | Previous | Blueprint Framework documentation architecture |
+| 2.0.0 | Previous | Builder V2 implementation |
 | 1.0.0 | Legacy | Initial project implementation |
 
 ---

@@ -1,12 +1,18 @@
+# FOLDER_STRUCTURE Template
+
+> Template: directory and file organization. Becomes `FOLDER_STRUCTURE.md`.
+
+---
+
 # Folder Structure
 
-> Directory and file organization of the OpenCode Configuration Manager.
+> Directory and file organization of {{PROJECT_NAME}}.
 
 ---
 
 # Purpose
 
-The OpenCode Configuration Manager is organized into independent directories, where each directory has a single responsibility.
+{{PROJECT_NAME}} is organized into independent directories, where each directory has a single responsibility.
 
 This separation improves maintainability, readability, and future expansion.
 
@@ -14,45 +20,28 @@ The builder relies on this structure when generating the final configuration.
 
 ---
 
-# Root Directory
-
-```
-.config/
-└── opencode/
-```
-
-The `opencode` directory is the root of the entire project.
-
-Everything required by the configuration manager exists inside this directory.
-
----
-
 # Project Structure
 
 ```
-opencode/
+project/
 
-├── backup/
-├── docs/
-├── profiles/
-├── providers/
-├── scripts/
-└── opencode.json
+├── {{BACKUP_DIR}}/
+├── {{DOCS_DIR}}/
+├── {{CONFIG_SOURCE_DIR}}/
+├── {{PROVIDER_DIR}}/
+├── {{SCRIPTS_DIR}}/
+└── {{GENERATED_ARTIFACT}}
 ```
 
 Each directory has a dedicated responsibility.
 
 ---
 
-# backup/
-
-```
-backup/
-```
+# {{BACKUP_DIR}}/
 
 ## Purpose
 
-Stores automatically created backups of the generated `opencode.json`.
+Stores automatically created backups of the generated `{{GENERATED_ARTIFACT}}`.
 
 Before generating a new configuration, the builder creates a timestamped backup of the previous configuration.
 
@@ -61,9 +50,9 @@ This allows recovery if a configuration change introduces errors.
 ## Example
 
 ```
-backup/
+{{BACKUP_DIR}}/
 
-opencode_2026-08-02_18-30-45.json
+{{GENERATED_ARTIFACT}}_2026-08-02_18-30-45.json
 ```
 
 ## Managed By
@@ -76,11 +65,7 @@ Not required.
 
 ---
 
-# docs/
-
-```
-docs/
-```
+# {{DOCS_DIR}}/
 
 ## Purpose
 
@@ -117,42 +102,8 @@ ROADMAP.md
 
 CHANGELOG.md
 
-PROJECT_STATE.md
-
-AI/
-
-_agent/
-
-blueprint/
+LESSONS_LEARNED.md
 ```
-
-## _agent/
-
-Contains the session continuity files.
-
-```
-_agent/
-
-SESSION_LOG.md
-
-SESSION_WORKFLOW.md
-```
-
-## blueprint/
-
-Contains the reusable Blueprint Framework.
-
-Generic engineering knowledge shared by every builder project.
-
-## AI/
-
-Contains AI task documents.
-
-## PROJECT_STATE.md
-
-Contains the living state snapshot of the repository.
-
-Regenerated after every major refactor.
 
 ## Managed By
 
@@ -164,44 +115,36 @@ Yes.
 
 ---
 
-# profiles/
-
-```
-profiles/
-```
+# {{CONFIG_SOURCE_DIR}}/
 
 ## Purpose
 
 Contains profile-specific configuration.
 
-Profiles define the configuration that will be merged into the final OpenCode configuration.
+Profiles define the configuration that will be merged into the final configuration.
 
 The builder selects the profile at invocation time.
 
 ```
-profiles/
+{{CONFIG_SOURCE_DIR}}/
 
-default/
+{{DEFAULT_PROFILE}}/
 
-coding/
-
-experimental/
-
-minimal/
+other-profiles/
 ```
 
-The `default` profile is fully configured.
+The default profile is fully configured.
 
-Additional profiles contain only `settings.json` and contribute their provider selection to the build.
+Additional profiles contain only the settings file and contribute their provider selection to the build.
 
 ---
 
-## default/
+## {{DEFAULT_PROFILE}}/
 
-Contains the active OpenCode configuration.
+Contains the active configuration.
 
 ```
-default/
+{{DEFAULT_PROFILE}}/
 
 settings.json
 
@@ -209,7 +152,7 @@ models.json
 
 plugins.json
 
-mcp.json
+service.json
 ```
 
 ---
@@ -228,7 +171,7 @@ Contains profile-level settings used by the builder.
 
 Purpose:
 
-Defines every AI model available inside the profile.
+Defines every model available inside the profile.
 
 Responsible only for model configuration.
 
@@ -238,15 +181,15 @@ Responsible only for model configuration.
 
 Purpose:
 
-Defines OpenCode plugins enabled for the profile.
+Defines plugins enabled for the profile.
 
 ---
 
-### mcp.json
+### service.json
 
 Purpose:
 
-Defines MCP server configuration for the profile.
+Defines service configuration for the profile.
 
 ---
 
@@ -260,33 +203,29 @@ Yes.
 
 ---
 
-# providers/
-
-```
-providers/
-```
+# {{PROVIDER_DIR}}/
 
 ## Purpose
 
 Contains provider definitions.
 
-Each provider describes how OpenCode communicates with an AI provider.
+Each provider describes how the application communicates with an external service.
 
 The current implementation contains a single provider.
 
 ```
-providers/
+{{PROVIDER_DIR}}/
 
-omniroute.json
+{{CURRENT_PROVIDER}}.json
 ```
 
 ---
 
-## omniroute.json
+## {{CURRENT_PROVIDER}}.json
 
 Purpose:
 
-Defines the OmniRoute provider.
+Defines the provider.
 
 Contains:
 
@@ -306,35 +245,25 @@ Yes.
 
 ---
 
-# scripts/
-
-```
-scripts/
-```
+# {{SCRIPTS_DIR}}/
 
 ## Purpose
 
 Contains automation scripts.
 
-The primary script is the OpenCode configuration builder.
+The primary script is the configuration builder.
 
 ```
-build-opencode-v2.ps1
-```
-
-The previous builder is retained as a legacy script.
-
-```
-build-opencode.ps1
+{{BUILDER_SCRIPT}}
 ```
 
 ---
 
-## build-opencode-v2.ps1
+## {{BUILDER_SCRIPT}}
 
 Purpose
 
-Generates the final `opencode.json`.
+Generates the final `{{GENERATED_ARTIFACT}}`.
 
 Responsibilities
 
@@ -364,19 +293,15 @@ Yes.
 
 ---
 
-# opencode.json
-
-```
-opencode.json
-```
+# {{GENERATED_ARTIFACT}}
 
 ## Purpose
 
-Generated OpenCode configuration.
+Generated configuration.
 
 This file is produced automatically by the builder.
 
-OpenCode reads this file during startup.
+The application reads this file during startup.
 
 ---
 
@@ -393,11 +318,11 @@ Any configuration changes must be made to the source files.
 # Directory Relationships
 
 ```
-profiles/
+{{CONFIG_SOURCE_DIR}}/
 
 ↓
 
-providers/
+{{PROVIDER_DIR}}/
 
 ↓
 
@@ -405,15 +330,15 @@ builder
 
 ↓
 
-backup
+{{BACKUP_DIR}}/
 
 ↓
 
-opencode.json
+{{GENERATED_ARTIFACT}}
 
 ↓
 
-OpenCode
+{{APP_NAME}}
 ```
 
 ---
@@ -422,12 +347,12 @@ OpenCode
 
 | Directory | Owner |
 |------------|-------|
-| backup | Builder |
-| docs | Developer |
-| profiles | Developer |
-| providers | Developer |
-| scripts | Developer |
-| opencode.json | Builder |
+| {{BACKUP_DIR}} | Builder |
+| {{DOCS_DIR}} | Developer |
+| {{CONFIG_SOURCE_DIR}} | Developer |
+| {{PROVIDER_DIR}} | Developer |
+| {{SCRIPTS_DIR}} | Developer |
+| {{GENERATED_ARTIFACT}} | Builder |
 
 ---
 
@@ -435,15 +360,15 @@ OpenCode
 
 ## Edit Manually
 
-- docs/
-- profiles/
-- providers/
-- scripts/
+- {{DOCS_DIR}}/
+- {{CONFIG_SOURCE_DIR}}/
+- {{PROVIDER_DIR}}/
+- {{SCRIPTS_DIR}}/
 
 ## Do Not Edit
 
-- backup/
-- opencode.json
+- {{BACKUP_DIR}}/
+- {{GENERATED_ARTIFACT}}
 
 Generated files should always be recreated by the builder.
 
@@ -453,12 +378,12 @@ Generated files should always be recreated by the builder.
 
 ## Existing
 
-- backup/
-- docs/
-- profiles/
-- providers/
-- scripts/
-- opencode.json
+- {{BACKUP_DIR}}/
+- {{DOCS_DIR}}/
+- {{CONFIG_SOURCE_DIR}}/
+- {{PROVIDER_DIR}}/
+- {{SCRIPTS_DIR}}/
+- {{GENERATED_ARTIFACT}}
 
 ## Planned
 
@@ -468,6 +393,6 @@ Future project ideas are documented exclusively in `ROADMAP.md`.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** {{DOC_VERSION}}
 
 **Status:** Current Project Structure

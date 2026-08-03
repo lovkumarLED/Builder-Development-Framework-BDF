@@ -1,6 +1,12 @@
+# ROADMAP Template
+
+> Template: planned evolution. Becomes `ROADMAP.md`.
+
+---
+
 # ROADMAP
 
-> Planned evolution of the OpenCode Configuration Manager.
+> Planned evolution of {{PROJECT_NAME}}.
 
 ---
 
@@ -31,7 +37,7 @@ This roadmap is intended to guide future development while keeping the overall p
 Current Version
 
 ```
-2.0.3
+{{CURRENT_VERSION}}
 ```
 
 Current Status
@@ -45,7 +51,7 @@ The project currently provides:
 - Modular configuration
 - Provider abstraction
 - Profile abstraction
-- Configuration builder (V2)
+- Configuration builder
 - Dynamic profile selection
 - Dynamic provider loading
 - Backup system
@@ -73,19 +79,18 @@ Completed work includes:
 - Profile abstraction
 - Backup system
 - Documentation
-- Manual testing framework
 
 ---
 
-## Phase 2 — Builder Improvements ✅
+## Phase 2 — Builder Improvements
 
 Status
 
 ```
-Completed
+Planned
 ```
 
-Completed work includes:
+Objectives
 
 - Dynamic provider loading.
 - Dynamic profile selection.
@@ -94,15 +99,9 @@ Completed work includes:
 - Improved error reporting.
 - Cleaner internal builder architecture.
 
-The implementation is documented in:
-
-```
-BUILDER_SPEC.md
-```
-
 ---
 
-## Phase 3 — Multiple Profiles
+## Phase 3 — Additional Profiles
 
 Status
 
@@ -117,7 +116,7 @@ Support multiple configuration profiles.
 Example
 
 ```
-profiles/
+{{CONFIG_SOURCE_DIR}}/
 
 default/
 
@@ -152,11 +151,11 @@ Support additional provider definitions.
 Examples
 
 ```
-providers/
+{{PROVIDER_DIR}}/
 
-omniroute.json
+{{CURRENT_PROVIDER}}.json
 
-cliproxy.json
+second-provider.json
 
 future-provider.json
 ```
@@ -210,7 +209,7 @@ Introduce automated verification.
 Possible additions
 
 - Builder unit tests.
-- JSON validation tests.
+- Configuration validation tests.
 - Regression testing.
 - Integration testing.
 - Configuration comparison.
@@ -310,6 +309,6 @@ This ensures that the roadmap always reflects future work rather than project hi
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** {{DOC_VERSION}}
 
 **Status:** Active Development Roadmap

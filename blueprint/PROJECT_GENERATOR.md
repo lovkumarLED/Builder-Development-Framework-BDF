@@ -1,0 +1,335 @@
+# Project Generator
+
+> Creating a new builder project using the Blueprint Framework.
+
+---
+
+# Purpose
+
+This document explains how a completely new builder project is created.
+
+The workflow is generic.
+
+It applies to any target application, any scripting language, and any future builder project.
+
+---
+
+# Overview
+
+```
+Idea
+
+↓
+
+Create Repository
+
+↓
+
+Copy Blueprint Templates
+
+↓
+
+Rename Templates
+
+↓
+
+Customize Schemas
+
+↓
+
+Implement Builder
+
+↓
+
+Testing
+
+↓
+
+Release
+```
+
+Every stage must be completed in order.
+
+Do not skip stages.
+
+---
+
+# Stage 1 — Idea
+
+Define the project before creating anything.
+
+## Decide
+
+- What configuration does the target application need?
+- Where does the configuration come from?
+- What is the generated configuration artifact?
+- Who maintains the source configuration?
+
+## Check the Blueprint
+
+Read:
+
+```
+FRAMEWORK.md
+```
+
+Confirm that the builder lifecycle matches the idea:
+
+```
+Sources → Validate → Backup → Merge → Generate → Application
+```
+
+If the idea does not fit the lifecycle, reconsider the idea before starting.
+
+---
+
+# Stage 2 — Create Repository
+
+Create a repository for the new project.
+
+## Structure
+
+The repository contains:
+
+```
+README.md
+
+AGENT.md
+
+ARCHITECTURE.md
+
+BUILDER_SPEC.md
+
+DESIGN_PRINCIPLES.md
+
+FOLDER_STRUCTURE.md
+
+JSON_SCHEMAS.md
+
+CONTRIBUTING_FOR_AI.md
+
+TESTING.md
+
+TROUBLESHOOTING.md
+
+ROADMAP.md
+
+CHANGELOG.md
+
+LESSONS_LEARNED.md
+
+source configuration directories
+```
+
+## Rules
+
+- The Blueprint Framework is shared knowledge; projects reference it.
+- Do not copy the blueprint into the repository unless the project needs an independent copy.
+- Never commit generated files.
+
+---
+
+# Stage 3 — Copy Blueprint Templates
+
+Copy every template from the blueprint templates folder into the repository documentation folder.
+
+```
+templates/
+```
+
+Copy:
+
+- `README.template.md`
+- `AGENT.template.md`
+- `ARCHITECTURE.template.md`
+- `DESIGN_PRINCIPLES.template.md`
+- `BUILDER_SPEC.template.md`
+- `FOLDER_STRUCTURE.template.md`
+- `JSON_SCHEMAS.template.md`
+- `CONTRIBUTING_FOR_AI.template.md`
+- `TESTING.template.md`
+- `TROUBLESHOOTING.template.md`
+- `ROADMAP.template.md`
+- `CHANGELOG.template.md`
+- `LESSONS_LEARNED.template.md`
+
+---
+
+# Stage 4 — Rename Templates
+
+Rename every template to its project document name.
+
+```
+README.template.md          →  README.md
+
+AGENT.template.md           →  AGENT.md
+
+ARCHITECTURE.template.md    →  ARCHITECTURE.md
+
+DESIGN_PRINCIPLES.template.md → DESIGN_PRINCIPLES.md
+
+BUILDER_SPEC.template.md    →  BUILDER_SPEC.md
+
+FOLDER_STRUCTURE.template.md → FOLDER_STRUCTURE.md
+
+JSON_SCHEMAS.template.md    →  JSON_SCHEMAS.md
+
+CONTRIBUTING_FOR_AI.template.md → CONTRIBUTING_FOR_AI.md
+
+TESTING.template.md         →  TESTING.md
+
+TROUBLESHOOTING.template.md →  TROUBLESHOOTING.md
+
+ROADMAP.template.md         →  ROADMAP.md
+
+CHANGELOG.template.md       →  CHANGELOG.md
+
+LESSONS_LEARNED.template.md →  LESSONS_LEARNED.md
+```
+
+---
+
+# Stage 5 — Customize Schemas
+
+Replace every placeholder with project-specific values.
+
+See the placeholder table in the templates readme.
+
+## Decisions To Make
+
+| Decision | Example |
+|----------|---------|
+| Project name | Configuration Manager |
+| Target application | The program that consumes the artifact |
+| Generated artifact | The final configuration file |
+| Builder script name | The automation entry point |
+| Source configuration directory | Where configuration lives |
+| Provider directory | Where provider definitions live |
+| Default profile | The default configuration set |
+| Scripting language | The builder implementation language |
+| Supported operating system | The development platform |
+
+## Rules
+
+- Never leave a placeholder in a project document.
+- Never hardcode configuration inside implementation.
+- Schemas describe only implemented configuration files.
+
+---
+
+# Stage 6 — Implement Builder
+
+Implement the builder following the specification.
+
+```
+BUILDER_SPEC.md
+```
+
+## Builder Requirements
+
+The builder MUST:
+
+- Read configuration.
+- Validate configuration.
+- Create backups.
+- Merge configuration.
+- Generate the artifact.
+- Report errors clearly.
+- Stop on validation failure.
+
+The builder MUST NOT:
+
+- Modify source files.
+- Modify documentation.
+- Continue after validation failure.
+- Generate partial output.
+
+## Implementation Rules
+
+- Configuration belongs in configuration files.
+- Implementation belongs in the builder.
+- The builder never defines configuration.
+- Every component has one responsibility.
+
+---
+
+# Stage 7 — Testing
+
+Test the project following the testing guide.
+
+```
+TESTING.md
+```
+
+## Verify
+
+- Folder structure exists.
+- Configuration files are valid.
+- Builder executes successfully.
+- Backup is created.
+- Generated artifact is valid.
+- Target application starts.
+- Configured functionality is available.
+- Existing functionality is not broken.
+
+Every test must pass before release.
+
+---
+
+# Stage 8 — Release
+
+Release the project.
+
+## Before Release
+
+- All tests pass.
+- Documentation describes the current implementation only.
+- The roadmap contains only future work.
+- The changelog records completed work.
+- No placeholders remain.
+- Generated files are reproducible.
+
+## Versioning
+
+Follow the project versioning policy in the changelog template.
+
+## Record
+
+- Set the initial project version.
+- Record the release in the changelog.
+- Update the roadmap if completed phases exist.
+
+---
+
+# After Release
+
+The project is now an implementation of the Blueprint Framework.
+
+Future maintenance follows the framework process:
+
+- Small changes.
+- Documentation synchronized with implementation.
+- Changelog for completed work.
+- Roadmap for future work.
+- Lessons returned to the blueprint when they become reusable.
+
+---
+
+# Checklist
+
+- [ ] Idea fits the builder lifecycle.
+- [ ] Repository created.
+- [ ] Templates copied.
+- [ ] Templates renamed.
+- [ ] All placeholders replaced.
+- [ ] Schemas describe only implemented files.
+- [ ] Builder implemented per specification.
+- [ ] All tests pass.
+- [ ] Documentation consistent.
+- [ ] Release recorded in changelog.
+
+---
+
+**Document Version:** 1.0
+
+**Status:** Active Project Generator

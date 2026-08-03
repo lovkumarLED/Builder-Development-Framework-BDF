@@ -1,14 +1,20 @@
-# OpenCode Configuration Manager
+# README Template
 
-> A modular configuration management system for OpenCode.
+> Template: project entry point. Becomes `README.md`.
+
+---
+
+# {{PROJECT_NAME}}
+
+> A modular configuration management system for {{APP_NAME}}.
 
 ---
 
 ## Overview
 
-The OpenCode Configuration Manager is a modular configuration system designed to simplify the management of OpenCode.
+{{PROJECT_NAME}} is a modular configuration system designed to simplify the management of {{APP_NAME}}.
 
-Instead of manually maintaining a large `opencode.json` file, the project separates configuration into smaller, independent files and automatically generates the final configuration through a builder script.
+Instead of manually maintaining a large configuration file, the project separates configuration into smaller, independent files and automatically generates the final configuration through a builder script.
 
 This approach makes the configuration easier to maintain, easier to extend, and significantly reduces the risk of configuration errors.
 
@@ -17,13 +23,13 @@ This approach makes the configuration easier to maintain, easier to extend, and 
 ## Current Features
 
 - Modular configuration architecture
-- OmniRoute provider integration
+- Provider integration
 - Profile-based configuration
 - Dynamic profile selection
 - Dynamic provider loading
 - Separate model management
 - Separate plugin management
-- Separate MCP management
+- Separate service management
 - Automatic configuration generation
 - Automatic backup creation
 - Structured project documentation
@@ -36,56 +42,28 @@ The project is organized into several independent components.
 
 | Component | Purpose |
 |-----------|---------|
-| `providers/` | Provider definitions |
-| `profiles/` | Profile-specific configuration |
-| `backup/` | Automatic configuration backups |
-| `scripts/` | Builder scripts |
-| `docs/` | Project documentation |
-
----
-
-## Documentation Architecture
-
-The documentation is organized into two layers.
-
-### Layer 1 — Blueprint Framework
-
-Reusable engineering knowledge shared by every builder project.
-
-```
-blueprint/
-```
-
-This layer contains the engineering process, project generation workflow, migration guide, reusable lessons, and documentation templates.
-
-See `blueprint/README.md` for the full overview.
-
-### Layer 2 — Project Documentation
-
-OpenCode-specific documentation.
-
-This layer describes the current implementation only.
+| `{{CONFIG_SOURCE_DIR}}/` | Profile-specific configuration |
+| `{{PROVIDER_DIR}}/` | Provider definitions |
+| `{{BACKUP_DIR}}/` | Automatic configuration backups |
+| `{{SCRIPTS_DIR}}/` | Builder scripts |
+| `{{DOCS_DIR}}/` | Project documentation |
 
 ---
 
 ## Documentation
 
-The project documentation is split into multiple files.
+The documentation is split into multiple files.
 
 | Document | Description |
 |----------|-------------|
-| `AGENT.md` | AI agent entry guide |
 | `ARCHITECTURE.md` | Overall system architecture |
-| `DESIGN_PRINCIPLES.md` | Core engineering principles |
 | `FOLDER_STRUCTURE.md` | Directory and file responsibilities |
 | `JSON_SCHEMAS.md` | Configuration file schemas |
 | `BUILDER_SPEC.md` | Builder implementation specification |
-| `CONTRIBUTING_FOR_AI.md` | AI contribution rules |
 | `TESTING.md` | Testing procedures |
 | `TROUBLESHOOTING.md` | Common issues and fixes |
 | `ROADMAP.md` | Planned future improvements |
 | `CHANGELOG.md` | Project version history |
-| `PROJECT_STATE.md` | Living state snapshot |
 
 ---
 
@@ -93,8 +71,8 @@ The project documentation is split into multiple files.
 
 ### Implemented
 
-- OpenCode configuration management
-- OmniRoute provider
+- Configuration management for {{APP_NAME}}
+- Provider integration
 - Profile-based configuration
 - Dynamic profile selection
 - Dynamic provider loading
@@ -111,6 +89,7 @@ The following features are planned but **are not currently part of the project**
 - Extended CLI features
 
 These planned features are documented only in `ROADMAP.md`.
+
 ---
 
 ## Source of Truth
@@ -132,7 +111,7 @@ Generated files are never edited manually.
 
 Current generated file:
 
-- `opencode.json`
+- `{{GENERATED_ARTIFACT}}`
 
 All changes should always be made to the source files and regenerated using the builder.
 
@@ -161,12 +140,10 @@ Future features are intentionally excluded from the architecture and implementat
 
 Planned work is documented separately in `ROADMAP.md`.
 
-Generic engineering knowledge shared with other builder projects is documented separately in `blueprint/`.
-
 ---
 
-**Version:** 2.0.3
+**Version:** {{CURRENT_VERSION}}
 
-**Document Version:** 1.0
+**Document Version:** {{DOC_VERSION}}
 
 Documentation Status: Current Implementation
