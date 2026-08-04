@@ -88,7 +88,7 @@ Windows 11
 Shell
 
 ```
-PowerShell 7+
+Windows PowerShell 5.1 (or PowerShell 7+)
 ```
 
 Application
@@ -965,37 +965,6 @@ Before considering a build complete:
 ---
 
 # Future Testing Expansion
-
-Automated testing is implemented via the test harness:
-
-```
-scripts/test-opencode-v2.ps1
-```
-
-Current automated coverage (17 tests: 9 builder + 8 Release Docs):
-
-Builder tests:
-
-- Valid profile (real coding profile, no manual editing).
-- Invalid JSON.
-- Missing provider.
-- Duplicate model IDs.
-- Duplicate model names.
-- Duplicate plugins.
-- Malformed provider definition.
-- Provider-specific models.
-- Backup failure safety.
-
-Release Docs tests:
-
-- Registry shape.
-- Release manager output generation.
-- Release manager determinism.
-- CURRENT_RELEASE.md matches the registry.
-- Registry and CHANGELOG consistency (legacy preserved).
-- bdf/VERSION.md compatibility rows.
-- Missing markers abort without writing.
-- Real docs consistency (read-only).
 
 Future versions may extend automated testing with:
 

@@ -111,7 +111,7 @@ Schema (one entry per release, newest first):
       "builderVersion": "V2.1",
       "date": "2026-08-04",
       "status": "Current",
-      "summary": "Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, automated testing.",
+      "summary": "Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing.",
       "highlights": [
         "Provider-specific models",
         "Modular merge pipeline",
@@ -120,7 +120,7 @@ Schema (one entry per release, newest first):
         "Automated test harness"
       ],
       "newFeatures": [
-        "scripts/test-opencode-v2.ps1 - automated test harness (9 tests)",
+        "scripts/test-opencode-v2.ps1 - automated test harness (17 tests: 9 builder + 8 Release Docs)",
         "Provider-specific models: providers/<p>/models.json precedence",
         "-ConfigRoot parameter for isolated test builds",
         "Output verification stage before writing"
@@ -138,7 +138,7 @@ Schema (one entry per release, newest first):
       ],
       "breakingChanges": "None",
       "migrationRequired": "No",
-      "testingSummary": "9/9 tests passed",
+      "testingSummary": "17/17 tests passed, exit code 0",
       "knownIssues": "None",
       "docsUpdated": [
         "BUILDER_SPEC.md",

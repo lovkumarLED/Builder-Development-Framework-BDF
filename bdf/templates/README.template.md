@@ -56,14 +56,20 @@ The documentation is split into multiple files.
 
 | Document | Description |
 |----------|-------------|
+| `AGENT.md` | AI agent entry guide |
 | `ARCHITECTURE.md` | Overall system architecture |
+| `DESIGN_PRINCIPLES.md` | Core engineering principles |
 | `FOLDER_STRUCTURE.md` | Directory and file responsibilities |
 | `JSON_SCHEMAS.md` | Configuration file schemas |
 | `BUILDER_SPEC.md` | Builder implementation specification |
+| `CONTRIBUTING_FOR_AI.md` | AI contribution rules |
 | `TESTING.md` | Testing procedures |
 | `TROUBLESHOOTING.md` | Common issues and fixes |
 | `ROADMAP.md` | Planned future improvements |
 | `CHANGELOG.md` | Project version history |
+| `PROJECT_STATE.md` | Living state snapshot |
+| `ADAPTER.md` | Project-specific facts |
+| `LESSONS_LEARNED.md` | Reusable engineering lessons |
 
 ---
 

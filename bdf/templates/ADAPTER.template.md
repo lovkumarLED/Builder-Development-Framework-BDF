@@ -132,7 +132,7 @@ The script or command that runs the builder.
 The generic framework lives in:
 
 ```
-FRAMEWORK.md
+bdf/FRAMEWORK.md
 ```
 
 When the framework references a project-specific value, this adapter defines it.

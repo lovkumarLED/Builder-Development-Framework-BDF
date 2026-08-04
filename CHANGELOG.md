@@ -84,7 +84,7 @@ Builder V2.1: extended validation, modular merge pipeline, provider-specific mod
 
 ## New Features
 
-- scripts/test-opencode-v2.ps1 - automated test harness (9 tests: valid profile, invalid JSON, missing provider, duplicate model IDs, duplicate model names, duplicate plugins, malformed provider, provider-specific models, backup failure safety)
+- scripts/test-opencode-v2.ps1 - automated test harness (17 tests: 9 builder + 8 Release Docs)
 - Provider-specific models: providers/<provider>/models.json takes precedence over inline provider models and global models.json
 - -ConfigRoot parameter on the builder for isolated test builds
 - Output verification stage (JSON round-trip, providers, models, plugins, MCP) before writing
@@ -123,7 +123,7 @@ No
 
 ## Testing Summary
 
-9/9 tests passed, exit code 0
+17/17 tests passed, exit code 0
 
 ---
 

@@ -38,6 +38,7 @@ Every placeholder must be replaced before a project document is released.
 | `{{APP_NAME}}` | The application that consumes the generated configuration. | OpenCode |
 | `{{GENERATED_ARTIFACT}}` | The final generated configuration file. | opencode.json |
 | `{{BUILDER_SCRIPT}}` | The builder entry script. | build-opencode-v2.ps1 |
+| `{{TEST_HARNESS}}` | The automated test harness script. | test-opencode-v2.ps1 |
 | `{{DEFAULT_PROFILE}}` | The default profile name. | default |
 | `{{CURRENT_PROVIDER}}` | The current provider identifier. | omniroute |
 | `{{CONFIG_SOURCE_DIR}}` | The source configuration directory. | profiles |
@@ -47,9 +48,9 @@ Every placeholder must be replaced before a project document is released.
 | `{{BACKUP_DIR}}` | The backup directory. | backup |
 | `{{SHELL}}` | The scripting language used by the builder. | PowerShell |
 | `{{OS}}` | The supported operating system. | Windows 11 |
-| `{{CURRENT_VERSION}}` | The current project version. | 2.0.0 |
+| `{{CURRENT_VERSION}}` | The current project version. | 2.2.0 |
 | `{{PROJECT_STATUS}}` | The current project status. | Stable Foundation |
-| `{{VERSION_DESCRIPTION}}` | The summary of the current version. | Project state system |
+| `{{VERSION_DESCRIPTION}}` | The summary of the current version. | Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing |
 | `{{PROJECT_ROOT}}` | The root directory of the project. | .config/opencode |
 | `{{CONFIG_FILE}}` | The source configuration files and their format. | profiles/*/settings.json, models.json |
 | `{{SUPPORTED_PROVIDERS}}` | The providers the project supports. | omniroute |
@@ -116,7 +117,7 @@ Customize Schemas
 Review Consistency
 ```
 
-See `PROJECT_GENERATOR.md` for the complete workflow.
+See `../PROJECT_GENERATOR.md` for the complete workflow.
 
 ---
 

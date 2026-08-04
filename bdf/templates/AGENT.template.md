@@ -39,12 +39,113 @@ The generated configuration should never become the source of truth.
 
 ---
 
+# Builder Development Framework
+
+Generic engineering knowledge shared by every builder project lives in:
+
+```
+bdf/
+```
+
+Start with:
+
+```
+bdf/FRAMEWORK.md
+```
+
+The framework describes the reusable engineering process.
+
+The AI workflow is defined in:
+
+```
+bdf/AI_WORKFLOW.md
+```
+
+This documentation describes the {{APP_NAME}}-specific implementation.
+
+The project-specific facts are defined in:
+
+```
+ADAPTER.md
+```
+
+When a concept appears in both, the project document defines the {{APP_NAME}}-specific behavior and the framework defines the generic principle.
+
+---
+
+# Session Continuity
+
+Work spans multiple sessions.
+
+Context windows reset between sessions; the session files preserve memory.
+
+At session start:
+
+- Read `_agent/SESSION_WORKFLOW.md`.
+- Read `_agent/SESSION_LOG.md`.
+- Check the `Next:` line of the most recent entry.
+
+At session end:
+
+- Follow `_agent/SESSION_WORKFLOW.md`.
+- Write the session summary to `_agent/SESSION_LOG.md`.
+- Never delete or overwrite existing entries.
+
+---
+
+# Project State
+
+`PROJECT_STATE.md` is the living snapshot of the repository.
+
+It must always reflect the current repository state.
+
+## Major Refactor Definition
+
+A major refactor is any change that:
+
+- Adds, removes, moves, or renames files or folders.
+- Changes the architecture or documentation structure.
+- Changes how components connect to one another.
+- Introduces or removes an entire system.
+
+Minor documentation fixes and small updates do not count as major refactors.
+
+## Regeneration Rule
+
+After every major refactor:
+
+1. Regenerate `PROJECT_STATE.md` from the current repository state.
+2. Keep the 15-section structure exactly as defined in the template.
+3. Do not ask for confirmation before regenerating.
+4. Confirm the update with: Project state updated.
+5. Never leave `PROJECT_STATE.md` stale.
+
+## Template
+
+The generic template lives in:
+
+```
+bdf/templates/PROJECT_STATE.template.md
+```
+
+When the template changes, the framework version must be updated.
+
+---
+
 # Read Order
 
 Before making any modification, read the documentation in the following order.
 
 ```
 README.md
+
+↓
+
+PROJECT_STATE.md
+
+↓
+
+ADAPTER.md
 
 ↓
 

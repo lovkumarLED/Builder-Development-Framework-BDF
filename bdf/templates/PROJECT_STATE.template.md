@@ -251,6 +251,10 @@ PROJECT_STATE.md
 
 ↓
 
+ADAPTER.md
+
+↓
+
 ARCHITECTURE.md
 
 ↓
@@ -303,6 +307,7 @@ After every major refactor:
 
 | Document | Description |
 |----------|-------------|
+| `README.md` | Project entry point and overview |
 | `AGENT.md` | AI agent entry guide |
 | `ARCHITECTURE.md` | Overall system architecture |
 | `DESIGN_PRINCIPLES.md` | Core engineering principles |
@@ -315,6 +320,7 @@ After every major refactor:
 | `ROADMAP.md` | Planned future improvements |
 | `CHANGELOG.md` | Project version history |
 | `PROJECT_STATE.md` | Living state snapshot |
+| `LESSONS_LEARNED.md` | Reusable engineering lessons |
 | `ADAPTER.md` | Project-specific facts |
 | `_agent/` | Session continuity files |
 | `bdf/` | Reusable Builder Development Framework |

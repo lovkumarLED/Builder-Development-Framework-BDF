@@ -13,6 +13,7 @@ The framework is designed so that future AI agents understand the workflow autom
 An agent that follows this workflow produces complete changes:
 
 - Implementation.
+- Architecture.
 - Documentation.
 - Templates.
 - Tests.
@@ -43,6 +44,10 @@ Read Requested Improvements
 ↓
 
 Determine Impact
+
+↓
+
+Update Architecture
 
 ↓
 
@@ -119,11 +124,18 @@ Perform the impact analysis defined by the Blueprint Engine.
 
 Determine:
 
+- Which architecture documentation changes.
 - Which builder stages change.
 - Which documentation changes.
 - Which templates change.
 - Which tests change.
 - Which version records change.
+
+## Update Architecture
+
+If the change alters how components connect, the architecture documentation changes first.
+
+Architecture changes are documented before implementation.
 
 ## Update Documentation
 

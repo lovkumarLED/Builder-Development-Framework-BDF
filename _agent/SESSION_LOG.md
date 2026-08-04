@@ -10,10 +10,58 @@
 
 ## Session History
 
-### Aug 4, 2026 (session 8) — Built the Release Manager V1 (registry, marker pipeline, 17-test harness, docs) ← recent session
+### Aug 4, 2026 (session 11) — Final full-repo test: 5-agent audit, 28 doc bugs fixed, 17/17 green ← recent session
+Done:
+- Dispatched 5 parallel audit sub-agents covering all 60 files (root docs, bdf/, bdf/templates/, AI/, _agent/, SDD ledger); every finding personally verified against source files before fixing.
+- Baseline + post-fix harness runs: test-opencode-v2.ps1 17/17 PASSED, exit 0 (9 builder + 8 Release Docs); release manager no-op exit 0 ("All outputs already up to date - nothing written").
+- Fixed 28 doc bugs across 18 files: PROJECT_STATE.md AI/ tree completed (3 → 8 files); SESSION_LOG field count 13 → 14; BUILD_RELEASE_MANAGER.md spec example 9/9 → 17/17 + missing "and"; CONTINUE_RELEASE_MANAGER.md tasks 1/4/5 aligned to the amended plan (Task 3 absorbs markers, Tasks 4-5 verify-only); AI_WORKFLOW.md gained the missing Update Architecture stage (vs BLUEPRINT_ENGINE); BUILDER_EVOLUTION.md reordered Builder/Docs + added Template Changes stage (vs its own Rule 2); FRAMEWORK.md/PROJECT_GENERATOR.md/PROJECT_STATE.template.md PROJECT_STATE.md listing gaps; template path fixes (templates/README.md `../PROJECT_GENERATOR.md`, ADAPTER.template.md `bdf/FRAMEWORK.md`); ROADMAP.template.md `{{PROJECT_STATUS}}` + emoji removal; TESTING.md + TESTING.template.md `{{SCRIPTS_DIR}}` + duplicated-coverage dedup; CONTRIBUTING_FOR_AI.md + template read order aligned to AGENT.md; 4 template docs tables completed to the 15-doc set; JSON_SCHEMAS.md model precedence now matches BUILDER_SPEC.md; progress.md Task-10 duplicates removed; TESTING.md PowerShell 5.1 env note.
+- Verified every fix in place (builder agents re-read each edit + main-thread greps); harness re-run 17/17 green after all fixes.
+- Deliberately untouched: PLAN_RELEASE_MANAGER.md + task briefs/reports (historical execution records; ledger documents amendments), bdf/VERSION.md "V2.1" row (USER RULING), ROADMAP.md ✅ markers (consistent within the doc).
+
+Broken:
+- None — clean session.
+
+Next: User reviews session-11 fixes, then commits the docs repo (standing instruction: nothing committed; 28 modified files + untracked AI/DISTRIBUTE_SUBAGENTS.md).
+
+Learned: A final full-repo test with parallel sub-agent audits catches real drift (28 issues) that single-pass review misses — but every agent finding must be personally verified against the source before editing, since some "inconsistencies" are deliberate rulings or historical records.
+
+### Aug 4, 2026 (session 10) — Built the sub-agent distribution system; set 70% context ceiling
+Done:
+- Created the sub-agent distribution workflow: skill `~/.config/opencode/skills/subagent-distribution/SKILL.md` — plan (todowrite) → estimate S/M/L size + time + token cost → distribute to sub-agents → mandatory ≤300-word summaries → integrate from summaries.
+- Created 6 custom sub-agents in `~/.config/opencode/agent/`: reader (read-only summaries), writer (edit per spec), builder (implement + test), terminal (PowerShell/git, destructive ops ask), planner (breakdown/estimates), researcher (web).
+- Created the session prompt `docs/AI/DISTRIBUTE_SUBAGENTS.md` and registered it in opencode.json `instructions` so every session auto-loads the workflow (no pasting needed).
+- Updated `_agent/SESSION_WORKFLOW.md` to v1.2: Context Window Budget section (triggers at 50% delegate / 65% wrap up / 70% hard stop) + session log entry now mandatory for EVERY session.
+- Demonstrated the pattern: dispatched 5 parallel reader sub-agents to read all ~560 KB of docs; only compact summaries entered the main context.
+- Verified: opencode.json still valid JSON; all agent/skill files present with valid frontmatter.
+
+Broken:
+- None — clean session.
+
+Next: User restarts opencode and verifies the system loads (skill + 6 agents + DISTRIBUTE_SUBAGENTS.md instructions); review session 10 changes; standing instruction still open: commit the docs repository (sessions 7-10).
+
+Learned: The docs repo (~560 KB) ≈ 140k tokens ≈ 70% of a 200k window when read directly — delegating reads to sub-agents (each with its own fresh context window) means only ~300-word summaries return, keeping the main window near-empty for actual work.
+
+### Aug 4, 2026 (session 9) — Audited the whole docs repo; fixed stale template drift + stale release facts
+Done:
+- Read every MD file (root docs, bdf/, bdf/templates/, AI/, _agent/, .superpowers/sdd/) and cross-checked docs ↔ templates ↔ release pipeline (release_registry.json → release-manager.ps1 → CHANGELOG.md / CURRENT_RELEASE.md / PROJECT_STATE.md / bdf/VERSION.md).
+- Baseline: test-opencode-v2.ps1 17/17 PASSED, exit 0 (test 17 read-only real-docs consistency green).
+- Fixed stale release facts in release_registry.json (source of truth): testingSummary 9/9 → "17/17 tests passed, exit 0" (verified by an actual 17/17 harness run); harness feature description now "17 tests: 9 builder + 8 Release Docs". Regenerated via release-manager.ps1: CHANGELOG.md + CURRENT_RELEASE.md diffs show only the two intended lines changed (deterministic pipeline confirmed).
+- Fixed BUILDER_SPEC.md Builder Status V2 → V2.1 (registry builderVersion is V2.1; the doc already described V2.1 features incl. Stage 7 Verification).
+- Fixed stale templates (framework-level alignment with reference docs): BUILDER_SPEC.template.md V2 → V2.1; AGENT.template.md read order now includes PROJECT_STATE.md + ADAPTER.md and gained the Builder Development Framework / Session Continuity / Project State sections (mirrors AGENT.md 1.3); CONTRIBUTING_FOR_AI.template.md reading order now 8 docs (added PROJECT_STATE.md + ADAPTER.md); TESTING.template.md no longer says "future automated testing" — mirrors the 17-test harness (Purpose, JSON Validation Tests heading, Release Docs Test Group table, Manual Testing Procedure, Future Testing Expansion); bdf/templates/README.md gained the {{TEST_HARNESS}} placeholder and refreshed stale example values (2.0.0 → 2.2.0). Normalized LF → CRLF in edited files to match the working tree.
+- Non-issues checked and cleared: no unreplaced {{placeholders}} outside bdf/templates/; PROJECT_STATE.md and its template both have exactly 15 numbered sections (AGENT.md "15-section" rule correct); no new bugs found in release-manager.ps1 or the harness.
+- Verified: harness re-run 17/17 PASSED, exit 0; git diff reviewed line-by-line (9 files, only intended changes).
+
+Broken:
+- None — clean session.
+
+Next: Commit the docs repository (sessions 7 + 8 + 9 changes; standing instruction: nothing committed); user review of session 9 fixes; decide whether to record the template alignment as a BDF framework patch (templates README requires "template changes are recorded in the framework version history").
+
+Learned: Templates must mirror the reference implementation ("example values come from the reference implementation") — stale templates are real bugs, not decoration; the release pipeline proved deterministic (regeneration touched only the two registry-derived lines).
+
+### Aug 4, 2026 (session 8) — Built the Release Manager V1 (registry, marker pipeline, 17-test harness, docs) 
 Done:
 - Built `scripts/release-manager.ps1` (outside git): registry → generator → CHANGELOG/CURRENT_RELEASE/PROJECT_STATE/VERSION.md artifacts; all-or-nothing writes; duplicate-key raw-text scan (PS 5.1 ConvertFrom-Json collapses duplicates); marker policy (abort if AUTO-GENERATED markers missing); Verify-Generated before any write; final run exit 0 "All outputs already up to date - nothing written."
-- Created `docs/release_registry.json` (single 2.2.0 entry, 13 fields; the only hand-edited release artifact).
+- Created `docs/release_registry.json` (single 2.2.0 entry, 14 fields; the only hand-edited release artifact).
 - Converted CHANGELOG.md to a marker section: rich 2.2.0 entry generated from registry; legacy entries 2.1.0 → 1.0.0 and the manual Version History table untouched (byte-verified). PROJECT_STATE.md version table marker-wrapped; bdf/VERSION.md rows managed (Supported Builder Versions = V2.1 per user ruling; Last Updated).
 - Added generated `docs/CURRENT_RELEASE.md`; deleted superseded `RELEASE_NOTES_V2.1.md`.
 - Extended the harness to 17 tests (Release Docs group 10-17: registry shape, manager outputs, determinism, CURRENT_RELEASE match, registry↔CHANGELOG consistency with legacy preservation, VERSION rows, missing-marker abort, read-only real-docs consistency). Final run 17/17 PASSED, exit 0.
@@ -47,65 +95,4 @@ Broken:
 Next: Commit the docs repository (session 7 changes); user review of Builder V2.1 release.
 
 Learned: PS 5.1 ConvertFrom-Json silently keeps the last duplicate key — duplicate detection must scan raw text; `.PSObject.Properties.Count` is unreliable (returns odd values) — wrap with `@()`; returning a single-element array from a function unrolls it — use `return ,$array` to keep array shape in JSON output.
-
-### Aug 3, 2026 (session 6) — Re-verified the system + validated PROJECT_STATE against the framework
-Done:
-- Rebuilt the verification harness (145 assertions): builder behavior, failure modes, PROJECT_STATE vs actual system, framework conformance.
-- Harness iteration 1 found 0 system bugs but 4 harness bugs (plugin counted as object map instead of array-of-1, expression parens, version-table regex, example-doc threshold) — all fixed in the harness; final run 145 passed, 0 failed.
-- Regression: default build exit 0; valid JSON; provider omniroute; 58 models (source round-trip); 9 MCP servers; 1 plugin; $schema preserved; deterministic output (hash-identical); reproducible after delete; backup created and equals the prior config.
-- Failure modes all abort cleanly before writing output with clear errors: missing profile, missing/string/empty activeProviders, missing provider file, provider id mismatch, missing id, missing provider section, invalid JSON; minimal profile builds with warnings (provider only), then default restored.
-- Verified PROJECT_STATE.md against the actual system and UPGRADE_BLUEPRINT_FRAMEWORK.md: folder structure, 4 profiles, providers/scripts/schemas, docs tree, bdf/ contents, 15 templates, versions 2.1.0 + framework 2.0.0, version-history tables equal to CHANGELOG, read order identical to AGENT.md, roadmap phases, adapter 9 fields, templates version-independent (0 opencode refs), four framework questions present, framework generic (PROJECT_ADAPTER.md mentions are examples only).
-- No system or doc bugs found; docs repo left untouched (git status unchanged); final state: default config regenerated, no test fixtures left, temp harness removed.
-
-Broken:
-- None — clean session.
-
-Next: Commit the docs repository (session 4 + 5 changes); user review of verification results.
-
-Learned: PowerShell `$HOME` is read-only and not overridable via env vars — isolate builder tests with temp fixtures inside the real structure plus restore, not a fake $HOME; count-based facts can change type (plugin array of 1) — assert source-to-generated round-trip equality instead of type assumptions.
-
-### Aug 3, 2026 (session 5) — Verified the system + fixed doc/consistency bugs
-Done:
-- Regression-tested Builder V2: build-opencode-v2.ps1 -Profile default exit 0; opencode.json valid JSON (provider omniroute, 58 models, 9 mcp servers, 1 plugin); backup created; minimal profile tested (exit 0, expected warnings) then default restored.
-- Built a 4-section verification harness (builder behavior, generated config, PROJECT_STATE vs actual, doc consistency); first run 115 passed/9 failed (2 harness bugs + 7 real bugs); fixed all → final run 124 passed, 0 failed; harness removed.
-- Fixed real bugs: CHANGELOG.md statuses 2.0.3/2.0.2 Current→Previous; PROJECT_STATE.md §6 all 4 profiles, schemas/ in folder structure + table, §11 multiple profiles, §13 roadmap cleanup; FOLDER_STRUCTURE.md schemas/ (structure, section, ownership, rules); ADAPTER.md schemas/ + additional-profiles note; ROADMAP.md Phase 3 "Multiple Profiles" Planned→Completed ✅.
-- Verified actual model count is 58 (source round-trips generated); session 4 log claim of 57 left untouched (history is read-only).
-- Final rebuild confirmed exit 0; nothing committed (user instruction).
-
-Broken:
-- None — clean session.
-
-Next: Commit the docs repository (session 4 + 5 changes: CHANGELOG, PROJECT_STATE, FOLDER_STRUCTURE, ADAPTER, ROADMAP, SESSION_LOG; blueprint/ deleted; ADAPTER.md + bdf/ untracked); user review of verification results.
-
-Learned: Count-based facts in session logs can drift (57 vs 58 models) — verify numbers against source files, not history; dynamic source-vs-generated assertions beat hardcoded counts.
-
-### Aug 3, 2026 (session 4) — Upgraded Blueprint Framework to Builder Development Framework
-Done:
-- Renamed blueprint/ → bdf/; upgraded the framework to the Builder Development Framework (BDF), framework version 2.0.0 (breaking: rename), project version 2.1.0.
-- Created component docs: BLUEPRINT_ENGINE.md (9-stage change pipeline), PROJECT_ADAPTER.md (9 adapter fields + 6 example apps), BUILDER_EVOLUTION.md, FRAMEWORK_LIFECYCLE.md, AI_WORKFLOW.md (master workflow + Workflow A/B), templates/ADAPTER.template.md; created ADAPTER.md (OpenCode adapter, first implementation).
-- Updated FRAMEWORK.md, README.md, VERSION.md, MIGRATION.md (Stage 8 — Define the Project Adapter), PROJECT_GENERATOR.md (Stage 3), LESSONS_LEARNED.md (lessons 11-12), templates README + PROJECT_STATE.template.
-- Updated project docs to 2.1.0: README.md, AGENT.md, FOLDER_STRUCTURE.md, CONTRIBUTING_FOR_AI.md, ROADMAP.md, CHANGELOG.md, PROJECT_STATE.md (regenerated).
-- Built a 16-section verification harness (1087 assertions): first run 5 failures — history records misasserted as stale branding, live example naming, literal placeholder example, placeholder-scan gap; fixed docs + made harness history-aware (e.g. "Blueprint Framework only in 2.0.1 history row") → final run 1083 passed, 0 failed, exit 0; harness removed.
-- Ran Builder V2 regression test: build-opencode-v2.ps1 -Profile default exit 0; opencode.json valid JSON (provider omniroute, 57 models, 9 mcp servers); backup created.
-
-Broken:
-- None — clean session.
-
-Next: Commit the docs repository (8 modified, blueprint/ deleted, ADAPTER.md + bdf/ untracked); user review of the BDF.
-
-Learned: History records in living docs should be asserted as "allowed exactly once", not "absent"; a framework rename is complete only when docs, templates, harness, and history-aware assertions agree.
-
-### Aug 3, 2026 (session 3) — Built the project state system
-Done:
-- Created PROJECT_STATE.md (15-section living snapshot, version 2.0.3) and blueprint/templates/PROJECT_STATE.template.md.
-- Added the regeneration system: Project State rules in AGENT.md (major-refactor definition + regeneration rule) and a session-end checkpoint in _agent/SESSION_WORKFLOW.md.
-- Updated README.md, FOLDER_STRUCTURE.md, ROADMAP.md, CHANGELOG.md (2.0.3), blueprint/VERSION.md (1.1.0), blueprint/templates/README.md (new placeholders).
-- Built a 46-assertion consistency harness; found and fixed 5 real bugs (undocumented placeholders, two malformed table rows, one template placeholder row, one changelog omission); final run 46/46 passed, exit 0; harness removed.
-
-Broken:
-- None — clean session.
-
-Next: Commit the docs repository (5 modified + PROJECT_STATE.md + AI/ + _agent/ + blueprint/ untracked).
-
-Learned: Table-shape and changelog-completeness checks catch bugs content assertions miss; adversarial review beyond the harness still matters.
 

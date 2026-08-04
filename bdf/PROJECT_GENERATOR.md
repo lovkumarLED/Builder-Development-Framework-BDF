@@ -120,6 +120,8 @@ ROADMAP.md
 
 CHANGELOG.md
 
+PROJECT_STATE.md
+
 LESSONS_LEARNED.md
 
 source configuration directories
@@ -223,6 +225,8 @@ TROUBLESHOOTING.template.md →  TROUBLESHOOTING.md
 ROADMAP.template.md         →  ROADMAP.md
 
 CHANGELOG.template.md       →  CHANGELOG.md
+
+PROJECT_STATE.template.md   →  PROJECT_STATE.md
 
 LESSONS_LEARNED.template.md →  LESSONS_LEARNED.md
 ```

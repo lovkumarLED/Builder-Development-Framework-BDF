@@ -47,7 +47,7 @@ No
 Testing
 
 ```
-9/9 tests passed, exit code 0
+17/17 tests passed, exit code 0
 ```
 
 ---

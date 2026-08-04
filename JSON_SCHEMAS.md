@@ -112,7 +112,7 @@ If validation fails, the build process must terminate immediately.
 
 - Model identifiers must be unique.
 - Every model must contain valid configuration.
-- The builder copies this object directly into every active provider.
+- Global models are injected into a provider only when the provider has no models of its own (provider-specific models win over inline models, which win over global models).
 
 ---
 

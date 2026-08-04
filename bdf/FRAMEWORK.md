@@ -226,6 +226,7 @@ A builder project uses a standard set of documents.
 | `TROUBLESHOOTING.md` | How failures are diagnosed. |
 | `ROADMAP.md` | Planned future work only. |
 | `CHANGELOG.md` | Completed work only. |
+| `PROJECT_STATE.md` | Living state snapshot. |
 | `LESSONS_LEARNED.md` | Reusable engineering lessons. |
 | `ADAPTER.md` | Project-specific facts. |
 

@@ -23,7 +23,48 @@ Testing ensures that:
 
 This document describes the current testing process.
 
-Future automated testing will be documented after implementation.
+Automated testing is provided by the test harness:
+
+```
+{{TEST_HARNESS}}
+```
+
+The harness runs the builder against isolated temporary fixtures and verifies both success and failure behavior.
+
+It also runs the release manager against a temp copy of the docs and verifies the generated release documentation.
+
+Current automated coverage (17 tests: 9 builder + 8 Release Docs):
+
+Builder tests:
+
+- Valid profile (real profile, no manual editing).
+- Invalid JSON.
+- Missing provider.
+- Duplicate model IDs.
+- Duplicate model names.
+- Duplicate plugins.
+- Malformed provider definition.
+- Provider-specific models.
+- Backup failure safety (output remains untouched).
+
+Release Docs tests:
+
+- Registry shape (valid versions, one Current, no duplicates).
+- Release manager generates all outputs.
+- Release manager is deterministic.
+- CURRENT_RELEASE.md matches the registry Current entry.
+- Registry and CHANGELOG consistency (legacy entries preserved).
+- bdf/VERSION.md compatibility rows updated.
+- Missing markers abort without writing.
+- Real docs consistency (read-only).
+
+Run it with:
+
+```
+powershell -File {{SCRIPTS_DIR}}/{{TEST_HARNESS}}
+```
+
+The harness exits non-zero when any test fails.
 
 ---
 
@@ -205,7 +246,7 @@ Multiple generated configurations may cause confusion or outdated configurations
 
 ---
 
-# Configuration Validation Tests
+# JSON Validation Tests
 
 ## Test ID
 
@@ -806,7 +847,36 @@ Different outputs indicate a regression or non-deterministic behavior.
 
 ---
 
-# Testing Procedure
+# Release Docs Test Group (Tests 10-17)
+
+The Release Docs group verifies the release pipeline (registry → release manager → generated documentation).
+
+All tests except test 17 run against an isolated temp copy of the docs.
+
+| Test | Name | Asserts |
+|------|------|---------|
+| 10 | Registry shape | Registry exists, one Current entry, valid version format, strictly descending order, no duplicate JSON keys |
+| 11 | Release manager generates all outputs | Exit 0, CURRENT_RELEASE.md created, markers intact, every registry version present in CHANGELOG |
+| 12 | Release manager deterministic | Two runs produce identical CHANGELOG and CURRENT_RELEASE.md |
+| 13 | CURRENT_RELEASE matches registry | Quick reference contains the Current entry's builder version, project version, date, and testing summary |
+| 14 | Registry and CHANGELOG consistent | Every registry entry present in CHANGELOG with its summary; legacy entries preserved; exactly one Current in the generated section |
+| 15 | VERSION.md rows updated | Last Updated row matches the Current release date |
+| 16 | Missing markers abort safely | Removing a marker makes the manager fail with exit non-zero and leaves CHANGELOG untouched |
+| 17 | Real docs consistent (read-only) | Real `release_registry.json`, `CHANGELOG.md`, and `CURRENT_RELEASE.md` are consistent |
+
+Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only — it never writes or modifies the real documentation.
+
+Run the harness with:
+
+```
+powershell -File {{SCRIPTS_DIR}}/{{TEST_HARNESS}}
+```
+
+Expected: 17/17 PASSED, exit 0.
+
+---
+
+# Manual Testing Procedure
 
 Perform the following steps in order.
 
@@ -878,19 +948,15 @@ Before considering a build complete:
 
 ---
 
-# Future Automated Testing
+# Future Testing Expansion
 
-The current project uses manual verification.
+Future versions may extend automated testing with:
 
-Future versions may introduce automated testing for:
-
-- Configuration schema validation.
+- JSON schema validation.
 - Builder unit tests.
 - Integration testing.
 - Configuration comparison.
 - Regression testing.
-
-Automated testing will be documented after implementation.
 
 ---
 

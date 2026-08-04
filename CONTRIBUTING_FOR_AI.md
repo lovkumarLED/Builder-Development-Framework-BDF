@@ -22,10 +22,10 @@ Before making any modification, read the documentation in the following order.
 2. PROJECT_STATE.md
 3. ADAPTER.md
 4. ARCHITECTURE.md
-5. DESIGN_PRINCIPLES.md
-6. FOLDER_STRUCTURE.md
-7. JSON_SCHEMAS.md
-8. BUILDER_SPEC.md
+5. BUILDER_SPEC.md
+6. DESIGN_PRINCIPLES.md
+7. FOLDER_STRUCTURE.md
+8. JSON_SCHEMAS.md
 
 Do not begin implementation before understanding the project architecture.
 

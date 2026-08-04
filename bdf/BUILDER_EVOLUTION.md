@@ -50,11 +50,15 @@ Architecture Changes
 
 ↓
 
-Builder Changes
+Documentation Changes
 
 ↓
 
-Documentation Changes
+Template Changes
+
+↓
+
+Builder Changes
 
 ↓
 
@@ -105,17 +109,23 @@ Changes to how components connect.
 
 Architecture changes are documented before implementation.
 
-## Builder Changes
-
-The implementation changes.
-
-The builder is modified after the architecture and documentation plan exist.
-
 ## Documentation Changes
 
 Every affected project document is updated.
 
 Documentation ships with the implementation in the same change.
+
+## Template Changes
+
+Every affected template is updated.
+
+A template change is a framework change.
+
+## Builder Changes
+
+The implementation changes.
+
+The builder is modified after the architecture and documentation plan exist.
 
 ## Testing Changes
 

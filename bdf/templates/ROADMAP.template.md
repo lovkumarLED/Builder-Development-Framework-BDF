@@ -43,7 +43,7 @@ Current Version
 Current Status
 
 ```
-Stable Foundation
+{{PROJECT_STATUS}}
 ```
 
 The project currently provides:
@@ -63,7 +63,7 @@ The next development phases focus on expanding flexibility while preserving the 
 
 # Development Phases
 
-## Phase 1 — Foundation ✅
+## Phase 1 — Foundation
 
 Status
 
