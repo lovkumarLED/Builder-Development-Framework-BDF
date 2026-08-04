@@ -26,6 +26,11 @@ This approach makes the configuration easier to maintain, easier to extend, and 
 - Separate MCP management
 - Automatic configuration generation
 - Automatic backup creation
+- Extended configuration validation
+- Provider-specific models
+- Output verification
+- Automated test harness
+- Registry-driven release automation
 - Structured project documentation
 
 ---
@@ -48,23 +53,29 @@ The project is organized into several independent components.
 
 The documentation is organized into two layers.
 
-### Layer 1 — Blueprint Framework
+### Layer 1 — Builder Development Framework
 
 Reusable engineering knowledge shared by every builder project.
 
 ```
-blueprint/
+bdf/
 ```
 
-This layer contains the engineering process, project generation workflow, migration guide, reusable lessons, and documentation templates.
+This layer contains the engineering process, the blueprint engine, the project adapter concept, the builder evolution workflow, the framework lifecycle, the AI workflow, the project generation workflow, the migration guide, reusable lessons, and documentation templates.
 
-See `blueprint/README.md` for the full overview.
+See `bdf/README.md` for the full overview.
 
 ### Layer 2 — Project Documentation
 
 OpenCode-specific documentation.
 
 This layer describes the current implementation only.
+
+The project-specific facts are defined in the project adapter:
+
+```
+ADAPTER.md
+```
 
 ---
 
@@ -86,6 +97,7 @@ The project documentation is split into multiple files.
 | `ROADMAP.md` | Planned future improvements |
 | `CHANGELOG.md` | Project version history |
 | `PROJECT_STATE.md` | Living state snapshot |
+| `ADAPTER.md` | Project-specific facts |
 
 ---
 
@@ -130,11 +142,35 @@ These files are intended to be edited manually.
 
 Generated files are never edited manually.
 
-Current generated file:
+Current generated files:
 
 - `opencode.json`
+- `CURRENT_RELEASE.md`
+- The marker sections in `CHANGELOG.md` and `PROJECT_STATE.md`
+- The compatibility rows in `bdf/VERSION.md`
 
-All changes should always be made to the source files and regenerated using the builder.
+All changes should always be made to the source files and regenerated using the builder or the release manager.
+
+---
+
+## Releases
+
+Releases follow a single automated workflow:
+
+1. The AI records the release facts in `docs/release_registry.json`.
+2. The user reviews the release facts.
+3. The release manager generates all release documentation.
+
+```
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/release-manager.ps1
+```
+
+4. Run the test harness (Release Docs group must pass).
+5. Commit.
+
+The registry is the only hand-edited release artifact.
+
+Generated release files are never edited manually.
 
 ---
 
@@ -161,11 +197,11 @@ Future features are intentionally excluded from the architecture and implementat
 
 Planned work is documented separately in `ROADMAP.md`.
 
-Generic engineering knowledge shared with other builder projects is documented separately in `blueprint/`.
+Generic engineering knowledge shared with other builder projects is documented separately in `bdf/`.
 
 ---
 
-**Version:** 2.0.3
+**Version:** 2.2.0
 
 **Document Version:** 1.0
 

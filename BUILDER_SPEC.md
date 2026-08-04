@@ -123,11 +123,12 @@ Load Profile
 
 ↓
 
-Load Provider
+Validate
 
 ↓
 
-Validate
+Merge Configuration
+(settings → providers → models → plugins → mcp)
 
 ↓
 
@@ -135,11 +136,15 @@ Create Backup
 
 ↓
 
-Merge Configuration
+Generate Final Configuration
 
 ↓
 
-Generate opencode.json
+Verify Output
+
+↓
+
+Write opencode.json
 
 ↓
 
@@ -149,6 +154,86 @@ Finish
 Every build follows this order.
 
 No stage may be skipped.
+
+---
+
+# Release Pipeline
+
+Release documentation follows the same automation philosophy as the builder: facts are written once, documentation is generated, and generated artifacts are never edited manually.
+
+The release pipeline has one hand-edited input and one generator.
+
+```
+docs/release_registry.json
+    |
+    v
+scripts/release-manager.ps1
+    |
+    +---> CHANGELOG.md          (generated marker section only)
+    +---> CURRENT_RELEASE.md    (generated quick reference)
+    +---> bdf/VERSION.md        (generated compatibility rows)
+    +---> PROJECT_STATE.md      (generated version history table)
+```
+
+The registry (`docs/release_registry.json`) is the only hand-edited release artifact.
+
+It is the sequence authority for version documentation.
+
+The release manager (`scripts/release-manager.ps1`) generates all release documentation from it.
+
+## Marker Policy
+
+`CHANGELOG.md` and `PROJECT_STATE.md` carry
+
+```
+<!-- AUTO-GENERATED START -->
+
+...
+
+<!-- AUTO-GENERATED END -->
+```
+
+The release manager rewrites only the content between the markers.
+
+Manual prose above and below the markers is never touched.
+
+If the markers are missing, the script aborts rather than guessing.
+
+## Failure Policy
+
+Generation is all-or-nothing.
+
+Validation happens before anything is written.
+
+If any input fails validation, nothing is written and the script exits with failure.
+
+The repository is left exactly as it was before the run.
+
+## Release Workflow
+
+Every release follows the same workflow.
+
+```
+AI updates release_registry.json
+
+    v
+
+User reviews the release facts
+
+    v
+
+Run release-manager.ps1
+
+    v
+
+Generated Docs (CHANGELOG, CURRENT_RELEASE, VERSION, PROJECT_STATE)
+
+    v
+
+Commit
+```
+
+The generated files are never edited manually.
 
 ---
 
@@ -238,9 +323,19 @@ Validation includes
 - JSON syntax is valid.
 - `activeProviders` exists and is an array.
 - `activeProviders` contains at least one provider.
+- `activeProviders` contains no duplicate provider identifiers.
 - Provider files exist.
 - Provider identifier matches the provider filename.
-- The provider section is present.
+- The provider section is present and non-empty.
+- No duplicate provider identifiers across active provider files.
+- No duplicate model identifiers (raw text, not collapsed by parsing).
+- No duplicate model names within a models source.
+- No duplicate plugin identifiers.
+- No duplicate MCP identifiers.
+- Malformed provider definitions are rejected.
+- Malformed profile definitions are rejected.
+- Missing required fields are rejected.
+- Invalid configuration structure is rejected.
 - At least one provider was loaded.
 
 The build must stop immediately when validation fails.
@@ -287,33 +382,67 @@ Configuration generation should never destroy the last known working configurati
 
 The builder combines the source configuration.
 
-Current merge order
+Merge is split into independent stages.
 
 ```
-Provider
+Merge Settings
 
 ↓
 
-Models
+Merge Providers
 
 ↓
 
-Plugins
+Merge Models
 
 ↓
 
-MCP
+Merge Plugins
 
 ↓
 
-Generated Configuration
+Merge MCP
+
+↓
+
+Generate Final Configuration
 ```
 
-Models are injected into every active provider.
+Each stage is implemented as its own function and can be maintained independently.
 
 Plugins and MCP sections are merged only when the corresponding profile file exists.
 
 Each section is merged exactly once.
+
+### Model Precedence
+
+Each provider can own its own models.
+
+When resolving models for a provider, the builder uses the first source that exists:
+
+1. Provider-specific models file
+
+```
+providers/<provider>/models.json
+```
+
+2. Inline models inside the provider definition file
+
+```
+providers/<provider>.json  ->  provider.<provider>.models
+```
+
+3. Global models file
+
+```
+profiles/<profile>/models.json
+```
+
+Provider-specific models win over inline models, which win over global models.
+
+Global models are only injected into a provider when the provider has no models of its own.
+
+This keeps Builder V2 behavior: a provider with an empty `models` object receives the global models.
 
 ### Why
 
@@ -340,6 +469,30 @@ The previous configuration is replaced only after a successful build.
 OpenCode expects a single configuration file.
 
 Generation converts the modular project structure into the format required by OpenCode.
+
+---
+
+# Stage 7 — Verification
+
+Before writing, the builder verifies the generated configuration in memory.
+
+Verification passes:
+
+- JSON validity (round-trip parse succeeds).
+- Providers exist for every active provider.
+- Models are correctly attached to each provider.
+- Plugins are present when configured.
+- MCP configuration is present when configured.
+
+The build fails before writing if any verification step fails.
+
+Partial or invalid output is never written.
+
+### Why
+
+Verification catches generation defects before they can replace a working configuration.
+
+The backup guarantees recovery; verification guarantees the new output is valid.
 
 ---
 

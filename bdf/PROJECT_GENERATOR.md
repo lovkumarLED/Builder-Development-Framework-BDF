@@ -1,6 +1,6 @@
 # Project Generator
 
-> Creating a new builder project using the Blueprint Framework.
+> Creating a new builder project using the Builder Development Framework.
 
 ---
 
@@ -25,7 +25,11 @@ Create Repository
 
 ↓
 
-Copy Blueprint Templates
+Define Project Adapter
+
+↓
+
+Copy Framework Templates
 
 ↓
 
@@ -65,7 +69,7 @@ Define the project before creating anything.
 - What is the generated configuration artifact?
 - Who maintains the source configuration?
 
-## Check the Blueprint
+## Check the Framework
 
 Read:
 
@@ -123,15 +127,48 @@ source configuration directories
 
 ## Rules
 
-- The Blueprint Framework is shared knowledge; projects reference it.
-- Do not copy the blueprint into the repository unless the project needs an independent copy.
+- The Builder Development Framework is shared knowledge; projects reference it.
+- Do not copy the framework into the repository unless the project needs an independent copy.
 - Never commit generated files.
 
 ---
 
-# Stage 3 — Copy Blueprint Templates
+# Stage 3 — Define Project Adapter
 
-Copy every template from the blueprint templates folder into the repository documentation folder.
+Every new builder project begins by defining its adapter.
+
+## Procedure
+
+1. Read `PROJECT_ADAPTER.md`.
+2. Copy `templates/ADAPTER.template.md` into the repository documentation as `ADAPTER.md`.
+3. Define every field.
+4. Replace every placeholder.
+
+## Adapter Fields
+
+| Field | Definition |
+|-------|------------|
+| Project Name | The name of the builder project. |
+| Configuration File | The source configuration files and their format. |
+| Folder Structure | The project folders and their responsibilities. |
+| Supported Providers | The providers the project supports. |
+| Supported Models | The models the project exposes. |
+| Supported Plugins | The plugins the project enables. |
+| Supported MCP | The MCP servers the project configures. |
+| Output Artifact | The final generated configuration file. |
+| Builder Entry Point | The script or command that runs the builder. |
+
+## Rules
+
+- The framework remains generic.
+- The adapter contains all project-specific knowledge.
+- The adapter is complete before templates are customized.
+
+---
+
+# Stage 4 — Copy Framework Templates
+
+Copy every template from the framework templates folder into the repository documentation folder.
 
 ```
 templates/
@@ -152,10 +189,13 @@ Copy:
 - `ROADMAP.template.md`
 - `CHANGELOG.template.md`
 - `LESSONS_LEARNED.template.md`
+- `PROJECT_STATE.template.md`
+
+The `ADAPTER.template.md` is copied in Stage 3.
 
 ---
 
-# Stage 4 — Rename Templates
+# Stage 5 — Rename Templates
 
 Rename every template to its project document name.
 
@@ -189,7 +229,7 @@ LESSONS_LEARNED.template.md →  LESSONS_LEARNED.md
 
 ---
 
-# Stage 5 — Customize Schemas
+# Stage 6 — Customize Schemas
 
 Replace every placeholder with project-specific values.
 
@@ -217,7 +257,7 @@ See the placeholder table in the templates readme.
 
 ---
 
-# Stage 6 — Implement Builder
+# Stage 7 — Implement Builder
 
 Implement the builder following the specification.
 
@@ -253,7 +293,7 @@ The builder MUST NOT:
 
 ---
 
-# Stage 7 — Testing
+# Stage 8 — Testing
 
 Test the project following the testing guide.
 
@@ -276,7 +316,7 @@ Every test must pass before release.
 
 ---
 
-# Stage 8 — Release
+# Stage 9 — Release
 
 Release the project.
 
@@ -303,7 +343,7 @@ Follow the project versioning policy in the changelog template.
 
 # After Release
 
-The project is now an implementation of the Blueprint Framework.
+The project is now an implementation of the Builder Development Framework.
 
 Future maintenance follows the framework process:
 
@@ -311,7 +351,7 @@ Future maintenance follows the framework process:
 - Documentation synchronized with implementation.
 - Changelog for completed work.
 - Roadmap for future work.
-- Lessons returned to the blueprint when they become reusable.
+- Lessons returned to the framework when they become reusable.
 
 ---
 
@@ -319,6 +359,7 @@ Future maintenance follows the framework process:
 
 - [ ] Idea fits the builder lifecycle.
 - [ ] Repository created.
+- [ ] Project adapter defined.
 - [ ] Templates copied.
 - [ ] Templates renamed.
 - [ ] All placeholders replaced.
@@ -330,6 +371,6 @@ Future maintenance follows the framework process:
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Active Project Generator

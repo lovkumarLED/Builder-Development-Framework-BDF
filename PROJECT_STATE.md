@@ -21,9 +21,15 @@ The project separates:
 
 The documentation is organized into two layers.
 
-Layer 1: the Blueprint Framework, reusable engineering knowledge shared by every builder project.
+Layer 1: the Builder Development Framework (BDF), reusable engineering knowledge shared by every builder project.
 
 Layer 2: the OpenCode-specific project documentation.
+
+The project-specific facts are defined in the project adapter:
+
+```
+ADAPTER.md
+```
 
 This document is the living state snapshot of the repository.
 
@@ -36,7 +42,7 @@ It is regenerated after every major refactor.
 Version
 
 ```
-2.0.3
+2.2.0
 ```
 
 Status
@@ -46,14 +52,11 @@ Stable Foundation
 ```
 
 ## Version History
-
+<!-- AUTO-GENERATED START -->
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.0.3 | Current | Project state system |
-| 2.0.2 | Previous | Session continuity system |
-| 2.0.1 | Previous | Blueprint Framework documentation architecture |
-| 2.0.0 | Previous | Builder V2 implementation |
-| 1.0.0 | Legacy | Initial project implementation |
+| 2.2.0 | Current | Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing. |
+<!-- AUTO-GENERATED END -->
 
 ---
 
@@ -73,6 +76,7 @@ opencode/
 ├── docs/
 ├── profiles/
 ├── providers/
+├── schemas/
 ├── scripts/
 └── opencode.json
 ```
@@ -89,27 +93,36 @@ docs/
 │   └── SESSION_WORKFLOW.md
 ├── AI/
 │   ├── BUILD_BLUEPRINT_FRAMEWORK.md
-│   └── START_TASK.md
-├── blueprint/
+│   ├── START_TASK.md
+│   └── UPGRADE_BLUEPRINT_FRAMEWORK.md
+├── bdf/
+│   ├── AI_WORKFLOW.md
+│   ├── BLUEPRINT_ENGINE.md
+│   ├── BUILDER_EVOLUTION.md
 │   ├── FRAMEWORK.md
+│   ├── FRAMEWORK_LIFECYCLE.md
 │   ├── LESSONS_LEARNED.md
 │   ├── MIGRATION.md
+│   ├── PROJECT_ADAPTER.md
 │   ├── PROJECT_GENERATOR.md
 │   ├── README.md
 │   ├── VERSION.md
 │   └── templates/
 │       ├── README.md
 │       └── *.template.md
+├── ADAPTER.md
 ├── AGENT.md
 ├── ARCHITECTURE.md
 ├── BUILDER_SPEC.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING_FOR_AI.md
+├── CURRENT_RELEASE.md
 ├── DESIGN_PRINCIPLES.md
 ├── FOLDER_STRUCTURE.md
 ├── JSON_SCHEMAS.md
 ├── PROJECT_STATE.md
 ├── README.md
+├── release_registry.json
 ├── ROADMAP.md
 ├── TESTING.md
 └── TROUBLESHOOTING.md
@@ -122,11 +135,12 @@ docs/
 | `backup/` | Automatic configuration backups |
 | `profiles/` | Profile-specific configuration |
 | `providers/` | Provider definitions |
+| `schemas/` | Reserved for future JSON Schema validation |
 | `scripts/` | Builder scripts |
 | `docs/` | Project documentation |
 | `docs/_agent/` | Session continuity files |
 | `docs/AI/` | AI task documents |
-| `docs/blueprint/` | Reusable Blueprint Framework |
+| `docs/bdf/` | Reusable Builder Development Framework |
 
 ---
 
@@ -219,14 +233,14 @@ Generated files are never edited manually.
 
 ---
 
-# 5. Blueprint Framework
+# 5. Builder Development Framework
 
 Generic engineering knowledge shared by every builder project.
 
 Lives in:
 
 ```
-blueprint/
+bdf/
 ```
 
 ## Contents
@@ -234,17 +248,28 @@ blueprint/
 | Document | Purpose |
 |----------|---------|
 | `FRAMEWORK.md` | The complete engineering process |
-| `VERSION.md` | Blueprint versioning |
+| `BLUEPRINT_ENGINE.md` | The intelligence layer |
+| `PROJECT_ADAPTER.md` | Making the framework project-specific |
+| `BUILDER_EVOLUTION.md` | Creating future builder versions |
+| `FRAMEWORK_LIFECYCLE.md` | The master lifecycle reference |
+| `AI_WORKFLOW.md` | The AI agent workflow |
+| `VERSION.md` | Framework versioning |
 | `MIGRATION.md` | Adopting the framework in an existing project |
 | `PROJECT_GENERATOR.md` | Creating a new builder project |
 | `LESSONS_LEARNED.md` | Reusable engineering lessons |
 | `templates/` | Reusable documentation templates |
 
-The blueprint contains no project-specific knowledge.
+The framework contains no project-specific knowledge.
 
 Project names appear only as examples.
 
 The OpenCode Configuration Manager is the first project built using the framework.
+
+The project adapter defines the project-specific facts:
+
+```
+ADAPTER.md
+```
 
 ---
 
@@ -262,6 +287,12 @@ The builder selects the profile at invocation time.
 profiles/
 
 default/
+
+coding/
+
+experimental/
+
+minimal/
 ```
 
 The `default` profile is fully configured.
@@ -278,6 +309,8 @@ plugins.json
 mcp.json
 ```
 
+Additional profiles contain only `settings.json` and contribute their provider selection to the build.
+
 ## providers/
 
 Contains provider definitions.
@@ -290,6 +323,14 @@ omniroute.json
 
 The current implementation contains a single provider.
 
+Each provider may optionally own provider-specific models:
+
+```
+providers/<provider>/models.json
+```
+
+These take precedence over inline provider models and the global profile models.
+
 ## scripts/
 
 Contains automation scripts.
@@ -298,7 +339,19 @@ Contains automation scripts.
 build-opencode-v2.ps1
 ```
 
-The current builder.
+The current builder (Builder V2.1, evolved in place from V2.0).
+
+```
+test-opencode-v2.ps1
+```
+
+The automated test harness (17 tests: 9 builder + 8 Release Docs).
+
+```
+release-manager.ps1
+```
+
+The release manager: generates all release documentation from `release_registry.json`.
 
 ```
 build-opencode.ps1
@@ -328,6 +381,12 @@ AI agents are guided by `AGENT.md`.
 
 Every agent reads `AGENT.md` first.
 
+The master framework AI workflow is defined in:
+
+```
+bdf/AI_WORKFLOW.md
+```
+
 ## Read Order
 
 ```
@@ -336,6 +395,10 @@ README.md
 ↓
 
 PROJECT_STATE.md
+
+↓
+
+ADAPTER.md
 
 ↓
 
@@ -385,6 +448,20 @@ After every major refactor:
 - Keep the 15-section structure.
 - Never leave it stale.
 
+## Release Workflow
+
+Releases follow one workflow:
+
+1. The AI records the release facts in `docs/release_registry.json`.
+2. The user reviews the release facts.
+3. Run `release-manager.ps1` — it generates CHANGELOG.md, CURRENT_RELEASE.md, bdf/VERSION.md, and this version history table.
+4. Run the test harness (Release Docs group must pass).
+5. Commit.
+
+Generated release files are never edited manually.
+
+The registry is the sequence authority.
+
 ---
 
 # 8. Documentation Structure
@@ -402,11 +479,13 @@ After every major refactor:
 | `TROUBLESHOOTING.md` | Common issues and fixes |
 | `ROADMAP.md` | Planned future improvements |
 | `CHANGELOG.md` | Project version history |
+| `CURRENT_RELEASE.md` | Quick reference for the current release (generated) |
 | `PROJECT_STATE.md` | Living state snapshot |
+| `ADAPTER.md` | Project-specific facts |
 | `_agent/SESSION_WORKFLOW.md` | Session start, end, and log rules |
 | `_agent/SESSION_LOG.md` | Session history |
 | `AI/` | AI task documents |
-| `blueprint/` | Reusable Blueprint Framework |
+| `bdf/` | Reusable Builder Development Framework |
 
 ---
 
@@ -415,7 +494,7 @@ After every major refactor:
 Reusable documentation templates live in:
 
 ```
-blueprint/templates/
+bdf/templates/
 ```
 
 Templates are generic.
@@ -424,8 +503,10 @@ They contain no project-specific knowledge.
 
 Project-specific values appear only as placeholders.
 
+Placeholders follow the convention defined in:
+
 ```
-{{PLACEHOLDER_NAME}}
+bdf/templates/README.md
 ```
 
 Every template becomes one project document when a new builder project is created.
@@ -446,6 +527,7 @@ Current templates:
 - `CHANGELOG.template.md`
 - `LESSONS_LEARNED.template.md`
 - `PROJECT_STATE.template.md`
+- `ADAPTER.template.md`
 
 ---
 
@@ -475,18 +557,22 @@ Bug fixes and documentation improvements.
 
 Recorded in `CHANGELOG.md`.
 
+The release sequence is defined by `docs/release_registry.json` — the registry is the sequence authority.
+
+All version documentation (CHANGELOG marker section, CURRENT_RELEASE.md, bdf/VERSION.md compatibility rows, this version history table) is generated from the registry by the release manager.
+
 Future plans belong exclusively in `ROADMAP.md`.
 
-## Blueprint Versioning
+## Framework Versioning
 
-The Blueprint Framework is versioned independently.
+The Builder Development Framework is versioned independently.
 
-Recorded in `blueprint/VERSION.md`.
+Recorded in `bdf/VERSION.md`.
 
-Current blueprint version:
+Current framework version:
 
 ```
-1.1.0
+2.0.0
 ```
 
 ---
@@ -498,6 +584,7 @@ Current blueprint version:
 - Modular configuration architecture
 - OmniRoute provider integration
 - Profile-based configuration
+- Multiple profiles (default, coding, experimental, minimal)
 - Dynamic profile selection
 - Dynamic provider loading
 - Separate model management
@@ -506,17 +593,21 @@ Current blueprint version:
 - Automatic configuration generation
 - Automatic backup creation
 - Builder V2
+- Builder V2.1 (extended validation, modular merge pipeline, provider-specific models, output verification)
+- Automated test harness (17 tests: 9 builder + 8 Release Docs)
+- Release Manager V1 (registry-driven release documentation)
 - Documentation framework
-- Blueprint Framework
+- Builder Development Framework
+- Blueprint Engine
+- Project adapter
 - Session continuity system
 - Project state system
 
 ## Not Implemented
 
 - Additional providers
-- Advanced validation
+- JSON Schema validation
 - Extended CLI features
-- Automated testing
 
 Planned features are documented only in `ROADMAP.md`.
 
@@ -528,7 +619,7 @@ Planned features are documented only in `ROADMAP.md`.
 - One provider definition (dynamic loading supported).
 - One generated configuration.
 - One active builder.
-- Manual testing only.
+- JSON Schema validation not implemented (duplicate and structure validation handled by the builder).
 - Documentation expanded only after implementation.
 
 These limitations simplify development and provide a stable foundation for future expansion.
@@ -539,21 +630,15 @@ These limitations simplify development and provide a stable foundation for futur
 
 ## Immediate
 
-- Commit the docs repository (modified files, `blueprint/`, `_agent/`, `AI/`).
+- Commit the docs repository (modified files, `bdf/`, `ADAPTER.md`, `_agent/`, `AI/`).
 
 ## Roadmap Phases
 
-Phase 3 — Multiple Profiles
-
 Phase 4 — Additional Providers
 
-Phase 5 — Validation Framework
-
-Phase 6 — Automated Testing
-
-Phase 7 — Builder Refactoring
-
 Phase 8 — Documentation Expansion
+
+Phases 5, 6, and 7 (Validation Framework, Automated Testing, Builder Refactoring) were completed in Builder V2.1 (version 2.2.0).
 
 All phases are planned only. They are documented exclusively in `ROADMAP.md`.
 
@@ -565,7 +650,8 @@ All phases are planned only. They are documented exclusively in `ROADMAP.md`.
 AGENT.md
 |
 |-- points to the read order documents
-|-- points to blueprint/FRAMEWORK.md
+|-- points to bdf/FRAMEWORK.md
+|-- points to ADAPTER.md
 |-- points to _agent/ session files
 |-- defines the project state rules
 
@@ -574,6 +660,11 @@ README.md
 |-- overview of the project
 |-- documents the two-layer architecture
 |-- links every documentation file
+
+ADAPTER.md
+|
+|-- defines every project-specific fact
+|-- referenced by the framework components
 
 ARCHITECTURE.md
 |
@@ -597,7 +688,7 @@ ROADMAP.md
 |
 |-- records planned work
 
-blueprint/
+bdf/
 |
 |-- generic engineering knowledge
 |-- templates generate project documentation
@@ -620,9 +711,9 @@ PROJECT_STATE.md
 1. Generated configuration is never edited manually.
 2. Source configuration is always the source of truth.
 3. Documentation First: documentation is part of the project.
-4. Documentation is split into two layers: generic blueprint and project-specific docs.
+4. Documentation is split into two layers: generic framework and project-specific docs.
 5. Future features are documented only in `ROADMAP.md`.
-6. The Blueprint Framework is versioned independently from the project.
+6. The Builder Development Framework is versioned independently from the project.
 7. Session continuity files externalize context across sessions.
 8. `PROJECT_STATE.md` is regenerated after every major refactor to keep the repository state current.
 9. A major refactor is any change that adds, removes, moves, or renames files, or changes architecture.
@@ -630,6 +721,6 @@ PROJECT_STATE.md
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Current Project State

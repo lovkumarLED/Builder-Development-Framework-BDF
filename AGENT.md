@@ -33,25 +33,37 @@ The generated configuration should never become the source of truth.
 
 ---
 
-# Blueprint Framework
+# Builder Development Framework
 
 Generic engineering knowledge shared by every builder project lives in:
 
 ```
-blueprint/
+bdf/
 ```
 
 Start with:
 
 ```
-blueprint/FRAMEWORK.md
+bdf/FRAMEWORK.md
 ```
 
-The blueprint describes the reusable engineering process.
+The framework describes the reusable engineering process.
+
+The AI workflow is defined in:
+
+```
+bdf/AI_WORKFLOW.md
+```
 
 This documentation describes the OpenCode-specific implementation.
 
-When a concept appears in both, the project document defines the OpenCode-specific behavior and the blueprint defines the generic principle.
+The project-specific facts are defined in:
+
+```
+ADAPTER.md
+```
+
+When a concept appears in both, the project document defines the OpenCode-specific behavior and the framework defines the generic principle.
 
 ---
 
@@ -107,10 +119,10 @@ After every major refactor:
 The generic template lives in:
 
 ```
-blueprint/templates/PROJECT_STATE.template.md
+bdf/templates/PROJECT_STATE.template.md
 ```
 
-When the template changes, the blueprint version must be updated.
+When the template changes, the framework version must be updated.
 
 ---
 
@@ -124,6 +136,10 @@ README.md
 ↓
 
 PROJECT_STATE.md
+
+↓
+
+ADAPTER.md
 
 ↓
 
@@ -331,6 +347,6 @@ Consistency is more important than speed.
 
 ---
 
-**Document Version:** 1.2
+**Document Version:** 1.3
 
 **Status:** Active AI Entry Guide

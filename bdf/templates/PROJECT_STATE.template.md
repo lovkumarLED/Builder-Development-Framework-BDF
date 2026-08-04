@@ -27,7 +27,7 @@ The project separates:
 
 The documentation is organized into two layers.
 
-Layer 1: the Blueprint Framework, reusable engineering knowledge shared by every builder project.
+Layer 1: the Builder Development Framework, reusable engineering knowledge shared by every builder project.
 
 Layer 2: the {{APP_NAME}}-specific project documentation.
 
@@ -166,14 +166,14 @@ Generated files are never edited manually.
 
 ---
 
-# 5. Blueprint Framework
+# 5. Builder Development Framework
 
 Generic engineering knowledge shared by every builder project.
 
 Lives in:
 
 ```
-blueprint/
+bdf/
 ```
 
 ## Contents
@@ -181,13 +181,18 @@ blueprint/
 | Document | Purpose |
 |----------|---------|
 | `FRAMEWORK.md` | The complete engineering process |
-| `VERSION.md` | Blueprint versioning |
+| `BLUEPRINT_ENGINE.md` | The intelligence layer |
+| `PROJECT_ADAPTER.md` | Making the framework project-specific |
+| `BUILDER_EVOLUTION.md` | Creating future builder versions |
+| `FRAMEWORK_LIFECYCLE.md` | The master lifecycle reference |
+| `AI_WORKFLOW.md` | The AI agent workflow |
+| `VERSION.md` | Framework versioning |
 | `MIGRATION.md` | Adopting the framework in an existing project |
 | `PROJECT_GENERATOR.md` | Creating a new builder project |
 | `LESSONS_LEARNED.md` | Reusable engineering lessons |
 | `templates/` | Reusable documentation templates |
 
-The blueprint contains no project-specific knowledge.
+The framework contains no project-specific knowledge.
 
 Project names appear only as examples.
 
@@ -310,8 +315,9 @@ After every major refactor:
 | `ROADMAP.md` | Planned future improvements |
 | `CHANGELOG.md` | Project version history |
 | `PROJECT_STATE.md` | Living state snapshot |
+| `ADAPTER.md` | Project-specific facts |
 | `_agent/` | Session continuity files |
-| `blueprint/` | Reusable Blueprint Framework |
+| `bdf/` | Reusable Builder Development Framework |
 
 ---
 
@@ -320,7 +326,7 @@ After every major refactor:
 Reusable documentation templates live in:
 
 ```
-blueprint/templates/
+bdf/templates/
 ```
 
 Templates are generic.
@@ -365,11 +371,11 @@ Recorded in `CHANGELOG.md`.
 
 Future plans belong exclusively in `ROADMAP.md`.
 
-## Blueprint Versioning
+## Framework Versioning
 
-The Blueprint Framework is versioned independently.
+The Builder Development Framework is versioned independently.
 
-Recorded in `blueprint/VERSION.md`.
+Recorded in `bdf/VERSION.md`.
 
 ---
 
@@ -422,9 +428,9 @@ All phases are planned only. They are documented exclusively in `ROADMAP.md`.
 1. Generated configuration is never edited manually.
 2. Source configuration is always the source of truth.
 3. Documentation First: documentation is part of the project.
-4. Documentation is split into two layers: generic blueprint and project-specific docs.
+4. Documentation is split into two layers: generic framework and project-specific docs.
 5. Future features are documented only in `ROADMAP.md`.
-6. The Blueprint Framework is versioned independently from the project.
+6. The Builder Development Framework is versioned independently from the project.
 7. Session continuity files externalize context across sessions.
 8. `PROJECT_STATE.md` is regenerated after every major refactor to keep the repository state current.
 9. A major refactor is any change that adds, removes, moves, or renames files, or changes architecture.

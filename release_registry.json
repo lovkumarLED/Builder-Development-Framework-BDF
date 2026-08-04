@@ -1,0 +1,52 @@
+{
+  "releases": [
+    {
+      "version": "2.2.0",
+      "builderVersion": "V2.1",
+      "date": "2026-08-04",
+      "status": "Current",
+      "summary": "Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing.",
+      "highlights": [
+        "Provider-specific models",
+        "Modular merge pipeline",
+        "Extended validation",
+        "Pre-write output verification",
+        "Automated test harness"
+      ],
+      "newFeatures": [
+        "scripts/test-opencode-v2.ps1 - automated test harness (9 tests: valid profile, invalid JSON, missing provider, duplicate model IDs, duplicate model names, duplicate plugins, malformed provider, provider-specific models, backup failure safety)",
+        "Provider-specific models: providers/<provider>/models.json takes precedence over inline provider models and global models.json",
+        "-ConfigRoot parameter on the builder for isolated test builds",
+        "Output verification stage (JSON round-trip, providers, models, plugins, MCP) before writing"
+      ],
+      "improvements": [
+        "Validation extended: duplicate provider/model/plugin/MCP identifiers, duplicate model names, malformed provider and profile definitions, missing required fields, invalid configuration structure",
+        "Duplicate-key detection scans raw JSON text (PowerShell 5.1 ConvertFrom-Json silently drops duplicates)",
+        "Merge logic split into independent stages: settings, providers, models, plugins, MCP, final",
+        "Concise count-based logging (e.g. Provider 'omniroute': 58 model(s))"
+      ],
+      "bugFixes": [
+        "Fixed $Section: here-string parse errors",
+        "Fixed unreliable PSObject.Properties.Count checks (wrapped with @())",
+        "Fixed plugin single-element array unrolling in output (return ,$Plugins.plugin)",
+        "Removed 2 corrupted backups created during intermediate buggy runs"
+      ],
+      "breakingChanges": "None",
+      "migrationRequired": "No",
+      "testingSummary": "9/9 tests passed, exit code 0",
+      "knownIssues": "None",
+      "docsUpdated": [
+        "BUILDER_SPEC.md",
+        "CHANGELOG.md",
+        "PROJECT_STATE.md",
+        "TESTING.md",
+        "ROADMAP.md",
+        "FOLDER_STRUCTURE.md",
+        "ARCHITECTURE.md",
+        "ADAPTER.md",
+        "README.md",
+        "bdf/VERSION.md"
+      ]
+    }
+  ]
+}

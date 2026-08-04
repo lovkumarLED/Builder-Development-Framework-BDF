@@ -80,15 +80,15 @@ Learned: (one key takeaway)
 Example
 
 ```
-### Aug 3, 2026 (session 1) — Built the Blueprint Framework ← recent session
+### Aug 3, 2026 (session 1) — Built the Builder Development Framework ← recent session
 Done:
-- Created the reusable blueprint documentation.
+- Created the reusable framework documentation.
 - Created documentation templates.
 
 Broken:
 - None — clean session.
 
-Next: Review the blueprint with the user.
+Next: Review the framework with the user.
 
 Learned: Externalizing session context into a log preserves work across context resets.
 ```

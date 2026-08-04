@@ -1,0 +1,94 @@
+# Session Continuation - Release Manager V1
+
+> Paste this into the next opencode session to resume work.
+
+---
+
+## CONTINUE PROMPT (paste this into the next session)
+
+```
+Continue executing the Release Manager V1 implementation plan.
+
+Project: C:\Users\loveb\.config\opencode\docs (git repo)
+Plan: docs/AI/PLAN_RELEASE_MANAGER.md
+Spec: docs/AI/BUILD_RELEASE_MANAGER.md
+
+Execution setup (already decided - do not re-ask):
+- Subagent-Driven Development (superpowers:subagent-driven-development skill)
+- NO per-task git commits (user standing instruction) - work in place, user commits at end
+- NO git worktree - work in place
+- SDD ledger: docs/.superpowers/sdd/PLAN_RELEASE_MANAGER/progress.md (track progress there)
+- Task briefs: docs/.superpowers/sdd/PLAN_RELEASE_MANAGER/task-N-brief.md
+- Release manager script goes in C:\Users\loveb\.config\opencode\scripts\release-manager.ps1 (OUTSIDE git)
+- Test harness: C:\Users\loveb\.config\opencode\scripts\test-opencode-v2.ps1
+- Bash SDD helper scripts don't run on Windows - create briefs/review-packages manually with PowerShell
+
+Read in order before starting:
+1. _agent/SESSION_WORKFLOW.md
+2. _agent/SESSION_LOG.md
+3. PROJECT_STATE.md
+4. AI/BUILD_RELEASE_MANAGER.md (the spec)
+5. AI/PLAN_RELEASE_MANAGER.md (the plan)
+
+Tasks to execute in order (10 total, all pending unless ledger says otherwise):
+1. Create docs/release_registry.json (V2.1 entry)
+2. Implement scripts/release-manager.ps1 (marker-based generator, all-or-nothing)
+3. Migrate CHANGELOG.md to marker format (legacy 2.1.0->1.0.0 entries untouched)
+4. Create docs/CURRENT_RELEASE.md
+5. Add markers to PROJECT_STATE.md + bdf/VERSION.md
+6. Delete docs/RELEASE_NOTES_V2.1.md
+7. Add Release Docs tests 10-17 to test-opencode-v2.ps1
+8. Update 12 docs referencing the pipeline
+9. End-to-end release drill (temp copy only)
+10. Session wrap-up (release manager run + harness 17/17 + SESSION_LOG)
+
+Key constraints from spec:
+- release_registry.json = AI-written facts, user reviews before running release-manager
+- Everything else machine-generated, never hand-edited
+- Changelog markers <!-- AUTO-GENERATED START/END --> non-negotiable, abort if missing
+- All-or-nothing failure policy
+- PowerShell 5.1 only; duplicate JSON keys must be scanned on raw text (Get-DuplicateJsonKeys)
+- Deterministic output; UTF8 no BOM (Set-Content -Encoding UTF8 writes BOM - use [System.IO.File]::WriteAllText with UTF8Encoding($false))
+
+Verification commands:
+- Release manager: powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Users\loveb\.config\opencode\scripts\release-manager.ps1"
+- Full harness: powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Users\loveb\.config\opencode\scripts\test-opencode-v2.ps1" (expect 17/17 PASS)
+
+First action: read the SDD ledger, then dispatch Task 1 implementer subagent.
+```
+
+---
+
+## Context (what happened before this session ends)
+
+### Completed this session
+- Brainstormed + user-approved Release Manager V1 design (spec: `AI/BUILD_RELEASE_MANAGER.md`)
+- Wrote implementation plan (`AI/PLAN_RELEASE_MANAGER.md`, 10 tasks, all code blocks complete)
+- Created SDD workspace + ledger at `.superpowers/sdd/PLAN_RELEASE_MANAGER/`
+- Created `task-1-brief.md` (Task 1 brief extracted)
+- No implementation executed yet - Task 1 was about to be dispatched when session ended
+
+### User decisions locked in
+1. New release script approach (not harness-only)
+2. `docs/release_registry.json` as facts file
+3. Single rich CHANGELOG (RELEASE_NOTES_V2.1.md to be deleted in Task 6)
+4. Registry in docs/ (git repo), script in scripts/ (outside git)
+5. Workflow: Finish Builder -> Run Tests -> AI updates registry -> User reviews -> release-manager -> Generated docs -> Commit
+6. No per-task commits, work in place, no worktree
+
+### Spec additions from user feedback (all in BUILD_RELEASE_MANAGER.md)
+- Design Philosophy section
+- Failure Policy section (all-or-nothing)
+- Registry ownership: AI-generated -> user reviewed -> committed
+- Release Workflow diagram
+- Rich format starts at V2.1; V1.0/V2.0 history untouched
+
+### Files that exist
+- `docs/AI/BUILD_RELEASE_MANAGER.md` - the spec
+- `docs/AI/PLAN_RELEASE_MANAGER.md` - the implementation plan
+- `docs/RELEASE_NOTES_V2.1.md` - will be DELETED in Task 6
+- `scripts/build-opencode-v2.ps1`, `scripts/test-opencode-v2.ps1` - existing (outside git)
+- `docs/.superpowers/sdd/PLAN_RELEASE_MANAGER/` - SDD workspace (git-ignored)
+
+### Uncommitted repo state
+The docs repo has many uncommitted changes from sessions 4-7 (blueprint/ deleted, bdf/ added, etc.) - user handles commits.

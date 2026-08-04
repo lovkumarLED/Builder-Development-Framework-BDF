@@ -1,0 +1,171 @@
+# Builder Development Framework
+
+> The reusable engineering platform for building configuration builders.
+
+---
+
+# Purpose
+
+The Builder Development Framework (BDF) is a collection of reusable engineering knowledge for designing, building, documenting, evolving, and maintaining configuration builders.
+
+A configuration builder is a small automation system that:
+
+- Reads configuration from modular source files.
+- Validates the configuration.
+- Creates backups.
+- Merges the configuration.
+- Generates a single final configuration artifact consumed by an application.
+
+The framework does not contain implementation code.
+
+It contains the process, the principles, the documentation architecture, the templates, and the intelligence layer that make builder projects predictable and maintainable — for humans and for AI coding agents.
+
+---
+
+# Framework Architecture
+
+```
+Builder Development Framework (BDF)
+
+│
+
+├── Blueprint Engine
+├── Project Adapter
+├── Builder Evolution
+├── Framework Lifecycle
+├── Templates
+├── AI Workflow
+├── Lessons Learned
+└── Version System
+
+        │
+
+        ├── OpenCode Builder
+        ├── Claude Builder
+        ├── Kilo Builder
+        └── Future Builders
+```
+
+The framework is generic.
+
+Each builder project below it is created by combining the framework with a project adapter.
+
+---
+
+# Components
+
+| Component | Document | Purpose |
+|-----------|----------|---------|
+| Blueprint Engine | `BLUEPRINT_ENGINE.md` | The intelligence layer: determines what must change and in what order. |
+| Project Adapter | `PROJECT_ADAPTER.md` | Makes the generic framework project-specific. |
+| Builder Evolution | `BUILDER_EVOLUTION.md` | Creates future builder versions predictably. |
+| Framework Lifecycle | `FRAMEWORK_LIFECYCLE.md` | The master lifecycle reference for every project. |
+| Templates | `templates/` | Reusable documentation templates for new projects. |
+| AI Workflow | `AI_WORKFLOW.md` | The workflow every AI coding agent follows. |
+| Lessons Learned | `LESSONS_LEARNED.md` | Reusable engineering principles. |
+| Version System | `VERSION.md` | Framework versioning and compatibility. |
+
+Supporting documents:
+
+| Document | Purpose |
+|----------|---------|
+| `FRAMEWORK.md` | The complete engineering process. |
+| `MIGRATION.md` | Adopting the framework in an existing project. |
+| `PROJECT_GENERATOR.md` | Creating a new builder project. |
+| `README.md` | This document: framework entry point. |
+
+---
+
+# Two Layers
+
+The framework separates all knowledge into two layers.
+
+## Layer 1 — Builder Development Framework
+
+Reusable engineering knowledge.
+
+This folder.
+
+## Layer 2 — Project Documentation
+
+Project-specific implementation.
+
+Example: the OpenCode Configuration Manager documentation, which lives in this same documentation repository.
+
+The OpenCode Configuration Manager is the first implementation built using this framework.
+
+---
+
+# The Four Questions
+
+The framework is complete when its documentation answers four questions.
+
+## Question 1
+
+How is this builder built?
+
+## Question 2
+
+How should this builder evolve?
+
+## Question 3
+
+How do I create another builder?
+
+## Question 4
+
+How do I adapt this framework to another project?
+
+Every framework component contributes to at least one answer.
+
+---
+
+# How To Use
+
+Understand the framework:
+
+```
+Read FRAMEWORK.md
+```
+
+New project:
+
+```
+Read PROJECT_GENERATOR.md
+```
+
+Existing project:
+
+```
+Read MIGRATION.md
+```
+
+Evolve a builder:
+
+```
+Read BUILDER_EVOLUTION.md
+```
+
+Change a feature:
+
+```
+Read BLUEPRINT_ENGINE.md
+```
+
+---
+
+# Rules
+
+The framework contains no project-specific knowledge.
+
+Project names appear only as examples.
+
+Project-specific facts live in each project's adapter.
+
+Templates are changed only through the framework change process, never to satisfy a single project.
+
+---
+
+**Document Version:** 1.1
+
+**Status:** Active Builder Development Framework

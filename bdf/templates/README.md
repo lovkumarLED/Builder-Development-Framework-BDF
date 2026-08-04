@@ -1,4 +1,4 @@
-# Blueprint Templates
+# Framework Templates
 
 > Reusable documentation templates for builder projects.
 
@@ -51,6 +51,11 @@ Every placeholder must be replaced before a project document is released.
 | `{{PROJECT_STATUS}}` | The current project status. | Stable Foundation |
 | `{{VERSION_DESCRIPTION}}` | The summary of the current version. | Project state system |
 | `{{PROJECT_ROOT}}` | The root directory of the project. | .config/opencode |
+| `{{CONFIG_FILE}}` | The source configuration files and their format. | profiles/*/settings.json, models.json |
+| `{{SUPPORTED_PROVIDERS}}` | The providers the project supports. | omniroute |
+| `{{SUPPORTED_MODELS}}` | The models the project exposes. | gemini-3.6-flash, ... |
+| `{{SUPPORTED_PLUGINS}}` | The plugins the project enables. | superpowers |
+| `{{SUPPORTED_MCP}}` | The MCP servers the project configures. | github, filesystem |
 | `{{FOLDER_TREE}}` | The current folder tree of the project. | (tree diagram) |
 | `{{FOLDER_PURPOSE_TABLE}}` | The purpose of each project folder. | profiles/ (Profile configuration) |
 | `{{IMPLEMENTED_FEATURES}}` | The list of implemented features. | Modular configuration |
@@ -85,6 +90,7 @@ New projects replace them with their own values.
 | `CHANGELOG.template.md` | CHANGELOG.md |
 | `LESSONS_LEARNED.template.md` | LESSONS_LEARNED.md |
 | `PROJECT_STATE.template.md` | PROJECT_STATE.md |
+| `ADAPTER.template.md` | ADAPTER.md |
 
 ---
 
@@ -117,8 +123,8 @@ See `PROJECT_GENERATOR.md` for the complete workflow.
 # Template Rules
 
 - Never edit a template to fix a single project.
-- Template improvements are blueprint changes.
-- Template changes are recorded in the blueprint version history.
+- Template improvements are framework changes.
+- Template changes are recorded in the framework version history.
 - Placeholders never describe project history.
 - Every template is project-neutral.
 
@@ -136,6 +142,6 @@ This keeps every project documentation set consistent with the framework.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Active Template Guide

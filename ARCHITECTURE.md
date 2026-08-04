@@ -112,6 +112,24 @@ The following diagram illustrates the overall system structure.
                          ▼
 
                       OpenCode
+
+        +--------------------------------------------+
+        |                                            |
+        |  docs/release_registry.json                |
+        |  (hand-edited release facts)               |
+        |                                            |
+        +--------------------------------------------+
+
+                         │
+                         ▼
+
+                  release-manager.ps1
+
+                         │
+                         ▼
+
+        CHANGELOG.md · CURRENT_RELEASE.md
+        bdf/VERSION.md · PROJECT_STATE.md
 ```
 
 ---
@@ -157,8 +175,10 @@ Responsibilities:
 
 - Load profile configuration.
 - Load provider definitions.
-- Validate configuration.
+- Validate configuration (structure, duplicates, malformed definitions).
+- Merge configuration in stages (settings, providers, models, plugins, MCP).
 - Create backups.
+- Verify the generated configuration before writing.
 - Generate `opencode.json`.
 
 The builder never modifies the source configuration files.
@@ -263,6 +283,55 @@ opencode.json
 
 OpenCode
 ```
+
+---
+
+# Release Pipeline
+
+Release documentation is generated, not hand-written.
+
+The release pipeline mirrors the build pipeline: one source of facts, one generator, generated artifacts.
+
+```
+docs/release_registry.json
+
+↓
+
+release-manager.ps1
+
+↓
+
+CHANGELOG.md (marker section)
+
+CURRENT_RELEASE.md
+
+bdf/VERSION.md (compatibility rows)
+
+PROJECT_STATE.md (version history table)
+```
+
+## Data Flow
+
+- Release facts are recorded once in `docs/release_registry.json`.
+- The release manager validates the registry (unique versions, one Current, required fields).
+- The manager rewrites only the marker sections and generated rows.
+- Manual prose is preserved verbatim.
+- Generation is all-or-nothing: if validation fails, nothing is written.
+
+## Ownership Rules
+
+| File | Owner |
+|------|-------|
+| `release_registry.json` | AI (edits release facts) + user (reviews before generation) |
+| CHANGELOG marker section | Release Manager |
+| `CURRENT_RELEASE.md` | Release Manager |
+| `bdf/VERSION.md` compatibility rows | Release Manager |
+| PROJECT_STATE version history table | Release Manager |
+| Manual prose in release docs | Developer |
+
+Generated release artifacts are never edited manually.
+
+The registry is the sequence authority for version documentation.
 
 ---
 

@@ -48,11 +48,178 @@ Example
 
 ---
 
-# Version 2.0.3
+<!-- AUTO-GENERATED START -->
+
+# Version 2.2.0
 
 ## Status
 
 Current
+
+---
+
+## Date
+
+```
+2026-08-04
+```
+
+---
+
+## Summary
+
+Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing.
+
+---
+
+## Highlights
+
+- Provider-specific models
+- Modular merge pipeline
+- Extended validation
+- Pre-write output verification
+- Automated test harness
+
+---
+
+## New Features
+
+- scripts/test-opencode-v2.ps1 - automated test harness (9 tests: valid profile, invalid JSON, missing provider, duplicate model IDs, duplicate model names, duplicate plugins, malformed provider, provider-specific models, backup failure safety)
+- Provider-specific models: providers/<provider>/models.json takes precedence over inline provider models and global models.json
+- -ConfigRoot parameter on the builder for isolated test builds
+- Output verification stage (JSON round-trip, providers, models, plugins, MCP) before writing
+
+---
+
+## Improvements
+
+- Validation extended: duplicate provider/model/plugin/MCP identifiers, duplicate model names, malformed provider and profile definitions, missing required fields, invalid configuration structure
+- Duplicate-key detection scans raw JSON text (PowerShell 5.1 ConvertFrom-Json silently drops duplicates)
+- Merge logic split into independent stages: settings, providers, models, plugins, MCP, final
+- Concise count-based logging (e.g. Provider 'omniroute': 58 model(s))
+
+---
+
+## Bug Fixes
+
+- Fixed $Section: here-string parse errors
+- Fixed unreliable PSObject.Properties.Count checks (wrapped with @())
+- Fixed plugin single-element array unrolling in output (return ,$Plugins.plugin)
+- Removed 2 corrupted backups created during intermediate buggy runs
+
+---
+
+## Breaking Changes
+
+None
+
+---
+
+## Migration Required
+
+No
+
+---
+
+## Testing Summary
+
+9/9 tests passed, exit code 0
+
+---
+
+## Known Issues
+
+None
+
+---
+
+## Documentation
+
+Updated
+
+- BUILDER_SPEC.md
+- CHANGELOG.md
+- PROJECT_STATE.md
+- TESTING.md
+- ROADMAP.md
+- FOLDER_STRUCTURE.md
+- ARCHITECTURE.md
+- ADAPTER.md
+- README.md
+- bdf/VERSION.md
+<!-- AUTO-GENERATED END -->
+
+# Version 2.1.0
+
+## Status
+
+Previous
+
+## Date
+
+```
+2026-08-03
+```
+
+## Summary
+
+Documentation architecture: adopted the Builder Development Framework (BDF) upgrade.
+
+---
+
+## Added
+
+- `bdf/BLUEPRINT_ENGINE.md` — the intelligence layer and change pipeline.
+- `bdf/PROJECT_ADAPTER.md` — the project adapter concept.
+- `bdf/BUILDER_EVOLUTION.md` — predictable builder evolution workflow.
+- `bdf/FRAMEWORK_LIFECYCLE.md` — master lifecycle reference.
+- `bdf/AI_WORKFLOW.md` — the master AI agent workflow.
+- `bdf/templates/ADAPTER.template.md` — project adapter template.
+- `ADAPTER.md` — the OpenCode project adapter (first implementation).
+
+---
+
+## Changed
+
+- Framework renamed from Blueprint Framework to Builder Development Framework (BDF).
+- Framework folder renamed from `blueprint/` to `bdf/`.
+- `AGENT.md` read order now includes `ADAPTER.md`.
+- `README.md`, `AGENT.md`, and `FOLDER_STRUCTURE.md` updated to reference `bdf/`.
+- Framework version bumped to 2.0.0 (breaking change, migration in `bdf/MIGRATION.md`).
+
+---
+
+## Documentation
+
+Updated
+
+- README.md
+- AGENT.md
+- FOLDER_STRUCTURE.md
+- CHANGELOG.md
+- PROJECT_STATE.md
+- bdf/README.md
+- bdf/FRAMEWORK.md
+- bdf/VERSION.md
+- bdf/MIGRATION.md
+- bdf/PROJECT_GENERATOR.md
+- bdf/LESSONS_LEARNED.md
+- bdf/templates/README.md
+- bdf/templates/PROJECT_STATE.template.md
+
+---
+
+## Breaking Changes
+
+None
+
+---
+
+# Version 2.0.3
+
+## Status
+
+Previous
 
 ## Date
 
@@ -108,7 +275,7 @@ None
 
 ## Status
 
-Current
+Previous
 
 ## Date
 
@@ -357,7 +524,9 @@ ROADMAP.md
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.0.3 | Current | Project state system |
+| 2.2.0 | Current | Builder V2.1 (validation, merge pipeline, provider-specific models, verification, automated tests) |
+| 2.1.0 | Previous | Builder Development Framework adoption |
+| 2.0.3 | Previous | Project state system |
 | 2.0.2 | Previous | Session continuity system |
 | 2.0.1 | Previous | Blueprint Framework documentation architecture |
 | 2.0.0 | Previous | Builder V2 implementation |

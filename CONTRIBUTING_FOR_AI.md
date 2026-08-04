@@ -19,11 +19,13 @@ This document supplements the project documentation and should be read before ma
 Before making any modification, read the documentation in the following order.
 
 1. README.md
-2. ARCHITECTURE.md
-3. DESIGN_PRINCIPLES.md
-4. FOLDER_STRUCTURE.md
-5. JSON_SCHEMAS.md
-6. BUILDER_SPEC.md
+2. PROJECT_STATE.md
+3. ADAPTER.md
+4. ARCHITECTURE.md
+5. DESIGN_PRINCIPLES.md
+6. FOLDER_STRUCTURE.md
+7. JSON_SCHEMAS.md
+8. BUILDER_SPEC.md
 
 Do not begin implementation before understanding the project architecture.
 

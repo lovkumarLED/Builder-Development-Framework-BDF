@@ -1,6 +1,8 @@
-# Blueprint Framework
+# Builder Development Framework
 
 > The complete engineering process for building configuration builders.
+
+> Part of the Builder Development Framework (BDF).
 
 ---
 
@@ -37,7 +39,7 @@ It can be reused by any builder project, including future builders for any appli
 
 All knowledge in a builder project belongs to exactly one layer.
 
-## Layer 1 — Blueprint Framework
+## Layer 1 — Builder Development Framework
 
 Generic engineering knowledge.
 
@@ -69,11 +71,54 @@ Examples:
 
 ## Layer Rule
 
-Generic knowledge lives in the blueprint.
+Generic knowledge lives in the framework.
 
 Project knowledge lives in the project.
 
-If a project document duplicates blueprint knowledge, the blueprint remains the authority for the generic part.
+If a project document duplicates framework knowledge, the framework remains the authority for the generic part.
+
+---
+
+# Framework Components
+
+The framework is organized into eight components.
+
+| Component | Document | Purpose |
+|-----------|----------|---------|
+| Blueprint Engine | `BLUEPRINT_ENGINE.md` | The intelligence layer: determines what must change and in what order. |
+| Project Adapter | `PROJECT_ADAPTER.md` | Makes the generic framework project-specific. |
+| Builder Evolution | `BUILDER_EVOLUTION.md` | Creates future builder versions predictably. |
+| Framework Lifecycle | `FRAMEWORK_LIFECYCLE.md` | The master lifecycle reference for every project. |
+| Templates | `templates/` | Reusable documentation templates for new projects. |
+| AI Workflow | `AI_WORKFLOW.md` | The workflow every AI coding agent follows. |
+| Lessons Learned | `LESSONS_LEARNED.md` | Reusable engineering principles. |
+| Version System | `VERSION.md` | Framework versioning and compatibility. |
+
+Every component answers part of the four framework questions.
+
+---
+
+# The Four Questions
+
+The framework is complete when its documentation answers four questions.
+
+## Question 1 — How Is This Builder Built?
+
+Answered by this document, the templates, and the project specification.
+
+## Question 2 — How Should This Builder Evolve?
+
+Answered by `BUILDER_EVOLUTION.md`.
+
+## Question 3 — How Do I Create Another Builder?
+
+Answered by `PROJECT_GENERATOR.md` and `PROJECT_ADAPTER.md`.
+
+## Question 4 — How Do I Adapt This Framework to Another Project?
+
+Answered by `PROJECT_ADAPTER.md`.
+
+If these four questions are answered by the documentation, the framework is considered complete.
 
 ---
 
@@ -182,6 +227,7 @@ A builder project uses a standard set of documents.
 | `ROADMAP.md` | Planned future work only. |
 | `CHANGELOG.md` | Completed work only. |
 | `LESSONS_LEARNED.md` | Reusable engineering lessons. |
+| `ADAPTER.md` | Project-specific facts. |
 
 ## Documentation Rules
 
@@ -198,6 +244,12 @@ A builder project uses a standard set of documents.
 # AI Workflow
 
 The process is designed to work with any AI coding assistant.
+
+The master AI workflow is defined in:
+
+```
+AI_WORKFLOW.md
+```
 
 ## Before Any Change
 
@@ -242,7 +294,7 @@ Consistency is more important than speed.
 
 Versioning exists on two independent tracks.
 
-## Blueprint Versioning
+## Framework Versioning
 
 Tracks the evolution of this framework.
 
@@ -254,7 +306,7 @@ Tracks the evolution of a specific builder project.
 
 Recorded in the project changelog.
 
-Blueprint evolution is tracked independently from builder evolution.
+Framework evolution is tracked independently from builder evolution.
 
 ---
 
@@ -305,9 +357,9 @@ The guide explains how an existing project adopts the framework without losing d
 
 ---
 
-# Maintaining the Blueprint
+# Maintaining the Framework
 
-The blueprint itself evolves over time.
+The framework itself evolves over time.
 
 ## When To Change
 
@@ -318,11 +370,11 @@ The blueprint itself evolves over time.
 
 ## How To Change
 
-1. Update the relevant blueprint document or template.
+1. Update the relevant framework document or template.
 2. Update `VERSION.md`.
-3. Record the change in the blueprint change history.
+3. Record the change in the framework change history.
 4. Update `MIGRATION.md` if existing projects are affected.
-5. Keep the blueprint free of project-specific knowledge.
+5. Keep the framework free of project-specific knowledge.
 
 ## Breaking Changes
 
@@ -338,12 +390,12 @@ The first implementation built using this framework is the OpenCode Configuratio
 
 Its documentation set demonstrates how the framework is applied to a real project.
 
-The OpenCode Builder V2 is the first builder built using the Blueprint Framework.
+The OpenCode Builder V2 is the first builder built using the Builder Development Framework.
 
 Future builders may use the same framework without rewriting it.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
-**Status:** Active Blueprint Framework
+**Status:** Active Builder Development Framework

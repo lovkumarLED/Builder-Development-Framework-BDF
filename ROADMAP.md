@@ -31,7 +31,7 @@ This roadmap is intended to guide future development while keeping the overall p
 Current Version
 
 ```
-2.0.3
+2.2.0
 ```
 
 Current Status
@@ -45,10 +45,11 @@ The project currently provides:
 - Modular configuration
 - Provider abstraction
 - Profile abstraction
-- Configuration builder (V2)
+- Configuration builder (V2.1)
 - Dynamic profile selection
 - Dynamic provider loading
 - Backup system
+- Automated release pipeline (registry + release manager)
 - Documentation framework
 
 The next development phases focus on expanding flexibility while preserving the existing architecture.
@@ -102,38 +103,19 @@ BUILDER_SPEC.md
 
 ---
 
-## Phase 3 — Multiple Profiles
+## Phase 3 — Multiple Profiles ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
-Objectives
+Completed work includes:
 
-Support multiple configuration profiles.
-
-Example
-
-```
-profiles/
-
-default/
-
-minimal/
-
-coding/
-
-testing/
-```
-
-Possible Benefits
-
-- Separate development environments.
-- Faster startup configurations.
-- Experimental configurations.
-- Task-specific profiles.
+- Multiple profiles: `default`, `coding`, `experimental`, `minimal`.
+- The `default` profile is fully configured.
+- Additional profiles contribute their provider selection to the build.
 
 ---
 
@@ -174,20 +156,25 @@ Goals
 Status
 
 ```
-Planned
+Completed
 ```
 
-Objectives
+Completed work includes:
 
-Introduce stronger configuration validation.
+- Duplicate provider identifier detection.
+- Duplicate model identifier detection (raw text, not collapsed by parsing).
+- Duplicate model name detection.
+- Duplicate plugin identifier detection.
+- Duplicate MCP identifier detection.
+- Malformed provider definition rejection.
+- Malformed profile definition rejection.
+- Missing required field rejection.
+- Invalid configuration structure rejection.
 
-Possible additions
+Remaining (possible additions)
 
-- Required key validation.
 - Unknown key detection.
-- Duplicate model detection.
-- Duplicate provider detection.
-- Schema validation.
+- JSON Schema validation.
 
 Goal
 
@@ -200,20 +187,21 @@ Catch configuration errors before generation begins.
 Status
 
 ```
-Planned
+Completed
 ```
 
-Objectives
+Completed work includes:
 
-Introduce automated verification.
+- Reusable test harness (`scripts/test-opencode-v2.ps1`).
+- Valid profile testing against the real coding profile.
+- Failure-mode testing (invalid JSON, missing provider, duplicates, malformed definitions).
+- Backup failure safety testing.
+- Provider-specific models testing.
 
-Possible additions
+Remaining (possible additions)
 
-- Builder unit tests.
-- JSON validation tests.
-- Regression testing.
-- Integration testing.
-- Configuration comparison.
+- Configuration comparison across builds.
+- Integration testing with a running provider.
 
 Goal
 
@@ -226,19 +214,19 @@ Reduce manual testing effort.
 Status
 
 ```
-Planned
+Completed
 ```
 
-Objectives
+Completed work includes:
 
-Improve maintainability.
+- Modular merge pipeline (settings, providers, models, plugins, MCP).
+- Split verification stages (JSON, providers, models, plugins, MCP).
+- Concise count-based logging.
+- Clearer diagnostics.
+- Independent, maintainable functions.
 
-Possible improvements
+Remaining (possible additions)
 
-- Smaller internal functions.
-- Better logging.
-- Improved diagnostics.
-- Cleaner merge pipeline.
 - Easier future extension.
 
 Goal
@@ -261,11 +249,43 @@ Possible additions
 - Provider Development Guide.
 - Profile Creation Guide.
 - Builder Extension Guide.
-- Release Process.
 
 Goal
 
 Make onboarding easier for future contributors.
+
+---
+
+## Phase 9 — Release Manager V1 ✅
+
+Status
+
+```
+Completed
+```
+
+Completed on
+
+```
+2026-08-04
+```
+
+Completed work includes:
+
+- `docs/release_registry.json` — machine-readable release history (the only hand-edited release artifact).
+- `scripts/release-manager.ps1` — generates all release documentation from the registry.
+- Rich CHANGELOG marker section, `CURRENT_RELEASE.md`, `bdf/VERSION.md` compatibility rows, and the PROJECT_STATE version history table.
+- Marker policy: the manager rewrites only generated sections; manual prose is preserved.
+- All-or-nothing failure policy: nothing is written when validation fails.
+- Release Docs test group (tests 10-17) added to the test harness; test 17 is the only read-only real-docs test.
+
+Remaining (possible additions)
+
+- Release channels and support status in the registry.
+
+Goal
+
+Make every version release one command instead of a manual 10-file edit.
 
 ---
 

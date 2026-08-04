@@ -15,9 +15,50 @@ Testing ensures that:
 - Generated configuration is valid.
 - Existing functionality has not been broken by recent changes.
 
-This document describes the current manual testing process.
+This document describes the manual testing process.
 
-Future automated testing will be documented after implementation.
+Automated testing is provided by the test harness:
+
+```
+scripts/test-opencode-v2.ps1
+```
+
+The harness runs the builder against isolated temporary fixtures and verifies both success and failure behavior.
+
+It also runs the release manager against a temp copy of the docs and verifies the generated release documentation.
+
+Current automated coverage (17 tests: 9 builder + 8 Release Docs):
+
+Builder tests:
+
+- Valid profile (real coding profile, no manual editing).
+- Invalid JSON.
+- Missing provider.
+- Duplicate model IDs.
+- Duplicate model names.
+- Duplicate plugins.
+- Malformed provider definition.
+- Provider-specific models.
+- Backup failure safety (output remains untouched).
+
+Release Docs tests:
+
+- Registry shape (valid versions, one Current, no duplicates).
+- Release manager generates all outputs.
+- Release manager is deterministic.
+- CURRENT_RELEASE.md matches the registry Current entry.
+- Registry and CHANGELOG consistency (legacy entries preserved).
+- bdf/VERSION.md compatibility rows updated.
+- Missing markers abort without writing.
+- Real docs consistency (read-only).
+
+Run it with:
+
+```
+powershell -File scripts/test-opencode-v2.ps1
+```
+
+The harness exits non-zero when any test fails.
 
 ---
 
@@ -59,7 +100,13 @@ OpenCode
 Configuration Builder
 
 ```
-build-opencode-v2.ps1
+build-opencode-v2.ps1 (Builder V2.1)
+```
+
+Test Harness
+
+```
+test-opencode-v2.ps1
 ```
 
 Provider
@@ -816,6 +863,35 @@ Different outputs indicate a regression or non-deterministic behavior.
 
 ---
 
+# Release Docs Test Group (Tests 10-17)
+
+The Release Docs group verifies the release pipeline (registry → release manager → generated documentation).
+
+All tests except test 17 run against an isolated temp copy of the docs.
+
+| Test | Name | Asserts |
+|------|------|---------|
+| 10 | Registry shape | Registry exists, one Current entry, valid version format, strictly descending order, no duplicate JSON keys |
+| 11 | Release manager generates all outputs | Exit 0, CURRENT_RELEASE.md created, markers intact, every registry version present in CHANGELOG |
+| 12 | Release manager deterministic | Two runs produce identical CHANGELOG and CURRENT_RELEASE.md |
+| 13 | CURRENT_RELEASE matches registry | Quick reference contains the Current entry's builder version, project version, date, and testing summary |
+| 14 | Registry and CHANGELOG consistent | Every registry entry present in CHANGELOG with its summary; legacy entries (2.1.0 → 1.0.0) preserved; exactly one Current in the generated section |
+| 15 | VERSION.md rows updated | Last Updated row matches the Current release date |
+| 16 | Missing markers abort safely | Removing a marker makes the manager fail with exit non-zero and leaves CHANGELOG untouched |
+| 17 | Real docs consistent (read-only) | Real `release_registry.json`, `CHANGELOG.md`, and `CURRENT_RELEASE.md` are consistent |
+
+Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only — it never writes or modifies the real documentation.
+
+Run the harness with:
+
+```
+powershell -File scripts/test-opencode-v2.ps1
+```
+
+Expected: 17/17 PASSED, exit 0.
+
+---
+
 # Manual Testing Procedure
 
 Perform the following steps in order.
@@ -888,19 +964,46 @@ Before considering a build complete:
 
 ---
 
-# Future Automated Testing
+# Future Testing Expansion
 
-The current project uses manual verification.
+Automated testing is implemented via the test harness:
 
-Future versions may introduce automated testing for:
+```
+scripts/test-opencode-v2.ps1
+```
+
+Current automated coverage (17 tests: 9 builder + 8 Release Docs):
+
+Builder tests:
+
+- Valid profile (real coding profile, no manual editing).
+- Invalid JSON.
+- Missing provider.
+- Duplicate model IDs.
+- Duplicate model names.
+- Duplicate plugins.
+- Malformed provider definition.
+- Provider-specific models.
+- Backup failure safety.
+
+Release Docs tests:
+
+- Registry shape.
+- Release manager output generation.
+- Release manager determinism.
+- CURRENT_RELEASE.md matches the registry.
+- Registry and CHANGELOG consistency (legacy preserved).
+- bdf/VERSION.md compatibility rows.
+- Missing markers abort without writing.
+- Real docs consistency (read-only).
+
+Future versions may extend automated testing with:
 
 - JSON schema validation.
 - Builder unit tests.
 - Integration testing.
 - Configuration comparison.
 - Regression testing.
-
-Automated testing will be documented after implementation.
 
 ---
 

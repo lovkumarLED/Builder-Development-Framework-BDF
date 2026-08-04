@@ -219,6 +219,51 @@ Mixed history makes it impossible to know what exists today.
 
 ---
 
+# Lesson 11 — A Framework Is Judged by Its Questions
+
+## Principle
+
+A reusable framework is complete when its documentation answers four questions:
+
+- How is this builder built?
+- How should this builder evolve?
+- How do I create another builder?
+- How do I adapt this framework to another project?
+
+## Why
+
+Documentation that describes facts without answering questions cannot guide future work.
+
+An unanswered question forces every future agent to guess.
+
+## Application
+
+- Design every framework document to answer at least one question.
+- Test the framework by asking the four questions.
+- When a question cannot be answered, the framework is incomplete.
+
+---
+
+# Lesson 12 — Adapters Separate Generic From Specific
+
+## Principle
+
+A generic framework plus a project adapter equals a project-specific builder.
+
+## Why
+
+Embedding project details in a framework makes it unreusable.
+
+Keeping the framework generic and the adapter specific allows any number of projects to reuse the same engineering process.
+
+## Application
+
+- Keep the framework free of project-specific knowledge.
+- Define every project-specific fact in the project adapter.
+- Create a new project by writing a new adapter, never by rewriting the framework.
+
+---
+
 # Contributing a New Lesson
 
 A new lesson should be added when:
@@ -235,6 +280,6 @@ New lessons follow the same format:
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Active Lessons

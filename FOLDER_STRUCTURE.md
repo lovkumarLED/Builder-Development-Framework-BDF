@@ -36,6 +36,7 @@ opencode/
 ├── docs/
 ├── profiles/
 ├── providers/
+├── schemas/
 ├── scripts/
 └── opencode.json
 ```
@@ -117,13 +118,19 @@ ROADMAP.md
 
 CHANGELOG.md
 
+CURRENT_RELEASE.md
+
 PROJECT_STATE.md
+
+release_registry.json
+
+ADAPTER.md
 
 AI/
 
 _agent/
 
-blueprint/
+bdf/
 ```
 
 ## _agent/
@@ -138,11 +145,17 @@ SESSION_LOG.md
 SESSION_WORKFLOW.md
 ```
 
-## blueprint/
+## bdf/
 
-Contains the reusable Blueprint Framework.
+Contains the reusable Builder Development Framework.
 
 Generic engineering knowledge shared by every builder project.
+
+## ADAPTER.md
+
+Contains the project-specific facts of this project.
+
+Defines how the generic framework applies to this project.
 
 ## AI/
 
@@ -153,6 +166,22 @@ Contains AI task documents.
 Contains the living state snapshot of the repository.
 
 Regenerated after every major refactor.
+
+## CURRENT_RELEASE.md
+
+Contains the generated quick reference for the current release.
+
+Generated from the release registry by the release manager.
+
+## release_registry.json
+
+Contains the machine-readable release history.
+
+The only hand-edited release artifact.
+
+The AI records the release facts here after implementation and testing.
+
+The user reviews the facts before the release manager runs.
 
 ## Managed By
 
@@ -296,6 +325,42 @@ Contains:
 
 Provider definitions are independent from profiles.
 
+## Provider-specific models
+
+Each provider may own provider-specific models:
+
+```
+providers/<provider>/models.json
+```
+
+When present, these take precedence over inline provider models and the global profile models.
+
+## Managed By
+
+Developer
+
+## Manual Editing
+
+Yes.
+
+---
+
+# schemas/
+
+```
+schemas/
+```
+
+## Purpose
+
+Reserved for future JSON Schema validation of configuration files.
+
+The goal of schemas is to ensure that configuration files follow the expected structure before the builder generates `opencode.json`.
+
+At the current stage of the project (Builder V2.1), no JSON Schema validation has been implemented yet.
+
+Validation is currently performed by PowerShell code inside the builder.
+
 ## Managed By
 
 Developer
@@ -316,10 +381,22 @@ scripts/
 
 Contains automation scripts.
 
-The primary script is the OpenCode configuration builder.
+The primary script is the OpenCode configuration builder (Builder V2.1).
 
 ```
 build-opencode-v2.ps1
+```
+
+The automated test harness verifies the builder and the release pipeline.
+
+```
+test-opencode-v2.ps1
+```
+
+The release manager generates all release documentation from the release registry.
+
+```
+release-manager.ps1
 ```
 
 The previous builder is retained as a legacy script.
@@ -339,9 +416,10 @@ Generates the final `opencode.json`.
 Responsibilities
 
 - Load configuration files.
-- Validate configuration.
+- Validate configuration (structure, duplicates, malformed definitions).
+- Merge configuration in stages.
 - Create backup.
-- Merge configuration.
+- Verify generated configuration before writing.
 - Generate output.
 
 Supports
@@ -349,8 +427,51 @@ Supports
 - Dynamic profile selection.
 - Dynamic provider loading.
 - Optional profile sections.
+- Provider-specific models.
 
 The builder never edits source configuration files.
+
+---
+
+## test-opencode-v2.ps1
+
+Purpose
+
+Automated verification of the builder and the release pipeline.
+
+Responsibilities
+
+- Build isolated temporary fixtures.
+- Run the builder against each fixture.
+- Assert expected success or failure.
+- Run the release manager against a temp copy of the docs.
+- Assert registry, CHANGELOG, CURRENT_RELEASE, and VERSION.md consistency.
+- Report pass/fail results.
+
+Covers 17 tests: 9 builder tests (including failure modes and backup safety) plus 8 Release Docs tests (registry shape, generated outputs, determinism, CURRENT_RELEASE match, registry/CHANGELOG consistency, VERSION.md rows, missing-marker abort, read-only real-docs check).
+
+Test 17 is the only test that reads the real docs, and it is strictly read-only.
+
+---
+
+## release-manager.ps1
+
+Purpose
+
+Generates all release documentation from the release registry.
+
+Responsibilities
+
+- Read and validate `release_registry.json`.
+- Generate the CHANGELOG marker section.
+- Generate `CURRENT_RELEASE.md`.
+- Update the `bdf/VERSION.md` compatibility rows.
+- Update the `PROJECT_STATE.md` version history table.
+- Verify generated output before writing (all-or-nothing).
+
+The release manager never touches manual prose outside the markers.
+
+Generated release files are never edited manually.
 
 ---
 
@@ -426,6 +547,7 @@ OpenCode
 | docs | Developer |
 | profiles | Developer |
 | providers | Developer |
+| schemas | Developer |
 | scripts | Developer |
 | opencode.json | Builder |
 
@@ -438,6 +560,7 @@ OpenCode
 - docs/
 - profiles/
 - providers/
+- schemas/
 - scripts/
 
 ## Do Not Edit
@@ -457,6 +580,7 @@ Generated files should always be recreated by the builder.
 - docs/
 - profiles/
 - providers/
+- schemas/
 - scripts/
 - opencode.json
 
@@ -468,6 +592,6 @@ Future project ideas are documented exclusively in `ROADMAP.md`.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Current Project Structure
