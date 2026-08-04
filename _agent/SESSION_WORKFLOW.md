@@ -14,6 +14,7 @@ The session files preserve knowledge between sessions:
 
 - `SESSION_LOG.md` stores the history of completed sessions.
 - `SESSION_WORKFLOW.md` (this document) defines how sessions start, end, and write to the log.
+- `JOURNEY_TO_V3.md` tracks our position on the road to BDF V3.
 
 An agent must follow this document at the start and end of every session.
 
@@ -27,6 +28,8 @@ _agent/
 SESSION_LOG.md
 
 SESSION_WORKFLOW.md
+
+JOURNEY_TO_V3.md
 ```
 
 These files live inside the documentation repository.
@@ -41,8 +44,10 @@ At the start of every session:
 2. Read `_agent/SESSION_LOG.md`.
 3. Read the most recent session entry.
 4. Check its `Next:` line to determine where work should continue.
-5. Read `PROJECT_STATE.md` to load the current repository state.
-6. Follow the `AGENT.md` reading order before modifying any files.
+5. Read `_agent/JOURNEY_TO_V3.md` and note the `Current Position` section —
+   where we are on the road to V3.
+6. Read `PROJECT_STATE.md` to load the current repository state.
+7. Follow the `AGENT.md` reading order before modifying any files.
 
 Do not begin work without reading the most recent session entry.
 
@@ -60,8 +65,11 @@ On session end:
 1. Write the session summary directly into `_agent/SESSION_LOG.md`.
 2. Do not ask for confirmation.
 3. Confirm the update with: Session log updated.
-4. If a major refactor occurred this session, regenerate `PROJECT_STATE.md` (see AGENT.md, Project State section).
-5. Do not update any other session file unless its rules changed.
+4. Update the `Current Position` section of `_agent/JOURNEY_TO_V3.md`
+   (step, status, progress) — see the update rules in that file.
+   Confirm with: Journey position updated.
+5. If a major refactor occurred this session, regenerate `PROJECT_STATE.md` (see AGENT.md, Project State section).
+6. Do not update any other session file unless its rules changed.
 
 Every session must end with a session log entry — no exception. Even short or partial
 sessions get an entry, so the next session can resume from the `Next:` line.
@@ -110,6 +118,8 @@ Done:
 Broken:
 - (unresolved issues, one per bullet, or "None — clean session.")
 
+Journey: (position on the road to V3 — step name + status + progress, e.g. "Step 1 BDF V2.5 — IN PROGRESS, 40%")
+
 Next: (what to start next, one line)
 
 Learned: (one key takeaway)
@@ -125,6 +135,8 @@ Done:
 
 Broken:
 - None — clean session.
+
+Journey: Step 1 BDF V2.5 — NOT STARTED, 0%
 
 Next: Review the framework with the user.
 
@@ -150,6 +162,9 @@ The only permitted edits to existing entries are:
 1. Remove the `← recent session` tag from the previous session's header line.
 2. Insert the new session entry at the top of the Session History.
 3. Trim the oldest entries when the count exceeds five.
+
+`JOURNEY_TO_V3.md` is NOT part of the session history. Its `Current Position` section is a
+living status that must be updated at every session end (see Session End Rules).
 
 ---
 
@@ -200,12 +215,17 @@ It points to this document.
 
 This document and `AGENT.md` must remain consistent with each other.
 
+`JOURNEY_TO_V3.md` is the journey tracker this workflow updates at every session end.
+
+`AI/CONTINUE_PROJECT_BUILD.md` defines the checkpoint + resume rule for large version
+builds that exceed the context budget; checkpoint files point back here.
+
 `AGENT.md` also contains the project state rules.
 
 They point to this document for the session-end regeneration checkpoint.
 
 ---
 
-**Document Version:** 1.2
+**Document Version:** 1.3
 
 **Status:** Active Session Rules

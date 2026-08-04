@@ -128,6 +128,8 @@ ADAPTER.md
 
 AI/
 
+planning/
+
 _agent/
 
 bdf/
@@ -135,15 +137,35 @@ bdf/
 
 ## _agent/
 
-Contains the session continuity files.
+Contains the session continuity files and the journey tracker.
 
 ```
 _agent/
+
+JOURNEY_TO_V3.md
 
 SESSION_LOG.md
 
 SESSION_WORKFLOW.md
 ```
+
+## planning/
+
+Contains long-term planning and vision documents.
+
+```
+planning/
+
+BDF_ROAD_TO_V3.md
+
+DECISIONS.md
+
+FUTURE_IDEAS.md
+
+VERSION_STRATEGY.md
+```
+
+Defines the destination (BDF V3) and the version philosophy.
 
 ## bdf/
 
@@ -160,6 +182,12 @@ Defines how the generic framework applies to this project.
 ## AI/
 
 Contains AI task documents.
+
+Includes the build-continuation rule:
+
+```
+AI/CONTINUE_PROJECT_BUILD.md
+```
 
 ## PROJECT_STATE.md
 

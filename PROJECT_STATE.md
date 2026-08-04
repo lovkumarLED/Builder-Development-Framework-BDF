@@ -90,16 +90,24 @@ docs/
 
 ├── _agent/
 │   ├── SESSION_LOG.md
-│   └── SESSION_WORKFLOW.md
+│   ├── SESSION_WORKFLOW.md
+│   └── JOURNEY_TO_V3.md
 ├── AI/
 │   ├── BUILD_BLUEPRINT_FRAMEWORK.md
 │   ├── BUILD_BUILDER_V2.1.md
+│   ├── BUILD_BUILDER_V2.5.md
 │   ├── BUILD_RELEASE_MANAGER.md
+│   ├── CONTINUE_PROJECT_BUILD.md
 │   ├── CONTINUE_RELEASE_MANAGER.md
 │   ├── DISTRIBUTE_SUBAGENTS.md
 │   ├── PLAN_RELEASE_MANAGER.md
 │   ├── START_TASK.md
 │   └── UPGRADE_BLUEPRINT_FRAMEWORK.md
+├── planning/
+│   ├── BDF_ROAD_TO_V3.md
+│   ├── DECISIONS.md
+│   ├── FUTURE_IDEAS.md
+│   └── VERSION_STRATEGY.md
 ├── bdf/
 │   ├── AI_WORKFLOW.md
 │   ├── BLUEPRINT_ENGINE.md
@@ -143,8 +151,9 @@ docs/
 | `schemas/` | Reserved for future JSON Schema validation |
 | `scripts/` | Builder scripts |
 | `docs/` | Project documentation |
-| `docs/_agent/` | Session continuity files |
-| `docs/AI/` | AI task documents |
+| `docs/_agent/` | Session continuity + journey tracker |
+| `docs/AI/` | AI task documents (including build-continuation rule) |
+| `docs/planning/` | Long-term planning and vision (road to V3) |
 | `docs/bdf/` | Reusable Builder Development Framework |
 
 ---
@@ -439,11 +448,19 @@ At session start:
 - Read `_agent/SESSION_WORKFLOW.md`.
 - Read `_agent/SESSION_LOG.md`.
 - Check the `Next:` line of the most recent entry.
+- Read `_agent/JOURNEY_TO_V3.md` — current position on the road to V3.
 
 At session end:
 
 - Follow `_agent/SESSION_WORKFLOW.md`.
-- Write the session summary to `_agent/SESSION_LOG.md`.
+- Write the session summary to `_agent/SESSION_LOG.md`, including the `Journey:` line.
+- Update the `Current Position` section of `_agent/JOURNEY_TO_V3.md`.
+
+## Build Continuation
+
+Large version builds that exceed the context budget stop at a clean checkpoint, write
+`AI/CONTINUE_BUILD_<VERSION>_<STEP>.md`, and resume from it in the next session.
+Rule: `AI/CONTINUE_PROJECT_BUILD.md`.
 
 ## Project State
 
@@ -489,6 +506,9 @@ The registry is the sequence authority.
 | `ADAPTER.md` | Project-specific facts |
 | `_agent/SESSION_WORKFLOW.md` | Session start, end, and log rules |
 | `_agent/SESSION_LOG.md` | Session history |
+| `_agent/JOURNEY_TO_V3.md` | Live tracker of progress toward BDF V3 |
+| `planning/` | Long-term planning: BDF_ROAD_TO_V3, VERSION_STRATEGY, FUTURE_IDEAS, DECISIONS |
+| `AI/CONTINUE_PROJECT_BUILD.md` | Build checkpoint + resume rule for large versions |
 | `AI/` | AI task documents |
 | `bdf/` | Reusable Builder Development Framework |
 

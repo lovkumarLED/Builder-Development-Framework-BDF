@@ -1,6 +1,6 @@
 # ROADMAP
 
-> Planned evolution of the OpenCode Configuration Manager.
+> Planned evolution of the OpenCode Configuration Manager toward the Builder Development Framework (BDF) V3.
 
 ---
 
@@ -22,7 +22,50 @@ Implementation details belong in:
 BUILDER_SPEC.md
 ```
 
+The long-term vision and version philosophy live in:
+
+```
+planning/BDF_ROAD_TO_V3.md
+```
+
+The live tracker of our position on the road to V3 lives in:
+
+```
+_agent/JOURNEY_TO_V3.md
+```
+
 This roadmap is intended to guide future development while keeping the overall project vision clear.
+
+---
+
+# Destination — BDF V3
+
+Every phase below serves one destination:
+
+> **BDF V3 — the first stable public version of the Builder Development Framework.**
+
+V3 is complete when the same engineering framework can successfully create and maintain
+builders for **OpenCode**, **Claude Code**, and **KiloCode** without redesigning the framework.
+
+Only Project Adapters should differ between supported projects.
+
+The path is:
+
+```
+Current (Builder V2.2.0)
+↓
+BDF V2.5 (framework generalization)
+↓
+Claude Code Builder V1
+↓
+KiloCode Builder V1
+↓
+BDF V3 (Builder Generator)
+```
+
+Each step is built, tested, and validated before the next begins.
+
+Real projects shape the framework — never assumptions.
 
 ---
 
@@ -38,6 +81,12 @@ Current Status
 
 ```
 Stable Foundation
+```
+
+Journey Position
+
+```
+BDF V2.5 — Not started (next step on the road to V3)
 ```
 
 The project currently provides:
@@ -289,6 +338,155 @@ Make every version release one command instead of a manual 10-file edit.
 
 ---
 
+## Phase 10 — BDF V2.5: Framework Generalization
+
+Status
+
+```
+Planned — next
+```
+
+Objective
+
+Strengthen the framework. Not redesign it.
+
+Purpose
+
+```
+Prepare the framework for becoming V3.
+```
+
+Planned work includes:
+
+- `NEW_PROJECT_GUIDE.md` — documented process for onboarding a new project.
+- Better `PROJECT_ADAPTER.md` — cleaner generic/project boundary.
+- More generic templates.
+- Better Blueprint Engine.
+- Cleaner framework boundaries.
+- Improved validation, testing, adapters, templates, documentation, provider handling, and release system.
+
+Not included
+
+- Automatic project generation. That arrives with V3.
+
+Goal
+
+Make the framework reusable across OpenCode, Claude Code, and KiloCode without redesign.
+
+---
+
+## Phase 11 — Claude Code Builder V1
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+Use the generalized framework (V2.5) to build the first Claude Code builder.
+
+Do not redesign anything. Use the framework as-is.
+
+This is the first real validation of the framework against a second project.
+
+Discoveries made here (config format, provider system, validation differences) shape V3.
+
+Per-project work is limited to:
+
+```
+ADAPTER.md
+
+PROJECT_STATE.md
+
+README.md
+
+Folder Structure
+
+Schema docs
+```
+
+Everything else is reused from the framework.
+
+---
+
+## Phase 12 — KiloCode Builder V1
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+Use the same framework to build the KiloCode builder.
+
+Second real validation of the framework against a third project.
+
+---
+
+## Phase 13 — BDF V3: Builder Generator
+
+Status
+
+```
+Destination
+```
+
+Objective
+
+Turn the framework into a generator of builder projects.
+
+One command flow:
+
+```
+Create New Builder Project
+
+↓
+
+What software? (OpenCode / Claude Code / KiloCode)
+
+↓
+
+Read project schema
+
+↓
+
+Generate adapter
+
+↓
+
+Generate docs
+
+↓
+
+Generate folder structure
+
+↓
+
+Generate builder
+
+↓
+
+Generate tests
+
+↓
+
+Done
+```
+
+Definition of complete
+
+- The same framework creates and maintains builders for OpenCode, Claude Code, and KiloCode.
+- Only Project Adapters differ.
+- No framework redesign is required per project.
+
+V3 is the first stable public milestone — not the end of development.
+
+---
+
 # Long-Term Vision
 
 The long-term objective is to build a configuration management system that is:
@@ -299,7 +497,9 @@ The long-term objective is to build a configuration management system that is:
 - Well documented
 - Easy for both humans and AI agents to maintain
 
-Future features should extend the existing architecture rather than replacing it.
+The framework's destination is BDF V3 — the first stable public version that generates
+builders for OpenCode, Claude Code, and KiloCode from a single reusable engineering
+framework. Future features should extend the existing architecture rather than replacing it.
 
 ---
 
@@ -325,6 +525,14 @@ When a planned feature is implemented:
 1. Remove it from this document.
 2. Record it in `CHANGELOG.md`.
 3. Update the relevant documentation.
+
+Position on the road to V3 is tracked separately in:
+
+```
+_agent/JOURNEY_TO_V3.md
+```
+
+Update it whenever a roadmap phase advances.
 
 This ensures that the roadmap always reflects future work rather than project history.
 

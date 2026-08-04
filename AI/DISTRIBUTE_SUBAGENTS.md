@@ -64,12 +64,15 @@ main job from their summaries. You never bulk-read project docs yourself.
 
 - EVERY session ends with a session log entry in `_agent/SESSION_LOG.md` — short or partial
   sessions included. Format: `### (date) (session N) — description ← recent session` with
-  `Done:` / `Broken:` / `Next:` / `Learned:` lines.
+  `Done:` / `Broken:` / `Journey:` / `Next:` / `Learned:` lines.
 - Write it when I say "end session" / "wrap up", AND automatically at 65-70% context.
+- Also update `_agent/JOURNEY_TO_V3.md` `Current Position` (road to V3) at session end.
 - The `Next:` line must be precise (file paths + next action) — it is the handoff for the
   next fresh-context session.
 - Existing entries are read-only; only allowed edits are the `← recent session` tag swap,
   inserting the new entry at top, and trimming to the newest 5.
+- Large version builds that exceed the context budget follow the checkpoint + resume rule
+  in `AI/CONTINUE_PROJECT_BUILD.md`.
 
 ## Project ground rules (from docs — the sub-agents will refresh details on demand)
 

@@ -10,7 +10,23 @@
 
 ## Session History
 
-### Aug 4, 2026 (session 11) — Final full-repo test: 5-agent audit, 28 doc bugs fixed, 17/17 green ← recent session
+### Aug 4, 2026 (session 12) — Fixed backup timestamp bug in both builders; generated architecture maps ← recent session
+Done:
+- Root-caused backup timestamp bug: backup filenames + CreationTime were correct (09:08) but "Date modified" (LastWriteTime) showed 07:37 — `Copy-Item` preserves the source file's LastWriteTime, so backups displayed the OLD opencode.json's write time (previous session), not backup creation time. Confirmed pattern across all 4 existing backups (LastWriteTime 1-3h behind CreationTime).
+- Fixed both builders to stamp real time after copy: scripts/build-opencode-v2.ps1 (~line 810-817) and scripts/build-opencode.ps1 (~line 103-110) now set `$BackupFile.CreationTime`/`LastWriteTime = Get-Date` after Copy-Item.
+- Verified: test-opencode-v2.ps1 17/17 PASSED; real build `-Profile default` regenerated opencode.json (09:24) and the new backup opencode_2026-08-04_09-24-05.json shows LastWriteTime = CreationTime = 09:24 (matches clock). Ran release-manager.ps1 → "All outputs already up to date - nothing written" (deterministic no-op confirmed).
+- Reviewed PROJECT_STATE.md completeness for a ChatGPT handoff: it is a complete living snapshot + index (15 sections) but intentionally defers script internals / BDF content / registry structure to other docs; recommended handoff = PROJECT_STATE + README + ARCHITECTURE + BUILDER_SPEC + bdf/FRAMEWORK + bdf/BLUEPRINT_ENGINE + bdf/README.
+- Generated architecture maps via Kroki (mmdc not installed): docs/system-architecture.mmd/.png (Layer 1 BDF → Layer 2 project docs → sources → scripts → generated artifacts → OpenCode app) and docs/build-release-pipeline.mmd/.png (builder 8-stage + release manager all-or-nothing + 17-test coverage). Both validated (Kroki HTTP 200, 2048px PNG).
+- Used the sub-agent distribution workflow: 3 parallel reader sub-agents summarized PROJECT_STATE.md, all bdf/ docs, and all system docs (~150 KB) — only ~1.3k words entered main context.
+
+Broken:
+- None — clean session. Old backups (pre-fix) still show stale LastWriteTime (historical data, untouched; user may want them corrected).
+
+Next: Commit the docs repository (standing instruction from session 7: nothing committed; untracked: AI/DISTRIBUTE_SUBAGENTS.md, system-architecture.mmd/.png, build-release-pipeline.mmd/.png, this log entry). User to review PROJECT_STATE.md handoff package for ChatGPT. Optional: correct stale LastWriteTime on the 3 pre-fix backups.
+
+Learned: `Copy-Item` preserves the source's LastWriteTime — a backup's "Date modified" can show a time from a previous session while CreationTime/filename are correct. Debug fast: compare CreationTime vs LastWriteTime on backups; a stale LastWriteTime means copy-with-metadata, not a clock/timezone problem. Diagrams export fine via Kroki when mmdc isn't installed.
+
+### Aug 4, 2026 (session 11) — Final full-repo test: 5-agent audit, 28 doc bugs fixed, 17/17 green
 Done:
 - Dispatched 5 parallel audit sub-agents covering all 60 files (root docs, bdf/, bdf/templates/, AI/, _agent/, SDD ledger); every finding personally verified against source files before fixing.
 - Baseline + post-fix harness runs: test-opencode-v2.ps1 17/17 PASSED, exit 0 (9 builder + 8 Release Docs); release manager no-op exit 0 ("All outputs already up to date - nothing written").

@@ -78,12 +78,38 @@ At session start:
 - Read `_agent/SESSION_WORKFLOW.md`.
 - Read `_agent/SESSION_LOG.md`.
 - Check the `Next:` line of the most recent entry.
+- Read `_agent/JOURNEY_TO_V3.md` — note the `Current Position` on the road to V3.
 
 At session end:
 
 - Follow `_agent/SESSION_WORKFLOW.md`.
-- Write the session summary to `_agent/SESSION_LOG.md`.
+- Write the session summary to `_agent/SESSION_LOG.md`, including the `Journey:` line.
+- Update the `Current Position` section of `_agent/JOURNEY_TO_V3.md`.
 - Never delete or overwrite existing entries.
+
+---
+
+# Build Continuation
+
+Every version (V2.5, Claude Code Builder, KiloCode Builder, V3) must be built, tested,
+and validated completely before the next begins.
+
+If a version build is too large to finish within 70-80% of the 200,000-token context
+window, the agent must NOT push through. Instead:
+
+1. Stop at a clean checkpoint.
+2. Write `AI/CONTINUE_BUILD_<VERSION>_<STEP>.md` with what was done, what is next,
+   how to verify, and the resume prompt.
+3. Update `_agent/SESSION_LOG.md` and `_agent/JOURNEY_TO_V3.md`.
+4. Hand the user the resume prompt for the next session.
+
+The full rule and the resume prompt template are in:
+
+```
+AI/CONTINUE_PROJECT_BUILD.md
+```
+
+Resume from the latest checkpoint file — never restart a version from scratch.
 
 ---
 
@@ -347,6 +373,6 @@ Consistency is more important than speed.
 
 ---
 
-**Document Version:** 1.3
+**Document Version:** 1.4
 
 **Status:** Active AI Entry Guide
