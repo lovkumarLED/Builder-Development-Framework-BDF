@@ -42,20 +42,21 @@ It is regenerated after every major refactor.
 Version
 
 ```
-2.2.0
+2.3.0
 ```
 
 Status
 
 ```
-Stable Foundation
+Framework Generalization
 ```
 
 ## Version History
 <!-- AUTO-GENERATED START -->
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.2.0 | Current | Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing. |
+| 2.3.0 | Current | BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets. |
+| 2.2.0 | Previous | Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing. |
 <!-- AUTO-GENERATED END -->
 
 ---
@@ -112,13 +113,17 @@ docs/
 │   ├── AI_WORKFLOW.md
 │   ├── BLUEPRINT_ENGINE.md
 │   ├── BUILDER_EVOLUTION.md
+│   ├── BUILDER_PHASES.md
 │   ├── FRAMEWORK.md
 │   ├── FRAMEWORK_LIFECYCLE.md
 │   ├── LESSONS_LEARNED.md
 │   ├── MIGRATION.md
+│   ├── NEW_PROJECT_GUIDE.md
 │   ├── PROJECT_ADAPTER.md
 │   ├── PROJECT_GENERATOR.md
 │   ├── README.md
+│   ├── RELEASE_MANAGER.md
+│   ├── TESTING.md
 │   ├── VERSION.md
 │   └── templates/
 │       ├── README.md
@@ -265,11 +270,15 @@ bdf/
 | `BLUEPRINT_ENGINE.md` | The intelligence layer |
 | `PROJECT_ADAPTER.md` | Making the framework project-specific |
 | `BUILDER_EVOLUTION.md` | Creating future builder versions |
+| `BUILDER_PHASES.md` | The Alpha → Beta → General Release quality gates every builder build must pass |
 | `FRAMEWORK_LIFECYCLE.md` | The master lifecycle reference |
 | `AI_WORKFLOW.md` | The AI agent workflow |
 | `VERSION.md` | Framework versioning |
 | `MIGRATION.md` | Adopting the framework in an existing project |
 | `PROJECT_GENERATOR.md` | Creating a new builder project |
+| `NEW_PROJECT_GUIDE.md` | Onboarding process for starting a new project |
+| `RELEASE_MANAGER.md` | The generic release process |
+| `TESTING.md` | The generic test-harness pattern |
 | `LESSONS_LEARNED.md` | Reusable engineering lessons |
 | `templates/` | Reusable documentation templates |
 
@@ -597,7 +606,7 @@ Recorded in `bdf/VERSION.md`.
 Current framework version:
 
 ```
-2.0.0
+2.1.0
 ```
 
 ---
@@ -619,6 +628,7 @@ Current framework version:
 - Automatic backup creation
 - Builder V2
 - Builder V2.1 (extended validation, modular merge pipeline, provider-specific models, output verification)
+- Builder V2.3 / BDF V2.5 (framework generalization: NEW_PROJECT_GUIDE, RELEASE_MANAGER, TESTING framework docs, adapter validation checklist, Impact Analysis record)
 - Automated test harness (17 tests: 9 builder + 8 Release Docs)
 - Release Manager V1 (registry-driven release documentation)
 - Documentation framework
@@ -655,7 +665,7 @@ These limitations simplify development and provide a stable foundation for futur
 
 ## Immediate
 
-- Commit the docs repository (modified files, `bdf/`, `ADAPTER.md`, `_agent/`, `AI/`).
+- Commit the docs repository (BDF V2.5 changes, `bdf/` new + modified docs, `ADAPTER.md`, `_agent/`, `AI/`).
 
 ## Roadmap Phases
 
@@ -663,7 +673,11 @@ Phase 4 — Additional Providers
 
 Phase 8 — Documentation Expansion
 
+Phase 11 — Claude Code Builder V1 (next on the road to V3)
+
 Phases 5, 6, and 7 (Validation Framework, Automated Testing, Builder Refactoring) were completed in Builder V2.1 (version 2.2.0).
+
+Phase 10 (BDF V2.5: Framework Generalization) was completed in version 2.3.0.
 
 All phases are planned only. They are documented exclusively in `ROADMAP.md`.
 

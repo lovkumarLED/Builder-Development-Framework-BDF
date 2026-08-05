@@ -32,6 +32,7 @@ Builder Development Framework (BDF)
 ├── Blueprint Engine
 ├── Project Adapter
 ├── Builder Evolution
+├── Builder Phases
 ├── Framework Lifecycle
 ├── Templates
 ├── AI Workflow
@@ -64,6 +65,10 @@ Each builder project below it is created by combining the framework with a proje
 | AI Workflow | `AI_WORKFLOW.md` | The workflow every AI coding agent follows. |
 | Lessons Learned | `LESSONS_LEARNED.md` | Reusable engineering principles. |
 | Version System | `VERSION.md` | Framework versioning and compatibility. |
+| New Project Guide | `NEW_PROJECT_GUIDE.md` | The onboarding process for starting a new project with the framework. |
+| Release Manager | `RELEASE_MANAGER.md` | The generic release process: registry, generator, and generated release documents. |
+| Testing Framework | `TESTING.md` | The generic test-harness pattern every builder project follows. |
+| Builder Phases | `BUILDER_PHASES.md` | The quality gates (Alpha → Beta → General Release) every builder build must pass. |
 
 Supporting documents:
 
@@ -144,6 +149,12 @@ Evolve a builder:
 
 ```
 Read BUILDER_EVOLUTION.md
+```
+
+Qualify a builder build:
+
+```
+Read BUILDER_PHASES.md
 ```
 
 Change a feature:

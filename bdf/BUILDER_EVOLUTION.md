@@ -267,6 +267,7 @@ The roadmap moves completed work to the changelog.
 | `FRAMEWORK.md` | Defines the engineering process. |
 | `PROJECT_ADAPTER.md` | Provides project-specific facts. |
 | `FRAMEWORK_LIFECYCLE.md` | Tracks the lifecycle stage. |
+| `BUILDER_PHASES.md` | Defines the Alpha → Beta → General Release gates a build must pass before release. |
 | `AI_WORKFLOW.md` | Guides the agent through the workflow. |
 | `VERSION.md` | Records framework version changes. |
 | `templates/` | Supplies updated templates. |

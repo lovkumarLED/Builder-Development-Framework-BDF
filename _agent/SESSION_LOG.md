@@ -10,7 +10,46 @@
 
 ## Session History
 
-### Aug 4, 2026 (session 12) — Fixed backup timestamp bug in both builders; generated architecture maps ← recent session
+### Aug 5, 2026 (session 14) — Reviewed V2.5 changes; added Builder Phases quality gates ← recent session
+Done:
+- Reviewed the uncommitted V2.5 work (19 modified + 3 new bdf/ docs) via a sub-agent diff audit: release version 2.3.0 / builder V2.3 consistent across release_registry.json, CHANGELOG.md, CURRENT_RELEASE.md, PROJECT_STATE.md, ROADMAP.md; framework version 2.1.0 in bdf/VERSION.md confirmed as the separate intentional framework-numbering scale (not a mismatch).
+- Re-verified the test harness on the uncommitted state: test-opencode-v2.ps1 17/17 PASSED, exit 0 (includes read-only real-docs consistency test).
+- Created `bdf/BUILDER_PHASES.md` (v1.0): defines the three build phases every builder build must pass — Alpha (first working build), Beta (hardened, tests green), General Release (released, becomes the main builder). Evolution rule: a build passes Alpha + Beta → reaches General Release → only then does the main builder evolve to it; a build in Alpha/Beta is never the evolution starting point.
+- Registered BUILDER_PHASES.md everywhere: FRAMEWORK.md (components 11 → 12 + Question 2 answer), bdf/README.md (components table + architecture tree + "How To Use"), BUILDER_EVOLUTION.md (framework reference table), FRAMEWORK_LIFECYCLE.md (Stage 4 Testing = Alpha, Stage 5 Release = Beta → General Release + component table), PROJECT_STATE.md (folder tree + bdf contents table), JOURNEY_TO_V3.md (phase-gates note for road-to-V3 builds).
+- No release triggered — doc-level framework addition only; registry/CHANGELOG/CURRENT_RELEASE untouched this session.
+
+Broken:
+- None — clean session.
+
+Journey: Step 1 BDF V2.5 — COMPLETE, 100%; we are here = Step 2 Claude Code Builder V1
+
+Next: User reviews the V2.5 changes + BUILDER_PHASES.md, discusses planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md, then commits the docs repository; then Step 2 — Claude Code Builder V1 (will pass Alpha → Beta → General Release gates per BUILDER_PHASES.md).
+
+Learned: The phase-gate model (Alpha → Beta → General Release) ties the version workflow (BUILDER_EVOLUTION.md) to a definition of "ready to become the main builder" — tests gate Alpha→Beta, the release pipeline gates Beta→General Release.
+
+### Aug 5, 2026 (session 13) — BDF V2.5 complete: framework generalization, released 2.3.0
+Done:
+- Built BDF V2.5 (Framework Generalization) per `AI/BUILD_BUILDER_V2.5.md`, following the Builder Evolution workflow (Impact Analysis record → architecture → docs → templates → version → release).
+- Feature 1: created `bdf/NEW_PROJECT_GUIDE.md` (10-step onboarding, claude.json/opencode.json research examples, "project knowledge lives only in the adapter"); registered in FRAMEWORK.md (components + document table), AI_WORKFLOW.md (Branch B), PROJECT_GENERATOR.md, bdf/README.md.
+- Feature 2: adapter field table now single source of truth in `templates/ADAPTER.template.md`; PROJECT_ADAPTER.md describes each field + refers to the template (duplication removed); prose validation replaced with a 9-criterion executable Adapter Validation Checklist; reference `ADAPTER.md` verified to pass it (model sources checked against `profiles/default/models.json`).
+- Feature 3: `templates/README.md` — placeholder audit (added the missing `{{PLACEHOLDER_NAME}}` row; all listed placeholders used), cross-reference matrix (framework doc ↔ templates), provider placeholders confirmed generic (not OpenCode-shaped), template sync rule stated.
+- Feature 4: `BLUEPRINT_ENGINE.md` now defines the Impact Analysis record (affected documents/components/tests + backwards compatibility), required before the next stage starts.
+- Feature 5: OpenCode audit of `bdf/` — removed hardcoded `opencode.json` + "OpenCode-specific" label from MIGRATION.md and PROJECT_ADAPTER.md (Layer 1 no longer depends on Layer 2); created `bdf/RELEASE_MANAGER.md` (registry single source of truth, all-or-nothing writes, verify-before-write, marker policy, deterministic no-op); registered + reference ADAPTER.md now points to it.
+- Feature 6: created `bdf/TESTING.md` (generic test-harness pattern, 3 test groups, headless + deterministic, harness part of a version's definition of complete); registered; `docs/TESTING.md` aligned as the project mirror.
+- Release: bdf/VERSION.md framework 2.0.0 → 2.1.0 (change history entry + version rows); release_registry.json prepended 2.3.0 entry (builderVersion V2.3, status Current; 2.2.0 → Previous); release-manager.ps1 wrote CHANGELOG / CURRENT_RELEASE / PROJECT_STATE version table / VERSION.md rows ("Supported Builder Versions | V2.3, V2.1"); rerun = deterministic no-op.
+- Reference sync: ROADMAP.md Phase 10 → Completed (✅), project status 2.3.0 / Framework Generalization, Phase 11 → Planned-next; PROJECT_STATE.md regenerated (folder tree + bdf contents + version 2.3.0 + framework 2.1.0 + sections 11/13); CHANGELOG manual Version History table updated (2.3.0 Current); JOURNEY_TO_V3.md Step 1 COMPLETE 100%, we-are-here moved to Step 2.
+- Tests: harness 17/17 PASSED exit 0 (run twice — before and after the reference-doc sync); release manager no-op exit 0.
+
+Broken:
+- None — clean session.
+
+Journey: Step 1 BDF V2.5 — COMPLETE, 100%
+
+Next: Commit the docs repository (V2.5: 18 modified + 3 new bdf/ docs: NEW_PROJECT_GUIDE.md, RELEASE_MANAGER.md, TESTING.md); user review; then Step 2 — Claude Code Builder V1.
+
+Learned: The generic/project boundary audit is executable — grep `bdf/` for concrete target names (opencode.json, .config/opencode, omniroute) and keep only frame-as-example hits; a single source of truth for adapter fields makes the reference adapter checkable against the template; the release pipeline proved deterministic no-op twice.
+
+### Aug 4, 2026 (session 12) — Fixed backup timestamp bug in both builders; generated architecture maps
 Done:
 - Root-caused backup timestamp bug: backup filenames + CreationTime were correct (09:08) but "Date modified" (LastWriteTime) showed 07:37 — `Copy-Item` preserves the source file's LastWriteTime, so backups displayed the OLD opencode.json's write time (previous session), not backup creation time. Confirmed pattern across all 4 existing backups (LastWriteTime 1-3h behind CreationTime).
 - Fixed both builders to stamp real time after copy: scripts/build-opencode-v2.ps1 (~line 810-817) and scripts/build-opencode.ps1 (~line 103-110) now set `$BackupFile.CreationTime`/`LastWriteTime = Get-Date` after Copy-Item.
@@ -56,59 +95,4 @@ Broken:
 Next: User restarts opencode and verifies the system loads (skill + 6 agents + DISTRIBUTE_SUBAGENTS.md instructions); review session 10 changes; standing instruction still open: commit the docs repository (sessions 7-10).
 
 Learned: The docs repo (~560 KB) ≈ 140k tokens ≈ 70% of a 200k window when read directly — delegating reads to sub-agents (each with its own fresh context window) means only ~300-word summaries return, keeping the main window near-empty for actual work.
-
-### Aug 4, 2026 (session 9) — Audited the whole docs repo; fixed stale template drift + stale release facts
-Done:
-- Read every MD file (root docs, bdf/, bdf/templates/, AI/, _agent/, .superpowers/sdd/) and cross-checked docs ↔ templates ↔ release pipeline (release_registry.json → release-manager.ps1 → CHANGELOG.md / CURRENT_RELEASE.md / PROJECT_STATE.md / bdf/VERSION.md).
-- Baseline: test-opencode-v2.ps1 17/17 PASSED, exit 0 (test 17 read-only real-docs consistency green).
-- Fixed stale release facts in release_registry.json (source of truth): testingSummary 9/9 → "17/17 tests passed, exit 0" (verified by an actual 17/17 harness run); harness feature description now "17 tests: 9 builder + 8 Release Docs". Regenerated via release-manager.ps1: CHANGELOG.md + CURRENT_RELEASE.md diffs show only the two intended lines changed (deterministic pipeline confirmed).
-- Fixed BUILDER_SPEC.md Builder Status V2 → V2.1 (registry builderVersion is V2.1; the doc already described V2.1 features incl. Stage 7 Verification).
-- Fixed stale templates (framework-level alignment with reference docs): BUILDER_SPEC.template.md V2 → V2.1; AGENT.template.md read order now includes PROJECT_STATE.md + ADAPTER.md and gained the Builder Development Framework / Session Continuity / Project State sections (mirrors AGENT.md 1.3); CONTRIBUTING_FOR_AI.template.md reading order now 8 docs (added PROJECT_STATE.md + ADAPTER.md); TESTING.template.md no longer says "future automated testing" — mirrors the 17-test harness (Purpose, JSON Validation Tests heading, Release Docs Test Group table, Manual Testing Procedure, Future Testing Expansion); bdf/templates/README.md gained the {{TEST_HARNESS}} placeholder and refreshed stale example values (2.0.0 → 2.2.0). Normalized LF → CRLF in edited files to match the working tree.
-- Non-issues checked and cleared: no unreplaced {{placeholders}} outside bdf/templates/; PROJECT_STATE.md and its template both have exactly 15 numbered sections (AGENT.md "15-section" rule correct); no new bugs found in release-manager.ps1 or the harness.
-- Verified: harness re-run 17/17 PASSED, exit 0; git diff reviewed line-by-line (9 files, only intended changes).
-
-Broken:
-- None — clean session.
-
-Next: Commit the docs repository (sessions 7 + 8 + 9 changes; standing instruction: nothing committed); user review of session 9 fixes; decide whether to record the template alignment as a BDF framework patch (templates README requires "template changes are recorded in the framework version history").
-
-Learned: Templates must mirror the reference implementation ("example values come from the reference implementation") — stale templates are real bugs, not decoration; the release pipeline proved deterministic (regeneration touched only the two registry-derived lines).
-
-### Aug 4, 2026 (session 8) — Built the Release Manager V1 (registry, marker pipeline, 17-test harness, docs) 
-Done:
-- Built `scripts/release-manager.ps1` (outside git): registry → generator → CHANGELOG/CURRENT_RELEASE/PROJECT_STATE/VERSION.md artifacts; all-or-nothing writes; duplicate-key raw-text scan (PS 5.1 ConvertFrom-Json collapses duplicates); marker policy (abort if AUTO-GENERATED markers missing); Verify-Generated before any write; final run exit 0 "All outputs already up to date - nothing written."
-- Created `docs/release_registry.json` (single 2.2.0 entry, 14 fields; the only hand-edited release artifact).
-- Converted CHANGELOG.md to a marker section: rich 2.2.0 entry generated from registry; legacy entries 2.1.0 → 1.0.0 and the manual Version History table untouched (byte-verified). PROJECT_STATE.md version table marker-wrapped; bdf/VERSION.md rows managed (Supported Builder Versions = V2.1 per user ruling; Last Updated).
-- Added generated `docs/CURRENT_RELEASE.md`; deleted superseded `RELEASE_NOTES_V2.1.md`.
-- Extended the harness to 17 tests (Release Docs group 10-17: registry shape, manager outputs, determinism, CURRENT_RELEASE match, registry↔CHANGELOG consistency with legacy preservation, VERSION rows, missing-marker abort, read-only real-docs consistency). Final run 17/17 PASSED, exit 0.
-- Updated 12 docs to describe the release pipeline (marker policy, ownership rules, one-command release workflow); fixed the stale CHANGELOG manual Version History table (2.2.0 Current / 2.1.0 Previous).
-- End-to-end release drill on a temp docs copy (simulated 2.3.0/V2.2 release): all outputs correct (CHANGELOG 2.3.0 above 2.2.0; VERSION.md row "V2.2, V2.1"), real docs byte-identical (5 SHA-256 unchanged), git status unchanged, temp root deleted. Drill exposed the registry array-order question → user ruling: newest-first (prepend); the spec already stated this at AI/BUILD_RELEASE_MANAGER.md.
-- Release manager re-run + full harness re-run as final verification: manager exit 0 (nothing written); 17/17 PASSED exit 0. 6 parked review minors triaged (all inert or fails-safe; recorded in the SDD ledger). Nothing committed (standing instruction).
-
-Broken:
-- None — clean session.
-
-Next: Commit the docs repository (all session 8 changes); user review of Release Manager V1 (registry, manager, harness, generated docs).
-
-Learned: A temp-copy drill is the cheapest proof that a generator leaves the real tree untouched, and it surfaces spec decisions early — the drill's conflict (registry array order vs. per-output display order) was a user ruling, not a code bug; the manager's job is to follow the registry, one source of truth.
-
-### Aug 4, 2026 (session 7) — Built Builder V2.1 (validation, merge pipeline, provider models, verification, tests)
-Done:
-- Followed the BDF spec (AI/BUILD_BUILDER_V2.1.md); evolved `scripts/build-opencode-v2.ps1` in place from V2.0 to V2.1 (user instruction: no versioned script files, git keeps history).
-- Extended validation: duplicate model IDs/names, plugin IDs, provider IDs, malformed provider/profile definitions, missing required fields, invalid structure. Duplicate keys detected on raw JSON text because PS 5.1 ConvertFrom-Json silently collapses duplicates.
-- Split merge into stages: Merge-Settings/Providers/Models/Plugins/Mcp/Final; provider-specific models with precedence `providers/<p>/models.json` > inline provider models > global `models.json` (global only when provider has none — preserves V2 behavior).
-- Split verification: Verify-Json → Verify-Providers → Verify-Models → Verify-Plugins → Verify-MCP, orchestrated by Verify-FinalOutput, runs before writing; backup failure aborts before write.
-- Concise count-based logging ("58 model(s) merged"); added -ConfigRoot param for isolated test builds; release summary with Validation/Merge/Verification/Generated PASS + build time.
-- Created `scripts/test-opencode-v2.ps1` harness (9 tests): valid coding profile (real files, no manual editing), invalid JSON, missing provider, duplicate model IDs, duplicate model names, duplicate plugins, malformed provider, provider-specific models, backup failure safety. Final run 9/9 passed, exit 0.
-- Fixed 3 real builder bugs found by tests: `$Section:` here-string parse errors, PSObject.Properties.Count unreliability (wrap with @()), plugin single-element array unrolling (`return ,$Plugins.plugin`).
-- Backwards compatibility verified: default build output byte-identical to a V2.0-era backup (58 models, 1 plugin, 9 MCP servers); removed 2 corrupted backups created during intermediate buggy runs.
-- Docs updated: BUILDER_SPEC.md (pipeline, validation list, merge stages, model precedence, Stage 7 Verification), CHANGELOG.md (2.2.0), PROJECT_STATE.md (2.2.0), TESTING.md (automated harness), ROADMAP.md (phases 5-7 Completed), FOLDER_STRUCTURE.md, ARCHITECTURE.md, ADAPTER.md, README.md, bdf/VERSION.md (supports V2 + V2.1).
-- No migration needed (zero breaking changes); templates left untouched (version-independent).
-
-Broken:
-- None — clean session.
-
-Next: Commit the docs repository (session 7 changes); user review of Builder V2.1 release.
-
-Learned: PS 5.1 ConvertFrom-Json silently keeps the last duplicate key — duplicate detection must scan raw text; `.PSObject.Properties.Count` is unreliable (returns odd values) — wrap with `@()`; returning a single-element array from a function unrolls it — use `return ,$array` to keep array shape in JSON output.
 

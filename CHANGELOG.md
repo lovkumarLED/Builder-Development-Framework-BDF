@@ -50,11 +50,123 @@ Example
 
 <!-- AUTO-GENERATED START -->
 
-# Version 2.2.0
+# Version 2.3.0
 
 ## Status
 
 Current
+
+---
+
+## Date
+
+```
+2026-08-04
+```
+
+---
+
+## Summary
+
+BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets.
+
+---
+
+## Highlights
+
+- Framework generalization (first step to BDF V3)
+- Single source of truth for adapter fields
+- Testable adapter validation checklist
+- Impact Analysis record for the Blueprint Engine
+- Generic release process documented (RELEASE_MANAGER.md)
+- Generic test-harness pattern documented (TESTING.md)
+
+---
+
+## New Features
+
+- bdf/NEW_PROJECT_GUIDE.md - the onboarding process for starting a new project with the framework
+- bdf/RELEASE_MANAGER.md - the generic release process document (registry, generator, generated documents)
+- bdf/TESTING.md - the generic test-harness pattern document
+- Adapter field table now lives only in templates/ADAPTER.template.md (single source of truth)
+- Adapter validation checklist (executable yes/no criteria) in PROJECT_ADAPTER.md
+- Impact Analysis record required output of the Blueprint Engine Impact Analysis stage
+
+---
+
+## Improvements
+
+- Framework boundaries audited: OpenCode-specific file names removed from bdf/ (Layer 1 no longer depends on Layer 2)
+- templates/README.md: placeholder audit ({{PLACEHOLDER_NAME}} row added), cross-reference matrix, provider placeholders confirmed generic, template sync rule stated
+- FRAMEWORK.md and bdf/README.md register the three new framework documents
+- Reference ADAPTER.md passes the new adapter validation checklist
+- docs/TESTING.md aligned with bdf/TESTING.md (test groups + definition of complete)
+
+---
+
+## Bug Fixes
+
+- Removed OpenCode-specific file names from bdf/MIGRATION.md and bdf/PROJECT_ADAPTER.md examples
+- Generalized a Layer 2 description in bdf/MIGRATION.md from OpenCode-specific to project-specific
+
+---
+
+## Breaking Changes
+
+None
+
+---
+
+## Migration Required
+
+No
+
+---
+
+## Testing Summary
+
+17/17 tests passed, exit code 0
+
+---
+
+## Known Issues
+
+None
+
+---
+
+## Documentation
+
+Updated
+
+- bdf/NEW_PROJECT_GUIDE.md (new)
+- bdf/RELEASE_MANAGER.md (new)
+- bdf/TESTING.md (new)
+- bdf/FRAMEWORK.md
+- bdf/PROJECT_ADAPTER.md
+- bdf/AI_WORKFLOW.md
+- bdf/PROJECT_GENERATOR.md
+- bdf/BLUEPRINT_ENGINE.md
+- bdf/MIGRATION.md
+- bdf/README.md
+- bdf/VERSION.md
+- bdf/templates/README.md
+- bdf/templates/ADAPTER.template.md
+- ADAPTER.md
+- PROJECT_STATE.md
+- ROADMAP.md
+- TESTING.md
+- CHANGELOG.md
+- CURRENT_RELEASE.md
+- _agent/JOURNEY_TO_V3.md
+
+---
+
+# Version 2.2.0
+
+## Status
+
+Previous
 
 ---
 
@@ -524,7 +636,8 @@ ROADMAP.md
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.2.0 | Current | Builder V2.1 (validation, merge pipeline, provider-specific models, verification, automated tests) |
+| 2.3.0 | Current | BDF V2.5 framework generalization |
+| 2.2.0 | Previous | Builder V2.1 (validation, merge pipeline, provider-specific models, verification, automated tests) |
 | 2.1.0 | Previous | Builder Development Framework adoption |
 | 2.0.3 | Previous | Project state system |
 | 2.0.2 | Previous | Session continuity system |

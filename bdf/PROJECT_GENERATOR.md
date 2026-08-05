@@ -12,6 +12,16 @@ The workflow is generic.
 
 It applies to any target application, any scripting language, and any future builder project.
 
+The human-facing onboarding process (what to do, and why) is documented separately:
+
+```
+NEW_PROJECT_GUIDE.md
+```
+
+This document is the machine of the same workflow: the stages in order.
+
+Read the guide first, then follow the stages below.
+
 ---
 
 # Overview

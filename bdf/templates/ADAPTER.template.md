@@ -24,6 +24,27 @@ Every field in this document defines a project-specific fact.
 
 # Adapter Contents
 
+The adapter is complete only when every field in the following table is defined.
+
+| Field | Definition |
+|-------|------------|
+| Project Name | The name of the builder project. |
+| Configuration File | The source configuration files and their format. |
+| Folder Structure | The project folders and their responsibilities. |
+| Supported Providers | The providers the project supports. |
+| Supported Models | The models the project exposes. |
+| Supported Plugins | The plugins the project enables. |
+| Supported MCP | The MCP servers the project configures. |
+| Output Artifact | The final generated configuration file. |
+| Builder Entry Point | The script or command that runs the builder. |
+
+This table is the single source of truth for the adapter fields.
+
+The framework document `PROJECT_ADAPTER.md` describes each field and refers to this table;
+it does not duplicate it.
+
+Every section below defines one field.
+
 ## Project Name
 
 ```

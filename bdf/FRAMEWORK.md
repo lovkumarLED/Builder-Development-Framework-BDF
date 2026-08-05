@@ -81,7 +81,7 @@ If a project document duplicates framework knowledge, the framework remains the 
 
 # Framework Components
 
-The framework is organized into eight components.
+The framework is organized into twelve components.
 
 | Component | Document | Purpose |
 |-----------|----------|---------|
@@ -93,6 +93,10 @@ The framework is organized into eight components.
 | AI Workflow | `AI_WORKFLOW.md` | The workflow every AI coding agent follows. |
 | Lessons Learned | `LESSONS_LEARNED.md` | Reusable engineering principles. |
 | Version System | `VERSION.md` | Framework versioning and compatibility. |
+| New Project Guide | `NEW_PROJECT_GUIDE.md` | The onboarding process for starting a new project with the framework. |
+| Release Manager | `RELEASE_MANAGER.md` | The generic release process: registry, generator, and generated release documents. |
+| Testing Framework | `TESTING.md` | The generic test-harness pattern every builder project follows. |
+| Builder Phases | `BUILDER_PHASES.md` | The quality gates (Alpha → Beta → General Release) every builder build must pass. |
 
 Every component answers part of the four framework questions.
 
@@ -108,7 +112,9 @@ Answered by this document, the templates, and the project specification.
 
 ## Question 2 — How Should This Builder Evolve?
 
-Answered by `BUILDER_EVOLUTION.md`.
+Answered by `BUILDER_EVOLUTION.md` and `BUILDER_PHASES.md`.
+
+`BUILDER_EVOLUTION.md` defines the version workflow; `BUILDER_PHASES.md` defines the Alpha → Beta → General Release gates every build must pass before it becomes the main builder.
 
 ## Question 3 — How Do I Create Another Builder?
 
@@ -230,6 +236,16 @@ A builder project uses a standard set of documents.
 | `LESSONS_LEARNED.md` | Reusable engineering lessons. |
 | `ADAPTER.md` | Project-specific facts. |
 
+## Framework Process Documents
+
+The framework also includes process documents that are never generated into a project.
+
+| Document | Purpose |
+|----------|---------|
+| `NEW_PROJECT_GUIDE.md` | The onboarding process for starting a NEW project with the framework. |
+| `RELEASE_MANAGER.md` | The generic release process: registry, generator, generated release documents. |
+| `TESTING.md` | The generic test-harness pattern. Each project generates its own project `TESTING.md` from `templates/TESTING.template.md`; the framework document defines the pattern both mirror. |
+
 ## Documentation Rules
 
 - Documentation is part of the project.
@@ -343,6 +359,14 @@ PROJECT_GENERATOR.md
 ```
 
 The workflow covers idea, repository creation, template copying, customization, implementation, testing, and release.
+
+The human-facing onboarding process is documented in:
+
+```
+NEW_PROJECT_GUIDE.md
+```
+
+It defines the numbered steps and teaches where project-specific knowledge lives: only in the project adapter.
 
 ---
 

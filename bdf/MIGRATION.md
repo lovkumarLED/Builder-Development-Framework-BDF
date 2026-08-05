@@ -89,7 +89,7 @@ Replace project-specific names in reusable content with generic descriptions or 
 Example
 
 ```
-Before: The builder generates opencode.json.
+Before: The builder generates "the_app.json" (a hardcoded target-specific file name).
 
 After:  The builder generates the project's final configuration artifact.
 ```
@@ -239,7 +239,7 @@ Its documentation was restructured into two layers:
 
 ```
 Layer 1  bdf/          Reusable engineering knowledge.
-Layer 2  project docs  OpenCode-specific documentation.
+Layer 2  project docs  Project-specific documentation.
 ```
 
 Existing project documentation was preserved.

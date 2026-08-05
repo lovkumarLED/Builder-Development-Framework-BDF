@@ -7,7 +7,7 @@
 Builder Version
 
 ```
-V2.1
+V2.3
 ```
 
 ---
@@ -15,7 +15,7 @@ V2.1
 Project Version
 
 ```
-2.2.0
+2.3.0
 ```
 
 ---

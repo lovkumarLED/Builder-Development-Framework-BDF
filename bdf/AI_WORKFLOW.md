@@ -217,7 +217,8 @@ Result:
 New Builder Project
 ```
 
-Detailed in `PROJECT_ADAPTER.md` and `PROJECT_GENERATOR.md`.
+Detailed in `PROJECT_ADAPTER.md`, `PROJECT_GENERATOR.md`, and the human-facing onboarding
+guide `NEW_PROJECT_GUIDE.md`.
 
 ---
 

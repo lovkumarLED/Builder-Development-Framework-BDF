@@ -177,6 +177,12 @@ The AI records the release facts after implementation and testing.
 
 The user reviews the facts before the release manager runs.
 
+The generic release process is defined in:
+
+```
+bdf/RELEASE_MANAGER.md
+```
+
 ---
 
 ## Release Artifacts
@@ -224,6 +230,12 @@ Invocation example:
 ```
 
 Generated release files are never edited manually.
+
+The generic release process (registry, all-or-nothing writes, marker policy) is defined in:
+
+```
+bdf/RELEASE_MANAGER.md
+```
 
 ---
 

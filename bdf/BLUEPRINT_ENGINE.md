@@ -115,6 +115,27 @@ For every request, the engine identifies:
 
 Impact analysis happens before any file is modified.
 
+### The Impact Analysis Record
+
+The output artifact of the Impact Analysis stage is the Impact Analysis record.
+
+Every blueprint change produces exactly one record before the next stage starts.
+
+A blueprint change without this record is incomplete.
+
+Format:
+
+```
+Impact Analysis — <change title>
+
+Affected documents: <list>
+Affected components: <list>
+Affected tests: <list>
+Backwards compatibility: <safe | breaking — migration required>
+```
+
+The record states what changes and why, before any file is modified (Rule 1).
+
 ---
 
 ## Architecture Update

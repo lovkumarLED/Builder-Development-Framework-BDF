@@ -19,7 +19,7 @@ Every change to the framework must be recorded here.
 Version
 
 ```
-2.0.0
+2.1.0
 ```
 
 Status
@@ -34,12 +34,12 @@ Active
 
 | Item | Value |
 |------|-------|
-| Framework Version | 2.0.0 |
-| Supported Builder Versions | V2.1 |
+| Framework Version | 2.1.0 |
+| Supported Builder Versions | V2.3, V2.1 |
 | Compatible Projects | OpenCode Configuration Manager documentation |
 | Last Updated | 2026-08-04 |
-| Breaking Changes | Yes — framework renamed from Blueprint Framework |
-| Migration Required | Yes — see `MIGRATION.md` |
+| Breaking Changes | None |
+| Migration Required | No |
 
 ---
 
@@ -107,6 +107,57 @@ Example
 
 # Change History
 
+## Version 2.1.0
+
+Date
+
+```
+2026-08-04
+```
+
+Status
+
+```
+Current
+```
+
+Summary
+
+```
+BDF V2.5 framework generalization: generalized the framework for reuse across targets.
+```
+
+Added
+
+- `NEW_PROJECT_GUIDE.md` — the onboarding process for starting a new project.
+- `RELEASE_MANAGER.md` — the generic release process.
+- `TESTING.md` — the generic test-harness pattern.
+- The adapter field table moved into `templates/ADAPTER.template.md` (single source of truth).
+- The adapter validation checklist in `PROJECT_ADAPTER.md`.
+- The Impact Analysis record in `BLUEPRINT_ENGINE.md`.
+- The placeholder audit and cross-reference matrix in `templates/README.md`.
+
+Changed
+
+- `FRAMEWORK.md`, `bdf/README.md` registered the three new framework documents.
+- `AI_WORKFLOW.md` and `PROJECT_GENERATOR.md` reference the new project guide.
+- `MIGRATION.md` generalized an example and a layer description.
+- Templates now state the sync rule (templates mirror the reference implementation).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
 ## Version 2.0.0
 
 Date
@@ -118,7 +169,7 @@ Date
 Status
 
 ```
-Current
+Previous
 ```
 
 Summary
@@ -245,7 +296,8 @@ No
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.0.0 | Current | Builder Development Framework rename + intelligence layer |
+| 2.1.0 | Current | BDF V2.5 framework generalization |
+| 2.0.0 | Previous | Builder Development Framework rename + intelligence layer |
 | 1.1.0 | Previous | PROJECT_STATE template added |
 | 1.0.0 | Previous | Initial Blueprint Framework release |
 

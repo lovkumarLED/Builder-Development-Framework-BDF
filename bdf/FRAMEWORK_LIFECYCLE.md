@@ -142,6 +142,8 @@ The implementation is verified.
 
 The testing guide generated from `TESTING.template.md` defines the procedure.
 
+The build enters its Alpha Phase per `BUILDER_PHASES.md`: it runs end to end and known issues are recorded.
+
 ## Exit Criteria
 
 All tests pass.
@@ -160,11 +162,14 @@ The changelog records the release.
 
 The roadmap removes completed work.
 
+The build passes its Beta Phase (test suite green, migration notes written) and reaches General Release per `BUILDER_PHASES.md` — only then does it become the main builder.
+
 ## Exit Criteria
 
 - All tests pass.
 - Documentation describes the current implementation.
 - Version records are current.
+- The build reached General Release.
 
 ---
 
@@ -247,8 +252,8 @@ The project is recorded as archived.
 | Idea | `PROJECT_GENERATOR.md` |
 | Blueprint | `PROJECT_GENERATOR.md`, `PROJECT_ADAPTER.md` |
 | Builder | `FRAMEWORK.md` |
-| Testing | Templates, `FRAMEWORK.md` |
-| Release | Version system |
+| Testing | Templates, `FRAMEWORK.md`, `BUILDER_PHASES.md` (Alpha) |
+| Release | Version system, `BUILDER_PHASES.md` (Beta → General Release) |
 | Maintenance | `BLUEPRINT_ENGINE.md` |
 | Next Version | `BUILDER_EVOLUTION.md` |
 | Archive | This document |

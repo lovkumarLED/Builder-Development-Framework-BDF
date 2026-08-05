@@ -60,9 +60,9 @@ Done
 ```
 Step 0 — Current (Builder V2.2.0, Release Manager V1)          ✅ complete
 ↓
-Step 1 — BDF V2.5: Framework Generalization                    ← we are here
+Step 1 — BDF V2.5: Framework Generalization                    ✅ complete
 ↓
-Step 2 — Claude Code Builder V1 (first validation)
+Step 2 — Claude Code Builder V1 (first validation)             ← we are here
 ↓
 Step 3 — Framework Improvements (learned from Claude)
 ↓
@@ -80,26 +80,33 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 4, 2026 (session 12 end)
+Updated: Aug 5, 2026 (session 14 end)
 
 ```
 Step 1 — BDF V2.5: Framework Generalization
-Status: NOT STARTED
-Progress: 0%
+Status: COMPLETE
+Progress: 100%
 ```
 
-What remains before V2.5 is complete:
+What was completed in V2.5:
 
-- [ ] `NEW_PROJECT_GUIDE.md` — documented onboarding process for new projects.
-- [ ] Better `PROJECT_ADAPTER.md` — cleaner generic/project boundary.
-- [ ] More generic templates.
-- [ ] Better Blueprint Engine.
-- [ ] Cleaner framework boundaries.
-- [ ] Improved validation, testing, adapters, templates, documentation,
-      provider handling, and release system.
-- [ ] V2.5 released (registry entry + release pipeline run + tests green).
+- [x] `NEW_PROJECT_GUIDE.md` — documented onboarding process for new projects.
+- [x] Better `PROJECT_ADAPTER.md` — cleaner generic/project boundary (single source of truth + validation checklist).
+- [x] More generic templates (placeholder audit, cross-reference matrix, sync rule).
+- [x] Better Blueprint Engine (Impact Analysis record).
+- [x] Cleaner framework boundaries (OpenCode-specific knowledge removed from `bdf/`).
+- [x] Improved validation, testing, adapters, templates, documentation,
+      provider handling, and release system (bdf/TESTING.md, bdf/RELEASE_MANAGER.md).
+- [x] V2.5 released (registry entry 2.3.0 + release pipeline run + 17/17 tests green).
 
-After V2.5: build the Claude Code Builder V1, then KiloCode Builder V1, then V3.
+Next: Step 2 — build the Claude Code Builder V1 (first validation of the generalized
+framework), then KiloCode Builder V1, then V3.
+
+Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = Claude Builder V1).
+
+Phase gates: every builder build on the road to V3 must pass the Alpha → Beta →
+General Release gates in `bdf/BUILDER_PHASES.md` before it becomes the main builder
+and the journey advances to the next step.
 
 ---
 

@@ -52,9 +52,9 @@ Only Project Adapters should differ between supported projects.
 The path is:
 
 ```
-Current (Builder V2.2.0)
+Current (Builder V2.2.0) ✅
 ↓
-BDF V2.5 (framework generalization)
+BDF V2.5 (framework generalization) ✅
 ↓
 Claude Code Builder V1
 ↓
@@ -74,19 +74,19 @@ Real projects shape the framework — never assumptions.
 Current Version
 
 ```
-2.2.0
+2.3.0
 ```
 
 Current Status
 
 ```
-Stable Foundation
+Framework Generalization
 ```
 
 Journey Position
 
 ```
-BDF V2.5 — Not started (next step on the road to V3)
+BDF V2.5 — Completed; next step: Claude Code Builder V1
 ```
 
 The project currently provides:
@@ -338,12 +338,12 @@ Make every version release one command instead of a manual 10-file edit.
 
 ---
 
-## Phase 10 — BDF V2.5: Framework Generalization
+## Phase 10 — BDF V2.5: Framework Generalization ✅
 
 Status
 
 ```
-Planned — next
+Completed (2026-08-04)
 ```
 
 Objective
@@ -380,7 +380,7 @@ Make the framework reusable across OpenCode, Claude Code, and KiloCode without r
 Status
 
 ```
-Planned
+Planned — next
 ```
 
 Objective

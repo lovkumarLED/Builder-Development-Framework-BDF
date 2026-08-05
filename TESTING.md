@@ -8,6 +8,14 @@
 
 This document defines the testing process used to verify that the OpenCode Configuration Manager is functioning correctly.
 
+The generic testing pattern is defined in:
+
+```
+bdf/TESTING.md
+```
+
+This document is the project-specific mirror of the framework pattern.
+
 Testing ensures that:
 
 - Configuration files are valid.
@@ -72,6 +80,12 @@ Testing follows four principles.
 4. Changes should never break previously working functionality.
 
 Testing is considered part of development rather than an optional step.
+
+The harness and its test results are part of a version's definition of complete: a version
+whose tests fail is not released.
+
+The documented test groups mirror the framework pattern (valid build, failure modes,
+release docs), applied to this project as the manual and automated tests below.
 
 ---
 

@@ -68,21 +68,72 @@ Framework + Adapter = Builder Project
 
 # Adapter Contents
 
-Every adapter describes the following items.
+The adapter field table lives in exactly ONE place:
 
-| Field | Definition |
-|-------|------------|
-| Project Name | The name of the builder project. |
-| Configuration File | The source configuration files and their format. |
-| Folder Structure | The project folders and their responsibilities. |
-| Supported Providers | The providers the project supports. |
-| Supported Models | The models the project exposes. |
-| Supported Plugins | The plugins the project enables. |
-| Supported MCP | The MCP servers the project configures. |
-| Output Artifact | The final generated configuration file. |
-| Builder Entry Point | The script or command that runs the builder. |
+```
+templates/ADAPTER.template.md
+```
 
-The adapter is complete only when every field is defined.
+The template defines the nine adapter fields and their definitions.
+
+This document describes each field and refers to the template; it does not duplicate the
+table.
+
+Every adapter is complete only when every field listed in the template is defined.
+
+## Field Descriptions
+
+### Project Name
+
+The name of the builder project.
+
+The name appears in the project documentation and in the changelog.
+
+### Configuration File
+
+The source configuration files and their format.
+
+This field defines what the builder reads.
+
+### Folder Structure
+
+The project folders and their responsibilities.
+
+This field defines where every file lives.
+
+### Supported Providers
+
+The providers the project supports.
+
+If the target application has no provider concept, the value states that explicitly.
+
+### Supported Models
+
+The models the project exposes.
+
+### Supported Plugins
+
+The plugins the project enables.
+
+### Supported MCP
+
+The MCP servers the project configures.
+
+If the target application has no MCP concept, the value states that explicitly.
+
+### Output Artifact
+
+The final generated configuration file.
+
+The builder generates this artifact.
+
+It is never edited manually.
+
+### Builder Entry Point
+
+The script or command that runs the builder.
+
+The value must match a real script or command in the project.
 
 ---
 
@@ -115,7 +166,7 @@ Example
 ```
 Framework: The builder generates the project's final configuration artifact.
 
-Adapter:   The output artifact is opencode.json.
+Adapter:   The output artifact is {{GENERATED_ARTIFACT}} in the reference implementation.
 ```
 
 ---
@@ -206,7 +257,7 @@ ADAPTER.md
 
 ## Step 4 — Define Every Field
 
-Fill in every field from the adapter contents table.
+Fill in every field from the adapter field table in the template.
 
 Use only facts about the target application.
 
@@ -256,15 +307,34 @@ Every framework component reads the adapter when it needs project-specific knowl
 
 # Validating an Adapter
 
-An adapter passes validation when:
+Adapter validation is a yes/no checklist.
 
-- Every field in the contents table is defined.
-- Every placeholder is replaced.
-- The project name matches the project.
-- The output artifact matches the builder output.
-- The builder entry point matches the actual script or command.
-- The folder structure matches the project folders.
-- Supported providers, models, plugins, and MCP match the project configuration.
+Every criterion is checkable against the adapter file and the project.
+
+An adapter passes validation only when EVERY criterion below answers yes.
+
+## Adapter Validation Checklist
+
+| # | Criterion | How to check |
+|---|-----------|--------------|
+| 1 | Every field listed in `templates/ADAPTER.template.md` exists in `ADAPTER.md`. | Compare the field table in the template against the sections in the adapter. |
+| 2 | Every field is defined with a real value, not left blank. | Read every field section in the adapter. |
+| 3 | No `{{PLACEHOLDER}}` remains in a released adapter. | Search the released adapter for `{{`. |
+| 4 | The project name matches the project. | Compare the Project Name field to the repository name. |
+| 5 | The output artifact matches the generated builder output. | Run the builder and compare the artifact name. |
+| 6 | The builder entry point matches an actual script or command in the project. | Check the referenced path exists in the project. |
+| 7 | The folder structure matches the project folders. | Walk the project folders and compare. |
+| 8 | Supported providers, models, plugins, and MCP match the project configuration. | Compare the lists against the source configuration files. |
+| 9 | No builder behavior is referenced that the framework does not define. | Every behavior named in the adapter maps to a framework lifecycle stage. |
+
+## Point of Failure
+
+If any criterion answers no, the adapter is released only after the mismatch is fixed.
+
+A placeholder in a released adapter is a defect (Rule 5).
+
+An adapter that references behavior the framework does not define signals a framework gap:
+decide whether to add a generic stage or move the fact into the adapter.
 
 ---
 
