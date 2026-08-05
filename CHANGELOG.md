@@ -50,11 +50,107 @@ Example
 
 <!-- AUTO-GENERATED START -->
 
-# Version 2.3.0
+# Version 2.4.0
 
 ## Status
 
 Current
+
+---
+
+## Date
+
+```
+2026-08-05
+```
+
+---
+
+## Summary
+
+Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level <provider>-models.json with highest precedence.
+
+---
+
+## Highlights
+
+- All-provider discovery (providers/*.json)
+- Interactive active-provider selection persisted to profile settings.json
+- Profile-level per-provider model files (<provider>-models.json)
+- -Provider / -NonInteractive CLI switches
+- 12-test V2.5 harness + builder-regeneration guarantee in docs
+
+---
+
+## New Features
+
+- scripts/build-opencode-v2.5.ps1
+- scripts/test-opencode-v2.5.ps1
+- profiles/<profile>/<provider>-models.json
+
+---
+
+## Improvements
+
+- Model precedence: profile <provider>-models.json > providers/<p>/models.json > inline > global
+- settings.json backed up before activeProviders write
+
+---
+
+## Bug Fixes
+
+- settings.json no longer rewritten when the active-provider list is unchanged (no-op runs keep the file byte-identical)
+
+---
+
+## Breaking Changes
+
+None
+
+---
+
+## Migration Required
+
+No
+
+---
+
+## Testing Summary
+
+17/17 (V2.1) + 12/12 (V2.5) tests passed, exit code 0
+
+---
+
+## Known Issues
+
+None
+
+---
+
+## Documentation
+
+Updated
+
+- BUILDER_SPEC.md
+- JSON_SCHEMAS.md
+- FOLDER_STRUCTURE.md
+- ADAPTER.md
+- ARCHITECTURE.md
+- TESTING.md
+- README.md
+- PROJECT_STATE.md
+- CHANGELOG.md
+- CURRENT_RELEASE.md
+- bdf/VERSION.md
+- _agent/JOURNEY_TO_V3.md
+
+---
+
+# Version 2.3.0
+
+## Status
+
+Previous
 
 ---
 

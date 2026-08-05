@@ -80,7 +80,7 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 5, 2026 (session 14 end)
+Updated: Aug 5, 2026 (session 15 end)
 
 ```
 Step 1 — BDF V2.5: Framework Generalization
@@ -101,15 +101,15 @@ What was completed in V2.5:
 
 Side goals (build before Step 2 — Claude Code Builder V1):
 
-- [ ] Active-Provider Selector Builder — `scripts/build-opencode-v2.5.ps1`
-      (registry 2.4.0). Builder considers all `providers/*.json`, interactive
+- [x] Active-Provider Selector Builder — `scripts/build-opencode-v2.5.ps1`
+      (released, registry 2.4.0). Builder considers all `providers/*.json`, interactive
       active-provider selection persisted to profile `settings.json`, and
       profile-level `profiles/<profile>/<provider>-models.json` attach when the
       provider is active. Plan: `AI/BUILD_BUILDER_V2.5_SELECTOR.md`.
 - [ ] JSON Schema Validation (`schemas/`) — gate before Step 2. Spec reserved
       in `schemas/README.md`. Not built yet.
 
-Next: build the two side goals above, then Step 2 — Claude Code Builder V1
+Next: build the JSON Schema Validation side goal (`schemas/`), then Step 2 — Claude Code Builder V1
 (first validation of the generalized framework), then KiloCode Builder V1, then V3.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = Claude Builder V1).

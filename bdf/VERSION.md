@@ -35,9 +35,9 @@ Active
 | Item | Value |
 |------|-------|
 | Framework Version | 2.1.0 |
-| Supported Builder Versions | V2.3, V2.1 |
+| Supported Builder Versions | V2.5, V2.3, V2.1 |
 | Compatible Projects | OpenCode Configuration Manager documentation |
-| Last Updated | 2026-08-04 |
+| Last Updated | 2026-08-05 |
 | Breaking Changes | None |
 | Migration Required | No |
 

@@ -55,7 +55,8 @@ Framework Generalization
 <!-- AUTO-GENERATED START -->
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.3.0 | Current | BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets. |
+| 2.4.0 | Current | Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level <provider>-models.json with highest precedence. |
+| 2.3.0 | Previous | BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets. |
 | 2.2.0 | Previous | Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing. |
 <!-- AUTO-GENERATED END -->
 

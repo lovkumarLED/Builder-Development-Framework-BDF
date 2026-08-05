@@ -10,7 +10,26 @@
 
 ## Session History
 
-### Aug 5, 2026 (session 14) — Reviewed V2.5 changes; added Builder Phases quality gates ← recent session
+### Aug 5, 2026 (session 15) — Built and released Builder V2.5 Active-Provider Selector (registry 2.4.0) ← recent session
+Done:
+- Baseline fix: real `profiles/coding/models.json` was missing (removed during V2.5 prep), breaking V2.1 harness test 17 (16/17). Recreated it from the omniroute model set (18 models); V2.1 harness back to 17/17.
+- Built `scripts/build-opencode-v2.5.ps1` (V2.1 copy + 3 new stages): Stage 0 Discover-Providers (all providers/*.json, malformed = fail naming files), active-provider selection (interactive menu / -Provider / -NonInteractive) with settings.json persistence (backed up to backup/settings_*.json, $schema preserved, rewritten only when list differs), profile-level <provider>-models.json with highest precedence (profile > providers/<p>/models.json > inline > global). Verification additions: every active provider must have a models source; Stage 8 settings.json round-trip check. V2.1 script + harness byte-for-byte untouched.
+- Built `scripts/test-opencode-v2.5.ps1`: 12 tests, all passing. Test 12 Test-BuilderSpecCoversV25 greps BUILDER_SPEC.md for the 6 feature tokens (regeneration-guarantee sync test).
+- Docs sync (regeneration source): BUILDER_SPEC.md full V2.5 section (CLI table, 9 stages, 6 function contracts with verbatim error text, precedence, file shapes, regeneration guarantee, Current Builder = V2.5); JSON_SCHEMAS.md, FOLDER_STRUCTURE.md, ADAPTER.md, ARCHITECTURE.md, TESTING.md (both-harness definition of complete), README.md, PROJECT_STATE.md updated.
+- Real-world validation: coding profile build with -Provider modal,omniroute -> opencode.json has modal/kimi-k3 (from profile modal-models.json), omniroute 18 models, settings.json rewritten, backup created; interactive menu validated on the real profile (Enter keeps current).
+- Release: release_registry.json 2.4.0 entry (Current, builderVersion V2.5) + 2.3.0 flipped to Previous; user reviewed and approved; release-manager.ps1 regenerated CHANGELOG.md, CURRENT_RELEASE.md, PROJECT_STATE.md version table, bdf/VERSION.md rows (Supported Builder Versions V2.5, V2.3, V2.1). Note: plan's verbatim empty "bugFixes": [] rejected by release-manager validation (empty array serializes as ""); used one real fix entry instead.
+- Final sweep: 17/17 (V2.1) + 12/12 (V2.5), exit 0. JOURNEY_TO_V3.md side goal 1 ticked (registry 2.4.0), Next line updated to JSON Schema Validation side goal then Step 2.
+
+Broken:
+- None — clean session.
+
+Journey: Step 1 BDF V2.5 — COMPLETE, 100%; side goal Active-Provider Selector Builder done (2.4.0); JSON Schema Validation side goal open.
+
+Next: Next work: JSON Schema Validation side goal (schemas/), then Step 2 Claude Code Builder V1. Note: scripts/profiles/providers live outside the git repo (untracked by design); docs commits only.
+
+Learned: The plan's verbatim empty "bugFixes": [] collides with release-manager required-field validation (empty array -> "" -> "missing required field"); registry entries must not use empty arrays.
+
+### Aug 5, 2026 (session 14) — Reviewed V2.5 changes; added Builder Phases quality gates
 Done:
 - Reviewed the uncommitted V2.5 work (19 modified + 3 new bdf/ docs) via a sub-agent diff audit: release version 2.3.0 / builder V2.3 consistent across release_registry.json, CHANGELOG.md, CURRENT_RELEASE.md, PROJECT_STATE.md, ROADMAP.md; framework version 2.1.0 in bdf/VERSION.md confirmed as the separate intentional framework-numbering scale (not a mismatch).
 - Re-verified the test harness on the uncommitted state: test-opencode-v2.ps1 17/17 PASSED, exit 0 (includes read-only real-docs consistency test).
@@ -79,20 +98,4 @@ Broken:
 Next: User reviews session-11 fixes, then commits the docs repo (standing instruction: nothing committed; 28 modified files + untracked AI/DISTRIBUTE_SUBAGENTS.md).
 
 Learned: A final full-repo test with parallel sub-agent audits catches real drift (28 issues) that single-pass review misses — but every agent finding must be personally verified against the source before editing, since some "inconsistencies" are deliberate rulings or historical records.
-
-### Aug 4, 2026 (session 10) — Built the sub-agent distribution system; set 70% context ceiling
-Done:
-- Created the sub-agent distribution workflow: skill `~/.config/opencode/skills/subagent-distribution/SKILL.md` — plan (todowrite) → estimate S/M/L size + time + token cost → distribute to sub-agents → mandatory ≤300-word summaries → integrate from summaries.
-- Created 6 custom sub-agents in `~/.config/opencode/agent/`: reader (read-only summaries), writer (edit per spec), builder (implement + test), terminal (PowerShell/git, destructive ops ask), planner (breakdown/estimates), researcher (web).
-- Created the session prompt `docs/AI/DISTRIBUTE_SUBAGENTS.md` and registered it in opencode.json `instructions` so every session auto-loads the workflow (no pasting needed).
-- Updated `_agent/SESSION_WORKFLOW.md` to v1.2: Context Window Budget section (triggers at 50% delegate / 65% wrap up / 70% hard stop) + session log entry now mandatory for EVERY session.
-- Demonstrated the pattern: dispatched 5 parallel reader sub-agents to read all ~560 KB of docs; only compact summaries entered the main context.
-- Verified: opencode.json still valid JSON; all agent/skill files present with valid frontmatter.
-
-Broken:
-- None — clean session.
-
-Next: User restarts opencode and verifies the system loads (skill + 6 agents + DISTRIBUTE_SUBAGENTS.md instructions); review session 10 changes; standing instruction still open: commit the docs repository (sessions 7-10).
-
-Learned: The docs repo (~560 KB) ≈ 140k tokens ≈ 70% of a 200k window when read directly — delegating reads to sub-agents (each with its own fresh context window) means only ~300-word summaries return, keeping the main window near-empty for actual work.
 

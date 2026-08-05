@@ -7,7 +7,7 @@
 Builder Version
 
 ```
-V2.3
+V2.5
 ```
 
 ---
@@ -15,7 +15,7 @@ V2.3
 Project Version
 
 ```
-2.3.0
+2.4.0
 ```
 
 ---
@@ -23,7 +23,7 @@ Project Version
 Release Date
 
 ```
-2026-08-04
+2026-08-05
 ```
 
 ---
@@ -47,7 +47,7 @@ No
 Testing
 
 ```
-17/17 tests passed, exit code 0
+17/17 (V2.1) + 12/12 (V2.5) tests passed, exit code 0
 ```
 
 ---
