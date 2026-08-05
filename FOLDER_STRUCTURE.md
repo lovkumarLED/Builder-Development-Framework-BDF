@@ -262,6 +262,8 @@ default/
 
 settings.json
 
+<provider>-models.json
+
 models.json
 
 plugins.json
@@ -278,6 +280,20 @@ Purpose:
 General profile configuration.
 
 Contains profile-level settings used by the builder.
+
+The builder also writes the resolved `activeProviders` list back to this file after provider selection (backed up first).
+
+---
+
+### <provider>-models.json
+
+Purpose:
+
+Profile-level model definitions for a single provider.
+
+The file name follows the pattern `<provider>-models.json` (for example `omniroute-models.json`), one file per active provider.
+
+Carries the highest model-source precedence.
 
 ---
 
@@ -409,13 +425,25 @@ scripts/
 
 Contains automation scripts.
 
-The primary script is the OpenCode configuration builder (Builder V2.1).
+The primary script is the OpenCode configuration builder (Builder V2.5).
+
+```
+build-opencode-v2.5.ps1
+```
+
+Builder V2.1 is retained.
 
 ```
 build-opencode-v2.ps1
 ```
 
 The automated test harness verifies the builder and the release pipeline.
+
+```
+test-opencode-v2.5.ps1
+```
+
+The V2.1 test harness is retained.
 
 ```
 test-opencode-v2.ps1
@@ -431,6 +459,43 @@ The previous builder is retained as a legacy script.
 
 ```
 build-opencode.ps1
+```
+
+---
+
+## build-opencode-v2.5.ps1
+
+Purpose
+
+Generates the final `opencode.json`.
+
+Responsibilities
+
+- Discover all providers from `providers/*.json`.
+- Select the active providers (interactive menu / `-Provider` / `-NonInteractive`).
+- Persist the selection back to `settings.json` (backed up first, `$schema` preserved, UTF-8 no-BOM, only when the list differs).
+- Load configuration files.
+- Validate configuration (structure, duplicates, malformed definitions).
+- Merge configuration in stages.
+- Create backup.
+- Verify generated configuration before writing.
+- Generate output.
+
+Supports
+
+- Dynamic profile selection.
+- Active-provider discovery and selection.
+- Settings persistence.
+- Optional profile sections.
+- Provider-specific models with profile-level precedence.
+
+Model-source precedence (highest first):
+
+```
+profiles/<profile>/<provider>-models.json
+providers/<provider>/models.json
+inline provider models
+profiles/<profile>/models.json
 ```
 
 ---
@@ -458,6 +523,26 @@ Supports
 - Provider-specific models.
 
 The builder never edits source configuration files.
+
+---
+
+## test-opencode-v2.5.ps1
+
+Purpose
+
+Automated verification of the V2.5 builder.
+
+Responsibilities
+
+- Build isolated temporary fixtures.
+- Run the builder against each fixture.
+- Assert expected success or failure.
+- Verify active-provider discovery (all `providers/*.json`).
+- Verify active-provider selection (interactive, `-Provider`, `-NonInteractive`).
+- Verify settings.json persistence round-trip and backup creation.
+- Verify model-source precedence (profile-level > provider folder > inline > global).
+- Verify failure modes (empty selection, duplicate model keys, malformed providers).
+- Report pass/fail results.
 
 ---
 
@@ -620,6 +705,6 @@ Future project ideas are documented exclusively in `ROADMAP.md`.
 
 ---
 
-**Document Version:** 1.1
+**Document Version:** 1.2
 
 **Status:** Current Project Structure

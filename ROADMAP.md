@@ -375,12 +375,97 @@ Make the framework reusable across OpenCode, Claude Code, and KiloCode without r
 
 ---
 
+## Phase 10.5 — Active-Provider Selector Builder (V2.5 Builder)
+
+Status
+
+```
+Planned — first build of this feature set
+```
+
+Objective
+
+Extend the builder so it:
+
+- Considers every `provider` definition in `providers/` (all `*.json` files, not just the ones already listed in `settings.json`).
+- Lets the user pick which providers are active via an interactive selection menu, and persists the chosen list back into `profiles/<profile>/settings.json`.
+- Attaches the chosen provider's model list from profile-level `<provider>-models.json` files (`modal-models.json`, `omniroute-models.json`, ...) into the final `opencode.json`.
+
+Resilience rule (regeneration guarantee)
+
+The builder must be fully reproducible from documentation. If `scripts/*` are deleted, an
+agent must be able to regenerate `build-opencode-v2.5.ps1` with every feature by reading
+`BUILDER_SPEC.md` and `AI/BUILD_BUILDER_V2.5_SELECTOR.md`. The spec must describe every
+stage, function contract, CLI switch, precedence rule, and file shape exactly.
+
+Expected release
+
+```
+registry 2.4.0
+```
+
+---
+
+## Phase 10.6 — JSON Schema Validation (schemas/)
+
+Status
+
+```
+Planned — gate before Claude Code Builder V1
+```
+
+Objective
+
+Implement JSON Schema validation for configuration files before the builder's own
+validation runs:
+
+```
+profiles/<profile>/settings.json
+providers/*.json
+models.json
+<provider>-models.json   (new in Phase 10.5)
+plugins.json
+mcp.json
+```
+
+Reserved location and workflow
+
+`schemas/README.md` describes the future flow:
+
+```
+
+Configuration Files
+
+↓
+
+JSON Schema Validation
+
+↓
+
+Builder Validation
+
+↓
+
+Configuration Merge
+
+↓
+
+Generate opencode.json
+
+```
+
+Required before
+
+Claude Code Builder V1 (Phase 11). Not built yet — record only.
+
+---
+
 ## Phase 11 — Claude Code Builder V1
 
 Status
 
 ```
-Planned — next
+Planned — after gates (Phases 10.5, 10.6)
 ```
 
 Objective

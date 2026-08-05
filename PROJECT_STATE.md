@@ -354,15 +354,29 @@ providers/<provider>/models.json
 
 These take precedence over inline provider models and the global profile models.
 
+Profile-level provider models (`profiles/<profile>/<provider>-models.json`, V2.5) take precedence over the provider-folder file.
+
 ## scripts/
 
 Contains automation scripts.
 
 ```
+build-opencode-v2.5.ps1
+```
+
+The current builder (Builder V2.5, Active-Provider Selector): provider discovery, provider selection via prompt or `-Provider` argument, persisted `activeProviders`, profile-level `<provider>-models.json` precedence.
+
+```
 build-opencode-v2.ps1
 ```
 
-The current builder (Builder V2.1, evolved in place from V2.0).
+The established builder (Builder V2.1, evolved in place from V2.0), retained alongside V2.5.
+
+```
+test-opencode-v2.5.ps1
+```
+
+The V2.5 test harness (12 tests), including the docs-spec sync test `Test-BuilderSpecCoversV25`.
 
 ```
 test-opencode-v2.ps1
@@ -629,7 +643,8 @@ Current framework version:
 - Builder V2
 - Builder V2.1 (extended validation, modular merge pipeline, provider-specific models, output verification)
 - Builder V2.3 / BDF V2.5 (framework generalization: NEW_PROJECT_GUIDE, RELEASE_MANAGER, TESTING framework docs, adapter validation checklist, Impact Analysis record)
-- Automated test harness (17 tests: 9 builder + 8 Release Docs)
+- Builder V2.5 (Active-Provider Selector: provider discovery, persisted activeProviders, profile-level `<provider>-models.json` precedence)
+- Automated test harnesses (V2.1: 17 tests — 9 builder + 8 Release Docs; V2.5: 12 tests)
 - Release Manager V1 (registry-driven release documentation)
 - Documentation framework
 - Builder Development Framework

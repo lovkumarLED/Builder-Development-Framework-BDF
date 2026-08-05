@@ -25,17 +25,20 @@ Testing ensures that:
 
 This document describes the manual testing process.
 
-Automated testing is provided by the test harness:
+Automated testing is provided by two test harnesses:
 
 ```
 scripts/test-opencode-v2.ps1
+scripts/test-opencode-v2.5.ps1
 ```
 
-The harness runs the builder against isolated temporary fixtures and verifies both success and failure behavior.
+The V2.1 harness runs the builder against isolated temporary fixtures and verifies both success and failure behavior.
 
 It also runs the release manager against a temp copy of the docs and verifies the generated release documentation.
 
-Current automated coverage (17 tests: 9 builder + 8 Release Docs):
+The V2.5 harness (Active-Provider Selector) verifies the V2.5 builder against isolated temporary fixtures in the same style.
+
+V2.1 harness coverage (17 tests: 9 builder + 8 Release Docs):
 
 Builder tests:
 
@@ -67,6 +70,8 @@ powershell -File scripts/test-opencode-v2.ps1
 ```
 
 The harness exits non-zero when any test fails.
+
+The full suite is BOTH harnesses green: 17/17 (V2.1) + 12/12 (V2.5).
 
 ---
 
@@ -115,12 +120,14 @@ Configuration Builder
 
 ```
 build-opencode-v2.ps1 (Builder V2.1)
+build-opencode-v2.5.ps1 (Builder V2.5, Active-Provider Selector)
 ```
 
 Test Harness
 
 ```
 test-opencode-v2.ps1
+test-opencode-v2.5.ps1
 ```
 
 Provider
@@ -903,6 +910,39 @@ powershell -File scripts/test-opencode-v2.ps1
 ```
 
 Expected: 17/17 PASSED, exit 0.
+
+---
+
+# V2.5 Builder Test Group
+
+The V2.5 group verifies the Active-Provider Selector builder (`scripts/build-opencode-v2.5.ps1`) against isolated temporary fixtures.
+
+| Test | Name | Asserts |
+|------|------|---------|
+| 1 | All providers discovered | `-Provider` with both ids emits both provider sections |
+| 2 | Malformed provider fails | Non-zero exit, error names the bad file, no output written |
+| 3 | Non-interactive uses stored | Stored `activeProviders` reused, settings.json byte-identical |
+| 4 | Provider arg skips prompt | `-Provider` selection persists order to settings.json |
+| 5 | Provider arg unknown fails | Clear "Provider not found" error |
+| 6 | Profile models highest precedence | Profile-level `<provider>-models.json` wins over the provider-folder file |
+| 7 | Non-active profile models ignored | Inactive provider models never leak into the output |
+| 8 | Settings persist round-trip | `activeProviders` and `$schema` preserved exactly |
+| 9 | Settings backup created | `backup\` holds the original settings.json content |
+| 10 | Empty selection fails | Empty stored list fails with an activeProviders error |
+| 11 | Profile models dup key fails | Duplicate model key in `<provider>-models.json` fails, no output written |
+| 12 | Builder spec covers V2.5 | Docs-spec sync test: BUILDER_SPEC.md contains the V2.5 feature tokens |
+
+Test 12 (`Test-BuilderSpecCoversV25`) is a docs-spec sync test: it greps `BUILDER_SPEC.md` for the V2.5 feature tokens (`Discover-Providers`, `Select-ActiveProviders`, `Persist-ActiveProviders`, `Get-ProfileProviderModels`, `-NonInteractive`, `<provider>-models.json`), so the spec must be updated in lockstep with the builder.
+
+Run the V2.5 harness with:
+
+```
+powershell -File scripts/test-opencode-v2.5.ps1
+```
+
+Expected: 12/12 PASSED, exit 0.
+
+The definition of complete is BOTH harnesses green: 17/17 (V2.1) + 12/12 (V2.5).
 
 ---
 

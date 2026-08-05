@@ -64,9 +64,10 @@ The following diagram illustrates the overall system structure.
 
         +--------------------------------------------+
         |                                            |
-        |   profiles/default/                        |
+        |   profiles/<profile>/                      |
         |                                            |
         |   ├── settings.json                        |
+        |   ├── <provider>-models.json               |
         |   ├── models.json                          |
         |   ├── plugins.json                         |
         |   └── mcp.json                             |
@@ -86,17 +87,30 @@ The following diagram illustrates the overall system structure.
                          │
                          ▼
 
-                build-opencode-v2.ps1
+                build-opencode-v2.5.ps1
 
                          │
                          ▼
 
-                 Configuration Validation
+                 Discover Providers
 
                          │
                          ▼
 
-                 Backup Existing Config
+                 Select & Persist Active ──────► profiles/<profile>/settings.json
+                 (writes activeProviders back     (persisted: backed up first,
+                  to settings.json)                written only when the list
+                                                    differs)
+
+                         │
+                         ▼
+
+                 Load Profile
+
+                         │
+                         ▼
+
+                 Validate Configuration
 
                          │
                          ▼
@@ -106,7 +120,22 @@ The following diagram illustrates the overall system structure.
                          │
                          ▼
 
+                 Backup Existing Config
+
+                         │
+                         ▼
+
                   Generate opencode.json
+
+                         │
+                         ▼
+
+                 Verify Output
+
+                         │
+                         ▼
+
+                  Write opencode.json
 
                          │
                          ▼
@@ -173,6 +202,9 @@ The builder is responsible for generating the final OpenCode configuration.
 
 Responsibilities:
 
+- Discover all providers from `providers/*.json`.
+- Select active providers (interactive menu / `-Provider` / `-NonInteractive`).
+- Persist the selection back to `settings.json` (backed up first).
 - Load profile configuration.
 - Load provider definitions.
 - Validate configuration (structure, duplicates, malformed definitions).
@@ -181,7 +213,7 @@ Responsibilities:
 - Verify the generated configuration before writing.
 - Generate `opencode.json`.
 
-The builder never modifies the source configuration files.
+The builder never modifies source files except `settings.json`, where it writes the resolved `activeProviders` list back after selection.
 
 ---
 
@@ -257,15 +289,24 @@ Profile
 
 ↓
 
-Provider
+Discover Providers
 
 ↓
 
-Builder
+Select & Persist Active
+(settings.json)
 
 ↓
 
-Validation
+Load
+
+↓
+
+Validate
+
+↓
+
+Merge
 
 ↓
 
@@ -273,11 +314,15 @@ Backup
 
 ↓
 
-Generation
+Generate
 
 ↓
 
-opencode.json
+Verify
+
+↓
+
+Write opencode.json
 
 ↓
 
@@ -472,6 +517,6 @@ This approach minimizes breaking changes and keeps the project maintainable over
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Current Architecture

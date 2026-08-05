@@ -99,8 +99,18 @@ What was completed in V2.5:
       provider handling, and release system (bdf/TESTING.md, bdf/RELEASE_MANAGER.md).
 - [x] V2.5 released (registry entry 2.3.0 + release pipeline run + 17/17 tests green).
 
-Next: Step 2 — build the Claude Code Builder V1 (first validation of the generalized
-framework), then KiloCode Builder V1, then V3.
+Side goals (build before Step 2 — Claude Code Builder V1):
+
+- [ ] Active-Provider Selector Builder — `scripts/build-opencode-v2.5.ps1`
+      (registry 2.4.0). Builder considers all `providers/*.json`, interactive
+      active-provider selection persisted to profile `settings.json`, and
+      profile-level `profiles/<profile>/<provider>-models.json` attach when the
+      provider is active. Plan: `AI/BUILD_BUILDER_V2.5_SELECTOR.md`.
+- [ ] JSON Schema Validation (`schemas/`) — gate before Step 2. Spec reserved
+      in `schemas/README.md`. Not built yet.
+
+Next: build the two side goals above, then Step 2 — Claude Code Builder V1
+(first validation of the generalized framework), then KiloCode Builder V1, then V3.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = Claude Builder V1).
 

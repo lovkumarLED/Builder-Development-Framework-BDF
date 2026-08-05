@@ -98,6 +98,19 @@ If validation fails, the build process must terminate immediately.
 
 ---
 
+## Builder-Written
+
+`settings.json` is a source file that the builder also writes.
+
+After the user (or `-Provider` / `-NonInteractive`) resolves the active provider list, the builder persists it back to `activeProviders`.
+
+- The current file is backed up to `backup/settings_<profile>_<timestamp>.json` before any rewrite.
+- `$schema` is preserved when present.
+- Written as UTF-8 without BOM.
+- Written only when the resolved list differs from the stored list; a no-op run leaves the file untouched.
+
+---
+
 # models.json
 
 ## Schema
@@ -111,8 +124,50 @@ If validation fails, the build process must terminate immediately.
 ## Validation Rules
 
 - Model identifiers must be unique.
+- Model names must be unique within a models source.
 - Every model must contain valid configuration.
-- Global models are injected into a provider only when the provider has no models of its own (provider-specific models win over inline models, which win over global models).
+- Model resolution per active provider follows this precedence (first source that exists wins):
+
+```
+profiles/<profile>/<provider>-models.json   (highest)
+providers/<provider>/models.json
+inline provider models
+models.json (global)
+(none)
+```
+
+---
+
+# <provider>-models.json
+
+Profile-level provider models.
+
+## Location
+
+```
+profiles/<profile>/<provider>-models.json
+```
+
+One file per active provider, named after the provider id (for example `omniroute-models.json`).
+
+Optional: the file is loaded only when it exists.
+
+## Schema
+
+Same shape as `models.json`.
+
+| Key | Type | Required | Description |
+|------|------|----------|-------------|
+| models | Object | Yes | Collection of model definitions. |
+
+Each model entry has the same shape as a `models.json` entry (for example `name`).
+
+## Validation Rules
+
+- Model identifiers must be unique (duplicate keys are rejected).
+- Model names must be unique within the file.
+- The `models` section is required.
+- The file carries the highest precedence: it overrides `providers/<provider>/models.json`, inline provider models, and the global `models.json`.
 
 ---
 
@@ -189,9 +244,12 @@ The following files are considered source files.
 |------|----------|
 | settings.json | Yes |
 | models.json | Yes |
+| <provider>-models.json | Yes |
 | plugins.json | Yes |
 | mcp.json | Yes |
 | omniroute.json | Yes |
+
+`settings.json` is also written by the builder (see the Builder-Written section above): it persists the resolved `activeProviders` list back to the file, with a backup created first.
 
 ---
 
@@ -226,6 +284,7 @@ Validation is performed by the builder before configuration generation.
 
 - settings.json
 - models.json
+- <provider>-models.json
 - plugins.json
 - mcp.json
 - omniroute.json
@@ -270,6 +329,6 @@ Each file contributes one independent section to the final configuration.
 
 No configuration file is responsible for another file's contents.
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Current JSON Schemas

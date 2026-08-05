@@ -109,7 +109,22 @@ Providers may also own provider-specific models:
 providers/<provider>/models.json
 ```
 
-These take precedence over inline and global models.
+Profile-level provider models are loaded per active provider:
+
+```
+profiles/<profile>/<provider>-models.json
+```
+
+This source carries the highest precedence.
+
+Model-source precedence (highest first):
+
+```
+profiles/<profile>/<provider>-models.json
+providers/<provider>/models.json
+inline provider models
+profiles/<profile>/models.json
+```
 
 ---
 
@@ -262,6 +277,6 @@ When the framework references a project-specific value, this adapter defines it.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Active Project Adapter

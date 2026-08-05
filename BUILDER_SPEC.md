@@ -674,6 +674,373 @@ A successful build satisfies all of the following.
 
 ---
 
+# Builder V2.5 (Active-Provider Selector)
+
+Builder V2.5 is the current builder implementation.
+
+The stages described above document the historical V2.1 pipeline.
+
+Builder V2.5 adds active-provider selection to that pipeline.
+
+The user chooses which providers are active at build time.
+
+The selection is persisted in `settings.json`, which is now a builder-writable source file.
+
+---
+
+## Command Line Interface
+
+The builder accepts the following parameters.
+
+```
+-Profile        <profile-name>   default: default
+-ConfigRoot     <path>           default: $HOME\.config\opencode
+-Provider       <ids>            default: (empty)
+-NonInteractive                  switch, default: off
+```
+
+| Parameter | Default | Effect |
+| --- | --- | --- |
+| `-Profile` | `default` | Selects the profile directory `profiles/<profile>`. |
+| `-ConfigRoot` | `$HOME\.config\opencode` | Root directory containing `profiles/`, `providers/`, `backup/`, and `opencode.json`. |
+| `-Provider` | (empty) | Comma or space separated provider ids. Overrides interactive selection and the stored list. The given order is preserved. An unknown id aborts the build. |
+| `-NonInteractive` | off | Skips the interactive menu and uses the stored `settings.json` list. |
+
+### Why
+
+Active-provider selection must work in unattended runs.
+
+`-Provider` and `-NonInteractive` make the build reproducible from scripts.
+
+---
+
+## Stage List
+
+The V2.5 build follows this order.
+
+```
+Stage 0 — Discover / Select / Persist Providers
+Stage 1 — Load Profile
+Stage 2 — Validate
+Stage 3 — Merge
+Stage 4 — Create Backup
+Stage 5 — Generate Final Configuration
+Stage 6 — Verify Output
+Stage 7 — Write Output
+Stage 8 — Verify settings.json Persistence Round-trip
+```
+
+Stage 0 runs before profile loading.
+
+It discovers ALL providers (not only the active ones), then resolves the active list, and persists the result to `settings.json` when it differs.
+
+Stage 8 is new to V2.5.
+
+After writing `opencode.json`, the builder reloads `settings.json` and confirms that the persisted `activeProviders` match the resolved list.
+
+No stage may be skipped.
+
+---
+
+## New Function Contracts
+
+### Discover-Providers
+
+No parameters.
+
+Returns every valid provider id from `providers/*.json`, in filename order.
+
+Every `.json` file in `providers/` is loaded and validated.
+
+A malformed provider file causes a terminating error listing ALL bad files.
+
+Throws when no provider files exist:
+
+```
+No provider files found in <providers-root>
+```
+
+Throws when any file is malformed:
+
+```
+Provider discovery failed for: <file> - <message>; <file> - <message>
+```
+
+---
+
+### Select-ActiveProviders
+
+Params
+
+```
+[string[]]$Discovered
+[string[]]$Current
+```
+
+Returns the selected provider id list.
+
+Prints a numbered menu.
+
+Providers already in the current selection are marked `(active)`.
+
+Input grammar:
+
+- Comma or space separated numbers choose the matching providers.
+- `a` selects all discovered providers.
+- `n` selects none.
+- Empty input keeps the current selection.
+
+---
+
+### Resolve-ActiveProviders
+
+Params
+
+```
+[string[]]$Discovered
+[string[]]$Stored
+```
+
+Returns the resolved provider id list.
+
+Resolution order:
+
+1. `-Provider` is non-empty — wins over everything. The given order is preserved. An id that was not discovered throws:
+
+```
+Provider not found: <id> (discovered: <comma-separated list>)
+```
+
+2. `-NonInteractive` — returns the stored `settings.json` list.
+3. Otherwise — calls `Select-ActiveProviders` with the discovered list and the stored list.
+
+---
+
+### Persist-ActiveProviders
+
+Params
+
+```
+[string[]]$Active
+```
+
+Returns nothing.
+
+Aborts the build when the selection is empty:
+
+```
+No active providers selected; build aborted.
+```
+
+Rewrites `settings.json` only when the active list differs from the stored list.
+
+Difference is detected with `Compare-JsonArrays`.
+
+Before overwriting, the current `settings.json` is backed up to
+
+```
+backup\settings_<profile>_<timestamp>.json
+```
+
+`$schema` is preserved.
+
+The rewritten file is UTF-8 without BOM.
+
+---
+
+### Compare-JsonArrays
+
+Params
+
+```
+[object[]]$A
+[object[]]$B
+```
+
+Returns `$true` when the counts are equal and every element matches as a string.
+
+Returns `$false` otherwise.
+
+Used to decide whether `settings.json` must be rewritten.
+
+---
+
+### Get-ProfileProviderModels
+
+Params
+
+```
+[string]$ProviderId
+```
+
+Returns the parsed profile models file for the provider.
+
+Returns `$null` when the file does not exist.
+
+File
+
+```
+profiles/<profile>/<provider>-models.json
+```
+
+Checks duplicate keys via `Assert-NoDuplicateKeys` (section `model`).
+
+Checks duplicate model names via `Assert-NoDuplicateModelNames`.
+
+Throws when the `models` section is missing or invalid:
+
+```
+Profile models file '<file>' validation failed: 'models' section is missing or invalid.
+```
+
+---
+
+## Selection Rules
+
+- The interactive menu accepts comma/space separated numbers, `a` for all, `n` for none, and empty input to keep the current selection.
+- `-Provider` takes precedence over the stored list and the menu. The given order is preserved. An unknown id aborts the build.
+- `-NonInteractive` skips the menu and uses the stored `settings.json` list.
+- `Persist-ActiveProviders` aborts the build when the selection is empty.
+- The stored list is written back to `settings.json` only when it differs from the previous list.
+
+---
+
+## Model Precedence
+
+Models for an active provider resolve from the first source that exists.
+
+1. Profile-level models file
+
+```
+profiles/<profile>/<provider>-models.json
+```
+
+2. Provider-specific models file
+
+```
+providers/<provider>/models.json
+```
+
+3. Inline models inside the provider definition file
+
+```
+providers/<provider>.json  ->  provider.<provider>.models
+```
+
+4. Global models file
+
+```
+profiles/<profile>/models.json
+```
+
+5. None — no models configured for the provider.
+
+Profile-level models win over provider-specific models, which win over inline models, which win over global models.
+
+Global models are only injected into a provider when the provider has no models of its own.
+
+Non-active providers are never considered for any source.
+
+### Why
+
+Models are owned at the profile level first.
+
+A profile can override the models of any provider without editing provider files.
+
+---
+
+## <provider>-models.json Shape
+
+Profile-level models are stored per provider.
+
+```
+profiles/<profile>/<provider>-models.json
+
+{
+    "models": {
+        "<model-id>": {
+            ...model definition...
+        }
+    }
+}
+```
+
+The `models` object maps model identifiers to model definitions.
+
+Keys must be unique.
+
+`Assert-NoDuplicateKeys` scans the raw text with section `model`.
+
+Model names must be unique.
+
+`Assert-NoDuplicateModelNames` reads the `name` of every model.
+
+Non-active providers' model files are ignored.
+
+Only the models of providers in the active list are ever read or merged.
+
+---
+
+## settings.json Write Policy
+
+`settings.json` is a builder-writable source file.
+
+The builder writes it:
+
+- Only when the active list differs from the stored list.
+- With a backup at
+
+```
+backup\settings_<profile>_<timestamp>.json
+```
+
+before overwrite.
+
+- With `$schema` preserved.
+- As UTF-8 without BOM.
+
+---
+
+## Verification Additions
+
+Every active provider must have a models source.
+
+The source may be profile-level, provider folder, inline, or global.
+
+Otherwise the build fails before writing:
+
+```
+Verification failed: active provider '<name>' has no models.
+```
+
+Stage 8 round-trip check.
+
+After writing, `settings.json` `activeProviders` must match the resolved list:
+
+```
+Verification failed: settings.json activeProviders (<stored list>) does not match the resolved list (<resolved list>).
+```
+
+The build fails before finishing if either check fails.
+
+---
+
+## Regeneration Guarantee
+
+This specification fully describes the builder.
+
+An agent can regenerate `scripts\build-opencode-v2.5.ps1` from this document alone.
+
+Every function name, parameter, stage label, and error message above matches the script verbatim.
+
+Regeneration order:
+
+```
+AGENT.md -> ... -> BUILDER_SPEC.md -> plan
+```
+
+---
+
 # Builder Status
 
 Current Builder
@@ -681,19 +1048,25 @@ Current Builder
 Version
 
 ```
-V2.1
+V2.5
 ```
 
 Script
 
 ```
-build-opencode-v2.ps1
+build-opencode-v2.5.ps1
 ```
 
 Status
 
 ```
 Stable
+```
+
+Previous Version
+
+```
+V2.1 (build-opencode-v2.ps1)
 ```
 
 Future versions of the builder will update this document after implementation.

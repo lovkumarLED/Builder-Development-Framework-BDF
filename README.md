@@ -21,6 +21,7 @@ This approach makes the configuration easier to maintain, easier to extend, and 
 - Profile-based configuration
 - Dynamic profile selection
 - Dynamic provider loading
+- Active-Provider Selector (Builder V2.5)
 - Separate model management
 - Separate plugin management
 - Separate MCP management
@@ -28,6 +29,7 @@ This approach makes the configuration easier to maintain, easier to extend, and 
 - Automatic backup creation
 - Extended configuration validation
 - Provider-specific models
+- Profile-level provider models (<provider>-models.json)
 - Output verification
 - Automated test harness
 - Registry-driven release automation
@@ -46,6 +48,16 @@ The project is organized into several independent components.
 | `backup/` | Automatic configuration backups |
 | `scripts/` | Builder scripts |
 | `docs/` | Project documentation |
+
+### Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `build-opencode-v2.ps1` | Builder V2.1 (extended validation, modular merge pipeline) |
+| `build-opencode-v2.5.ps1` | Builder V2.5 (Active-Provider Selector) |
+| `test-opencode-v2.ps1` | V2.1 test harness (17 tests) |
+| `test-opencode-v2.5.ps1` | V2.5 test harness (12 tests) |
+| `release-manager.ps1` | Release documentation generator |
 
 ---
 
@@ -111,6 +123,7 @@ The project documentation is split into multiple files.
 - Dynamic profile selection
 - Dynamic provider loading
 - Automatic configuration builder
+- Builder V2.5 (Active-Provider Selector)
 - Backup system
 - Project documentation
 
@@ -201,7 +214,9 @@ Generic engineering knowledge shared with other builder projects is documented s
 
 ---
 
-**Version:** 2.2.0
+**Version:** 2.3.0
+
+**Builder Version:** V2.5 (Active-Provider Selector)
 
 **Document Version:** 1.0
 
