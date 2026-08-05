@@ -71,7 +71,7 @@ powershell -File scripts/test-opencode-v2.ps1
 
 The harness exits non-zero when any test fails.
 
-The full suite is BOTH harnesses green: 17/17 (V2.1) + 12/12 (V2.5).
+The full suite is BOTH harnesses green: 17/17 (V2.1) + 13/13 (V2.5).
 
 ---
 
@@ -931,6 +931,7 @@ The V2.5 group verifies the Active-Provider Selector builder (`scripts/build-ope
 | 10 | Empty selection fails | Empty stored list fails with an activeProviders error |
 | 11 | Profile models dup key fails | Duplicate model key in `<provider>-models.json` fails, no output written |
 | 12 | Builder spec covers V2.5 | Docs-spec sync test: BUILDER_SPEC.md contains the V2.5 feature tokens |
+| 13 | Active provider no models dropped | Provider without a models source is dropped from output + settings.json with a warning |
 
 Test 12 (`Test-BuilderSpecCoversV25`) is a docs-spec sync test: it greps `BUILDER_SPEC.md` for the V2.5 feature tokens (`Discover-Providers`, `Select-ActiveProviders`, `Persist-ActiveProviders`, `Get-ProfileProviderModels`, `-NonInteractive`, `<provider>-models.json`), so the spec must be updated in lockstep with the builder.
 
@@ -940,9 +941,9 @@ Run the V2.5 harness with:
 powershell -File scripts/test-opencode-v2.5.ps1
 ```
 
-Expected: 12/12 PASSED, exit 0.
+Expected: 13/13 PASSED, exit 0.
 
-The definition of complete is BOTH harnesses green: 17/17 (V2.1) + 12/12 (V2.5).
+The definition of complete is BOTH harnesses green: 17/17 (V2.1) + 13/13 (V2.5).
 
 ---
 

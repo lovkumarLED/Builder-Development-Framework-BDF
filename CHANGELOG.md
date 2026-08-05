@@ -78,7 +78,8 @@ Builder V2.5 Active-Provider Selector: discovers all providers, interactive acti
 - Interactive active-provider selection persisted to profile settings.json
 - Profile-level per-provider model files (<provider>-models.json)
 - -Provider / -NonInteractive CLI switches
-- 12-test V2.5 harness + builder-regeneration guarantee in docs
+- Active providers without a models source are dropped (with a warning) instead of failing the build
+- 13-test V2.5 harness + builder-regeneration guarantee in docs
 
 ---
 
@@ -117,7 +118,7 @@ No
 
 ## Testing Summary
 
-17/17 (V2.1) + 12/12 (V2.5) tests passed, exit code 0
+17/17 (V2.1) + 13/13 (V2.5) tests passed, exit code 0
 
 ---
 

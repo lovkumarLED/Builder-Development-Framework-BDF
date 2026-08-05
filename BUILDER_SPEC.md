@@ -734,6 +734,10 @@ Stage 0 runs before profile loading.
 
 It discovers ALL providers (not only the active ones), then resolves the active list, and persists the result to `settings.json` when it differs.
 
+Stage 3 runs the active-provider model guard after merging models.
+
+Every active provider must produce a models source (profile `<provider>-models.json`, `providers/<p>/models.json`, inline, or global). A provider without any models source is NOT considered active: it is dropped with a warning, removed from the generated configuration, and removed from `settings.json` (the reduced list is persisted, backed up first). If no active provider remains, the build aborts.
+
 Stage 8 is new to V2.5.
 
 After writing `opencode.json`, the builder reloads `settings.json` and confirms that the persisted `activeProviders` match the resolved list.
@@ -1003,15 +1007,15 @@ before overwrite.
 
 ## Verification Additions
 
-Every active provider must have a models source.
+Active providers without a models source are dropped after merge, before generation.
 
-The source may be profile-level, provider folder, inline, or global.
-
-Otherwise the build fails before writing:
+The drop is announced with a warning and the reduced list is persisted to `settings.json`:
 
 ```
-Verification failed: active provider '<name>' has no models.
+Provider '<name>': models not found (no <provider>-models.json, providers/<name>/models.json, inline, or global models.json). Provider will not be considered active and was removed from settings.json.
 ```
+
+The provider is absent from `opencode.json` and from `settings.json`.
 
 Stage 8 round-trip check.
 
@@ -1021,7 +1025,7 @@ After writing, `settings.json` `activeProviders` must match the resolved list:
 Verification failed: settings.json activeProviders (<stored list>) does not match the resolved list (<resolved list>).
 ```
 
-The build fails before finishing if either check fails.
+The build fails before finishing if the round-trip check fails.
 
 ---
 

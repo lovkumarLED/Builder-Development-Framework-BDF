@@ -10,6 +10,20 @@
 
 ## Session History
 
+### Aug 5, 2026 (session 16) — Active-provider drop-on-missing-models (post-release feature, registry 2.4.0) ← recent session
+Done:
+- User request: a provider that is available but has no models source must NOT be considered active; builder warns (models-not-found message), removes it from settings.json, and continues the build.
+- Reworked `scripts/build-opencode-v2.5.ps1`: deleted the Verify-Models throw block and added a drop guard after the Stage 3 merge — active providers with no models source (no profile `<provider>-models.json`, no `providers/<p>/models.json`, no inline, no global) are warned (`Provider '<P>': models not found (...). Provider will not be considered active and was removed from settings.json.`), removed from `$ActiveProviders`/`$ProviderRoot`/`$ExpectedModels`, the reduced list is persisted back to settings.json (backup created), and the build continues. All-dropped edge still aborts via the existing "No active providers selected; build aborted." error.
+- BUILDER_SPEC.md: Verification Additions section rewritten from "build continues with warning" to the drop semantics (provider absent from opencode.json AND settings.json, verbatim warning message).
+- Extended `scripts/test-opencode-v2.5.ps1` with test 13 `Test-ActiveProviderNoModelsDropped` (drop from output, drop from settings.json, warning text present, provider-with-models untouched): 13/13 PASSED, exit 0.
+- Registry sync: 2.4.0 highlight "Active providers without a models source are dropped (with a warning) instead of failing the build", testingSummary → 17/17 (V2.1) + 13/13 (V2.5); TESTING.md test table + definition of complete updated; release-manager regenerated CHANGELOG/CURRENT_RELEASE/PROJECT_STATE/bdf VERSION (deterministic re-run verified identical).
+- Manual fixture checks: provider-without-models dropped (settings.json + opencode.json clean), all-dropped fails with activeProviders error.
+Broken:
+- V2.1 harness is 16/17 until the user restores `providers/modal.json` from the recycle bin (user deleted it after session 15's green sweep; modal is in stored activeProviders). modal-models.json stays deleted (intentional).
+Journey: Step 1 BDF V2.5 — COMPLETE, 100%; JSON Schema Validation side goal open.
+Next: User restores `providers/modal.json` (recycle bin) → re-run V2.1 harness (expect 17/17) → commit docs → then JSON Schema Validation side goal (schemas/), then Step 2 Claude Code Builder V1.
+Learned: None.
+
 ### Aug 5, 2026 (session 15) — Built and released Builder V2.5 Active-Provider Selector (registry 2.4.0) ← recent session
 Done:
 - Baseline fix: real `profiles/coding/models.json` was missing (removed during V2.5 prep), breaking V2.1 harness test 17 (16/17). Recreated it from the omniroute model set (18 models); V2.1 harness back to 17/17.
