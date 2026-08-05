@@ -22,7 +22,8 @@ main job from their summaries. You never bulk-read project docs yourself.
    - Reading >10 KB of files → always delegate to a reader sub-agent.
 
 2. **DISTRIBUTE** — Dispatch subtasks to sub-agents via the task tool, choosing
-   `subagent_type` by the routing table. Dispatch independent subtasks in PARALLEL.
+   `subagent_type` by the routing table. Dispatch independent subtasks in PARALLEL,
+   but subject to the Subagent Budget below — never more than 2 at a time.
 
 3. **SUMmarize** — Every sub-agent must return a compact summary (~300 words max).
    You work from summaries. You NEVER re-read files a sub-agent already read.
@@ -44,21 +45,60 @@ main job from their summaries. You never bulk-read project docs yourself.
 | Plan breakdown, todo tracking | planner |
 | Web research / doc lookup | researcher |
 
+Project-specific dispatch (use MORE sub-agents here — this is what they are for):
+
+- FULL_SYSTEM_CHECK (runbook `AI/FULL_SYSTEM_CHECK.md`): Parts 1, 5, 6 are pure
+  inspection → dispatch 2-3 parallel reader/builder sub-agents (one per part) and work
+  from their findings tables. Only Parts 3-4 (running harnesses / clean-room builds)
+  stay inline because they execute on this machine.
+- BDF version builds (`AI/BUILD_*.md`): dispatch one builder per feature stage, max 3
+  parallel, integrate from reports, then run the harness inline.
+
+## Subagent budget (balanced — delegate to SAVE context, cap to SAVE quota)
+
+Sub-agents are the tool to keep the 200k context window from filling: delegate bulk
+reading and L tasks so the main agent works from ~300-word summaries. Over-dispatching
+is still forbidden, but NOT because it saves context (it doesn't) — because each sub-agent
+run costs several of the 200 daily requests. Balance:
+
+Rules:
+
+1. **DEFAULT = DELEGATE the heavy parts.** ANY reading of >10 KB of files goes to a
+   reader sub-agent — never bulk-read docs in the main context. Medium (2-20 KB) tasks
+   that only produce a summary can go to one sub-agent too. Quick 1-2 line greps stay inline.
+2. **ONE sub-agent per coherent task; parallel only for independent L tasks, max 3 at a time.**
+   Parallel = independent files/questions, never sub-tasks of one job.
+3. **REUSE, don't respawn.** Continue the same sub-agent via `task_id` with one
+   targeted question instead of spawning a fresh one.
+4. **MAX 8 sub-agent spawns per session (all types combined).** After that, work inline
+   even at some context cost — a checkpoint file is cheaper than a burned daily quota.
+5. **Quota guard: stop dispatching whenever the request quota is the bottleneck.**
+   Free plan = 200 requests/day; each sub-agent run costs multiple requests. If quota is
+   low, the main agent does the smallest remaining fix inline instead of spawning.
+6. **Never dispatch a second sub-agent to re-read** what the first already read —
+   resume the first via `task_id`.
+7. **Always end with a handoff.** When stopping (context or quota), every incomplete goal
+   goes into the checkpoint MD + resume prompt — never lost in conversation.
+
 ## Permission rules (destructive ops)
 
 - NEVER delete files, move files, `git reset --hard`, force-push, or overwrite generated
   files (opencode.json, CURRENT_RELEASE.md, bdf/VERSION.md rows, marker sections,
   SESSION_LOG entries) without asking me first.
+- NEVER run `git commit` (or amend/push) on your own — commit ONLY when I explicitly
+  ask you to.
 - Sub-agents must also ask before destructive operations.
 
-## Context budget (hard ceiling: 70% of 200k = ~140k tokens)
+## Context budget (hard ceiling: 80% of 200k = ~160k tokens)
 
-- < 50%: normal operation.
-- 50-64%: delegate everything possible, no bulk reads.
-- 65%: WRAP UP — finish the current subtask, write the session log, tell me to start a fresh session.
-- 70%: STOP all work, write the session log, start nothing new.
+- < 60%: normal operation.
+- 60-75%: delegate everything possible, no bulk reads.
+- 75%: WRAP UP — finish the current subtask, write the session log + checkpoint MD, prepare the resume prompt.
+- 80%: STOP all work, write the session log + checkpoint MD, start nothing new.
 - Reading is always delegated to reader sub-agents — bulk reading in the main context is forbidden
   (the ~560 KB of docs ≈ 140k tokens ≈ 70% by itself).
+- Complete at least 60-70% of the session's goals before stopping; put the remainder
+  in the checkpoint MD's `Next:` list.
 
 ## Session log — every session
 
@@ -69,6 +109,9 @@ main job from their summaries. You never bulk-read project docs yourself.
 - Also update `_agent/JOURNEY_TO_V3.md` `Current Position` (road to V3) at session end.
 - The `Next:` line must be precise (file paths + next action) — it is the handoff for the
   next fresh-context session.
+- **EVERY stop must hand over a checkpoint MD + resume prompt** — the "what to do next"
+  is always written to an MD file (`AI/CONTINUE_<TOPIC>_<STEP>.md`), and the user gets a
+  ready-to-paste prompt that points at that file, so the next session resumes from disk.
 - Existing entries are read-only; only allowed edits are the `← recent session` tag swap,
   inserting the new entry at top, and trimming to the newest 5.
 - Large version builds that exceed the context budget follow the checkpoint + resume rule

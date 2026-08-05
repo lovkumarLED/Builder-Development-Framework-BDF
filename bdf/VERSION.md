@@ -19,7 +19,7 @@ Every change to the framework must be recorded here.
 Version
 
 ```
-2.1.0
+2.1.1
 ```
 
 Status
@@ -34,7 +34,7 @@ Active
 
 | Item | Value |
 |------|-------|
-| Framework Version | 2.1.0 |
+| Framework Version | 2.1.1 |
 | Supported Builder Versions | V2.5, V2.3, V2.1 |
 | Compatible Projects | OpenCode Configuration Manager documentation |
 | Last Updated | 2026-08-05 |
@@ -107,6 +107,45 @@ Example
 
 # Change History
 
+## Version 2.1.1
+
+Date
+
+```
+2026-08-05
+```
+
+Status
+
+```
+Current
+```
+
+Summary
+
+```
+Template sync: ADAPTER.template.md gained the three release fields the reference adapter already defined (Release Registry, Release Artifacts, Release Manager Entry Point).
+```
+
+Changed
+
+- `templates/ADAPTER.template.md` — field table + sections now match the reference `ADAPTER.md` (single source of truth restored).
+- `templates/README.md` — placeholder audit gained the three new tokens (`{{RELEASE_REGISTRY}}`, `{{RELEASE_ARTIFACTS}}`, `{{RELEASE_MANAGER_SCRIPT}}`).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
 ## Version 2.1.0
 
 Date
@@ -118,7 +157,7 @@ Date
 Status
 
 ```
-Current
+Previous
 ```
 
 Summary
@@ -296,7 +335,8 @@ No
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.1.0 | Current | BDF V2.5 framework generalization |
+| 2.1.1 | Current | Template sync: ADAPTER template release fields |
+| 2.1.0 | Previous | BDF V2.5 framework generalization |
 | 2.0.0 | Previous | Builder Development Framework rename + intelligence layer |
 | 1.1.0 | Previous | PROJECT_STATE template added |
 | 1.0.0 | Previous | Initial Blueprint Framework release |

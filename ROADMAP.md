@@ -52,9 +52,7 @@ Only Project Adapters should differ between supported projects.
 The path is:
 
 ```
-Current (Builder V2.2.0) ✅
-↓
-BDF V2.5 (framework generalization) ✅
+Current (Builder V2.5 Active-Provider Selector) ✅
 ↓
 Claude Code Builder V1
 ↓
@@ -74,13 +72,13 @@ Real projects shape the framework — never assumptions.
 Current Version
 
 ```
-2.3.0
+2.4.0
 ```
 
 Current Status
 
 ```
-Framework Generalization
+Builder V2.5 Active-Provider Selector
 ```
 
 Journey Position
@@ -94,7 +92,7 @@ The project currently provides:
 - Modular configuration
 - Provider abstraction
 - Profile abstraction
-- Configuration builder (V2.1)
+- Configuration builder (V2.5)
 - Dynamic profile selection
 - Dynamic provider loading
 - Backup system

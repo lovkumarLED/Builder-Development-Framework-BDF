@@ -80,7 +80,7 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 5, 2026 (session 15 end)
+Updated: Aug 5, 2026 (session 18 end)
 
 ```
 Step 1 — BDF V2.5: Framework Generalization

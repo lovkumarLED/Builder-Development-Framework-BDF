@@ -32,16 +32,25 @@ Everything required by the configuration manager exists inside this directory.
 ```
 opencode/
 
+├── agent/
 ├── backup/
 ├── docs/
+├── node_modules/
 ├── profiles/
 ├── providers/
 ├── schemas/
 ├── scripts/
-└── opencode.json
+├── skills/
+├── .gitignore
+├── opencode.json
+├── opencode.jsonc
+├── package-lock.json
+└── package.json
 ```
 
 Each directory has a dedicated responsibility.
+
+`node_modules/`, `package.json`, `package-lock.json`, and `.gitignore` belong to the npm tooling for the skills; they are not configuration sources.
 
 ---
 
@@ -133,6 +142,8 @@ planning/
 _agent/
 
 bdf/
+
+.superpowers/
 ```
 
 ## _agent/
@@ -149,6 +160,14 @@ SESSION_LOG.md
 SESSION_WORKFLOW.md
 ```
 
+## .superpowers/
+
+Contains the subagent-driven-development (SDD) ledger and per-session snapshots.
+
+The SDD ledger lives in `.superpowers/sdd/` and records task briefs, reports, and reviews for large plan builds.
+
+Per-session snapshots live in `.superpowers/snapshot-<SESSION N>/` and pin the builder-document set so a clean-room build can reproduce the exact feature set (see `AI/FULL_SYSTEM_CHECK.md` Part 5).
+
 ## planning/
 
 Contains long-term planning and vision documents.
@@ -161,6 +180,8 @@ BDF_ROAD_TO_V3.md
 DECISIONS.md
 
 FUTURE_IDEAS.md
+
+NEXT_PHASE_IMPLEMENTATION_PLAN.md
 
 VERSION_STRATEGY.md
 ```
@@ -247,9 +268,9 @@ experimental/
 minimal/
 ```
 
-The `default` profile is fully configured.
+The `default` profile is the primary profile (settings, plugins, mcp, per-provider models). It currently exposes `omniroute` via `omniroute-models.json`; the `models.json` file is expected but absent until the modal provider is restored (see `_agent/SESSION_LOG.md`).
 
-Additional profiles contain only `settings.json` and contribute their provider selection to the build.
+`coding/` is a fully developed secondary profile (settings, models, `<provider>-models.json`, plugins, mcp). `experimental/` and `minimal/` contain only `settings.json` and contribute their provider selection to the build.
 
 ---
 
@@ -263,8 +284,6 @@ default/
 settings.json
 
 <provider>-models.json
-
-models.json
 
 plugins.json
 

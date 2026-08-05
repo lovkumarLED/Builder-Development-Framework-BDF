@@ -65,6 +65,9 @@ Every placeholder must be replaced before a project document is released.
 | `{{IMMEDIATE_NEXT_STEPS}}` | The immediate next steps. | Commit the repository |
 | `{{ROADMAP_PHASES}}` | The planned roadmap phases. | Phase 1 — Foundation |
 | `{{FILE_RELATIONSHIP_MAP}}` | The map of file relationships. | AGENT.md → read order docs |
+| `{{RELEASE_REGISTRY}}` | The machine-readable release history file. | release_registry.json |
+| `{{RELEASE_ARTIFACTS}}` | The generated release documentation files. | CURRENT_RELEASE.md |
+| `{{RELEASE_MANAGER_SCRIPT}}` | The release manager entry script. | release-manager.ps1 |
 | `{{DOC_VERSION}}` | The document version footer. | 1.0 |
 | `{{PLACEHOLDER_NAME}}` | Example placeholder used in the convention illustration. | (not a project value) |
 

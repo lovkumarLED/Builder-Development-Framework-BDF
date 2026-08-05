@@ -10,35 +10,59 @@
 
 When building a version of the BDF, watch the context window.
 
-If the version **cannot be completed within 70-80% of the 200,000-token context window**
-(≈140k–160k tokens), the build is too big for one session. Do NOT try to force it.
+If the version **cannot be completed within 80% of the 200,000-token context window**
+(≈160k tokens), the build is too big for one session. Do NOT try to force it.
+
+Also stop when the daily request quota is near exhaustion (free plan = 200 requests/day;
+each task call and each sub-agent run costs several). A checkpoint is cheaper than a
+burned quota.
 
 Instead:
 
 1. **STOP at a clean checkpoint.** Finish the current subtask first if it is 90%+ done.
    Prefer stopping at a boundary where the work left behind is verifiable (a completed
    file, a passing test group) — never in the middle of a broken edit.
+   Aim to have completed **60-70% of the session's goals before stopping**; stop work on
+   the rest (not on the whole plan) and hand it off via the checkpoint file.
 
-2. **Write a checkpoint file:** `AI/CONTINUE_BUILD_<VERSION>_<STEP>.md` containing:
-   - The version being built and the step/phase within it.
+2. **Write a checkpoint file (MANDATORY, before EVERY stop):** `AI/CONTINUE_<TOPIC>_<STEP>.md`
+   (`<TOPIC>` = what was being worked on, e.g. `FULL_SYSTEM_CHECK`, `BUILD_V2.5`) containing:
+   - What was being done and the step/phase within it.
    - `Done:` — a precise list of what was completed (files created/edited, tests run).
    - `Next:` — exactly what remains, with file paths and the next concrete action.
    - `Verify:` — how the next session confirms the checkpoint state (e.g. run the test
      harness, check a file exists).
    - `Rules:` — the resume prompt (below) that points to this file.
    - Any decisions made and any unresolved questions.
+   - This applies to EVERY session stop (version builds, checks, research, reviews) — an
+     MD with "what was done + what is left" plus a prompt pointing to it is produced
+     BEFORE stopping, never skipped.
 
 3. **Update the tracking files:**
    - `_agent/SESSION_LOG.md` — session entry with the `Journey:` line.
    - `_agent/JOURNEY_TO_V3.md` — `Current Position` (step, status, progress).
 
 4. **Give the user the resume prompt** (below) so the next session continues
-   exactly where the build stopped.
+   exactly where the build stopped. This is MANDATORY at every stop — always hand over
+   a checkpoint file + a ready-to-paste prompt pointing at that MD file, never just a
+   verbal summary. The prompt lives in the checkpoint MD's `Rules:`/`Resume` section,
+   and you paste it into chat for the user.
 
 5. **Repeat** — every build session ends with either a fully built + tested version
    or a checkpoint file. Continue this loop until the version is complete, then move to
    the next version on the road to V3. Never restart a version from scratch; always
    resume from the latest checkpoint file.
+
+---
+
+# Request Quota (200/day)
+
+- Free plan = 200 requests/day. Each sub-agent run, edit, and tool call consumes several.
+- Budget: do not spend more than ~150 requests in one session; if the day quota is
+  already mostly gone, do only the highest-priority subtask, then checkpoint.
+- When the quota is low, prefer the main agent doing 1-2 line fixes over sub-agent spawns.
+- A session that ends with a checkpoint file + resume prompt never wastes quota: the
+  next session resumes from disk, not from memory.
 
 ---
 
@@ -54,15 +78,15 @@ Instead:
 
 # Checkpoint File Template
 
-Save as: `AI/CONTINUE_BUILD_<VERSION>_<STEP>.md`
+Save as: `AI/CONTINUE_<TOPIC>_<STEP>.md`
 
 ```
-# CONTINUE BUILD — <VERSION> (step <STEP> of <TOTAL>)
+# CONTINUE — <TOPIC> (step <STEP> of <TOTAL>)
 
-> Resume file. Read this first, then continue exactly where the build stopped.
+> Resume file. Read this first, then continue exactly where the work stopped.
 
-## Version
-<VERSION> — <short description of what this version adds>
+## Topic
+<TOPIC> — <short description of what was being worked on>
 
 ## Done
 - <file/action completed>
@@ -76,7 +100,7 @@ Save as: `AI/CONTINUE_BUILD_<VERSION>_<STEP>.md`
 - <how to confirm the checkpoint is valid before continuing>
 
 ## Decisions
-- <architectural choices made, if any>
+- <decisions made, if any>
 
 ## Questions
 - <unresolved questions, or "None">
@@ -92,12 +116,12 @@ Paste this to continue: (see template below)
 Paste this into the next session (fill the placeholders):
 
 ```
-Read C:\Users\loveb\.config\opencode\docs\AI\CONTINUE_BUILD_<VERSION>_<STEP>.md
+Read C:\Users\loveb\.config\opencode\docs\AI\CONTINUE_<TOPIC>_<STEP>.md
 
 Follow AGENT.md and _agent/SESSION_WORKFLOW.md.
 Do NOT restart or redo completed work — trust the checkpoint file.
-Run the Verify step first, then continue the build from the Next list.
-Build the rest of <VERSION> completely, run the test harness, and update
+Run the Verify step first, then continue from the Next list.
+Finish <TOPIC> completely, run the test harness, and update
 JOURNEY_TO_V3.md when done. If the context budget runs low again, write a new
 checkpoint file and give me the new resume prompt.
 ```
@@ -108,10 +132,10 @@ checkpoint file and give me the new resume prompt.
 
 | Context level | Action |
 |---------------|--------|
-| < 50% | Normal operation. |
-| 50-64% | Avoid new bulk reads. Delegate everything possible. |
-| 65% | WRAP UP. Finish the current subtask, write the checkpoint file, update the tracking files, give the resume prompt. |
-| 70-80% | Hard stop for version builds. Write the checkpoint file immediately. Never start new work. |
+| < 60% | Normal operation. |
+| 60-75% | Avoid new bulk reads. Delegate everything possible. |
+| 75% | WRAP UP. Finish the current subtask, write the checkpoint file (Done + Next + Verify + resume prompt), update the tracking files, give the resume prompt. |
+| 80% (≈160k) | HARD STOP. Write the checkpoint file immediately. Never start new work. |
 
 Bulk reading is always delegated to reader sub-agents — never load the full docs into
 the main context (docs ≈ 560 KB ≈ 140k tokens ≈ 70% of the window by itself).

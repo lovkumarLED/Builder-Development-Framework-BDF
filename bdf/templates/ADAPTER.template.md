@@ -36,7 +36,10 @@ The adapter is complete only when every field in the following table is defined.
 | Supported Plugins | The plugins the project enables. |
 | Supported MCP | The MCP servers the project configures. |
 | Output Artifact | The final generated configuration file. |
+| Release Registry | The machine-readable release history. |
+| Release Artifacts | The generated release documentation. |
 | Builder Entry Point | The script or command that runs the builder. |
+| Release Manager Entry Point | The script that generates the release documentation. |
 
 This table is the single source of truth for the adapter fields.
 
@@ -127,12 +130,60 @@ It is never edited manually.
 
 ---
 
+## Release Registry
+
+The machine-readable release history.
+
+```
+{{RELEASE_REGISTRY}}
+```
+
+The only hand-edited release artifact.
+
+The AI records the release facts after implementation and testing.
+
+The user reviews the facts before the release manager runs.
+
+---
+
+## Release Artifacts
+
+The generated release documentation.
+
+```
+{{RELEASE_ARTIFACTS}}
+```
+
+Generated from the release registry by the release manager.
+
+It is never edited manually.
+
+---
+
 ## Builder Entry Point
 
 The script or command that runs the builder.
 
 ```
 {{BUILDER_SCRIPT}}
+```
+
+---
+
+## Release Manager Entry Point
+
+The script that generates the release documentation.
+
+```
+{{RELEASE_MANAGER_SCRIPT}}
+```
+
+Generated release files are never edited manually.
+
+The generic release process (registry, all-or-nothing writes, marker policy) is defined in:
+
+```
+bdf/RELEASE_MANAGER.md
 ```
 
 ---
