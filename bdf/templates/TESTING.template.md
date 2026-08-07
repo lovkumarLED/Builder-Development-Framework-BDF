@@ -847,6 +847,34 @@ Different outputs indicate a regression or non-deterministic behavior.
 
 ---
 
+# Active-Provider Selector Test Group (V2.5 Builder)
+
+The V2.5 group verifies provider discovery, interactive selection persistence, per-provider model files, and the `-Provider`/`-NonInteractive` switches.
+
+| Test | Name | Asserts |
+|------|------|---------|
+| 1 | Provider discovery | Every provider under `{{PROVIDER_DIR}}/` is discovered |
+| 2 | Selection persistence | Selected active providers persist to profile settings; unchanged list rewrites nothing |
+| 3 | Per-provider model precedence | Profile `<provider>-models.json` wins over provider-folder and inline models |
+| 4 | Model source drop | Active provider without any models source is dropped with a warning, not a failure |
+| 5 | CLI switches | `-Provider` and `-NonInteractive` behave per spec |
+
+# JSON Schema Validation Test Group (V2.7 Builder)
+
+The V2.7 group verifies the schema-validation entry gate and the F1-F7 feature set: pre-flight, dry-run, backup retention, provenance, diagnostics, merge diff, dynamic target artifact, and the no-literal-keys policy.
+
+| Test | Name | Asserts |
+|------|------|---------|
+| 1 | Schema compliance | Config sources validate against `{{SCHEMA_DIR}}` schemas before builder validation |
+| 2 | Pre-flight deps | Missing provider/profile/schema files reported together, then abort |
+| 3 | WhatIf dry-run | Validates + merges only; writes nothing; prints planned changes; exit 0 |
+| 4 | Backup retention | Backups pruned to newest N per artifact prefix (`-KeepBackups`) |
+| 5 | Provenance sidecar | Sidecar written with builder version, profile, providers, timestamp, output hash |
+| 6 | Doctor diagnostics | Read-only diagnostics; exit 0 clean / 1 issues; no writes |
+| 7 | Merge diff summary | Diff vs previous backup reported; no prior backup = no diff |
+| 8 | Dynamic target artifact | `target.json` artifact name drives output, backup prefix, provenance, WhatIf |
+| 9 | No literal keys | Generated artifact contains only `{env:VAR}` apiKey placeholders |
+
 # Release Docs Test Group (Tests 10-17)
 
 The Release Docs group verifies the release pipeline (registry → release manager → generated documentation).

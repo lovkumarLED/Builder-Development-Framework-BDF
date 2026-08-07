@@ -268,6 +268,114 @@ Make onboarding easier for future contributors.
 
 ---
 
+## Phase 9 - Release Manager
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+Automate the release process: registry-driven versioning, generated release documents, deterministic re-runs.
+
+Required before
+
+Framework generalization (Phase 10).
+
+---
+
+## Phase 10 - BDF V2.5: Framework Generalization
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+Generalize the framework so it can be reused across multiple builder targets (OpenCode, Claude Code, KiloCode).
+
+Required before
+
+Target-specific builders (Phases 11-12).
+
+---
+
+## Phase 10.5 - Active-Provider Selector Builder
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+Builder gains provider discovery, interactive active-provider selection, per-provider model files, and `-Provider`/`-NonInteractive` CLI switches.
+
+---
+
+## Phase 10.6 - JSON Schema Validation
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+Builder validates config sources against schema files before its own validation; pre-flight dependency check, dry-run, backup retention, provenance sidecar, diagnostics, diff summary.
+
+---
+
+## Phase 11 - Claude Code Builder V1
+
+Status
+
+```
+Planned - after gates (Phases 10.5, 10.6)
+```
+
+Objective
+
+Use the generalized framework to build the first Claude Code builder. Do not redesign anything; use the framework as-is.
+
+This is the first real validation of the framework against a second project.
+
+---
+
+## Phase 12 - KiloCode Builder V1
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+Build a KiloCode builder on the same generalized framework.
+
+---
+
+## Phase 13 - BDF V3: Builder Generator
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+BDF V3 is the destination: a builder-generator framework where a generic framework plus a project adapter produces a project-specific builder.
+
+---
+
 # Long-Term Vision
 
 The long-term objective is to build a configuration management system that is:

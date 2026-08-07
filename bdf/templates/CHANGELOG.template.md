@@ -54,16 +54,115 @@ Example
 
 ---
 
-# Version 1.0.0
+# Release Manager Section
+
+The current and previous entries are written by the release manager ({{RELEASE_MANAGER_SCRIPT}}) from the release registry ({{RELEASE_REGISTRY}}), between the special markers:
+
+- `<!-- AUTO-GENERATED START -->` opens the generated section.
+- `<!-- AUTO-GENERATED END -->` closes it.
+
+Generated entries carry the modern subsections: Highlights, New Features, Improvements, Bug Fixes, Breaking Changes, Migration Required, Testing Summary, Known Issues, and Documentation.
+
+The release manager never touches manual entries outside the markers.
+
+---
+
+<!-- AUTO-GENERATED START -->
+
+# Version {{CURRENT_VERSION}}
 
 ## Status
 
 Current
 
+---
+
 ## Date
 
 ```
-YYYY-MM-DD
+{{ENTRY_DATE}}
+```
+
+---
+
+## Summary
+
+{{VERSION_DESCRIPTION}}
+
+---
+
+## Highlights
+
+- {{HIGHLIGHT_1}}
+- {{HIGHLIGHT_2}}
+
+---
+
+## New Features
+
+- {{NEW_FEATURE_1}}
+- {{NEW_FEATURE_2}}
+
+---
+
+## Improvements
+
+- {{IMPROVEMENT_1}}
+- {{IMPROVEMENT_2}}
+
+---
+
+## Bug Fixes
+
+- {{BUG_FIX_1}}
+
+---
+
+## Breaking Changes
+
+{{BREAKING_CHANGES}}
+
+---
+
+## Migration Required
+
+{{MIGRATION_REQUIRED}}
+
+---
+
+## Testing Summary
+
+{{TESTING_SUMMARY}}
+
+---
+
+## Known Issues
+
+{{KNOWN_ISSUES}}
+
+---
+
+## Documentation
+
+{{DOC_STATUS}}
+
+- {{DOC_UPDATED_1}}
+- {{DOC_UPDATED_2}}
+
+---
+
+<!-- AUTO-GENERATED END -->
+
+# Version 1.0.0
+
+## Status
+
+Legacy
+
+## Date
+
+```
+{{ENTRY_DATE}}
 ```
 
 ## Summary
@@ -133,7 +232,7 @@ Implemented
 
 Implemented
 
-- Testing guide.
+- Manual testing guide.
 - Verification procedures.
 - Regression testing procedures.
 
@@ -159,7 +258,8 @@ ROADMAP.md
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 1.0.0 | Current | Initial project implementation |
+| {{CURRENT_VERSION}} | Current | {{VERSION_DESCRIPTION}} |
+| 1.0.0 | Legacy | Initial project implementation |
 
 ---
 
@@ -170,12 +270,15 @@ Every new version should include:
 - Version number
 - Date
 - Summary
-- Added
-- Changed
-- Fixed
-- Removed
+- Highlights
+- New Features
+- Improvements
+- Bug Fixes
+- Breaking Changes
+- Migration Required
+- Testing Summary
+- Known Issues
 - Documentation updates
-- Breaking changes (if any)
 
 ---
 
@@ -186,7 +289,7 @@ Every new version should include:
 Date
 
 ```
-YYYY-MM-DD
+YYY-MM-DD
 ```
 
 ### Added

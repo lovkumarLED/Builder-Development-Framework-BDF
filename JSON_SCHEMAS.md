@@ -205,6 +205,31 @@ Each model entry has the same shape as a `models.json` entry (for example `name`
 
 ---
 
+# target.json (P2, optional)
+
+Profile-level target artifact; selects the file the builder generates for this profile.
+
+## Location
+
+```
+profiles/<profile>/target.json
+```
+
+## Schema
+
+| Key | Type | Required | Description |
+|------|------|----------|-------------|
+| artifact | String | Yes | Generated artifact file name (e.g. `opencode.json`). |
+
+## Validation Rules
+
+- Validated against `schemas/targets.schema.json` when present (`artifact`: string, `additionalProperties: false`).
+- Missing, unreadable, or schema-invalid `target.json` falls back to `opencode.json` (backward compatible).
+- The builder derives the backup prefix (`<base>_*`), provenance sidecar (`<base>.provenance.json`), WhatIf names, and retention prefix from the artifact base name.
+- A future Claude profile would set `"artifact": "claude.json"` — no builder code change required.
+
+---
+
 # omniroute.json
 
 ## Schema
@@ -247,6 +272,7 @@ The following files are considered source files.
 | <provider>-models.json | Yes |
 | plugins.json | Yes |
 | mcp.json | Yes |
+| target.json | Yes (optional) |
 | omniroute.json | Yes |
 
 `settings.json` is also written by the builder (see the Builder-Written section above): it persists the resolved `activeProviders` list back to the file, with a backup created first.
@@ -294,6 +320,40 @@ Validation is performed by the builder before configuration generation.
 Additional JSON schemas will only be documented after implementation.
 
 Future configuration formats belong exclusively in `ROADMAP.md`.
+
+Implemented in Builder V2.7.
+
+---
+
+## JSON Schema Files (Builder V2.7)
+
+The seven live schema files live in `schemas/`.
+
+| File | Validates | Required | additionalProperties |
+|------|-----------|----------|----------------------|
+| `schema.json` | Root shape of the generated `opencode.json` (documentation only; not validated by the builder pipeline) | — | — |
+| `settings.schema.json` | `profiles/<profile>/settings.json` | `activeProviders` (array of strings) | false |
+| `provider.schema.json` | `providers/<id>.json` | `id` (string), `provider` (object) | false |
+| `models.schema.json` | Covers BOTH `models.json` AND `<provider>-models.json` (profile-level per-provider model files) | `models` (object); model entries require `name` (string) | false |
+| `plugins.schema.json` | `profiles/<profile>/plugins.json` | `plugin` (array of strings) | false |
+| `mcp.schema.json` | `profiles/<profile>/mcp.json` | `mcp` (object); server entries permissive by design | false at root |
+| `targets.schema.json` | `profiles/<profile>/target.json` | `artifact` (string) | false |
+
+---
+
+## Validation Subset (PS 5.1)
+
+The builder implements schema validation inside the script: Windows PowerShell 5.1 has no `Test-Json -Schema`.
+
+The supported keyword subset:
+
+- `type` (string / number / object / array / boolean / null).
+- `required`.
+- `properties`.
+- `additionalProperties: false`.
+- `items`.
+- `enum`.
+- `$ref` (local same-file references only).
 
 ---
 

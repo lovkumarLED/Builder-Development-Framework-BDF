@@ -20,24 +20,44 @@ The builder relies on this structure when generating the final configuration.
 
 ---
 
+# Root Directory
+
+```
+{{PROJECT_ROOT}}/
+```
+
+The {{PROJECT_ROOT}} directory is the root of the entire project.
+
+Everything required by the configuration manager exists inside this directory.
+
+---
+
 # Project Structure
 
 ```
-project/
+{{PROJECT_ROOT}}/
 
 ├── {{BACKUP_DIR}}/
 ├── {{DOCS_DIR}}/
 ├── {{CONFIG_SOURCE_DIR}}/
 ├── {{PROVIDER_DIR}}/
+├── {{SCHEMA_DIR}}/
 ├── {{SCRIPTS_DIR}}/
-└── {{GENERATED_ARTIFACT}}
+├── {{GENERATED_ARTIFACT}}
+└── {{PROVENANCE_SIDECAR}}
 ```
 
 Each directory has a dedicated responsibility.
 
+Tooling directories, package manifests, and lockfiles belong to the project tooling; they are not configuration sources.
+
 ---
 
 # {{BACKUP_DIR}}/
+
+```
+{{BACKUP_DIR}}/
+```
 
 ## Purpose
 
@@ -66,6 +86,10 @@ Not required.
 ---
 
 # {{DOCS_DIR}}/
+
+```
+{{DOCS_DIR}}/
+```
 
 ## Purpose
 
@@ -102,11 +126,25 @@ ROADMAP.md
 
 CHANGELOG.md
 
+CURRENT_RELEASE.md
+
 PROJECT_STATE.md
+
+release_registry.json
 
 ADAPTER.md
 
 LESSONS_LEARNED.md
+
+AI/
+
+planning/
+
+_agent/
+
+bdf/
+
+.superpowers/
 ```
 
 ## Managed By
@@ -120,6 +158,10 @@ Yes.
 ---
 
 # {{CONFIG_SOURCE_DIR}}/
+
+```
+{{CONFIG_SOURCE_DIR}}/
+```
 
 ## Purpose
 
@@ -137,9 +179,9 @@ The builder selects the profile at invocation time.
 other-profiles/
 ```
 
-The default profile is fully configured.
+The `{{DEFAULT_PROFILE}}` profile is the primary profile (settings, per-provider models, plugins, MCP).
 
-Additional profiles contain only the settings file and contribute their provider selection to the build.
+Additional profiles carry a settings file, a small per-provider model file, and an optional `target.json`; they contribute their provider selection to the build.
 
 ---
 
@@ -152,11 +194,13 @@ Contains the active configuration.
 
 settings.json
 
-models.json
+<provider>-models.json
 
 plugins.json
 
-service.json
+mcp.json
+
+target.json (optional)
 ```
 
 ---
@@ -169,15 +213,19 @@ General profile configuration.
 
 Contains profile-level settings used by the builder.
 
+The builder also writes the resolved `activeProviders` list back to this file after provider selection (backed up first).
+
 ---
 
-### models.json
+### <provider>-models.json
 
 Purpose:
 
-Defines every model available inside the profile.
+Profile-level model definitions for a single provider.
 
-Responsible only for model configuration.
+The file name follows the pattern `<provider>-models.json` (for example `{{CURRENT_PROVIDER}}-models.json`), one file per active provider.
+
+Carries the highest model-source precedence.
 
 ---
 
@@ -189,11 +237,25 @@ Defines plugins enabled for the profile.
 
 ---
 
-### service.json
+### mcp.json
 
 Purpose:
 
-Defines service configuration for the profile.
+Defines MCP server configuration for the profile.
+
+---
+
+### target.json (optional, P2)
+
+Purpose:
+
+Names the generated target artifact for this profile (e.g. `{{GENERATED_ARTIFACT}}`).
+
+Falls back to `{{GENERATED_ARTIFACT}}` when missing or invalid.
+
+Drives the output file, backup prefix (`<base>_*`), provenance sidecar (`<base>.provenance.json`), WhatIf names, and retention.
+
+Validated against `{{SCHEMA_DIR}}/targets.schema.json` when present.
 
 ---
 
@@ -208,6 +270,10 @@ Yes.
 ---
 
 # {{PROVIDER_DIR}}/
+
+```
+{{PROVIDER_DIR}}/
+```
 
 ## Purpose
 
@@ -239,6 +305,58 @@ Contains:
 
 Provider definitions are independent from profiles.
 
+## Provider-specific models
+
+Each provider may own provider-specific models:
+
+```
+{{PROVIDER_DIR}}/{{CURRENT_PROVIDER}}/models.json
+```
+
+When present, these take precedence over inline provider models and the global profile models.
+
+## Managed By
+
+Developer
+
+## Manual Editing
+
+Yes.
+
+---
+
+# {{SCHEMA_DIR}}/
+
+```
+{{SCHEMA_DIR}}/
+```
+
+## Purpose
+
+Contains the live JSON Schema files used by the builder.
+
+Each schema validates one configuration source before the builder generates `{{GENERATED_ARTIFACT}}`: a missing `{{SCHEMA_DIR}}/` directory produces a warning and the build continues (legacy compatibility).
+
+## Contents
+
+```
+{{SCHEMA_DIR}}/
+
+{{SCHEMA_FILE_PATTERN}}
+```
+
+The schema files are the machine-readable definitions behind `JSON_SCHEMAS.md`:
+
+- `schema.json` — root shape of the generated `{{GENERATED_ARTIFACT}}` (documentation only; not validated by the builder pipeline).
+- `settings.schema.json` — validates settings files.
+- `provider.schema.json` — validates provider files.
+- `models.schema.json` — covers both `models.json` and `<provider>-models.json` (profile-level per-provider model files).
+- `plugins.schema.json` — validates plugin files.
+- `mcp.schema.json` — validates MCP files.
+- `targets.schema.json` — validates `target.json` (P2).
+
+A README in the schema directory describes the validation flow and the artifact list.
+
 ## Managed By
 
 Developer
@@ -250,6 +368,10 @@ Yes.
 ---
 
 # {{SCRIPTS_DIR}}/
+
+```
+{{SCRIPTS_DIR}}/
+```
 
 ## Purpose
 
@@ -271,17 +393,18 @@ Generates the final `{{GENERATED_ARTIFACT}}`.
 
 Responsibilities
 
-- Load configuration files.
+- Load and validate configuration files.
 - Validate configuration.
 - Create backup.
 - Merge configuration.
-- Generate output.
+- Generate output and the provenance sidecar.
 
 Supports
 
 - Dynamic profile selection.
-- Dynamic provider loading.
+- Active-provider discovery and selection with settings persistence.
 - Optional profile sections.
+- Provider-specific models with profile-level precedence.
 
 The builder never edits source configuration files.
 
@@ -316,6 +439,36 @@ This file is considered a generated artifact.
 It should never be edited manually.
 
 Any configuration changes must be made to the source files.
+
+---
+
+# {{PROVENANCE_SIDECAR}}
+
+The sidecar file follows the pattern `<artifactBase>.provenance.json`.
+
+## Purpose
+
+Generated provenance sidecar for the configuration build.
+
+Written by the builder to the root of the configuration directory, next to `{{GENERATED_ARTIFACT}}`.
+
+Contains:
+
+- builder version
+- profile
+- active providers
+- generated timestamp (UTC)
+- SHA-256 of the generated `{{GENERATED_ARTIFACT}}` content
+
+The provenance is written **never into `{{GENERATED_ARTIFACT}}`**: the sidecar keeps the generated configuration consumer-schema safe.
+
+## Managed By
+
+Builder
+
+## Manual Editing
+
+Not required.
 
 ---
 
@@ -355,6 +508,7 @@ builder
 | {{DOCS_DIR}} | Developer |
 | {{CONFIG_SOURCE_DIR}} | Developer |
 | {{PROVIDER_DIR}} | Developer |
+| {{SCHEMA_DIR}} | Developer |
 | {{SCRIPTS_DIR}} | Developer |
 | {{GENERATED_ARTIFACT}} | Builder |
 
@@ -367,12 +521,14 @@ builder
 - {{DOCS_DIR}}/
 - {{CONFIG_SOURCE_DIR}}/
 - {{PROVIDER_DIR}}/
+- {{SCHEMA_DIR}}/
 - {{SCRIPTS_DIR}}/
 
 ## Do Not Edit
 
 - {{BACKUP_DIR}}/
 - {{GENERATED_ARTIFACT}}
+- {{PROVENANCE_SIDECAR}}
 
 Generated files should always be recreated by the builder.
 
@@ -386,8 +542,10 @@ Generated files should always be recreated by the builder.
 - {{DOCS_DIR}}/
 - {{CONFIG_SOURCE_DIR}}/
 - {{PROVIDER_DIR}}/
+- {{SCHEMA_DIR}}/
 - {{SCRIPTS_DIR}}/
 - {{GENERATED_ARTIFACT}}
+- {{PROVENANCE_SIDECAR}}
 
 ## Planned
 

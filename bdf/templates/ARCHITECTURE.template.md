@@ -73,9 +73,11 @@ The following diagram illustrates the overall system structure.
         |   {{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/        |
         |                                            |
         |   ├── settings file                        |
+        |   ├── <provider>-models.json               |
         |   ├── models file                          |
         |   ├── plugins file                         |
-        |   └── service configuration file           |
+        |   ├── service configuration file           |
+        |   └── optional target file                 |
         |                                            |
         +--------------------------------------------+
 
@@ -136,6 +138,8 @@ A source profile contains:
 - models
 - plugins
 - service configuration
+- per-provider model files (`<provider>-models.json`)
+- an optional target file naming the generated artifact
 
 Source profiles do not contain provider definitions.
 
@@ -269,6 +273,92 @@ Generation
 
 {{APP_NAME}}
 ```
+
+---
+
+## Builder Pipeline Evolution
+
+The builder has evolved through versioned pipelines while keeping the same architecture.
+
+The historical pipeline is the diagram above.
+
+### Builder V2.5 (Active-Provider Selector)
+
+Builder V2.5 introduces active-provider selection to the build.
+
+The user chooses which providers are active at build time.
+
+Selection runs before profile loading:
+
+```
+Discover Providers
+
+↓
+
+Select & Persist Active Providers
+
+↓
+
+Load Profile
+```
+
+The resolved active provider list is persisted in the profile settings file, which becomes a builder-writable source file.
+
+Settings are backed up before overwrite and written only when the list differs.
+
+Per-provider model files override provider and global models.
+
+### Builder V2.7 (JSON Schema Validation)
+
+Builder V2.7 extends the pipeline with a schema-validation stage and renumbers the build into a canonical nine-stage pipeline.
+
+| Stage | Name | Notes |
+|-------|------|-------|
+| 0 | Discover Providers | unchanged |
+| 1 | Load Profile | unchanged |
+| 2 | Load Provider | provider reference check; merging happens in Stage 6 |
+| 3 | Schema Validation | JSON Schema source check + pre-flight dependency check |
+| 4 | Validation | structural validation |
+| 5 | Backup | honors backup retention |
+| 6 | Merge | providers + models + plugins + service configuration |
+| 7 | Generation | writes {{GENERATED_ARTIFACT}} + provenance sidecar |
+| 8 | Verification | round-trip check + diff summary + retention prune |
+
+JSON Schema validation is non-breaking: missing schemas produce a warning and a skip.
+
+Dependency references are checked before merge so that missing inputs abort early with a single report.
+
+### Provenance and Backup Retention
+
+The build records provenance in a sidecar file ({{PROVENANCE_SIDECAR}}).
+
+The sidecar captures builder version, profile, active providers, generation timestamp, and output hash.
+
+The sidecar never writes into the generated artifact.
+
+Backups are pruned to the newest N files per prefix so the backup directory cannot grow without bound.
+
+---
+
+# Release Pipeline
+
+Release documentation is generated, not hand-written.
+
+The release pipeline mirrors the build pipeline: one source of facts, one generator, generated artifacts.
+
+```
+{{RELEASE_REGISTRY}}
+
+↓
+
+{{RELEASE_MANAGER_SCRIPT}}
+
+↓
+
+{{RELEASE_ARTIFACTS}}
+```
+
+Generated release artifacts are never edited manually.
 
 ---
 

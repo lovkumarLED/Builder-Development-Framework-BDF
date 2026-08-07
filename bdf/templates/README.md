@@ -70,6 +70,24 @@ Every placeholder must be replaced before a project document is released.
 | `{{RELEASE_MANAGER_SCRIPT}}` | The release manager entry script. | release-manager.ps1 |
 | `{{DOC_VERSION}}` | The document version footer. | 1.0 |
 | `{{PLACEHOLDER_NAME}}` | Example placeholder used in the convention illustration. | (not a project value) |
+| `{{SCHEMA_DIR}}` | The schema files directory. | schemas |
+| `{{SCHEMA_FILE_PATTERN}}` | The schema file pattern inside {{SCHEMA_DIR}}. | *.schema.json |
+| `{{PROVENANCE_SIDECAR}}` | The builder-written provenance sidecar file. | opencode.provenance.json |
+| `{{ENTRY_DATE}}` | Date of a release entry. | 2026-08-06 |
+| `{{DOC_STATUS}}` | Status field of a release entry. | Current / Previous |
+| `{{HIGHLIGHT_1}}` | First release highlight. | F1 JSON Schema validation |
+| `{{HIGHLIGHT_2}}` | Second release highlight. | P2 dynamic target artifact |
+| `{{NEW_FEATURE_1}}` | First new feature of a release. | scripts/build-opencode-v2.7.ps1 |
+| `{{NEW_FEATURE_2}}` | Second new feature of a release. | -WhatIf dry run CLI flag |
+| `{{IMPROVEMENT_1}}` | First improvement of a release. | Real-world reproducibility |
+| `{{IMPROVEMENT_2}}` | Second improvement of a release. | Backups pruned by prefix |
+| `{{BUG_FIX_1}}` | First bug fix of a release. | Diff summary enumerates OrderedDictionary |
+| `{{BREAKING_CHANGES}}` | Breaking-changes note of a release. | None |
+| `{{MIGRATION_REQUIRED}}` | Migration-required note of a release. | No |
+| `{{TESTING_SUMMARY}}` | Testing summary of a release. | 17/17 + 13/13 + 30/30 passed |
+| `{{KNOWN_ISSUES}}` | Known-issues note of a release. | None |
+| `{{DOC_UPDATED_1}}` | First doc updated by a release. | BUILDER_SPEC.md |
+| `{{DOC_UPDATED_2}}` | Second doc updated by a release. | JSON_SCHEMAS.md |
 
 The example values come from the reference implementation.
 

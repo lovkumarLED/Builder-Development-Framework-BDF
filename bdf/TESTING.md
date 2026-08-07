@@ -75,6 +75,18 @@ Tests verify:
 - The generated documents match the registry.
 - The release manager aborts when markers are missing.
 
+## JSON Schema (Builder V2.7)
+
+The V2.7 harness group follows the same pattern for the JSON Schema builder.
+
+- Schema Validation: valid sources pass; settings missing `required` fails; wrong `type` fails; `additionalProperties` fails; provider violation fails; models violation fails; missing `schemas/` directory warns and continues.
+- Pre-flight: missing provider file aborts with "Pre-flight failed".
+- WhatIf: nothing written, exit 0.
+- Doctor: clean exits 0, corrupt exits 1.
+- Backup retention: `-KeepBackups` honored.
+- Provenance: sidecar fields and SHA correct.
+- Diff summary: Added/Removed lines; identical input silent.
+
 ---
 
 # Testing Principles

@@ -93,6 +93,21 @@ At session end:
 
 ---
 
+# Build Continuation
+
+Every version build must be built, tested, and validated completely before the next begins.
+
+If a version build is too large to finish within the context window budget, the agent must NOT push through. Instead:
+
+1. Stop at a clean checkpoint.
+2. Write `AI/CONTINUE_BUILD_<VERSION>_<STEP>.md` with what was done, what is next, how to verify, and the resume prompt.
+3. Update `_agent/SESSION_LOG.md` and `_agent/JOURNEY_TO_V3.md`.
+4. Hand the user the resume prompt for the next session.
+
+Resume from the latest checkpoint file - never restart a version from scratch.
+
+---
+
 # Project State
 
 `PROJECT_STATE.md` is the living snapshot of the repository.

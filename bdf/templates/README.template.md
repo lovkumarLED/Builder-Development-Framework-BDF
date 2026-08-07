@@ -73,6 +73,46 @@ The documentation is split into multiple files.
 
 ---
 
+## Documentation Architecture
+
+The documentation is organized into two layers.
+
+### Layer 1 - Builder Development Framework
+
+Reusable engineering knowledge shared by every builder project.
+
+```
+{{DOCS_DIR}}/bdf/
+```
+
+This layer contains the engineering process, the blueprint engine, the project adapter concept, the builder evolution workflow, the framework lifecycle, the AI workflow, the project generation workflow, the migration guide, reusable lessons, and documentation templates.
+
+See `{{DOCS_DIR}}/bdf/README.md` for the full overview.
+
+### Layer 2 - Project Documentation
+
+Project-specific documentation. Describes the current implementation only.
+
+The framework stays generic; the project layer holds what is specific to this target.
+
+---
+
+## Releases
+
+Releases follow a single automated workflow:
+
+1. The AI records the release facts in `{{RELEASE_REGISTRY}}`.
+2. The user reviews the release facts.
+3. The release manager generates all release documentation (`{{RELEASE_MANAGER_SCRIPT}}`).
+4. Run the test harness (Release Docs group must pass).
+5. Commit.
+
+The registry is the only hand-edited release artifact.
+
+Generated release files are never edited manually.
+
+---
+
 ## Current Status
 
 ### Implemented

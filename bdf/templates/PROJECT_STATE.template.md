@@ -293,6 +293,22 @@ At session end:
 - Follow `_agent/SESSION_WORKFLOW.md`.
 - Write the session summary to `_agent/SESSION_LOG.md`.
 
+## Build Continuation
+
+Large version builds that exceed the context budget stop at a clean checkpoint, write `AI/CONTINUE_BUILD_<VERSION>_<STEP>.md`, and resume from it in the next session.
+
+## Release Workflow
+
+Releases follow one workflow:
+
+1. Record the release facts in `{{RELEASE_REGISTRY}}`.
+2. The user reviews the release facts.
+3. Run `{{RELEASE_MANAGER_SCRIPT}}` - it generates the release documents (CHANGELOG, CURRENT_RELEASE, VERSION, version history table).
+4. Run the test harness (Release Docs group must pass).
+5. Commit.
+
+Generated release files are never edited manually. The registry is the sequence authority.
+
 ## Project State
 
 After every major refactor:

@@ -52,7 +52,7 @@ Only Project Adapters should differ between supported projects.
 The path is:
 
 ```
-Current (Builder V2.5 Active-Provider Selector) ✅
+Current (Builder V2.7 JSON Schema Validation) ✅
 ↓
 Claude Code Builder V1
 ↓
@@ -72,13 +72,13 @@ Real projects shape the framework — never assumptions.
 Current Version
 
 ```
-2.4.0
+2.5.0
 ```
 
 Current Status
 
 ```
-Builder V2.5 Active-Provider Selector
+Builder V2.7 JSON Schema Validation
 ```
 
 Journey Position
@@ -92,7 +92,7 @@ The project currently provides:
 - Modular configuration
 - Provider abstraction
 - Profile abstraction
-- Configuration builder (V2.5)
+- Configuration builder (V2.7)
 - Dynamic profile selection
 - Dynamic provider loading
 - Backup system

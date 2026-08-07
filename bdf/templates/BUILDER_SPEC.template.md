@@ -158,6 +158,83 @@ No stage may be skipped.
 
 ---
 
+# Release Pipeline
+
+Release documentation follows the same automation philosophy as the build: facts are written once, documentation is generated, and generated artifacts are never edited manually.
+
+The release pipeline has one hand-edited input and one generator.
+
+```
+{{RELEASE_REGISTRY}}
+    |
+    v
+{{RELEASE_MANAGER_SCRIPT}}
+    |
+    +---> {{RELEASE_ARTIFACTS}}
+```
+
+The registry ({{RELEASE_REGISTRY}}) is the only hand-edited release artifact.
+
+It is the sequence authority for version documentation.
+
+The release manager ({{RELEASE_MANAGER_SCRIPT}}) generates all release documentation from it.
+
+## Marker Policy
+
+Generated release documents carry content markers.
+
+```
+<!-- AUTO-GENERATED START -->
+
+...
+
+<!-- AUTO-GENERATED END -->
+```
+
+The release manager rewrites only the content between the markers.
+
+Manual prose above and below the markers is never touched.
+
+If the markers are missing, the generator aborts rather than guessing.
+
+## Failure Policy
+
+Generation is all-or-nothing.
+
+Validation happens before anything is written.
+
+If any input fails validation, nothing is written and the script exits with an error.
+
+The repository is left exactly as it was before the run.
+
+## Release Workflow
+
+Every release follows the same workflow.
+
+```
+AI updates {{RELEASE_REGISTRY}}
+
+    v
+
+User reviews the release facts
+
+    v
+
+Run {{RELEASE_MANAGER_SCRIPT}}
+
+    v
+
+Generated release artifacts
+
+    v
+
+Commit
+```
+
+The generated files are never edited manually.
+
+---
+
 # Stage 1 — Load Profile
 
 The builder begins by loading the profile selected at invocation time.
@@ -289,6 +366,36 @@ Plugins and service sections are merged only when the corresponding profile file
 
 Each section is merged exactly once.
 
+### Model Precedence
+
+Each provider can own its own models.
+
+When resolving models for a provider, the builder uses the first source that exists:
+
+1. Provider-specific models file
+
+```
+{{PROVIDER_DIR}}/<provider>/models.json
+```
+
+2. Inline models inside the provider definition file
+
+```
+{{PROVIDER_DIR}}/<provider>.json  ->  provider.<provider>.models
+```
+
+3. Global models file
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/models.json
+```
+
+Provider-specific models win over inline models, which win over global.
+
+Global models are only injected into a provider when the provider has no models of its own.
+
+This keeps builder behavior stable: a provider with an empty models object receives the global models.
+
 ### Why
 
 Configuration is intentionally stored in separate files.
@@ -314,6 +421,30 @@ The previous configuration is replaced only after a successful build.
 {{APP_NAME}} expects a single configuration file.
 
 Generation converts the modular project structure into the format required by {{APP_NAME}}.
+
+---
+
+# Stage 7 — Verification
+
+Before writing, the builder verifies the generated configuration in memory.
+
+Verification passes:
+
+- Output validity (round-trip parse succeeds).
+- Providers exist for every active provider.
+- Models are correctly attached to each provider.
+- Plugins are present when configured.
+- Service configuration is present when configured.
+
+The build fails before writing when any verification step fails.
+
+Partial or invalid output is never written.
+
+### Why
+
+Verification catches generation defects before they can replace a working configuration.
+
+The backup guarantees recovery; verification guarantees the new output is valid.
 
 ---
 
@@ -495,6 +626,428 @@ A successful build satisfies all of the following.
 
 ---
 
+# Builder V2.5 (Active-Provider Selector)
+
+Builder V2.5 is a versioned builder implementation.
+
+The pipeline stages documented above describe the earlier builder pipeline.
+
+Builder V2.5 adds active-provider selection to that pipeline.
+
+The user chooses which providers are active at build time.
+
+The selection is persisted in the profile settings file, which is now a builder-writable source file.
+
+---
+
+## Command Line Interface
+
+The builder accepts the following parameters.
+
+```
+-Profile        <profile-name>   default: {{DEFAULT_PROFILE}}
+-ConfigRoot     <path>           default: <config-root>
+-Provider       <ids>            default: (empty)
+-NonInteractive                  switch, default: off
+```
+
+| Parameter | Default | Effect |
+| --- | --- | --- |
+| `-Profile` | `{{DEFAULT_PROFILE}}` | Selects the profile directory `{{CONFIG_SOURCE_DIR}}/<profile>`. |
+| `-ConfigRoot` | `<config-root>` | Root directory containing the source configuration, provider definitions, backups, and the generated artifact. |
+| `-Provider` | (empty) | Comma- or space-separated provider ids. Overrides interactive selection and the stored list. The given order is preserved. An unknown id aborts the build. |
+| `-NonInteractive` | off | Skips the interactive menu and uses the stored settings list. |
+
+### Why
+
+Active-provider selection must work in unattended runs.
+
+The provider and non-interactive parameters make the build reproducible from scripts.
+
+---
+
+## Stage List
+
+The V2.5 build follows this order.
+
+```
+Stage 0 — Discover / Select / Persist Providers
+Stage 1 — Load Profile
+Stage 2 — Validate
+Stage 3 — Merge
+Stage 4 — Create Backup
+Stage 5 — Generate Final Configuration
+Stage 6 — Verify Output
+Stage 7 — Write Output
+Stage 8 — Verify Settings Persistence Round-trip
+```
+
+Stage 0 runs before profile loading.
+
+It discovers ALL providers (not only the active ones), then resolves the active list, and persists the result to the settings file when it differs.
+
+Stage 3 runs the active-provider model guard after merging models.
+
+Every active provider must produce a models source (profile `<provider>-models.json`, provider-specific `models.json`, inline, or global).
+
+A provider without any models source is NOT considered active: it is dropped with a warning, removed from the generated configuration, and removed from the settings file (the reduced list is persisted, backed up first).
+
+If no active provider remains, the build aborts.
+
+Stage 8 is new to V2.5.
+
+After writing the generated artifact, the builder reloads the settings file and confirms that the persisted active provider list matches the resolved list.
+
+No stage may be skipped.
+
+---
+
+## Function Contracts
+
+The following functions are introduced by V2.5.
+
+### Discover-Providers
+
+No parameters.
+
+Returns every valid provider id from the provider directory, in filename order.
+
+Every provider file is loaded and validated.
+
+A malformed provider file causes a terminating error listing ALL bad files.
+
+Throws when no provider files exist.
+
+Throws when any file is malformed.
+
+---
+
+### Select-ActiveProviders
+
+Prints a numbered menu and returns the selected provider list.
+
+Providers already in the current selection are marked as active.
+
+Input grammar:
+
+- Comma- or space-separated numbers choose the matching providers.
+- `a` selects all discovered providers.
+- `n` selects none.
+- Empty input keeps the current selection.
+
+---
+
+### Resolve-ActiveProviders
+
+Returns the resolved provider id list.
+
+Resolution order:
+
+1. `-Provider` is non-empty — wins over everything. The given order is preserved. An id that was not discovered throws.
+2. `-NonInteractive` — returns the stored settings list.
+3. Otherwise — calls `Select-ActiveProviders` with the discovered list and the stored list.
+
+---
+
+### Persist-ActiveProviders
+
+Returns nothing.
+
+Aborts the build when the selection is empty.
+
+Rewrites the settings file only when the active list differs from the stored list.
+
+Before overwriting, the current settings file is backed up.
+
+The schema declaration is preserved.
+
+The rewritten file is UTF-8 without BOM.
+
+---
+
+### Compare-JsonArrays
+
+Returns whether two arrays are equal as lists of strings.
+
+Used to decide whether the settings file must be rewritten.
+
+---
+
+### Get-ProfileProviderModels
+
+Returns the parsed profile models file for a provider.
+
+Returns nothing when the file does not exist.
+
+File:
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/<provider>-models.json
+```
+
+Checks duplicate keys.
+
+Checks duplicate model names.
+
+Throws when the models section is missing or invalid.
+
+---
+
+## Selection Rules
+
+- The interactive menu accepts comma/space separated numbers, `a` for all, `n` for none, and empty input to keep the current selection.
+- `-Provider` takes precedence over the stored list and the menu. The given order is preserved. An unknown id aborts the build.
+- `-NonInteractive` skips the menu and uses the stored settings list.
+- `Persist-ActiveProviders` aborts the build when the selection is empty.
+- The stored list is written back to the settings file only when it differs from the previous list.
+
+---
+
+## Model Precedence
+
+Models for an active provider resolve from the first source that exists.
+
+1. Profile-level models file
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/<provider>-models.json
+```
+
+2. Provider-specific models file
+
+```
+{{PROVIDER_DIR}}/<provider>/models.json
+```
+
+3. Inline models inside the provider definition file
+
+```
+{{PROVIDER_DIR}}/<provider>.json  ->  provider.<provider>.models
+```
+
+4. Global models file
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/models.json
+```
+
+5. None — no models configured for the provider.
+
+Profile-level models win over provider-specific models, which win over inline models, which win over global models.
+
+Global models are only injected into a provider when the provider has no models of its own.
+
+Non-active providers are never considered for any source.
+
+### Why
+
+Models are owned at the profile level first.
+
+A profile can override the models of any provider without editing provider files.
+
+---
+
+## <provider>-models.json Shape
+
+Profile-level models are stored per provider.
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/<provider>-models.json
+
+{
+    "models": {
+        "<model-id>": {
+            ...model definition...
+        }
+    }
+}
+```
+
+The `models` object maps model identifiers to model definitions.
+
+Keys must be unique.
+
+Model names must be unique.
+
+Non-active providers' model files are ignored.
+
+Only the models of providers in the active list are ever read or merged.
+
+---
+
+## Settings Write Policy
+
+The profile settings file is a builder-writable source file.
+
+The builder writes it:
+
+- Only when the active list differs from the stored list.
+- With a backup at
+
+```
+{{BACKUP_DIR}}/settings_<profile>_<timestamp>.json
+```
+
+before overwrite.
+
+- With the schema declaration preserved.
+- As UTF-8 without BOM.
+
+---
+
+## Regeneration Guarantee
+
+This specification fully describes the current builder and its predecessors.
+
+An agent can regenerate the current builder script from this document alone.
+
+The retained V2.5 sections above also allow regenerating the previous builder, and the historical pipeline section documents the earlier builder for reference.
+
+Every function name, parameter, and stage label above matches the respective script.
+
+---
+
+# Builder V2.7 (JSON Schema Validation)
+
+Builder V2.7 is a versioned builder implementation.
+
+It is built on the V2.5 pipeline (documented above) and adds a schema-validation stage plus the hardening feature set F1-F7.
+
+Every V2.5 stage and function remains intact; the historical sections above are retained for regeneration.
+
+---
+
+## V2.7 Pipeline (9 Stages)
+
+The V2.7 build follows this canonical nine-stage order.
+
+| Stage | Name | Notes |
+|-------|------|-------|
+| 0 | Discover Providers | active-provider discovery, selection, persistence |
+| 1 | Load Profile | unchanged |
+| 2 | Load Provider | provider reference check; merging happens in Stage 6 |
+| 3 | Schema Validation | NEW — F1 (JSON Schema) + F2 (pre-flight) entry gate |
+| 4 | Validation | structural validation |
+| 5 | Backup | honors F4 retention |
+| 6 | Merge | providers + models + plugins + service configuration + final merge |
+| 7 | Generation | writes {{GENERATED_ARTIFACT}} + F5 provenance sidecar |
+| 8 | Verification | round-trip + F7 diff summary + F4 prune |
+
+No stage may be skipped.
+
+---
+
+## V2.7 Feature Set (F1-F7)
+
+| # | Feature | Behavior |
+| --- | --- | --- |
+| F1 | JSON Schema Validation | Validate configuration sources against schema files BEFORE builder validation. Non-breaking: missing schemas result in a warning and a skip. |
+| F2 | Pre-flight dependency check | Before merge, verify every active-provider reference, profile file, and referenced schema file exists; report ALL missing inputs, then abort with a clear error. |
+| F3 | Dry-run | Validate and merge only; write nothing, no backups; print planned changes; exit successfully. |
+| F4 | Backup retention | Prune the backup directory to the newest N files per prefix. Configurable retention count. |
+| F5 | Provenance stamp | Write a sidecar file with builder version, profile, providers, generation timestamp, and output hash. Never writes INTO the generated artifact. |
+| F6 | Diagnostics | Read the real configuration at the config root, validate sources against schemas and dependency references, print a status table, and exit with a clean or issue signal. No writes. |
+| F7 | Merge diff summary | After a successful build, print an added/removed/updated summary (providers, model counts, plugins, service entries) versus the previous backup artifact. |
+
+---
+
+## Target Artifact Resolution (P2)
+
+The generated artifact name is dynamic and resolved when a profile runs, never fixed in the builder code.
+
+An optional target file in the profile names the output artifact.
+
+```json
+{
+    "artifact": "{{GENERATED_ARTIFACT}}"
+}
+```
+
+Resolution rules (Stage 1 / Load Profile):
+
+- File present and valid (artifact is a non-empty string) — the artifact name is used.
+- File missing, unreadable, or invalid — the default artifact is used (backward compatible).
+- An artifact value without the expected suffix gets the suffix appended.
+
+The resolved target drives every hardcoded value in the builder:
+
+- Output write path.
+- Backup prefix (base name minus extension).
+- Provenance sidecar path.
+- Dry-run messages, diff scan, and retention prune on the artifact prefix.
+
+The target file is validated against its schema during Stage 3 (optional source; skipped if absent).
+
+---
+
+## API Key Policy (P1)
+
+- Provider source files and the generated artifact must contain **only** environment-variable placeholders, never literal API key values.
+- The builder NEVER carries, restores, or invents API keys. A key may appear in generated output only if a provider source file already contains it (as a placeholder).
+- Missing provider files are reported by the pre-flight check (F2); they are never "restored" from backups.
+
+---
+
+## Command Line Interface (V2.7)
+
+The V2.7 builder accepts all V2.5 parameters (unchanged) plus additional parameters.
+
+```
+-SchemaDir        <path>           default: <config-root>/schemas
+-WhatIf           <switch>         dry run
+-KeepBackups      <int>            default: 10
+-Doctor           <switch>         read-only diagnose
+-ProvenancePath   <path>           default: <config-root>/<artifactBase>.provenance.json
+```
+
+| Parameter | Default | Effect |
+| --- | --- | --- |
+| `-SchemaDir` | `<config-root>/schemas` | Directory containing the schema files used at Stage 3. |
+| `-WhatIf` | switch | Dry run. Validates and merges only; writes nothing; prints planned changes; exits successfully. |
+| `-KeepBackups` | 10 | Keeps the newest N files per prefix in the backup directory. |
+| `-Doctor` | switch | Read-only mode that diagnoses the real configuration at the config root; no writes. |
+| `-ProvenancePath` | `<config-root>/<artifactBase>.provenance.json` | Path of the provenance sidecar written by F5 (default derives from the resolved target artifact). |
+
+---
+
+## V2.7 Function Contracts
+
+The following functions are introduced by V2.7 (names are illustrative identifiers).
+
+| Function | Contract |
+| --- | --- |
+| `Test-SchemaCompliance` | Validates a file against a schema object; returns validity and error list. |
+| `Invoke-SourceSchemaCheck` | Runs the schema check for a source file and throws on failure. |
+| `Get-SchemaForSource` | Maps a source file name to its schema file name; returns nothing when no schema applies. |
+| `Assert-InputFilesExist` | Returns the list of every missing input file; never throws. |
+| `Get-CurrentSources` | Returns the source files for the current profile. |
+| `Prune-Backups` | Keeps the newest N files per prefix in the backup directory. |
+| `Write-ProvenanceFile` | Writes the provenance sidecar. |
+| `Get-LatestBackupConfig` | Returns the parsed content of the newest backup artifact. |
+| `Compare-BackupDiff` | Returns diff lines (added / removed / updated) against the previous backup artifact. |
+| `Invoke-Doctor` | Runs read-only diagnostics; prints a status table; reports whether the configuration is clean. |
+
+---
+
+## Supported JSON Schema Subset
+
+The builder implements a compact JSON Schema validator.
+
+Supported:
+
+- `$schema` (informational only, not enforced)
+- `type`
+- `required`
+- `properties`
+- `additionalProperties: false`
+- `items`
+- `enum`
+- `$ref` — local same-file only, e.g. `#/definitions`
+
+Validation is implemented inside the builder.
+
+---
+
 # Builder Status
 
 Current Builder
@@ -502,7 +1055,7 @@ Current Builder
 Version
 
 ```
-V2.1
+current builder
 ```
 
 Script
@@ -516,6 +1069,10 @@ Status
 ```
 Stable
 ```
+
+The exact builder version is defined by the project adapter.
+
+Prior builder versions remain documented for historical regeneration.
 
 Future versions of the builder will update this document after implementation.
 

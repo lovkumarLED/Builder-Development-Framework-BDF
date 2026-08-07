@@ -19,7 +19,7 @@ Every change to the framework must be recorded here.
 Version
 
 ```
-2.1.1
+2.2.1
 ```
 
 Status
@@ -34,10 +34,10 @@ Active
 
 | Item | Value |
 |------|-------|
-| Framework Version | 2.1.1 |
-| Supported Builder Versions | V2.5, V2.3, V2.1 |
+| Framework Version | 2.2.1 |
+| Supported Builder Versions | V2.7, V2.5, V2.3, V2.1 |
 | Compatible Projects | OpenCode Configuration Manager documentation |
-| Last Updated | 2026-08-05 |
+| Last Updated | 2026-08-06 |
 | Breaking Changes | None |
 | Migration Required | No |
 
@@ -58,6 +58,16 @@ Builder V2.1 extends V2 with the same architectural shape:
 - Provider-specific models.
 - Pre-write output verification.
 - Automated testing.
+
+Builder V2.7 extends the same architectural shape with:
+
+- JSON Schema validation (F1) of config sources before builder validation.
+- Pre-flight dependency check (F2) that aborts on any missing input.
+- `-WhatIf` dry-run (F3).
+- Backup retention pruning (F4).
+- Provenance sidecar (F5).
+- `-Doctor` read-only diagnostics (F6).
+- Merge diff summary vs the previous backup (F7).
 
 The project's release manager (`release-manager.ps1`) supports the registry workflow: release facts are recorded once in `release_registry.json`, and the changelog, quick reference, compatibility rows, and project state version history are generated from it. The generated table rows in this document are never edited manually.
 
@@ -106,6 +116,94 @@ Example
 ---
 
 # Change History
+
+## Version 2.2.1
+
+Date
+
+```
+2026-08-06
+```
+
+Status
+
+```
+Current
+```
+
+Summary
+
+```
+Full template-to-reference sync (Part 7 of the full-system check): all 15 template pairs now mirror the reference docs' V2.5/V2.7 structure; placeholder audit back to parity.
+```
+
+Changed
+
+- `templates/BUILDER_SPEC.template.md` — Release Pipeline, Stage 7 Verification, Model Precedence, Builder V2.5 + V2.7 sections, current-builder status.
+- `templates/ARCHITECTURE.template.md` — Release Pipeline, builder pipeline evolution, per-provider model files, provenance/retention concepts.
+- `templates/FOLDER_STRUCTURE.template.md` — Root Directory, schemas/, mcp.json, `<provider>-models.json`, target.json, provenance sidecar; obsolete file entries removed.
+- `templates/JSON_SCHEMAS.template.md` — mcp.json, per-provider models, target.json, builder-written files, schema table, validation subset.
+- `templates/CHANGELOG.template.md` — modern entry subsections (Highlights, New Features, Improvements, Bug Fixes, Testing Summary, Known Issues, Docs Updated).
+- `templates/ROADMAP.template.md` — Phases 9-13 incl. Framework Generalization, Active-Provider Selector, JSON Schema Validation, Claude Code/KiloCode builders, Destination BDF V3.
+- `templates/TESTING.template.md` — V2.5 Active-Provider Selector and V2.7 JSON Schema Validation test groups.
+- `templates/AGENT.template.md`, `templates/PROJECT_STATE.template.md` — Build Continuation + Release Workflow sections.
+- `templates/README.template.md` — Documentation Architecture + Releases sections.
+- `templates/LESSONS_LEARNED.template.md` — Lessons 11-12 added.
+- `templates/README.md` — placeholder table extended 36 → 54 rows; audit clean (54 used = 54 rows).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.0
+
+Date
+
+```
+2026-08-06
+```
+
+Status
+
+```
+Previous
+```
+
+Summary
+
+```
+Registered Builder V2.7 (JSON Schema Validation) in the supported-builder list and the reference documentation.
+```
+
+Changed
+
+- `VERSION.md` — compatibility table now lists V2.7 as a supported builder version.
+- `ARCHITECTURE.md`, `BUILDER_SPEC.md`, `README.md`, `ADAPTER.md`, `FOLDER_STRUCTURE.md`, `JSON_SCHEMAS.md`, `TESTING.md` — Builder V2.7 (F1-F7, 9-stage pipeline) documented as the current builder.
+- `templates/` — example placeholders updated to the current runner scripts where they name the builder.
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
 
 ## Version 2.1.1
 
@@ -335,7 +433,9 @@ No
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.1.1 | Current | Template sync: ADAPTER template release fields |
+| 2.2.1 | Current | Full template-to-reference sync (15 pairs, placeholder audit 54/54) |
+| 2.2.0 | Previous | Builder V2.7 (JSON Schema Validation) registered |
+| 2.1.1 | Previous | Template sync: ADAPTER template release fields |
 | 2.1.0 | Previous | BDF V2.5 framework generalization |
 | 2.0.0 | Previous | Builder Development Framework rename + intelligence layer |
 | 1.1.0 | Previous | PROJECT_STATE template added |

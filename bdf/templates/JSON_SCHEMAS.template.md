@@ -106,7 +106,20 @@ If validation fails, the build process must terminate immediately.
 
 ---
 
-# Models File
+## Builder-Written
+
+`settings.json` is a source file that the builder also writes.
+
+After the user (or a CLI switch) resolves the active provider list, the builder persists it back to `activeProviders`.
+
+- The current file is backed up before any rewrite.
+- `$schema` is preserved when present.
+- Written as UTF-8 without BOM.
+- Written only when the resolved list differs from the stored list; a no-op run leaves the file untouched.
+
+---
+
+# Model Definitions File
 
 `models.json`
 
@@ -121,8 +134,52 @@ If validation fails, the build process must terminate immediately.
 ## Validation Rules
 
 - Model identifiers must be unique.
+- Model names must be unique within a models source.
 - Every model must contain valid configuration.
-- The builder copies this object directly into every active provider.
+- Model resolution per active provider follows this precedence (first source that exists wins):
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/<provider>-models.json   (highest)
+{{PROVIDER_DIR}}/<provider>/models.json
+inline provider models
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/models.json (global)
+(none)
+```
+
+---
+
+# Per-Provider Models File
+
+`<provider>-models.json`
+
+Profile-level provider models.
+
+## Location
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/<provider>-models.json
+```
+
+One file per active provider, named after the provider id (for example `{{CURRENT_PROVIDER}}-models.json`).
+
+Optional: the file is loaded only when it exists.
+
+## Schema
+
+Same shape as `models.json`.
+
+| Key | Type | Required | Description |
+|------|------|----------|-------------|
+| models | Object | Yes | Collection of model definitions. |
+
+Each model entry has the same shape as a `models.json` entry (for example `name`).
+
+## Validation Rules
+
+- Model identifiers must be unique (duplicate keys are rejected).
+- Model names must be unique within the file.
+- The `models` section is required.
+- The file carries the highest precedence: it overrides `{{PROVIDER_DIR}}/<provider>/models.json`, inline provider models, and the global `models.json`.
 
 ---
 
@@ -145,22 +202,50 @@ If validation fails, the build process must terminate immediately.
 
 ---
 
-# Service Configuration File
+# MCP Configuration File
 
-`service.json`
+`mcp.json`
 
 ## Schema
 
 | Key | Type | Required | Description |
 |------|------|----------|-------------|
-| service | Object | Yes | Collection of service definitions. |
+| mcp | Object | Yes | Collection of MCP server definitions. |
 
 ---
 
 ## Validation Rules
 
-- Service identifiers must be unique.
-- Invalid service configuration causes the build to fail.
+- MCP identifiers must be unique.
+- Invalid MCP configuration causes the build to fail.
+
+---
+
+# Target Configuration File
+
+`target.json` (P2, optional)
+
+Profile-level target artifact; selects the file the builder generates for this profile.
+
+## Location
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/target.json
+```
+
+## Schema
+
+| Key | Type | Required | Description |
+|------|------|----------|-------------|
+| artifact | String | Yes | Generated artifact file name (e.g. `{{GENERATED_ARTIFACT}}`). |
+
+---
+
+## Validation Rules
+
+- Validated against `{{SCHEMA_DIR}}/targets.schema.json` when present (`artifact`: string, `additionalProperties: false`).
+- Missing, unreadable, or schema-invalid `target.json` falls back to `{{GENERATED_ARTIFACT}}` (backward compatible).
+- The builder derives the backup prefix (`<base>_*`), provenance sidecar (`<base>.provenance.json`), WhatIf names, and retention prefix from the artifact base name.
 
 ---
 
@@ -205,19 +290,36 @@ The following files are considered source files.
 |------|----------|
 | settings.json | Yes |
 | models.json | Yes |
+| <provider>-models.json | Yes |
 | plugins.json | Yes |
-| service.json | Yes |
+| mcp.json | Yes |
+| target.json | Yes (optional) |
 | {{CURRENT_PROVIDER}}.json | Yes |
+
+`settings.json` is also written by the builder (see the Builder-Written section above): it persists the resolved `activeProviders` list back to the file, with a backup created first.
 
 ---
 
-The following file is generated automatically.
+The following files are generated automatically.
 
 | File | Editable |
 |------|----------|
 | {{GENERATED_ARTIFACT}} | No |
+| {{PROVENANCE_SIDECAR}} | No |
 
 Generated files should never be modified manually.
+
+---
+
+# Builder-Written Files
+
+The builder writes exactly three artifacts:
+
+- `settings.json` write-back: the resolved `activeProviders` list, backed up first, `$schema` preserved, UTF-8 no BOM, written only when the list differs.
+- `{{GENERATED_ARTIFACT}}`: the merged output configuration, produced from all source files.
+- `{{PROVENANCE_SIDECAR}}`: provenance recorded next to the output (builder version, profile, active providers, timestamp, output SHA-256).
+
+All other configuration files are user-owned source files.
 
 ---
 
@@ -236,14 +338,50 @@ Validation is performed by the builder before configuration generation.
 
 ---
 
+# JSON Schema Files
+
+The live schema files live in `{{SCHEMA_DIR}}/`.
+
+| File | Validates | Required | additionalProperties |
+|------|-----------|----------|----------------------|
+| `schema.json` | Root shape of the generated `{{GENERATED_ARTIFACT}}` (documentation only; not validated by the builder pipeline) | — | — |
+| `settings.schema.json` | `{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/settings.json` | `activeProviders` (array of strings) | false |
+| `provider.schema.json` | `{{PROVIDER_DIR}}/{{CURRENT_PROVIDER}}.json` | `id` (string), `provider` (object) | false |
+| `models.schema.json` | Covers BOTH `models.json` AND `<provider>-models.json` (profile-level per-provider model files) | `models` (object); model entries require `name` (string) | false |
+| `plugins.schema.json` | `{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/plugins.json` | `plugin` (array of strings) | false |
+| `mcp.schema.json` | `{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/mcp.json` | `mcp` (object); server entries permissive by design | false at root |
+| `targets.schema.json` | `{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/target.json` | `artifact` (string) | false |
+
+Each configuration source file has a matching `*.schema.json` file.
+
+---
+
+# Validation Subset
+
+The builder implements schema validation inside the script: {{SHELL}} has no native schema test, so a compact validator is used.
+
+The supported keyword subset:
+
+- `type` (string / number / object / array / boolean / null).
+- `required`.
+- `properties`.
+- `additionalProperties: false`.
+- `items`.
+- `enum`.
+- `$ref` (local same-file references only).
+
+---
+
 # Current Status
 
 ## Implemented
 
 - settings.json
 - models.json
+- <provider>-models.json
 - plugins.json
-- service.json
+- mcp.json
+- target.json
 - {{CURRENT_PROVIDER}}.json
 
 ## Planned
@@ -251,6 +389,8 @@ Validation is performed by the builder before configuration generation.
 Additional configuration schemas will only be documented after implementation.
 
 Future configuration formats belong exclusively in `ROADMAP.md`.
+
+Implemented in Builder {{CURRENT_VERSION}}.
 
 ---
 
@@ -275,7 +415,7 @@ plugins.json
 
 ↓
 
-service.json
+mcp.json
 
 ↓
 

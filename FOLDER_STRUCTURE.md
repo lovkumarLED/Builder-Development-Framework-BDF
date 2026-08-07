@@ -43,6 +43,7 @@ opencode/
 ├── skills/
 ├── .gitignore
 ├── opencode.json
+├── opencode.provenance.json
 ├── opencode.jsonc
 ├── package-lock.json
 └── package.json
@@ -194,6 +195,12 @@ Contains the reusable Builder Development Framework.
 
 Generic engineering knowledge shared by every builder project.
 
+## bdf/templates/
+
+Contains the reusable documentation templates.
+
+Per `bdf/templates/README.md`, the templates sync mirrors of the core project documents: each template mirrors one reference document (ARCHITECTURE, FOLDER_STRUCTURE, JSON_SCHEMAS, TESTING, README, CHANGELOG, ROADMAP, AGENT, and the rest), and a template change is a framework change that re-checks every document that references it.
+
 ## ADAPTER.md
 
 Contains the project-specific facts of this project.
@@ -268,9 +275,9 @@ experimental/
 minimal/
 ```
 
-The `default` profile is the primary profile (settings, plugins, mcp, per-provider models). It currently exposes `omniroute` via `omniroute-models.json`; the `models.json` file is expected but absent until the modal provider is restored (see `_agent/SESSION_LOG.md`).
+The `default` profile is the primary profile (settings, plugins, mcp, per-provider models). It currently exposes `omniroute` via `omniroute-models.json`. No provider files carry literal keys (P1 env-key policy; `{env:VAR}` placeholders only).
 
-`coding/` is a fully developed secondary profile (settings, models, `<provider>-models.json`, plugins, mcp). `experimental/` and `minimal/` contain only `settings.json` and contribute their provider selection to the build.
+`coding/` is a fully developed secondary profile (settings, `<provider>-models.json`, plugins, mcp). `experimental/` and `minimal/` carry `settings.json`, a small `omniroute-models.json` (so the active-provider guard keeps omniroute), and a `target.json` each; they contribute their provider selection to the build.
 
 ---
 
@@ -288,6 +295,8 @@ settings.json
 plugins.json
 
 mcp.json
+
+target.json (optional)
 ```
 
 ---
@@ -316,16 +325,6 @@ Carries the highest model-source precedence.
 
 ---
 
-### models.json
-
-Purpose:
-
-Defines every AI model available inside the profile.
-
-Responsible only for model configuration.
-
----
-
 ### plugins.json
 
 Purpose:
@@ -339,6 +338,20 @@ Defines OpenCode plugins enabled for the profile.
 Purpose:
 
 Defines MCP server configuration for the profile.
+
+---
+
+### target.json (optional, P2)
+
+Purpose:
+
+Names the generated target artifact for this profile (e.g. `opencode.json`).
+
+Resolved during Stage 1 (Load Profile); missing or invalid file falls back to `opencode.json`.
+
+Drives the output file, backup prefix (`<base>_*`), provenance sidecar (`<base>.provenance.json`), WhatIf names, and retention.
+
+Validated against `schemas/targets.schema.json` when present.
 
 ---
 
@@ -364,7 +377,7 @@ Contains provider definitions.
 
 Each provider describes how OpenCode communicates with an AI provider.
 
-The current implementation contains a single provider.
+The current implementation contains one provider.
 
 ```
 providers/
@@ -385,6 +398,7 @@ Contains:
 - provider metadata
 - API configuration
 - connection settings
+- `apiKey` as `{env:OMNIROUTE_API_KEY_OPENCODE}` placeholder only (P1 policy)
 
 Provider definitions are independent from profiles.
 
@@ -416,13 +430,45 @@ schemas/
 
 ## Purpose
 
-Reserved for future JSON Schema validation of configuration files.
+Contains the live JSON Schema files used by Builder V2.7.
 
 The goal of schemas is to ensure that configuration files follow the expected structure before the builder generates `opencode.json`.
 
-At the current stage of the project (Builder V2.1), no JSON Schema validation has been implemented yet.
+The schemas are validated by the builder (F1) before its own validation stage: a missing `schemas/` directory produces a warning and the build continues (V2.5-era compatibility).
 
-Validation is currently performed by PowerShell code inside the builder.
+## Contents
+
+```
+schemas/
+
+schema.json
+
+settings.schema.json
+
+provider.schema.json
+
+models.schema.json
+
+plugins.schema.json
+
+mcp.schema.json
+
+targets.schema.json
+
+README.md
+```
+
+The seven schema files are the machine-readable definitions behind `JSON_SCHEMAS.md`:
+
+- `schema.json` — root shape of the generated `opencode.json` (documentation only; not validated by the builder pipeline).
+- `settings.schema.json` — validates `profiles/<profile>/settings.json`.
+- `provider.schema.json` — validates `providers/<id>.json`.
+- `models.schema.json` — covers both `models.json` and `<provider>-models.json` (profile-level per-provider model files).
+- `plugins.schema.json` — validates `profiles/<profile>/plugins.json`.
+- `mcp.schema.json` — validates `profiles/<profile>/mcp.json`.
+- `targets.schema.json` — validates `profiles/<profile>/target.json` (target artifact, P2).
+
+`README.md` describes the validation flow and the artifact list.
 
 ## Managed By
 
@@ -444,7 +490,13 @@ scripts/
 
 Contains automation scripts.
 
-The primary script is the OpenCode configuration builder (Builder V2.5).
+The primary script is the OpenCode configuration builder (Builder V2.7).
+
+```
+build-opencode-v2.7.ps1
+```
+
+Builder V2.5 is retained.
 
 ```
 build-opencode-v2.5.ps1
@@ -457,6 +509,12 @@ build-opencode-v2.ps1
 ```
 
 The automated test harness verifies the builder and the release pipeline.
+
+```
+test-opencode-v2.7.ps1
+```
+
+The V2.5 test harness is retained.
 
 ```
 test-opencode-v2.5.ps1
@@ -478,6 +536,52 @@ The previous builder is retained as a legacy script.
 
 ```
 build-opencode.ps1
+```
+
+---
+
+## build-opencode-v2.7.ps1
+
+Purpose
+
+Generates the final `opencode.json`.
+
+Responsibilities
+
+- Discover all providers from `providers/*.json`.
+- Select the active providers (interactive menu / `-Provider` / `-NonInteractive`).
+- Persist the selection back to `settings.json` (backed up first, `$schema` preserved, UTF-8 no-BOM, only when the list differs).
+- Validate config sources against `schemas/*.schema.json` before builder validation (F1).
+- Pre-flight dependency check: every input file must exist before any merge (F2).
+- Support `-WhatIf` dry runs (validate + merge only, write nothing) (F3).
+- Prune backups to the newest `-KeepBackups` per prefix (F4).
+- Write provenance sidecar `opencode.provenance.json` (F5).
+- Support `-Doctor` read-only diagnostics (F6).
+- Print a merge diff summary vs the previous backup (F7).
+- Load configuration files.
+- Validate configuration (structure, duplicates, malformed definitions).
+- Merge configuration in stages.
+- Create backup.
+- Verify generated configuration before writing.
+- Generate output.
+
+Supports
+
+- Dynamic profile selection.
+- Active-provider discovery and selection.
+- Settings persistence.
+- Optional profile sections.
+- Provider-specific models with profile-level precedence.
+- JSON Schema validation (seven live schemas under `schemas/`).
+- Backup retention, provenance stamping, doctor / dry-run CLI.
+
+Model-source precedence (highest first):
+
+```
+profiles/<profile>/<provider>-models.json
+providers/<provider>/models.json
+inline provider models
+profiles/<profile>/models.json
 ```
 
 ---
@@ -542,6 +646,34 @@ Supports
 - Provider-specific models.
 
 The builder never edits source configuration files.
+
+---
+
+## test-opencode-v2.7.ps1
+
+Purpose
+
+Automated verification of the V2.7 builder.
+
+Responsibilities
+
+- Build isolated temporary fixtures.
+- Run the builder against each fixture.
+- Assert expected success or failure.
+- Verify JSON Schema validation (valid pass, missing required / wrong type / additionalProperties / provider violation / models violation fail).
+- Verify the missing-schema-directory warning-and-continue path.
+- Verify the pre-flight dependency check aborts on missing inputs.
+- Verify `-WhatIf` writes nothing and exits 0.
+- Verify `-Doctor` exits 0 clean / 1 on corrupt config.
+- Verify `-KeepBackups` retention pruning.
+- Verify the provenance sidecar (fields + output SHA-256).
+- Verify the merge diff summary (Added/Removed lines, silent on identical).
+- Verify existing V2.5 behavior still passes.
+- Verify the P2 dynamic target artifact (target.json -> custom artifact + prefix + provenance).
+- Verify the P1 gate (no literal API keys in generated output).
+- Report pass/fail results.
+
+Covers 30 tests.
 
 ---
 
@@ -640,6 +772,38 @@ This file is considered a generated artifact.
 It should never be edited manually.
 
 Any configuration changes must be made to the source files.
+
+---
+
+# opencode.provenance.json
+
+```
+opencode.provenance.json
+```
+
+## Purpose
+
+Generated provenance sidecar for the configuration build.
+
+Written by Builder V2.7 (F5) to the root of the configuration directory, next to `opencode.json`.
+
+Contains:
+
+- builder version
+- profile
+- active providers
+- generated timestamp (UTC)
+- SHA-256 of the generated `opencode.json` content
+
+The provenance is written **never into `opencode.json`**: the sidecar keeps the generated configuration consumer-schema safe.
+
+## Managed By
+
+Builder
+
+## Manual Editing
+
+Not required.
 
 ---
 
