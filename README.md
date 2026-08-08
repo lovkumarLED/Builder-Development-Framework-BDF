@@ -13,7 +13,7 @@
 
 [![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-development-framework)
 [![Framework](https://img.shields.io/badge/BDF-2.2.9-blue)](#builder-development-framework)
-[![Tests](https://img.shields.io/badge/tests-17%2F13%2F31%2F30%2F28%20green-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-kilo%2031%2F31%20%2B%20opencode%2031%2F31%20%2B%20app%2034%20green-brightgreen)](#testing)
 [![Release](https://img.shields.io/badge/release-2.5.0-orange)](#releases)
 [![Status](https://img.shields.io/badge/status-13%2F15%20phases%20complete%20%2B%20V3%20in%20progress-blue)](#roadmap)
 
@@ -197,6 +197,11 @@ backup retention → provenance sidecar → merge-diff summary
 - `-Doctor` = read-only diagnostics of the real config.
 - `activeProviders` (from `settings.json`) decides **which** providers merge;
   a provider with **no models is dropped** (the model guard).
+- **Dual-key normalization** happens in the provider merge stage: if a
+  provider file carries `apiKey` but no `options.apiKey`, the builder mirrors
+  it automatically — the app and hand-written providers produce the same
+  output. Builder-only users get the same result as app users (no ups and
+  downs between the two worlds).
 
 ---
 
@@ -291,8 +296,11 @@ a private copy.
   "provider": {
     "tokenrouter": {
       "name": "TokenRouter",
-      "apiKey": "sk-...",                    ← user's key, in the user's file only
-      "options": { "baseURL": "https://api.tokenrouter.com/v1" },
+      "apiKey": "sk-...",                    ← OpenCode reads this
+      "options": {
+        "baseURL": "https://api.tokenrouter.com/v1",
+        "apiKey": "sk-..."                   ← Kilo reads this (dual key)
+      },
       "npm": "@ai-sdk/openai-compatible",    ← SDK type
       "models": {}
     }
@@ -300,13 +308,33 @@ a private copy.
 }
 ```
 
+**The dual key is the compatibility contract.** Different agents read the key
+from different fields: **OpenCode** reads `provider.<id>.apiKey`, **Kilo**
+reads `provider.<id>.options.apiKey`. The app writes **both** — one save works
+in every agent. Hand-written provider files get the same treatment: the
+builders mirror `apiKey` into `options.apiKey` automatically at merge time
+(the "Dual-key" line in the build log), so builder-only users get the same
+result as app users.
+
 The **SDK type** (`npm`) is chosen from a dropdown of 15 registry-verified
 packages: `@ai-sdk/openai-compatible` (default — fits OmniRoute, LiteLLM, CLI
-proxies, TokenRouter, any local gateway), `@ai-sdk/openai`, `@openrouter/
-ai-sdk-provider`, `@ai-sdk/anthropic`, `@ai-sdk/google`, `@ai-sdk/mistral`,
-`@ai-sdk/xai`, `@ai-sdk/deepseek`, `@ai-sdk/groq`, `@ai-sdk/perplexity`,
-`@ai-sdk/togetherai`, `@ai-sdk/cerebras`, `@ai-sdk/azure`,
-`@ai-sdk/amazon-bedrock`, `@ai-sdk/cohere` — or a custom package name.
+proxies, TokenRouter, Modal, NVIDIA NIM, any local gateway),
+`@ai-sdk/openai`, `@openrouter/ai-sdk-provider`, `@ai-sdk/anthropic`,
+`@ai-sdk/google`, `@ai-sdk/mistral`, `@ai-sdk/xai`, `@ai-sdk/deepseek`,
+`@ai-sdk/groq`, `@ai-sdk/perplexity`, `@ai-sdk/togetherai`,
+`@ai-sdk/cerebras`, `@ai-sdk/azure`, `@ai-sdk/amazon-bedrock`,
+`@ai-sdk/cohere` — or a custom package name.
+
+### Real providers — not just proxies
+
+The app started as a proxy switcher (OmniRoute, LiteLLM, CLI Proxy), and that
+still works exactly as before. **Real, legitimate providers work the same
+way**: the Add-provider form has presets for **TokenRouter, Modal, OpenAI,
+Google (Gemini), OpenRouter, and NVIDIA NIM** — picking a preset fills the
+base URL *and* the SDK package automatically, then it's key → test → save →
+build → chat in your agent. (For Modal, paste your own endpoint URL — every
+account has its own — and use the combined proxy token `wk-…ws-…` as the
+key.)
 
 ### Models — `profiles\coding\<provider>-models.json`
 
@@ -345,6 +373,18 @@ the app warns about this.
   copied to the agent's `backup\` folder first.
 - **Local-first:** the server binds `127.0.0.1` only.
 - **Merge, never clobber:** unknown content in existing files is preserved.
+
+### Rules for users (what NOT to do)
+
+- **Never hand-edit your agent's main config** — `opencode.json` / `kilo.json`
+  are *generated* by the builder from `providers\` + `profiles\`. Edit a
+  provider or model in the app and rebuild instead; hand edits are overwritten
+  by the next build.
+- **Never create `opencode.jsonc` next to `opencode.json`.** OpenCode reads
+  the `.jsonc` *instead of* the `.json` when both exist — your built config
+  silently disappears from `/models`. (Same trap: a stale `kilo.jsonc`.)
+  The app and the builder target `opencode.json` today; generating both
+  formats is planned for a future update — not right now.
 
 ---
 
@@ -432,7 +472,7 @@ automatically (SHA256 hash marker detects the change).
 docs/
 ├── app/                    ← the AI Switcher app (self-contained)
 │   ├── app/                ← Python package (see module table above)
-│   ├── tests/              ← 28 unit tests (unittest, stdlib-only)
+│   ├── tests/              ← 34 unit tests (unittest, stdlib-only)
 │   ├── assets/             ← logo + favicon
 │   ├── lib/                ← anime.min.js (local)
 │   ├── gui.html            ← the whole frontend (one file)
@@ -540,6 +580,6 @@ Current release: **2.5.0** (Builder V2.7, JSON Schema Validation). History in
 **Version:** 2.5.0
 **Builder Version:** V2.7 (JSON Schema Validation)
 **Framework Version:** 2.2.9
-**Document Version:** 2.4
+**Document Version:** 2.5
 
 Documentation Status: Current Implementation

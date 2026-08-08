@@ -24,6 +24,12 @@ inside it. This guide explains how to create them yourself.
 - The framework scans the agent's main JSON and detects the provider section
   (guidance only).
 - You create `{{PROVIDER_DIR}}/<id>.json` yourself.
+- **The dual-key contract:** different agents read the API key from different
+  fields — OpenCode reads `provider.<id>.apiKey`, Kilo reads
+  `provider.<id>.options.apiKey`. Write the key in **both** places (see the
+  example). If you write only one, the builder mirrors it automatically at
+  merge time, so hand-written and app-written provider files produce
+  identical output.
 - Models can live:
   1. inline in the provider file (`models`),
   2. in `{{PROVIDER_DIR}}/<id>/models.json`,
@@ -47,7 +53,10 @@ The provider id is the file name. Example: `<id>` → `{{PROVIDER_DIR}}/<id>.jso
       "npm": "<npm-package>",
       "name": "<Display Name>",
       "apiKey": "{env:<ID>_API_KEY}",
-      "options": {},
+      "options": {
+        "baseURL": "<https://api.provider.com/v1>",
+        "apiKey": "{env:<ID>_API_KEY}"
+      },
       "models": {}
     }
   }

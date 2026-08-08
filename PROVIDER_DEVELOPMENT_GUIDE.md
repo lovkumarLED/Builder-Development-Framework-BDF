@@ -25,6 +25,14 @@ any open-source coding agent).
 - The framework scans the agent's main JSON and detects the provider section
   (guidance only).
 - You create `providers/<id>.json` yourself.
+- **The dual-key contract:** different agents read the API key from different
+  fields — **OpenCode** reads `provider.<id>.apiKey`, **Kilo** reads
+  `provider.<id>.options.apiKey`. Write the key in **both** places (see the
+  example below). If you write only one, the builder **mirrors it
+  automatically** at merge time ("Dual-key: options.apiKey mirrored from
+  apiKey." in the build log) — so hand-written provider files and app-written
+  files produce identical output. There are no ups and downs between using
+  the app and using the builder directly.
 - Models can live:
   1. inline in the provider file (`models`),
   2. in `providers/<id>/models.json`,
@@ -40,7 +48,7 @@ The provider id is the file name. Example: `omniroute` → `providers/omniroute.
 
 ## 2. Create the file
 
-Minimal shape:
+Minimal shape (dual key: `apiKey` for OpenCode, `options.apiKey` for Kilo):
 
 ```json
 {
@@ -51,13 +59,19 @@ Minimal shape:
       "name": "OmniRoute",
       "apiKey": "{env:OMNIROUTE_API_KEY_OPENCODE}",
       "options": {
-        "baseURL": "http://localhost:20128/v1"
+        "baseURL": "http://localhost:20128/v1",
+        "apiKey": "{env:OMNIROUTE_API_KEY_OPENCODE}"
       },
       "models": {}
     }
   }
 }
 ```
+
+Real providers work identically: `baseURL` is the provider's endpoint
+(TokenRouter, Modal, OpenAI, OpenRouter, ...), `npm` is the SDK package, and
+the key is the provider's API key (for Modal, the combined proxy token
+`wk-<id>.ws-<secret>`).
 
 ## 3. Add models (optional)
 
@@ -129,10 +143,18 @@ The builder (e.g. `build-opencode-v2.7.ps1`):
 2. Resolves active providers from `profiles/<profile>/settings.json` →
    `activeProviders`.
 3. Loads each active provider + its models.
-4. Merges them into the generated artifact.
+4. **Normalizes the dual key** (mirrors `apiKey` → `options.apiKey` when
+   missing) so the merged output works in OpenCode AND Kilo.
+5. Merges them into the generated artifact.
 
 If a provider has **no models source**, the builder drops it with a warning
 (not considered active). If no active provider remains, the build aborts.
+
+> **Agent config warning:** the builders generate `opencode.json` (OpenCode)
+> / `kilo.json` (Kilo). Do NOT create `opencode.jsonc` next to
+> `opencode.json` — OpenCode reads the `.jsonc` *instead of* the `.json` when
+> both exist, and your built config silently disappears from `/models`.
+> Generating both formats is planned for a future update — not right now.
 
 ---
 
@@ -144,9 +166,11 @@ If a provider has **no models source**, the builder drops it with a warning
 | `Provider 'x': models not found` | Add a models source (inline, folder, or profile-level). |
 | `No active providers selected` | Every active provider was dropped (no models) or settings lists none. |
 | Schema validation fails | Run `-Doctor` and check the schema message (`provider.schema.json`). |
+| Agent says "401 / no token / missing key" | Provider file has `apiKey` only and the agent reads `options.apiKey` — rebuild (the builder mirrors it), then **restart the agent** (it caches config). |
+| Provider missing from OpenCode `/models` | A `opencode.jsonc` is shadowing the built `opencode.json` (see the warning above) — move the `.jsonc` away and restart. |
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Active Provider Development Guide

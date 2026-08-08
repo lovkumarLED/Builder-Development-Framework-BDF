@@ -84,12 +84,12 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 8, 2026 (session 29: AI Switcher app COMPLETE — Phase 14 done; env/theme; BDF-exact data model; kilo live; commits 459d407 + b3a0bdb)
+Updated: Aug 8, 2026 (session 32: real-provider story complete — Kilo 401 fixed + accepted, OpenCode jsonc shadow fixed, real-provider presets, builder dual-key parity, docs overhaul, committed)
 
 ```
 Step 3 — Universal Agent Framework core
-Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08; GUI app = BDF made autonomous, session 29)
-Progress: ~90%
+Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08; GUI app = BDF made autonomous, session 29; real-provider fix + presets + builder parity, sessions 31-32)
+Progress: ~93%
 ```
 
 Phase map (roadmap): Phase 14 GUI App COMPLETE; Phase 15 More Coding Agents PLANNED — the app + universal scaffold are expected to work with additional open-source coding agents, but only OpenCode + KiloCode are verified so far; the rest is untested until tried.
@@ -160,14 +160,44 @@ What was completed:
       Python env; rule.md live theme + rulebook; kilo live (omniroute + tokenrouter,
       19 models in kilo.json); full E2E click-through battery with hash-verified
       restore; commits 459d407 + b3a0bdb.
+- [x] SESSION 30 RESEARCH: real-provider root cause found (web-verified) — Kilo reads
+      provider.<id>.options.apiKey, the app wrote only top-level apiKey → Kilo sent no
+      token → TokenRouter 401; plan written (AI/CONTINUE_REAL_PROVIDERS.md). Also fixed:
+      build-kilo.ps1 stale-copy trap (finder prefers highest versioned builder) and
+      semantic builder-version selection.
+- [x] SESSION 31: REAL-PROVIDER FIX IMPLEMENTED — app/agentstore.py write_provider now
+      writes the key to BOTH top-level apiKey and options.apiKey (options preserved);
+      3 new tests (34/34 green); real tokenrouter provider re-created via the app's own
+      write_provider (key from the app's backup, never echoed) + models restored +
+      activeProviders=[omniroute, tokenrouter]; kilo rebuilt via /api/build; built
+      kilo.json tokenrouter verified to carry options.apiKey; hash-verified snapshot
+      (only intended files changed); app server restarted with the fix. USER-SCOPED
+      feature: real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter,
+      NVIDIA NIM) added via the app and used through agents — real-provider presets with
+      SDK auto-fill added to the Add-provider form (gui.html + config.py synced);
+      Modal researched (OpenAI-compatible; combined proxy token wk-<id>.ws-<secret>);
+      app README updated.
+- [x] SESSION 32: ACCEPTANCE PASSED (Kilo chat with TokenRouter answers, no 401) +
+      OpenCode /models fixed (stray opencode.jsonc with disabled_providers shadowed the
+      built opencode.json — removed, backed up; user rule documented) + BUILDER PARITY:
+      builders mirror the dual key at merge time (K1 + V2.7 + wizard copies; scaffold
+      bootstraps from K1) — hand-written provider files now converge with app-written
+      ones; kilo harness fixed to per-provider models fixtures + new 'Dual-key options
+      mirror' test (31/31), opencode harness 31/31; stale test-kilo.ps1 (OpenCode copy)
+      replaced with the real K1 harness; real kilo rebuild dual-keys omniroute too;
+      docs overhaul (root README, app README rules, PROVIDER_DEVELOPMENT_GUIDE +
+      template, DEVELOPER_GUIDE, CHANGELOG 2.5.1, PROJECT_STATE, FOLDER_STRUCTURE,
+      ROADMAP); committed.
+- [ ] FUTURE: app update to generate BOTH opencode.json and opencode.jsonc (planned,
+      not yet — documented); add Modal/other real providers via the app when wanted.
 - [ ] FUTURE (Phase 15): extend the app + universal scaffold to MORE coding agents
       (OpenCode + KiloCode verified; others expected to work — untested yet).
 
 Dropped: Claude Code Builder V1 — 2026-08-08 decision (entropic `~/.claude.json`, no
 provider support). See `planning/DECISIONS.md`.
 
-Next: commit docs on request; then BUILDER_PHASES Alpha→Beta→General gates for the
-universal framework, then Step 4 / Step 5.
+Next: BUILDER_PHASES Alpha→Beta→General gates for the universal framework, then Step 4 /
+Step 5; user adds more real providers via the app when wanted.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = KiloCode Builder,
 Phases 5-7 = universal V3).

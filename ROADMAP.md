@@ -592,6 +592,13 @@ flame ASCII-art startup banner with local addresses, rule.md live theme + agent 
 kilo verified live (omniroute + tokenrouter, 19 models in kilo.json). Full E2E click-through
 battery on a real agent config with snapshot backup + hash-verified restore (32/32).
 Committed: 459d407 (docs batch) + b3a0bdb (feat app).
+
+EXTENDED (session 31, 2026-08-08): real-provider support — the app writes the key in both
+agent contracts (apiKey for OpenCode, options.apiKey for Kilo — fixes Kilo's TokenRouter
+401), Add-provider presets for TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter and
+NVIDIA NIM with SDK auto-fill, and the builders mirror the dual key at merge time so
+builder-only users get the same result as app users. 34 app unit tests, kilo harness
+31/31, opencode harness 31/31.
 ```
 
 Objective

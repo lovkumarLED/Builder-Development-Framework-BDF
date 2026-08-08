@@ -174,6 +174,12 @@ Providers are user-owned. Create the file yourself:
 providers/<id>.json
 ```
 
+Write the API key in **both** places — `apiKey` (OpenCode) and
+`options.apiKey` (Kilo). If you write only one, the builder mirrors it
+automatically at merge time, so builder-only work and app work produce the
+same output. (The AI Switcher app does the same when you save a provider
+through the GUI.)
+
 See `PROVIDER_DEVELOPMENT_GUIDE.md`.
 
 ## Creating a profile

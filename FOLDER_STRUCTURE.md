@@ -227,7 +227,7 @@ Includes the build-continuation rule:
 AI/CONTINUE_PROJECT_BUILD.md
 ```
 
-- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js — no CDN), `tests/` (28 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage).
+- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js — no CDN), `tests/` (34 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage). Add-provider presets cover proxies (OmniRoute, LiteLLM, CLI Proxy) AND real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill; the app writes the key in both agent contracts (`apiKey` + `options.apiKey`).
 
 ## PROJECT_STATE.md
 

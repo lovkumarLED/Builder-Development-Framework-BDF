@@ -9,8 +9,50 @@
 ---
 
 ## Session History
+### Aug 8, 2026 (session 32) - Real-provider story COMPLETE: builder parity (dual-key merge normalization), harness fixes, docs overhaul, committed ← recent session
+Done:
+- USER ACCEPTANCE PASSED: Kilo chat with TokenRouter works (no 401) - the options.apiKey fix proven live.
+- Fixed the SECOND agent issue: OpenCode /models hid tokenrouter because a user-created opencode.jsonc (with disabled_providers:["tokenrouter"]) SHADOWED the built opencode.json (OpenCode reads .jsonc INSTEAD of .json when both exist). Backed up + removed the jsonc; /models now shows tokenrouter + omniroute. User rule documented: never create opencode.jsonc next to opencode.json.
+- USER SCOPED + APPROVED the feature design (brainstorming): real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) added via the app, used THROUGH the agents; proxy switching untouched. Real-provider presets with SDK auto-fill shipped in the Add-provider form (gui.html PRESETS {url,npm}, onchange fills URL+SDK+name; backend config.py PRESETS synced).
+- BDF BUILDER PARITY (the 'no ups and downs' ask): builders now normalize the dual key at MERGE time - if a provider file carries only apiKey, the builder mirrors options.apiKey automatically (K1 + V2.7 builders + wizard copies; scaffold-agent.ps1 bootstraps from K1 so future agents inherit it). PS 5.1 quirk caught by the harness: Add-Member required for a missing options property on parsed JSON (Set-ObjectProperty/ordered-dict-in-Add-Member pattern).
+- HARNESSES: kilo 31/31 (was failing 19/30 - 10 tests used the REMOVED global profiles/<profile>/models.json fixture; fixtures updated to per-provider <id>-models.json + new dedicated 'Dual-key options mirror' test 31st), opencode 31/31. Stale exact-name test-kilo.ps1 (OpenCode V2.7 harness copy) replaced with the real K1 harness (backed up) - same trap as the old build-kilo.ps1.
+- REAL CONFIG VERIFIED: kilo rebuild via /api/build now dual-keys omniroute too (was the only single-key provider - would have 401'd in Kilo as well); tokenrouter intact; 17 models merged. Hash-verified: only intended files changed.
+- DOCS OVERHAUL (every MD updated): root README (dual-key data model + real-provider presets + user rules + builder parity + test counts 34/31/31 + doc version 2.5), app README (Rules: what NOT to do - no hand-edits, jsonc warning, 'we will generate both opencode.json and opencode.jsonc in the future, not right now'), PROVIDER_DEVELOPMENT_GUIDE v1.1 (dual-key contract + jsonc warning + 401 troubleshooting row) + template mirror, DEVELOPER_GUIDE (dual-key in Adding a provider), CHANGELOG 2.5.1, PROJECT_STATE (status + next), FOLDER_STRUCTURE (34 tests + presets), ROADMAP Phase 14 extended.
+- COMMITTED: session 31+32 work (app fix + presets + builder parity + docs + harness updates). Repo visibility checked and reported.
+Broken:
+- None - clean session. Notes: modal not yet added to any agent config (user may add via the app when ready - Modal preset + endpoint + wk-...ws-... key are documented); opencode.jsonc generation for the future.
+Journey: Step 3 IN PROGRESS ~93%; Phase 14 COMPLETE (extended with real-provider presets + builder parity); Phase 15 PLANNED.
+Next: user adds more real providers via the app (e.g. Modal/OpenAI/OpenRouter) when wanted; future app update to generate both opencode.json + opencode.jsonc; then BUILDER_PHASES gates + Step 4/5.
+Learned: True agent-agnostic compatibility = satisfying EVERY agent's config contract in one write (dual key) AND making the builder normalize legacy single-key files at merge - then the app, hand-written configs, and builder-only users all converge on identical output; also: a shadowing sibling config file (.jsonc vs .json) silently wins in some agents - the docs must warn users.
 
-### Aug 8, 2026 (session 29) - AI Switcher app COMPLETE: BDF made autonomous - backend, env, theme, BDF-exact data model, kilo live ← recent session
+### Aug 8, 2026 (session 31) - Real-provider fix IMPLEMENTED: dual key placement + real-provider presets - acceptance pending user's Kilo chat test
+Done:
+- IMPLEMENTED the root-cause fix from AI/CONTINUE_REAL_PROVIDERS.md: app/agentstore.py write_provider now writes the key to BOTH provider.<id>.apiKey (OpenCode reads) AND provider.<id>.options.apiKey (Kilo reads), preserving any extra options keys. 3 new unit tests (dual placement, options preserved, sync on update) - suite 34/34 green.
+- Applied the fix to the real config: re-created providers/tokenrouter.json through the app's own write_provider (key read from the app's own backup, never echoed - No-Secrets), restored tokenrouter-models.json (kimi-k3-free, 4 thinking levels) from backup, activeProviders=[omniroute, tokenrouter]. Hash-verified kilo snapshot first; after rebuild only the 4 intended files changed (kilo.json, kilo.provenance.json, settings.json, + 2 restored provider/model files) - kilo.jsonc/omniroute/scripts byte-identical.
+- Rebuilt kilo via POST /api/build (real K1 builder, 2 providers / 17 models merged); verified built kilo.json tokenrouter entry now carries options.apiKey + top-level apiKey, models merged. App server restarted to load the fixed agentstore code; /api/status + GUI verified.
+- USER SCOPED THE FEATURE (brainstorm): real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) added via the app and used THROUGH THE AGENTS (Kilo/OpenCode) - no in-app chat panel. Added real-provider presets to the Add-provider form: gui.html PRESETS now {url, npm} with SDK auto-fill on preset pick (+ name auto-fill, openAdd resets preset to Custom); backend config.py PRESETS synced; app README updated (preset table, Modal endpoint+key notes, real-providers paragraph, 401/restart troubleshooting row, stale privacy line fixed).
+- MODAL RESEARCH (web-verified, user-requested): Modal = OpenAI-compatible endpoint; the API key is a combined proxy token wk-<id>.ws-<secret> (exactly the format already in the user's auth.json); shared base https://inference.us-west.modal.direct/v1, dedicated endpoints have per-account URLs (user's own: lovebh505-com--ep-kimi-k3-server.us-west.modal.direct/v1). NO modal API calls made and NO kilo config changes beyond tokenrouter (per user's 'don't do it' on the modal endpoint test).
+- Verification: JS syntax checked via node --check (1 block OK); unit tests 34/34; served GUI confirmed to carry the new presets.
+Broken:
+- ACCEPTANCE TEST PENDING (user action): restart Kilo and chat with TokenRouter (kimi-k3) - the 401 fix is in the built kilo.json but unproven in Kilo's runtime. auth.json fallback (research step 6 of the MD) NOT started - not needed unless the chat still 401s.
+- Uncommitted: app/agentstore.py + tests + config.py + gui.html + README changes (repo rule: commits only on request).
+Journey: Step 3 IN PROGRESS ~92%; Phase 14 COMPLETE (+ real-provider presets); Phase 15 PLANNED.
+Next: user tests Kilo chat with TokenRouter (restart Kilo first - it caches the old config); if still 401, research ~/.local/share/kilo/auth.json + kilo auth login and design auth.json integration; commit on request.
+Learned: Writing the key in BOTH top-level apiKey and options.apiKey costs one duplicated field and makes the same provider file work in OpenCode AND Kilo - agent compatibility is about each agent's config contract, and the app can satisfy several contracts at once.
+
+### Aug 8, 2026 (session 30) - Real-provider root cause found: Kilo reads options.apiKey, app wrote top-level apiKey - plan written, not yet implemented
+Done:
+- RESEARCH COMPLETED (web-verified): TokenRouter auth = Authorization: Bearer (the app's proxy already works - HTTP 200 chat with kimi-k3).
+- KEY FINDING - KiloCode stores provider API keys in provider.<id>.options.apiKey (config) or ~/.local/share/kilo/auth.json (data dir, via /connect or kilo auth login) - NOT top-level provider.<id>.apiKey. OpenCode reads top-level apiKey (works); Kilo reads options.apiKey (finds nothing -> sends no token -> TokenRouter 401 'Token not provided').
+- Also fixed during the session: build-kilo.ps1 was a stale OpenCode builder copy (app picked it by exact name) - finder now prefers the HIGHEST versioned builder (semantic sort, v2.7 > v2.5 > v1); stale build-kilo.ps1 replaced with the real K1 builder (backed up). OpenCode picked build-opencode-v2.5.ps1 before the semantic fix - verified both agents now build with their real builders. Provenance sidecar question answered (kilo.provenance.json exists, K1 stamps it).
+- Plan written: AI/CONTINUE_REAL_PROVIDERS.md - dual key placement fix (apiKey + options.apiKey), rebuild, verify, auth.json fallback research, acceptance test = user chats in Kilo with TokenRouter.
+Broken:
+- The 401 itself is NOT yet fixed - implementation is the next session's job. Untested: whether options.apiKey alone satisfies Kilo or auth.json is also needed.
+Journey: Step 3 IN PROGRESS ~90%; Phase 14 COMPLETE; Phase 15 PLANNED.
+Next: implement AI/CONTINUE_REAL_PROVIDERS.md - dual key placement, rebuild kilo, verify, acceptance test in Kilo chat.
+Learned: Same provider config works in OpenCode but not Kilo because the two agents read the key from DIFFERENT fields - agent compatibility means knowing each agent's config contract, not just writing one shape.
+
+### Aug 8, 2026 (session 29) - AI Switcher app COMPLETE: BDF made autonomous - backend, env, theme, BDF-exact data model, kilo live
 Done:
 - Built docs/app/ as a MODULAR FastAPI backend (server.py + app/ package: config, storage, discovery, providers, agentstore, engine, testing, plugins, proxy, serve, rules) implementing the FULL API contract from AI/BDF_GUI_APP_FRONTEND_SPEC.md: GET / (serves gui.html), GET /api/status, POST /api/discover + /api/scan, GET/POST /api/providers + PUT/DELETE /api/providers/<id> (apiKey NEVER returned - hasKey only), POST /api/test, POST /api/switch, POST /api/scaffold (calls the REAL scaffold-agent.ps1 -Agent <agent> -NonInteractive -Bootstrap engine - one engine, two surfaces), POST /api/build (runs the agent's real builder), POST /v1/* local OpenAI-compatible proxy on 127.0.0.1:9090 to the active provider (SSE streaming verified).
 - Frontend gui.html delivered by Qwen 3.8 Max; later redesigned by this session: real logo image (assets/logo.jpg + favicon), fiery navy theme from logo pixels, local Anime.js (lib/ - no CDN), ember particle background, block-by-block staggered UI, flame-glow active card, always-visible scrollbars (page + popups).
@@ -45,44 +87,5 @@ Broken: None.
 Journey: unchanged (Step 3 ~90%); GUI app = Phase 14 idea, V3 still not released.
 Next: NEXT SESSION - build the app per AI/CONTINUE_BDF_GUI_APP.md (fresh context, full plan + UI spec + prompt ready).
 Learned: This session hit its useful limit - the MD plan is the correct handoff for a big build; the app deserves fresh context.
-
-### Aug 8, 2026 (session 28d) - Phase 8 Documentation Expansion complete: 4 guides + 4 templates
-Done:
-- Phase 8 (ROADMAP) COMPLETED - "Documentation Expansion" for onboarding:
-  - DEVELOPER_GUIDE.md - working on the project: read order, workflow, source-of-truth rules, verification, common tasks.
-  - PROVIDER_DEVELOPMENT_GUIDE.md - user-owned provider definitions + models, precedence, No-Secrets {env:VAR} policy, troubleshooting.
-  - PROFILE_CREATION_GUIDE.md - the 3 default profiles, file contract, creating new profiles, P2 target.json.
-  - BUILDER_EXTENSION_GUIDE.md - builder pipeline, adding features/tests/CLI flags/merge stages, extension boundaries, verification checklist.
-  - All four mirrored as framework templates (bdf/templates/): template count 15 to 19.
-- Registered everywhere: FOLDER_STRUCTURE.md, PROJECT_STATE.md, README.md (docs map + roadmap 13/13 + badge + framework 2.2.8), bdf/PROJECT_GENERATOR.md (Stage 4 + 5), bdf/templates/README.md (list + matrix, 19 templates).
-- ROADMAP Phase 8 - + summary table 13/13 (only Phase 13 V3 release steps remain); template ROADMAP.template.md Phase 8 -.
-- Framework bumped 2.2.7 to 2.2.8 (template change rule); placeholder audit 64/64, 0 orphans.
-- README status corrected (12/13, V3 in progress - not released) + README Synchronization Rule added (AGENT.md + CONTRIBUTING Rule 11 + template; framework 2.2.9).
-Broken: None blocking.
-Journey: Phase 13 (BDF V3) is now the ONLY remaining phase - all 13 roadmap phases otherwise complete.
-Next: Build the GUI app per AI/CONTINUE_BDF_GUI_APP.md.
-Learned: Onboarding guides belong in the project docs AND as mirrored templates.
-
-### Aug 8, 2026 (session 28c) - No-Secrets Rule (ULTIMATE) + kilo build fix + ROADMAP phase markers
-Done:
-- USER RULING clarified: the system CAN copy-paste API keys (scan - copy - paste is its job), the user protects their own files - but the SYSTEM's own artifacts (scripts, templates, docs, examples) NEVER contain a literal key, only {env:VAR} placeholders.
-- Restored all user-owned files to their original state (they had been wrongly purged): kilo.json, kilo.jsonc, all kilo mcp.json files, kilo/providers/omniroute.json (literal key back), opencode.json + all opencode mcp.json files.
-- Verified: system artifacts (all scripts + templates + docs) contain ZERO literal keys; user files keep theirs. Both builds re-run green; generated kilo.json/opencode.json carry the user's keys verbatim.
-- KILO BUILD FIX: restored kilo/profiles/coding/omniroute-models.json (18 models from the last successful build backup). Real build now green: backup - 18 models merged - all stages PASS - kilo.json regenerated - provenance stamped - idempotent rerun. User's exact command build-kilo-v1.ps1 coding -DryRun -Verbose verified exit 0.
-- ROADMAP phase markers: Phase 4 + 10.5 + 11 marked; summary table; template synced; framework 2.2.5 - 2.2.6.
-Broken: None blocking. Real kilo build green with user's restored provider + models.
-Journey: Step 3 universal core (~90%) - contract locked, no-secrets rule locked, kilo real build green.
-Next: Only the kilo builder test remains per the handoff (already green); commit docs on request.
-Learned: Two-world rule - user files may hold literal keys, system artifacts never do, system copies user content verbatim.
-
-### Aug 8, 2026 (session 28b) - V3 scaffold contract finalized (user ruling) + kilo backup-first test
-Done:
-- USER RULING implemented: the framework creates the providers/ folder (like the profile folders) but NEVER writes provider or model JSON files inside it - the JSON files are 100% user-owned. ONE job: scan the agent's OWN main JSON (kilo.json for kilo - never another agent's config), split mcp/plugin sections, seed the profiles.
-- scripts/scaffold-agent.ps1 rewritten: scans only the agent's primary main JSON; seeds coding/mcp.json + plugins.json once (user-owned after); EMPTY mcp/plugins for experimental/minimal; settings.json =  + activeProviders only; providers/ folder created but files never written; discovery/-List/-Bootstrap/error self-fix preserved.
-- Kilo backup-first test: main kilo.json + kilo.jsonc + profiles backed up to %TEMP%\opencode\kilo-backup-20260808-071644; test-kilo-v1.ps1 - 30/30 exit 0; main kilo.json byte-identical after.
-Broken: None blocking.
-Journey: Step 3 universal core (~90%), scaffold contract locked.
-Next: kilo builder test + commit docs on request.
-Learned: The scaffold's value is scanning the agent's own main JSON and seeding the 3-profile structure without ever inventing content.
 
 ---

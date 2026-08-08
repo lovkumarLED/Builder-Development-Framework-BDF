@@ -714,6 +714,7 @@ Current framework version:
 ## Implemented
 
 - GUI App 'AI Switcher' (docs/app/) COMPLETE - the BDF made autonomous (session 29, 2026-08-08): FastAPI backend + gui.html + start.bat + local /v1 proxy on 127.0.0.1:9090; calls the real scaffold-agent.ps1 engine and the generated builders. BDF-exact data model: the app reads/writes the agent's own providers/, <provider>-models.json, plugins.json, mcp.json and settings.json activeProviders (a LIST - every listed provider merges into the build), all backup-first. MULTI-AGENT management: Agents card registers any agent config folder, switches the managed agent instantly, loads already-set-up folders directly (no wizard forced). Features: models with thinking levels (default/minimal/high/max) in the provider modal + Models card, plugins card, MCP servers card, SDK type selector (15 npm packages, registry-verified), active hero showing every active provider side-by-side, flame startup banner with local addresses, self-contained Python env (env/ auto-bootstrapped), rule.md live theme + agent rulebook. Verified live on opencode and kilo (kilo.json: omniroute 18 models + tokenrouter 1 model, 19 merged); full E2E click-through battery with snapshot backup + hash-verified restore (32/32). Committed 459d407 + b3a0bdb.
+- Real-provider fix + presets (session 31, 2026-08-08): the app writes the key in BOTH agent contracts (provider.<id>.apiKey for OpenCode + provider.<id>.options.apiKey for Kilo) — fixes Kilo's TokenRouter 401; the builders mirror the dual key at merge time (builder-only parity); Add-provider presets for TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter, NVIDIA NIM with SDK auto-fill; 34 app unit tests, kilo harness 31/31, opencode harness 31/31.
 - Modular configuration architecture
 - OmniRoute provider integration
 - Profile-based configuration
@@ -767,7 +768,8 @@ These limitations simplify development and provide a stable foundation for futur
 
 ## Immediate
 
-- Committed: 459d407 (docs batch, sessions 28b-28f) + b3a0bdb (AI Switcher app, session 29).
+- Committed: 459d407 (docs batch, sessions 28b-28f) + b3a0bdb (AI Switcher app, session 29) + session 31 commit (real-provider fix + presets + builder parity + docs).
+- Pending: user acceptance of Kilo chat with TokenRouter (done — works), then commit; future app update to generate BOTH opencode.json and opencode.jsonc (planned, not yet).
 
 ## Roadmap Phases
 

@@ -50,6 +50,84 @@ Example
 
 <!-- AUTO-GENERATED START -->
 
+# Version 2.5.1
+
+## Status
+
+Current
+
+---
+
+## Date
+
+```
+2026-08-08
+```
+
+---
+
+## Summary
+
+Real-provider compatibility: the app and the builders now write the API key in
+**both** places agents read it (`provider.<id>.apiKey` for OpenCode,
+`provider.<id>.options.apiKey` for Kilo), fixing the TokenRouter 401 in Kilo.
+The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI,
+Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the
+dual key automatically at merge time, so builder-only users get the same
+result as app users. 34 app unit tests, kilo harness 31/31, opencode harness
+31/31.
+
+---
+
+## Highlights
+
+- Dual key placement in `app/agentstore.py write_provider` (top-level
+  `apiKey` + `options.apiKey`), options preserved on write
+- Builder merge-stage dual-key normalization (K1 + V2.7 builders) — fixes
+  hand-written provider files on the next build; kilo harness grows a
+  dedicated test (31/31)
+- Real-provider presets in the Add-provider form (URL + SDK auto-filled),
+  presets kept in sync in `app/config.py`
+- Kilo harness fixtures updated to per-provider models (the global
+  `models.json` lookup was removed earlier; the fixtures still used it)
+- Stale exact-name harness copy (`test-kilo.ps1`) replaced with the real K1
+  harness (backed up)
+- User rules documented: never hand-edit the generated main config, never
+  create `opencode.jsonc` next to `opencode.json` (it shadows the built
+  config); generating both formats planned for a future update
+
+---
+
+## New Features
+
+- Add-provider presets: TokenRouter, Modal, OpenAI, Google (Gemini),
+  OpenRouter, NVIDIA NIM (SDK auto-fill on preset pick)
+- Builder dual-key normalization with a "Dual-key: options.apiKey mirrored"
+  build-log line
+
+---
+
+## Improvements
+
+- OpenCode and Kilo both work from one provider file (no more "works in
+  OpenCode, 401 in Kilo")
+- Builder-only workflow produces identical output to the app workflow
+
+---
+
+## Bug Fixes
+
+- Kilo 401 "Token not provided": key now lands in `options.apiKey` for
+  runtime reading
+- OpenCode `/models` not showing a provider: a stray `opencode.jsonc`
+  (with `disabled_providers`) was shadowing the built `opencode.json`
+- Kilo harness: 10 tests used the removed global-models fixture and failed
+  after the model guard change — fixtures now use per-provider models
+- PS 5.1: `Add-Member` required when creating a missing `options` object on
+  parsed JSON
+
+---
+
 # Version 2.5.0
 
 ## Status
