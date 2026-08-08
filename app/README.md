@@ -89,34 +89,69 @@ After the first-time wizard, your agent is registered automatically.
 
 A *provider* is an AI server that speaks the OpenAI way. Common ones:
 
-| Preset          | Example address                  |
-|-----------------|----------------------------------|
-| OmniRoute       | `http://localhost:20128/v1`      |
-| LiteLLM         | `http://localhost:4000/v1`       |
-| CLI Proxy       | `http://localhost:PORT/v1`       |
-| Custom          | any address you like             |
+| Preset          | Example address                          |
+|-----------------|------------------------------------------|
+| OmniRoute       | `http://localhost:20128/v1`              |
+| LiteLLM         | `http://localhost:4000/v1`               |
+| CLI Proxy       | `http://localhost:PORT/v1`               |
+| TokenRouter     | `https://api.tokenrouter.com/v1`         |
+| Modal           | `https://inference.us-west.modal.direct/v1` |
+| OpenAI          | `https://api.openai.com/v1`              |
+| Google (Gemini) | `https://generativelanguage.googleapis.com/v1beta/openai` |
+| OpenRouter      | `https://openrouter.ai/api/v1`           |
+| NVIDIA NIM      | `https://integrate.api.nvidia.com/v1`    |
+| Custom          | any address you like                     |
 
 To add one:
 
 1. Click **"Add provider"**.
-2. Pick a preset (or Custom).
-3. Give it a **name** (anything, e.g. "OmniRoute").
+2. Pick a preset (or Custom). The preset fills in the address **and** the SDK
+   type for you — change either one if you like. (For **Modal**, paste your own
+   endpoint URL — every Modal account has its own, e.g.
+   `https://you--your-app.us-west.modal.direct/v1` — and use your proxy token
+   `wk-…ws-…` as the API key.)
+3. Give it a **name** (anything, e.g. "TokenRouter").
 4. Check the address.
 5. Pick the **SDK type** — how your server talks. "OpenAI-compatible (most
-   servers)" fits OmniRoute, LiteLLM, CLI proxies, TokenRouter, and almost any
-   local gateway. Choose OpenAI, OpenRouter, Claude (Anthropic), Gemini
-   (Google), DeepSeek, Groq, and others for those APIs — or "Other…" to type
-   any exact package name.
+   servers)" fits OmniRoute, LiteLLM, CLI proxies, TokenRouter, Modal,
+   NVIDIA NIM, and almost any local gateway. Choose OpenAI, OpenRouter, Claude
+   (Anthropic), Gemini (Google), DeepSeek, Groq, and others for those APIs —
+   or "Other…" to type any exact package name.
 6. Paste the **API key** (if it needs one) — the little eye 👁 hides/shows it.
 7. (Optional) Add its **models** — each with a thinking level.
 8. Click **"Test connection"** — green ✓ means it works.
 9. Click **Save** — the provider is added **and switched on** automatically, so the next build includes it. (Switch to another one anytime with one click.)
+
+> **Real providers (TokenRouter, Modal, OpenAI, Google, OpenRouter, NVIDIA …)
+> work just like proxies**: add one, save, rebuild, and it appears in your
+> agent (Kilo/OpenCode) ready to chat — the app writes your key in both
+> places your agent reads it. Remember to **restart your agent** after a
+> rebuild so it picks up the new config.
+
+---
+
+## Rules: what NOT to do
+
+- **Don't hand-edit your agent's main config** (`opencode.json`, `kilo.json`).
+  It's *generated* — the app and the builder own it. Change a provider or
+  model in the app and click **Build my config** instead.
+- **Never create `opencode.jsonc` next to `opencode.json`.** OpenCode reads
+  the `.jsonc` *instead of* the `.json` when both exist, so your built config
+  silently disappears from `/models`. If a `opencode.jsonc` shows up, move it
+  away (the app reads the built `.json`).
+  We will update the app in the future to generate **both** `opencode.json`
+  and `opencode.jsonc` — but not right now.
 
 > When you save a provider, the app **writes it into your agent's own
 > `providers/` folder** (e.g. `providers\omniroute.json`) — the same place your
 > agent's builder reads from. Your keys are only ever stored in your own
 > provider files. They never leave your computer, and the app never shows them
 > back to you (you can only add a new one, never read the old one).
+>
+> **Your key is written where your agent reads it** — the app saves it in
+> **both** places: top-level `apiKey` (what OpenCode reads) **and**
+> `options.apiKey` (what Kilo and other agents read). One save, every agent
+> works.
 >
 > Existing provider files (created by you earlier, or by the app) show up
 > automatically — the app never overwrites anything without making a backup
@@ -236,6 +271,7 @@ built-in look and shows a warning in the black window — nothing breaks.
 | Double-clicking `start.bat` does nothing | Python is not installed, or "Add python.exe to PATH" wasn't ticked. Install/reinstall Python. |
 | "The server is running but the browser says it can't connect" | Check the small black window — it should say "Application startup complete". If it shows an error (e.g. port already in use), close other apps and retry. |
 | A provider shows red on Test | That server isn't running right now. Start it, or check the address. |
+| Your agent says "401 / no token / missing key" after adding a provider | Rebuild your config, then **restart the agent** — it keeps the old config in memory. The app writes your key in both places your agent reads it. |
 | "No active provider" when chatting | Add a provider, then click "Switch to this" on it. |
 
 ---
@@ -245,5 +281,5 @@ built-in look and shows a warning in the black window — nothing breaks.
 - The app runs **only on your computer** (`127.0.0.1`) — nothing is sent
   anywhere except your own requests to the provider you chose.
 - No account, no phone-home, no analytics.
-- Keys never appear in the app's own files, logs, or on screen (only in your
-  `providers.json`).
+- Keys never appear in the app's own files, logs, or on screen (only inside
+  your agent's `providers\` folder, in your own files).

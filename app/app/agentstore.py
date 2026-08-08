@@ -105,12 +105,22 @@ def slugify(name):
     return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
 
 
+def _builder_version(path):
+    match = re.search(r"-v(\d+(?:\.\d+)*)\.ps1$", path.name)
+    if not match:
+        return (0,)
+    return tuple(int(part) for part in match.group(1).split("."))
+
+
 def find_builder_script(agent_dir, agent):
     scripts_dir = agent_dir / "scripts"
-    exact = scripts_dir / f"build-{agent}.ps1"
-    if exact.is_file():
-        return exact
     if scripts_dir.is_dir():
+        versioned = list(scripts_dir.glob(f"build-{agent}-v*.ps1"))
+        if versioned:
+            return max(versioned, key=_builder_version)
+        exact = scripts_dir / f"build-{agent}.ps1"
+        if exact.is_file():
+            return exact
         matches = sorted(scripts_dir.glob(f"build-{agent}*.ps1"))
         if matches:
             return matches[0]
@@ -192,7 +202,10 @@ def write_provider(agent_dir, provider_id, name, base_url, api_key, npm=None):
     inner = (data.get("provider") or {}).get(provider_id, {})
     inner["name"] = name
     inner["apiKey"] = api_key
-    inner["options"] = {"baseURL": base_url}
+    options = dict(inner.get("options") or {})
+    options["baseURL"] = base_url
+    options["apiKey"] = api_key
+    inner["options"] = options
     inner["npm"] = npm or inner.get("npm") or NPM_OPENAI_COMPATIBLE
     inner.setdefault("models", {})
     data["provider"] = data.get("provider") or {}

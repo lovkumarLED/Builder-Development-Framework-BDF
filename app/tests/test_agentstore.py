@@ -59,6 +59,40 @@ class AgentStoreTests(unittest.TestCase):
         self.assertEqual(provider["baseUrl"], "http://b/v1")
         self.assertEqual(provider["apiKey"], "k2")
 
+    def test_write_provider_dual_key_placement(self):
+        agentstore.write_provider(self.agent_dir, "tokenrouter", "TokenRouter", "https://api.tokenrouter.com/v1", "sk-dual")
+        data = json.loads((self.agent_dir / "providers" / "tokenrouter.json").read_text(encoding="utf-8"))
+        inner = data["provider"]["tokenrouter"]
+        self.assertEqual(inner["apiKey"], "sk-dual")
+        self.assertEqual(inner["options"]["apiKey"], "sk-dual")
+        self.assertEqual(inner["options"]["baseURL"], "https://api.tokenrouter.com/v1")
+        provider = agentstore.read_provider(self.agent_dir, "tokenrouter")
+        self.assertEqual(provider["apiKey"], "sk-dual")
+
+    def test_write_provider_preserves_extra_options(self):
+        providers_dir = self.agent_dir / "providers"
+        providers_dir.mkdir(parents=True)
+        (providers_dir / "smoke.json").write_text(
+            json.dumps({"id": "smoke", "provider": {"smoke": {"name": "Smoke", "options": {"baseURL": "http://a/v1", "organization": "acme"}}}}),
+            encoding="utf-8",
+        )
+        agentstore.write_provider(self.agent_dir, "smoke", "Smoke", "http://b/v1", "k")
+        data = json.loads((providers_dir / "smoke.json").read_text(encoding="utf-8"))
+        options = data["provider"]["smoke"]["options"]
+        self.assertEqual(options["baseURL"], "http://b/v1")
+        self.assertEqual(options["apiKey"], "k")
+        self.assertEqual(options["organization"], "acme")
+
+    def test_update_syncs_dual_keys(self):
+        agentstore.write_provider(self.agent_dir, "smoke", "Smoke", "http://a/v1", "old")
+        agentstore.write_provider(self.agent_dir, "smoke", "Smoke", "http://b/v1", "new")
+        data = json.loads((self.agent_dir / "providers" / "smoke.json").read_text(encoding="utf-8"))
+        inner = data["provider"]["smoke"]
+        self.assertEqual(inner["apiKey"], "new")
+        self.assertEqual(inner["options"]["apiKey"], "new")
+        provider = agentstore.read_provider(self.agent_dir, "smoke")
+        self.assertEqual(provider["apiKey"], "new")
+
     def test_delete_removes_file_with_backup(self):
         agentstore.write_provider(self.agent_dir, "smoke", "Smoke", "http://a/v1", "k")
         agentstore.delete_provider(self.agent_dir, "smoke")
@@ -146,6 +180,31 @@ class AgentStoreTests(unittest.TestCase):
         agentstore.write_plugins(self.agent_dir, ["another"])
         self.assertEqual(agentstore.read_plugins(self.agent_dir), ["another"])
         self.assertEqual(len(list((self.agent_dir / "backup").glob("plugins_*.json"))), 1)
+
+    def test_find_builder_prefers_versioned(self):
+        scripts = self.agent_dir / "scripts"
+        scripts.mkdir(parents=True)
+        (scripts / "build-kilo.ps1").write_text("stale opencode copy", encoding="utf-8")
+        (scripts / "build-kilo-v1.ps1").write_text("real kilo builder", encoding="utf-8")
+        found = agentstore.find_builder_script(self.agent_dir, "kilo")
+        self.assertEqual(found.name, "build-kilo-v1.ps1")
+
+    def test_find_builder_picks_highest_version(self):
+        scripts = self.agent_dir / "scripts"
+        scripts.mkdir(parents=True)
+        (scripts / "build-opencode-v2.5.ps1").write_text("old", encoding="utf-8")
+        (scripts / "build-opencode-v2.7.ps1").write_text("current", encoding="utf-8")
+        (scripts / "build-opencode-v2.7.1.ps1").write_text("patch", encoding="utf-8")
+        found = agentstore.find_builder_script(self.agent_dir, "opencode")
+        self.assertEqual(found.name, "build-opencode-v2.7.1.ps1")
+
+    def test_find_builder_falls_back_to_exact_and_any(self):
+        scripts = self.agent_dir / "scripts"
+        scripts.mkdir(parents=True)
+        (scripts / "build-aider.ps1").write_text("x", encoding="utf-8")
+        self.assertEqual(agentstore.find_builder_script(self.agent_dir, "aider").name, "build-aider.ps1")
+        (scripts / "build-goose-old.ps1").write_text("x", encoding="utf-8")
+        self.assertEqual(agentstore.find_builder_script(self.agent_dir, "goose").name, "build-goose-old.ps1")
 
     def test_agent_registry_migrates_legacy_and_switches(self):
         set_state(agent="kilo", dir=str(self.agent_dir))

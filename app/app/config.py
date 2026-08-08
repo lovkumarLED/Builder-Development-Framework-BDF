@@ -13,10 +13,18 @@ STATE_FILE = APP_DIR / "state.json"
 HOST = "127.0.0.1"
 PORT = 9090
 
+# Preset list (proxy + real providers). The Add-provider form in gui.html keeps
+# the live copy with per-preset SDK packages — keep this list in sync with it.
 PRESETS = {
     "OmniRoute": "http://localhost:20128/v1",
     "LiteLLM": "http://localhost:4000/v1",
     "CLI Proxy": "http://localhost:xxxxx/v1",
+    "TokenRouter": "https://api.tokenrouter.com/v1",
+    "Modal": "https://inference.us-west.modal.direct/v1",
+    "OpenAI": "https://api.openai.com/v1",
+    "Google (Gemini)": "https://generativelanguage.googleapis.com/v1beta/openai",
+    "OpenRouter": "https://openrouter.ai/api/v1",
+    "NVIDIA NIM": "https://integrate.api.nvidia.com/v1",
     "Custom": "",
 }
 

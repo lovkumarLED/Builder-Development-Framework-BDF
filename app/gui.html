@@ -316,7 +316,7 @@ footer button:hover{color:var(--accent)}
     </div>
 
     <div class="card hidden" id="buildPanel" style="margin-top:22px">
-      <h3 style="margin-bottom:12px">Build my config</h3>
+      <h3 id="bldTitle" style="margin-bottom:12px">Build my config</h3>
       <div class="term" id="termOut"></div>
       <div class="mrow">
         <button class="btn ghost" id="bldClose">Close</button>
@@ -350,6 +350,12 @@ footer button:hover{color:var(--accent)}
         <option value="OmniRoute">OmniRoute</option>
         <option value="LiteLLM">LiteLLM</option>
         <option value="CLI Proxy">CLI Proxy</option>
+        <option value="TokenRouter">TokenRouter</option>
+        <option value="Modal">Modal</option>
+        <option value="OpenAI">OpenAI</option>
+        <option value="Google (Gemini)">Google (Gemini)</option>
+        <option value="OpenRouter">OpenRouter</option>
+        <option value="NVIDIA NIM">NVIDIA NIM</option>
         <option value="Custom">Custom</option>
       </select>
     </div>
@@ -581,7 +587,18 @@ const Providers = (() => {
     try { await Api.deleteProvider(p.id); Toast.ok(p.name + " deleted."); await load(); }
     catch (e) { Toast.err(Utils.friendly(e, "Couldn't delete.")); }
   });
-  const PRESETS = { "OmniRoute": "http://localhost:20128/v1", "LiteLLM": "http://localhost:4000/v1", "CLI Proxy": "http://localhost:PORT/v1", "Custom": "" };
+  const PRESETS = {
+    "OmniRoute": { url: "http://localhost:20128/v1", npm: "@ai-sdk/openai-compatible" },
+    "LiteLLM": { url: "http://localhost:4000/v1", npm: "@ai-sdk/openai-compatible" },
+    "CLI Proxy": { url: "http://localhost:PORT/v1", npm: "@ai-sdk/openai-compatible" },
+    "TokenRouter": { url: "https://api.tokenrouter.com/v1", npm: "@ai-sdk/openai-compatible" },
+    "Modal": { url: "https://inference.us-west.modal.direct/v1", npm: "@ai-sdk/openai-compatible" },
+    "OpenAI": { url: "https://api.openai.com/v1", npm: "@ai-sdk/openai" },
+    "Google (Gemini)": { url: "https://generativelanguage.googleapis.com/v1beta/openai", npm: "@ai-sdk/openai-compatible" },
+    "OpenRouter": { url: "https://openrouter.ai/api/v1", npm: "@openrouter/ai-sdk-provider" },
+    "NVIDIA NIM": { url: "https://integrate.api.nvidia.com/v1", npm: "@ai-sdk/openai-compatible" },
+    "Custom": { url: "", npm: "" }
+  };
   const SDK_OPTIONS = [
     { label: "OpenAI-compatible (most servers)", npm: "@ai-sdk/openai-compatible" },
     { label: "OpenAI", npm: "@ai-sdk/openai" },
@@ -658,6 +675,7 @@ const Providers = (() => {
   const openAdd = () => {
     Store.editingId = null;
     Utils.$("#modalTitle").textContent = "Add a provider";
+    Utils.$("#fPreset").value = "Custom";
     Utils.$("#fName").value = ""; Utils.$("#fUrl").value = ""; Utils.$("#fKey").value = "";
     Utils.$("#eName").textContent = Utils.$("#eUrl").textContent = Utils.$("#eKey").textContent = "";
     Utils.$("#fTestRes").textContent = ""; Utils.$("#fTestRes").className = "testline";
@@ -790,7 +808,13 @@ const Wizard = (() => {
 })();
 
 const BuildPanel = (() => {
-  const open = () => { Utils.$("#buildPanel").classList.remove("hidden"); Utils.$("#termOut").textContent = ""; Utils.$("#bldRun").disabled = false; };
+  const open = () => {
+    Utils.$("#buildPanel").classList.remove("hidden");
+    Utils.$("#termOut").textContent = "";
+    Utils.$("#bldRun").disabled = false;
+    const agent = Store.status && Store.status.agent;
+    Utils.$("#bldTitle").textContent = agent ? "Build my config — " + agent : "Build my config";
+  };
   const line = (text, cls) => { const t = Utils.$("#termOut"); const d = Utils.el("div", cls || "m", Utils.esc(text)); t.appendChild(d); t.scrollTop = t.scrollHeight; };
   const classify = l => /pass|complete|success|generated|written|merged|loaded|\+\]|\[ok|✓/.test(l) ? "g" : /fail|error|invalid|missing|\bx\]|\[!|✗/.test(l) ? "r" : /warn|\bwarning\b/.test(l) ? "a" : /\[\.\]|\[~\]|\[i\]/.test(l) ? "c" : "m";
   const run = async () => {
@@ -1086,7 +1110,13 @@ const App = (() => {
     Utils.$("#bldRun").onclick = () => BuildPanel.run();
     Utils.$("#bldClose").onclick = () => Utils.$("#buildPanel").classList.add("hidden");
     Utils.$("#advToggle").onclick = () => Advanced.toggle();
-    Utils.$("#fPreset").onchange = () => { Utils.$("#fUrl").value = Providers.PRESETS[Utils.$("#fPreset").value] || ""; };
+    Utils.$("#fPreset").onchange = () => {
+      const p = Providers.PRESETS[Utils.$("#fPreset").value] || { url: "", npm: "" };
+      Utils.$("#fUrl").value = p.url || "";
+      if (p.npm) Providers.setSdk(p.npm);
+      const nameIn = Utils.$("#fName");
+      if (!nameIn.value.trim()) nameIn.value = Utils.$("#fPreset").value === "Custom" ? "" : Utils.$("#fPreset").value;
+    };
     Utils.$("#fEye").onclick = () => { const k = Utils.$("#fKey"); k.type = k.type === "password" ? "text" : "password"; };
     Utils.$("#fTest").onclick = () => Providers.testModal();
     Utils.$("#fSave").onclick = () => Providers.save();
