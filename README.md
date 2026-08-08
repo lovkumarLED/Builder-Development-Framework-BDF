@@ -7,9 +7,12 @@
 > **Learn the engineering process once. Reuse it forever.**
 >
 > A reusable engineering platform that builds configuration builders for **any
-> open-source coding agent** — currently OpenCode and KiloCode — plus a **GUI
+> open-source coding agent** - currently OpenCode and KiloCode - plus a **GUI
 > app that performs the exact same work automatically** for people who never
 > want to touch JSON, PowerShell, or an AI agent.
+>
+> Built by a learner, for learners. Free. Local-first. No account, no cloud,
+> nothing leaves your PC.
 
 [![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-development-framework)
 [![Framework](https://img.shields.io/badge/BDF-2.2.10-blue)](#builder-development-framework)
@@ -76,12 +79,12 @@ You're welcome. 😂
 
 ## 🚀 What is this? — Two worlds, one engine
 
-**BDF is a builder of builders.** It solves one problem: coding agents
+**BDF is a builder of builders.** Look, the problem is simple: coding agents
 (OpenCode, KiloCode, Aider, Goose, ...) store their configuration in messy
-monolithic JSON files that are painful to maintain. BDF splits that mess into
+monolithic JSON files that are painful to maintain. So BDF splits that mess into
 small, well-defined files — profiles, providers, models, plugins, MCP servers —
 and provides builders that re-merge them into the agent's main config, safely
-and reproducibly.
+and reproducibly. Every single time.
 
 Everything here has **two surfaces powered by the same engine**
 (`scripts/scaffold-agent.ps1` + the generated builders):
@@ -113,7 +116,7 @@ Everything here has **two surfaces powered by the same engine**
 
 ## ⚡ Quick start
 
-**For normal people (use the app):**
+**For normal people (use the app):** no terminal needed, I promise.
 
 1. Install **Python** on Windows (tick *"Add python.exe to PATH"*).
 2. Double-click **`docs\app\install.bat`** once. It creates the app's own
@@ -215,7 +218,8 @@ User clicks "Test" on a provider card
 
 ## 🔄 How the BDF engine works
 
-The framework's ONE job, the same for ANY open-source coding agent:
+The framework's ONE job, the same for ANY open-source coding agent — no
+exceptions, no special cases:
 
 1. **Discover** the agent's config location (registry: opencode, kilo, aider,
    goose, codex-cli, ... — add more by extending `$AgentRegistry` in
@@ -277,7 +281,7 @@ automatic URL + SDK + name fill:
 ### The core idea
 
 The app is BDF made autonomous. It never re-implements the engine — it calls
-it:
+it. That's the whole trick, honestly:
 
 - `POST /api/scaffold` → runs `scaffold-agent.ps1 -Agent <agent> -ConfigRoot <dir>
   -NonInteractive -Bootstrap` → profiles + builder scripts.
@@ -618,6 +622,11 @@ Current release: **2.5.1** (Builder V2.7, JSON Schema Validation). History in
 ---
 
 - **Backup before you touch. Never write secrets. Copy verbatim.**
+
+---
+
+Thanks for reading. If this helps one more person learn AI the free way like it
+helped me — that's the whole point. ❤️
 
 ---
 
