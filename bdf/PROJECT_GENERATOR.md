@@ -196,6 +196,10 @@ Copy:
 - `FOLDER_STRUCTURE.template.md`
 - `JSON_SCHEMAS.template.md`
 - `CONTRIBUTING_FOR_AI.template.md`
+- `DEVELOPER_GUIDE.template.md`
+- `PROVIDER_DEVELOPMENT_GUIDE.template.md`
+- `PROFILE_CREATION_GUIDE.template.md`
+- `BUILDER_EXTENSION_GUIDE.template.md`
 - `TESTING.template.md`
 - `TROUBLESHOOTING.template.md`
 - `ROADMAP.template.md`
@@ -227,6 +231,14 @@ FOLDER_STRUCTURE.template.md → FOLDER_STRUCTURE.md
 JSON_SCHEMAS.template.md    →  JSON_SCHEMAS.md
 
 CONTRIBUTING_FOR_AI.template.md → CONTRIBUTING_FOR_AI.md
+
+DEVELOPER_GUIDE.template.md    →  DEVELOPER_GUIDE.md
+
+PROVIDER_DEVELOPMENT_GUIDE.template.md → PROVIDER_DEVELOPMENT_GUIDE.md
+
+PROFILE_CREATION_GUIDE.template.md → PROFILE_CREATION_GUIDE.md
+
+BUILDER_EXTENSION_GUIDE.template.md → BUILDER_EXTENSION_GUIDE.md
 
 TESTING.template.md         →  TESTING.md
 

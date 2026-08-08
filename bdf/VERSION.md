@@ -19,7 +19,7 @@ Every change to the framework must be recorded here.
 Version
 
 ```
-2.2.7
+2.2.9
 ```
 
 Status
@@ -34,7 +34,7 @@ Active
 
 | Item | Value |
 |------|-------|
-| Framework Version | 2.2.7 |
+| Framework Version | 2.2.9 |
 | Supported Builder Versions | V2.7, V2.5, V2.3, V2.1 |
 | Compatible Projects | OpenCode Configuration Manager documentation, KiloCode V1 adapter, V3 universal scaffold |
 | Last Updated | 2026-08-06 |
@@ -117,7 +117,7 @@ Example
 
 # Change History
 
-## Version 2.2.7
+## Version 2.2.9
 
 Date
 
@@ -129,6 +129,91 @@ Status
 
 ```
 Current
+```
+
+Summary
+
+```
+README Synchronization Rule added (user ruling): README.md must be updated in
+the SAME change whenever something is added, changed, or fixed; footer versions
+kept in sync; never claim an unreached status.
+```
+
+Changed
+
+- `templates/AGENT.template.md` — README Synchronization Rule section added.
+- Reference `AGENT.md` — README Synchronization Rule added.
+- `CONTRIBUTING_FOR_AI.md` — Rule 11 (Keep README Current).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.8
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Previous
+```
+
+Summary
+
+```
+Phase 8 Documentation Expansion: four onboarding guides added (Developer,
+Provider Development, Profile Creation, Builder Extension) + four mirrored
+templates. Template count 15 -> 19.
+```
+
+Changed
+
+- New templates: `DEVELOPER_GUIDE.template.md`, `PROVIDER_DEVELOPMENT_GUIDE.template.md`, `PROFILE_CREATION_GUIDE.template.md`, `BUILDER_EXTENSION_GUIDE.template.md`.
+- `templates/README.md` — template list + cross-reference matrix updated (19 templates).
+- `PROJECT_GENERATOR.md` — Stage 4 copy list + Stage 5 rename map extended.
+- Reference docs: `DEVELOPER_GUIDE.md`, `PROVIDER_DEVELOPMENT_GUIDE.md`, `PROFILE_CREATION_GUIDE.md`, `BUILDER_EXTENSION_GUIDE.md` (new).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.7
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Previous
 ```
 
 Summary
@@ -694,7 +779,9 @@ No
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.2.7 | Current | README rebuilt (badges, mermaid diagrams, quick start, rules); template mirrored |
+| 2.2.9 | Current | README Synchronization Rule (README updated in same change, versions in sync, no false status claims) |
+| 2.2.8 | Previous | Phase 8: 4 onboarding guides + 4 templates (15 → 19) |
+| 2.2.7 | Previous | README rebuilt (badges, mermaid diagrams, quick start, rules); template mirrored |
 | 2.2.6 | Previous | ROADMAP phase completion markers (✅ on 12/13 phases) + summary table; template synced |
 | 2.2.5 | Previous | No-Secrets Rule (ULTIMATE): system artifacts never contain literal keys ({env:VAR} only); user files may hold keys; system copies verbatim |
 | 2.2.4 | Previous | V3 scaffold contract finalized: providers/ folder created, provider/model files user-owned, own-main-JSON scan, 3-profile seed (coding main), settings minimal |

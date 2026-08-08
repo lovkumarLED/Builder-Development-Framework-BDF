@@ -136,7 +136,7 @@ reference which templates, so a change to one document always shows what must be
 |--------------------|----------------------|
 | `FRAMEWORK.md` | The template set as a component; `DESIGN_PRINCIPLES.template.md` (principles). |
 | `PROJECT_ADAPTER.md` | `ADAPTER.template.md` (adapter contents, field table, creating an adapter). |
-| `PROJECT_GENERATOR.md` | All 15 templates (Stage 4 copy list + Stage 5 rename map). |
+| `PROJECT_GENERATOR.md` | All 19 templates (Stage 4 copy list + Stage 5 rename map). |
 | `NEW_PROJECT_GUIDE.md` | `ADAPTER.template.md`, `PROJECT_STATE.template.md`, `FOLDER_STRUCTURE.template.md`, `JSON_SCHEMAS.template.md`, `BUILDER_SPEC.template.md`. |
 | `AI_WORKFLOW.md` | This document (`templates/README.md`) in the agent reading order. |
 | `BLUEPRINT_ENGINE.md` | The template set (the engine updates templates when a change is reusable). |
@@ -164,6 +164,10 @@ reference which templates, so a change to one document always shows what must be
 | `FOLDER_STRUCTURE.template.md` | FOLDER_STRUCTURE.md |
 | `JSON_SCHEMAS.template.md` | JSON_SCHEMAS.md |
 | `CONTRIBUTING_FOR_AI.template.md` | CONTRIBUTING_FOR_AI.md |
+| `DEVELOPER_GUIDE.template.md` | DEVELOPER_GUIDE.md |
+| `PROVIDER_DEVELOPMENT_GUIDE.template.md` | PROVIDER_DEVELOPMENT_GUIDE.md |
+| `PROFILE_CREATION_GUIDE.template.md` | PROFILE_CREATION_GUIDE.md |
+| `BUILDER_EXTENSION_GUIDE.template.md` | BUILDER_EXTENSION_GUIDE.md |
 | `TESTING.template.md` | TESTING.md |
 | `TROUBLESHOOTING.template.md` | TROUBLESHOOTING.md |
 | `ROADMAP.template.md` | ROADMAP.md |

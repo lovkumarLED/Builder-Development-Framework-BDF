@@ -306,6 +306,28 @@ Whenever implementation changes:
 - Keep documents consistent with one another.
 - Regenerate `PROJECT_STATE.md` after every major refactor.
 
+## README Synchronization Rule
+
+**`README.md` is the public face of the project. It must never go stale.**
+
+Whenever something is added, changed, or fixed:
+
+1. Check whether `README.md` mentions the affected area (features, scripts,
+   architecture, rules, roadmap status, versions, docs map, badges).
+2. If it does, update the corresponding README section in the SAME change —
+   never in a later commit.
+3. If the change is user-visible (new feature, new script, new rule, status
+   change), it MUST be reflected in `README.md` before the work is considered
+   done.
+4. Keep the README footer versions in sync (`Version`, `Builder Version`,
+   `Framework Version`) whenever any of them change.
+5. Never claim a status the project has not reached (e.g. do not mark a phase
+   complete or a release done before it actually is).
+
+This rule applies to every README that describes a changed area:
+`README.md`, `bdf/README.md`, and `bdf/templates/README.md` (placeholder
+examples must stay current).
+
 ---
 
 # Working Style
