@@ -6,12 +6,12 @@
 
 > **Learn the engineering process once. Reuse it forever.**
 >
-> The reusable engineering platform that builds configuration builders for **any
-> open-source coding agent** — currently powering **OpenCode** and **KiloCode** —
-> plus a **GUI app that does the exact same work, automatically, for normal
-> people** (no AI agent, no terminal, no JSON editing).
+> A reusable engineering platform that builds configuration builders for **any
+> open-source coding agent** — currently OpenCode and KiloCode — plus a **GUI
+> app that performs the exact same work automatically** for people who never
+> want to touch JSON, PowerShell, or an AI agent.
 
-[![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-v27-json-schema-validation)
+[![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-development-framework)
 [![Framework](https://img.shields.io/badge/BDF-2.2.9-blue)](#builder-development-framework)
 [![Tests](https://img.shields.io/badge/tests-17%2F13%2F31%2F30%2F28%20green-brightgreen)](#testing)
 [![Release](https://img.shields.io/badge/release-2.5.0-orange)](#releases)
@@ -19,207 +19,474 @@
 
 ---
 
-## 🚀 What Is This?
+## Table of Contents
 
-**BDF is a builder of builders.** It is both:
-
-1. A **configuration builder** — a small automation system that turns messy,
-   hard-to-maintain config files into clean, validated, reproducible outputs.
-2. An **engineering framework** — the process, templates, adapters, and
-   intelligence layer that make building such builders predictable and reusable.
-
-And now it has **two worlds powered by the same engine**:
-
-| World | Who it's for | How it works |
-|-------|-------------|--------------|
-| **1 — The MD framework** | developers + AI agents | `docs/bdf/*.md` define the process; an AI agent builds/maintains builders from them |
-| **2 — The AI Switcher app** (`docs/app/`) | **normal people** | the app itself does the BDF work — scan → split → seed profiles → generate builder scripts → build — with a friendly GUI, no AI agent, no terminal |
-
-> **The app performs exactly like BDF — but autonomously.** It calls the *real*
-> engine (`scripts/scaffold-agent.ps1`) and the *real* generated builders. One
-> engine, two surfaces. Everything the framework does by hand for developers,
-> the app does by itself for everyone.
-
-It currently powers **three real projects** built on the same reusable framework:
-
-| Project | What it builds | Builder |
-|---------|----------------|---------|
-| **OpenCode Configuration Manager** | `opencode.json` from modular sources | `build-opencode-v2.7.ps1` |
-| **KiloCode Configuration Manager** | `kilo.json` from modular sources | `build-kilo-v1.ps1` |
-| **AI Switcher App** | the same work, in a GUI — scan, seed, generate builders, build, switch providers | `docs/app/` (FastAPI + `gui.html`) |
+1. [What is this? — Two worlds, one engine](#-what-is-this--two-worlds-one-engine)
+2. [Quick start](#-quick-start)
+3. [Architecture](#-architecture)
+4. [How the BDF engine works](#-how-the-bdf-engine-works)
+5. [How the AI Switcher app works](#-how-the-ai-switcher-app-works)
+6. [Agent management](#-agent-management)
+7. [Providers, models, plugins, MCP — the data model](#-providers-models-plugins-mcp--the-data-model)
+8. [The GUI: screens, theme, animations, assets](#-the-gui-screens-theme-animations-assets)
+9. [Development: setup, structure, testing](#-development-setup-structure-testing)
+10. [Roadmap](#-roadmap)
+11. [Documentation map](#-documentation-map)
+12. [Releases](#-releases)
 
 ---
 
-## 🔥 AI Switcher App — BDF for everyone
+## 🚀 What is this? — Two worlds, one engine
 
-A normal person who just wants free AI should not have to: install things
-manually, edit JSON, understand OmniRoute vs LiteLLM vs CLI-Proxy, or read a
-README. The app is that: **open it, paste your provider details, click — and
-switch between local AI servers with one click.**
+**BDF is a builder of builders.** It solves one problem: coding agents
+(OpenCode, KiloCode, Aider, Goose, ...) store their configuration in messy
+monolithic JSON files that are painful to maintain. BDF splits that mess into
+small, well-defined files — profiles, providers, models, plugins, MCP servers —
+and provides builders that re-merge them into the agent's main config, safely
+and reproducibly.
 
-What it does (the BDF job, GUI'd):
+Everything here has **two surfaces powered by the same engine**
+(`scripts/scaffold-agent.ps1` + the generated builders):
+
+| World | Audience | How it drives the engine |
+|-------|----------|--------------------------|
+| **1 — The MD framework** (`docs/bdf/*.md`) | developers + AI agents | an agent reads the process docs and runs the scaffold/builders |
+| **2 — The AI Switcher app** (`docs/app/`) | normal people | the app itself calls the same scaffold + builders through a GUI — no AI agent, no terminal, no JSON editing |
+
+> The app is **not** a separate framework — it is a frontend for this one.
+> Anything the framework learns (new agents, new builder features) is
+> available to the app automatically.
 
 ```
-Open the app → follow the wizard alone
-↓
-App discovers / finds your coding agent (OpenCode, Kilo, Aider, Goose, ...)
-↓
-App SCANS the main JSON itself and shows friendly cards (MCP, plugins, profiles)
-↓
-App CREATES the profiles + GENERATES your builder scripts (real scaffold engine)
-↓
-Add providers (name + address + key + models with thinking levels) — SDK types included
-↓
-Test connection ✓ → Build my config (runs your real builder, backup-first)
-↓
-Switch providers = one click — your AI tool keeps working
+┌─────────────────────────────────────────────┐   ┌─────────────────────────────────────────────┐
+│  WORLD 1 — DEVELOPERS (MD framework)        │   │  WORLD 2 — NORMAL USERS (AI Switcher app)   │
+│  docs/bdf/*.md define the process           │   │  docs/app/: double-click start.bat → browser │
+│  an AI agent builds/maintains builders      │   │  the app scans, seeds, generates, builds     │
+└──────────────────────┬──────────────────────┘   └──────────────────────┬──────────────────────┘
+                       │  same engine, same behavior                      │
+                       ▼                                                  ▼
+          ┌───────────────────────────────────────────────────────────────────┐
+          │  scripts/scaffold-agent.ps1  +  the generated  build-<agent>.ps1 │
+          │  (scan → split → seed profiles → generate builder → build)       │
+          └───────────────────────────────────────────────────────────────────┘
 ```
 
-### How to start the app (the server)
+---
 
-1. **Windows** (10/11) with **Python** installed
-   (<https://www.python.org/downloads/> — tick **"Add python.exe to PATH"**).
-2. Double-click **`docs\app\start.bat`**.
-   - **First run (one-time, needs internet):** the app creates its own private
-     Python environment (`env\`) and installs its packages — then opens.
-   - **Second run onward:** instant.
-3. Your browser opens **`http://127.0.0.1:9090`** automatically — the console
-   shows the app's flame banner with the local addresses.
+## ⚡ Quick start
 
-Manual start (same thing, in a terminal):
+**For normal people (use the app):**
+
+1. Install **Python** on Windows (tick *"Add python.exe to PATH"*).
+2. Double-click **`docs\app\start.bat`**. First run creates the app's own
+   Python environment (`env\`) and installs its packages (one-time, needs
+   internet). Second run is instant.
+3. Your browser opens **`http://127.0.0.1:9090`**. Follow the wizard.
+4. Close the window = the app stops. It is not a background service.
+
+**For developers (use the framework):**
+
+```powershell
+# Discover what's installed
+powershell -File scripts\scaffold-agent.ps1 -List
+
+# Scaffold an agent (scan main JSON → seed profiles → generate builder scripts)
+powershell -File scripts\scaffold-agent.ps1 -Agent kilo -NonInteractive -Bootstrap
+
+# Build the agent's config from the modular sources
+powershell -File C:\Users\You\.config\kilo\scripts\build-kilo-v1.ps1 -Profile coding -NonInteractive
+```
+
+---
+
+## 🏗 Architecture
+
+### System overview
+
+```
+Browser (gui.html, one file: HTML + CSS + vanilla JS + local Anime.js)
+        │  fetch()  (relative paths, same origin)
+        ▼
+FastAPI server (server.py on 127.0.0.1:9090 — LOCAL ONLY)
+        │
+        ├── /api/*   — the app's own API (agents, discover, scan, providers,
+        │              models, plugins, mcp, test, switch, scaffold, build, rules)
+        ├── /v1/*    — OpenAI-compatible proxy → the ACTIVE provider
+        ├── /lib     — static: anime.min.js (local, no CDN)
+        └── /assets  — static: logo + favicon
+        │
+        ▼
+app/ package (modular Python: one responsibility per module)
+        │
+        ▼
+The agent's real config folder (e.g. C:\Users\You\.config\kilo)
+   ├── kilo.json                 ← generated by the builder (never hand-edited)
+   ├── providers\<id>.json       ← app-managed provider files (backup-first)
+   ├── profiles\coding\
+   │     ├── settings.json       ← activeProviders list (the builder's source)
+   │     ├── <provider>-models.json
+   │     ├── plugins.json
+   │     └── mcp.json
+   ├── scripts\build-<agent>.ps1 ← generated builder (the real engine)
+   └── backup\                   ← every write is backed up here first
+```
+
+### Request flow — one example end to end
+
+```
+User clicks "Test" on a provider card
+  → POST /api/test {id}
+    → app/testing.py reads providers\<id>.json via app/agentstore.py
+    → GET <baseUrl>/v1/models with Authorization: Bearer <key>
+    → {ok, message, latencyMs} → the card dot turns green
+```
+
+### The backend modules (`docs/app/app/`)
+
+| Module | Responsibility |
+|--------|----------------|
+| `server.py` | entry point: mounts static dirs, includes all routers, starts uvicorn, prints the banner |
+| `config.py` | paths, host/port, presets, the agent registry mirror |
+| `banner.py` | flame ASCII-art startup banner + local addresses |
+| `storage.py` | `state.json` persistence (atomic writes) |
+| `agents.py` | `/api/agents` — register/remove/switch which agent the app manages |
+| `discovery.py` | `/api/status`, `/api/discover`, `/api/scan` — find agents, read their main JSON read-only |
+| `agentstore.py` | **the heart**: reads/writes the agent's real BDF files (providers, models, plugins, mcp, settings), backups, builder discovery, agent registry logic |
+| `providers.py` | `/api/providers` CRUD + `/api/switch` + models writing |
+| `engine.py` | `/api/scaffold` (runs `scaffold-agent.ps1 -Bootstrap`) + `/api/build` (runs the agent's real builder) |
+| `testing.py` | `/api/test` — connection tester (GET /v1/models) |
+| `plugins.py` | `/api/plugins` — profile plugin list |
+| `mcp.py` | `/api/mcp` — profile MCP servers |
+| `proxy.py` | `/v1/*` — OpenAI-compatible passthrough to the ACTIVE provider |
+| `serve.py` | `GET /` (gui.html), `GET /api/rules` — serves the GUI with the rule.md theme injected |
+| `rules.py` | parses `rule.md` (theme front-matter + rulebook), never crashes, defaults on bad input |
+
+---
+
+## 🔄 How the BDF engine works
+
+The framework's ONE job, the same for ANY open-source coding agent:
+
+1. **Discover** the agent's config location (registry: opencode, kilo, aider,
+   goose, codex-cli, ... — add more by extending `$AgentRegistry` in
+   `scripts/scaffold-agent.ps1`).
+2. **Scan** the agent's OWN main JSON first, read-only. Never another agent's
+   config, never `.jsonc` without consent.
+3. **Split** the main config into sections: `mcp`, `plugin`, `settings`
+   (providers are detected for guidance only).
+4. **Seed** the three profiles — `coding` (the main) + `experimental` +
+   `minimal` — each with exactly `settings.json`, `mcp.json`, `plugins.json`.
+   `mcp.json`/`plugins.json` are user-owned after creation — the framework
+   NEVER overwrites them.
+5. **Generate the builder scripts** (`build-<agent>.ps1`,
+   `test-<agent>.ps1`, `scaffold-<agent>.ps1`) via `-Bootstrap`, adapted from
+   the reference builders.
+6. **Keep providers/models user-owned**: the framework creates the
+   `providers/` folder but never writes files inside it. (The **app** writes
+   them on the user's behalf, backup-first.)
+
+The generated builders all share one pipeline:
+
+```
+F1 JSON Schema validation → F2 pre-flight dependency check → merge stages
+(settings → providers → models → plugins → mcp) → output verification →
+backup retention → provenance sidecar → merge-diff summary
+```
+
+- `-WhatIf` = dry run (validate + merge, never write).
+- `-Doctor` = read-only diagnostics of the real config.
+- `activeProviders` (from `settings.json`) decides **which** providers merge;
+  a provider with **no models is dropped** (the model guard).
+
+---
+
+## 🤖 How the AI Switcher app works
+
+### The core idea
+
+The app is BDF made autonomous. It never re-implements the engine — it calls
+it:
+
+- `POST /api/scaffold` → runs `scaffold-agent.ps1 -Agent <agent> -ConfigRoot <dir>
+  -NonInteractive -Bootstrap` → profiles + builder scripts.
+- `POST /api/build` → runs the agent's real `build-<agent>*.ps1 -Profile coding
+  -NonInteractive` (it finds `build-kilo-v1.ps1` too).
+
+### The agent registry (`state.json`)
+
+The app can manage **many agents at once**:
+
+```json
+{
+  "agent": "kilo",
+  "dir": "C:\\Users\\loveb\\.config\\kilo",
+  "agents": [
+    { "name": "kilo",      "dir": "C:\\Users\\loveb\\.config\\kilo" },
+    { "name": "opencode",  "dir": "C:\\Users\\loveb\\.config\\opencode" }
+  ],
+  "activeAgent": "kilo"
+}
+```
+
+- `agents` — every registered agent (name + config folder).
+- `activeAgent` — the one being managed right now. **Every** `/api/*` call
+  operates on the active agent via `agentstore.current_agent()`.
+- Legacy `{agent, dir}` keys are auto-migrated to the registry on first use.
+
+### Readiness — when the wizard appears
+
+An agent is **ready** if its `scripts\` folder contains any `build-*.ps1`
+(`agentstore.has_any_builder`). `/api/status` reports `ready` for the active
+agent:
+
+- ready → the app boots straight to the dashboard.
+- not ready → the wizard. **Adding an already-set-up agent skips the wizard
+  entirely** (the app detects the builder and loads it immediately).
+- the wizard's "Looks good — open it →" button also uses this check to skip
+  re-scaffolding.
+
+### The active-provider list
+
+`profiles\coding\settings.json` holds `activeProviders` — a **list**. Every
+provider in the list is merged into the build (each with its own models). The
+**first** one is the *primary*:
+
+- the `/v1` proxy forwards to the primary,
+- "Switch to this" moves a provider to the front (all stay in the build),
+- new providers are added to the front automatically.
+
+### The proxy (`127.0.0.1:9090/v1`)
+
+Any OpenAI-compatible tool can point at the app once. `app/proxy.py` reads the
+active agent's settings → takes the primary provider → forwards every
+`/v1/*` request with `Authorization: Bearer <key>` (SSE streaming passes
+through). Switching providers = one click in the GUI, zero tool reconfiguration.
+
+---
+
+## 🧩 Agent management
+
+| Action | What happens |
+|--------|--------------|
+| **Add agent** | `POST /api/agents {name, dir}` → validated (folder must exist) → registered → auto-switched → `ready` returned |
+| **Switch** | `POST /api/agents/switch {name}` → `activeAgent` changes → the whole app re-routes (providers, models, plugins, MCP, build follow) |
+| **Remove** | `DELETE /api/agents/{name}` → removed from the registry (files untouched) → falls back to the next agent, or the wizard if none remain |
+| **Wizard scaffold** | registers the agent too (`upsert_agent`) |
+
+Every add/remove/switch re-checks `/api/status` and re-renders the dashboard —
+no page refresh needed.
+
+---
+
+## 🧩 Providers, models, plugins, MCP — the data model
+
+All data lives in the **agent's own config** (BDF-style). The app never keeps
+a private copy.
+
+### Provider file — `providers\<id>.json`
+
+```json
+{
+  "id": "tokenrouter",
+  "provider": {
+    "tokenrouter": {
+      "name": "TokenRouter",
+      "apiKey": "sk-...",                    ← user's key, in the user's file only
+      "options": { "baseURL": "https://api.tokenrouter.com/v1" },
+      "npm": "@ai-sdk/openai-compatible",    ← SDK type
+      "models": {}
+    }
+  }
+}
+```
+
+The **SDK type** (`npm`) is chosen from a dropdown of 15 registry-verified
+packages: `@ai-sdk/openai-compatible` (default — fits OmniRoute, LiteLLM, CLI
+proxies, TokenRouter, any local gateway), `@ai-sdk/openai`, `@openrouter/
+ai-sdk-provider`, `@ai-sdk/anthropic`, `@ai-sdk/google`, `@ai-sdk/mistral`,
+`@ai-sdk/xai`, `@ai-sdk/deepseek`, `@ai-sdk/groq`, `@ai-sdk/perplexity`,
+`@ai-sdk/togetherai`, `@ai-sdk/cerebras`, `@ai-sdk/azure`,
+`@ai-sdk/amazon-bedrock`, `@ai-sdk/cohere` — or a custom package name.
+
+### Models — `profiles\coding\<provider>-models.json`
+
+```json
+{
+  "models": {
+    "moonshotai/kimi-k3-free": {
+      "name": "Kimi-K3",
+      "variants": {
+        "default": { "reasoningEffort": "default" },
+        "minimal": { "reasoningEffort": "minimal" },
+        "high":    { "reasoningEffort": "high" },
+        "max":     { "reasoningEffort": "max" }
+      }
+    }
+  }
+}
+```
+
+Added from the provider modal or the **Models card** (pick a provider → rows
+with thinking chips). Providers **without models are skipped by the build** —
+the app warns about this.
+
+### Plugins & MCP — `profiles\coding\plugins.json` / `mcp.json`
+
+- Plugins: `{ "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"] }`
+  — the Plugins card add/remove, deduped.
+- MCP: `{ "mcp": { "context7": { "type": "local", "command": ["npx", "-y", ...] } } }`
+  — the MCP card, with JSON validation (bad config = friendly inline error).
+
+### Safety invariants (the rules)
+
+- **No-Secrets:** keys live only in the user's own provider files — never in
+  code, logs, examples, or API responses (`hasKey` only on GET).
+- **Backup-first:** every write (provider, models, plugins, mcp, settings) is
+  copied to the agent's `backup\` folder first.
+- **Local-first:** the server binds `127.0.0.1` only.
+- **Merge, never clobber:** unknown content in existing files is preserved.
+
+---
+
+## 🎨 The GUI: screens, theme, animations, assets
+
+### Screens (one HTML file, shown/hidden by JS)
+
+- **Setup wizard** — welcome → agent location → scanning → found cards →
+  generate/open. Progress bar, slide transitions.
+- **Dashboard** — Agents card, the glowing active-hero (every active provider
+  side-by-side), provider cards (switch/test/edit/delete), Plugins, MCP
+  servers, Models cards, Build panel, Advanced panel.
+
+### The theme engine — `rule.md`
+
+`docs/app/rule.md` has **two jobs**:
+
+1. **Theme** (YAML front-matter): the app injects these as CSS variables into
+   the page at serve time (`app/rules.py` → `app/serve.py`). Edit a color,
+   save, refresh — the app updates. Invalid values fall back to defaults; the
+   parser never crashes.
+2. **Rulebook** (markdown): the design/feature/architecture rules AI agents
+   must follow when changing the app.
+
+### Animations — how they work, how to add new ones
+
+Animations use **Anime.js** (`docs/app/lib/anime.min.js` — local copy, no
+CDN, works offline) plus pure CSS keyframes. Every animation respects
+`prefers-reduced-motion` (the app checks it once into a `reduced` flag).
+
+- Page load: header + cards stagger in (`anime({ targets, translateY, delay:
+  anime.stagger(70) })`).
+- Provider cards: staggered pop-in on every render (`UI.stagger`).
+- Wizard steps: slide + fade per step.
+- Toasts: slide in from the right, fade out.
+- Embers: a canvas particle system (orange/cyan sparks) in the background.
+- Hover/active states: CSS transitions + the hero's flame-ring pulse.
+
+**To add a new animation:**
+
+```js
+// one-off tween
+anime({ targets: "#myCard", translateY: [24, 0], opacity: [0, 1],
+        duration: 500, easing: "easeOutCubic" });
+
+// staggered block entrance
+anime({ targets: ".my-cards", translateY: [26, 0], opacity: [0, 1],
+        duration: 460, delay: anime.stagger(90), easing: "easeOutCubic" });
+
+// CSS-only alternative: define a @keyframes and apply it (reduced-motion is
+// already handled globally by the media query in gui.html)
+```
+
+### Assets & images
+
+| File | Purpose |
+|------|---------|
+| `app/assets/logo.jpg` | the original brand logo (full size) |
+| `app/assets/logo.png` | 256px PNG used in the README |
+| `app/assets/favicon.png` | browser tab icon |
+
+To add images: put them in `app/assets/` and reference them with relative
+paths (`src="assets/my-image.png"`) — the server serves `/assets` statically.
+Never hot-link external images (local-first, offline-friendly).
+
+---
+
+## 🛠 Development: setup, structure, testing
+
+### Setup
 
 ```powershell
 cd docs\app
-python server.py        # first run; creates env\ and installs packages
-# or, after the first run:
-env\Scripts\python server.py
+python -m venv env                 # or just run start.bat once — it does this
+env\Scripts\python -m pip install -r requirements.txt
+env\Scripts\python server.py       # runs on http://127.0.0.1:9090
 ```
 
-**Close the window = the app stops.** It is not a background service — it runs
-only while the window you opened is open, unlike your provider servers
-(OmniRoute, LiteLLM, CLI proxy), which sit in the background all day. A browser
-page cannot touch your files or run PowerShell by itself — that local helper
-window is the app's hands, and it exists only while you use it.
+Adding a dependency? Put it in `requirements.txt` — start.bat re-installs
+automatically (SHA256 hash marker detects the change).
 
-### First run — the setup wizard
+### Where things live
 
-1. **Welcome** → click "Let's get started".
-2. **Your coding agent** → "Find my agent automatically" (or type the folder
-   path, e.g. `C:\Users\YourName\.config\kilo`).
-3. **Scanning** → the app reads your main JSON by itself — it only looks.
-4. **What it found** → cards with your MCP servers, plugins, profiles. If the
-   agent is **already set up** (has a builder), the button reads
-   **"Looks good — open it →"** — one click, straight in, no re-scaffolding.
-   Otherwise click **"Generate my builder"** — the app creates the scripts.
-5. **Done** → add a provider.
+```
+docs/
+├── app/                    ← the AI Switcher app (self-contained)
+│   ├── app/                ← Python package (see module table above)
+│   ├── tests/              ← 28 unit tests (unittest, stdlib-only)
+│   ├── assets/             ← logo + favicon
+│   ├── lib/                ← anime.min.js (local)
+│   ├── gui.html            ← the whole frontend (one file)
+│   ├── rule.md             ← theme + rulebook
+│   ├── server.py / start.bat / requirements.txt
+│   └── README.md           ← plain-language user guide
+├── scripts/                ← scaffold-agent.ps1 (the engine), the builders
+├── bdf/                    ← the framework docs + templates
+├── _agent/                 ← session log, journey tracker
+└── AI/                     ← build plans, continuation files
+```
 
-### Agents — manage several coding agents
+### Testing
 
-The **Agents card** sits at the top of the home screen:
+**Unit tests** (fast, isolated — they never touch your real config):
 
-- Every registered agent is listed — name, config folder, and who's **Active**
-  (the one being managed right now).
-- **Add agent**: name + config folder (e.g. `C:\Users\YourName\.config\opencode`)
-  — any location, no code changes per user. An already-set-up folder is
-  detected and **loaded immediately** (no setup forced); a genuinely new agent
-  goes to the wizard.
-- **Switch to this**: the whole app — providers, models, plugins, MCP, build —
-  instantly starts managing the chosen agent. Each agent keeps its own config.
-- ✕ removes an agent (never deletes its files); the app re-routes instantly,
-  no refresh needed.
+```powershell
+cd docs\app
+env\Scripts\python -m unittest discover -s tests
+```
 
-### Providers
+Covers: rules parsing, theme injection, and the agent store (providers,
+models, plugins, MCP, settings merge, agent registry, backups).
 
-- Presets: **OmniRoute** (`http://localhost:20128/v1`), **LiteLLM**
-  (`http://localhost:4000/v1`), **CLI Proxy**, or **Custom**.
-- **SDK type** dropdown — how your server talks. "OpenAI-compatible (most
-  servers)" fits OmniRoute, LiteLLM, CLI proxies, TokenRouter and any local
-  gateway; the list also includes OpenAI, OpenRouter, Claude (Anthropic),
-  Gemini (Google), Mistral, Grok (xAI), DeepSeek, Groq, Perplexity, Together
-  AI, Cerebras, Azure OpenAI, Amazon Bedrock, Cohere — or "Other…" to type an
-  exact package name. (All 15 verified against the npm registry.)
-- **API key** with show/hide 👁 — the app never shows it back, ever.
-- **Test connection** ✓ green = works (per-card and inside the modal).
-- **Save** → the provider is added **and switched on automatically**, so the
-  next build includes it. The app writes your agent's `providers\<name>.json`
-  (backup-first) — the exact file your builder reads. No JSON editing.
+**End-to-end battery** (the way session 29 tested everything):
 
-### The active hero
+1. **Snapshot** the real agent config to a temp folder (every file) + the
+   app's `state.json`.
+2. Click through every button in a real browser.
+3. **Restore** the snapshot and hash-verify every file is byte-identical
+   (compare against a manifest captured before the test).
 
-Every provider in your `activeProviders` list glows **🔥 Active** — side by
-side in the hero card. "Switch to this" moves one to the front (the first is
-the one your tool talks to through `127.0.0.1:9090`); **every active provider
-is merged into the build**, each with its own models.
+This is the safe way to test write features on a real config — the snapshot +
+hash manifest is your undo button.
 
-### Models (with thinking levels)
+**Frontend checks:** after editing `gui.html`, extract its inline `<script>`
+and run `node --check` on it.
 
-In the provider screen (and in the **Models card** on the home screen), add
-each model: **model id** + optional display name + **thinking chips** —
-`default`, `minimal`, `high`, `max` (e.g. Kimi-K3 with all four). The app
-writes your `profiles\coding\<provider>-models.json` with the exact
-`variants` / `reasoningEffort` shape the builder expects.
+### Conventions
 
-> A provider **without any models is skipped by the build** (the builder's model
-> guard) — the app warns you about this. Models that exist in your files load
-> back into the editors, chips pre-toggled.
-
-### Plugins & MCP servers
-
-- **Plugins card** — add/remove plugin ids (e.g.
-  `superpowers@git+https://github.com/obra/superpowers.git`); the app writes
-  `profiles\coding\plugins.json`, deduped, backup-first.
-- **MCP servers card** — your agent's MCP tools with their type (local/remote):
-  add (name + config JSON, validated — bad JSON gets a friendly inline error)
-  / remove; writes `profiles\coding\mcp.json`, backup-first.
-
-### Switch & Build
-
-- Your agent's `activeProviders` is a **list** — the build merges **every
-  provider in it**, each with its own models.
-- **"Build my config"** runs your **real builder** (`build-<agent>.ps1`,
-  `build-kilo-v1.ps1`, ...) with your profile — terminal-style output,
-  colored, backup-first, provenance stamped.
-
-### The one endpoint (proxy)
-
-Anything that speaks the OpenAI way can point at
-`http://127.0.0.1:9090/v1` **once** — the app forwards to whichever provider is
-primary, so **switching providers is one click forever**, no tool reconfiguration.
-
-### Safety & privacy
-
-- **Local-first:** everything runs on `127.0.0.1` — nothing leaves your machine
-  except your own requests to the provider you chose. No account, no telemetry.
-- **No-Secrets:** API keys live only in your own provider files; never in code,
-  logs, or API responses.
-- **Backup-first:** every file the app rewrites (providers, models, plugins,
-  MCP, settings) is backed up to your agent's `backup\` folder first.
-- **Model/plugin/MCP files you already have are preserved** — the app merges,
-  never clobbers, and never deletes without a backup.
-- **`env\` is private to this computer** and safe to delete — recreated on next
-  launch. Your providers/settings/rule.md are never touched by it.
-
-### Troubleshooting (quick)
-
-| Problem | Fix |
-|---------|-----|
-| Double-clicking `start.bat` does nothing | Python not installed / "Add to PATH" unticked |
-| Browser says it can't connect | the black window should say "Application startup complete"; port busy? close other apps |
-| A provider shows red on Test | that server isn't running right now |
-| A provider is missing from the build | it has no models (add at least one), or it isn't in `activeProviders` (the app keeps all added providers there) |
-| Popup content is cut off | the popup scrolls — use the flame scrollbar inside it |
-| The app acts weird / stale | close ALL "AI Switcher" windows and double-click `start.bat` once — two windows = two servers fighting over the port |
-
-Full plain-language guide: **`docs/app/README.md`**.
+- Modular backend: one responsibility per module, clear interfaces.
+- BDF-exact data model: the app reads/writes the agent's own files.
+- No-Secrets, backup-first, local-first — always.
+- README sync rule: any user-visible change must be reflected in the READMEs
+  in the same change.
+- Commit only when asked; conventional commit style (`feat(app):`, `docs:`).
 
 ---
 
 ## 🧭 Roadmap
 
-**13 of 15 phases complete** toward **BDF V3** — the first stable public version
-that generates builders for OpenCode, KiloCode, and any same-architecture
-open-source coding agent. **Phase 13 (BDF V3) is still in progress — the best is
-yet to come.**
+**13 of 15 phases complete** toward **BDF V3** — the first stable public
+version that generates builders for OpenCode, KiloCode, and any
+same-architecture open-source coding agent. Phase 13 (BDF V3) is in progress.
 
 | Phase | Status |
 |-------|--------|
@@ -241,132 +508,27 @@ yet to come.**
 | Phase 14 — GUI App (AI Switcher) | ✅ |
 | Phase 15 — More Coding Agents | 🔜 planned (untested) |
 
-**Phase 15 note:** OpenCode + KiloCode are verified end-to-end today. The app
-and the universal scaffold are expected to work with **more open-source coding
-agents** too — it has not been tested with others yet, so we will find out when
-we try them.
-
-The journey is tracked live in `_agent/JOURNEY_TO_V3.md`.
+**Phase 15 note:** OpenCode + KiloCode are verified today. The app and the
+universal scaffold are expected to work with **more open-source coding
+agents** — untested yet; we will find out when we try them.
 
 ---
 
-## 📚 Documentation Map
+## 📚 Documentation map
 
-The docs are split into two layers. **Framework** (generic, reusable) and
-**project** (OpenCode-specific) — plus the **app**.
-
-### Project documents
-
-| Document | Description |
-|----------|-------------|
-| `AGENT.md` | AI agent entry guide — read order, rules |
-| `ARCHITECTURE.md` | Overall system architecture |
-| `BUILDER_SPEC.md` | Builder implementation specification (F1–F7, P1–P2) |
-| `DEVELOPER_GUIDE.md` | How to work on the project (human onboarding) |
-| `PROVIDER_DEVELOPMENT_GUIDE.md` | Creating user-owned provider definitions + models |
-| `PROFILE_CREATION_GUIDE.md` | Creating and editing profiles |
-| `BUILDER_EXTENSION_GUIDE.md` | Extending the builder |
-| `FOLDER_STRUCTURE.md` | Directory and file responsibilities |
-| `JSON_SCHEMAS.md` | Configuration file schemas |
-| `TESTING.md` | Testing procedures |
-| `TROUBLESHOOTING.md` | Common issues and fixes |
-| `ROADMAP.md` | Planned future improvements |
-| `CHANGELOG.md` | Project version history |
-| `PROJECT_STATE.md` | Living state snapshot |
-| `CURRENT_RELEASE.md` | Current release quick reference (generated) |
-| `ADAPTER.md` | Project-specific facts (the adapter) |
-| `release_registry.json` | Machine-readable release history (hand-edited) |
-| `app/` | The **AI Switcher** GUI app — self-contained (backend, GUI, launcher, its own plain-language README, `rule.md` theme + rulebook) |
-
-### Framework documents (`bdf/`)
-
-| Document | Description |
-|----------|-------------|
-| `FRAMEWORK.md` | The complete engineering process |
-| `BLUEPRINT_ENGINE.md` | The intelligence layer |
-| `PROJECT_ADAPTER.md` | Making the framework project-specific |
-| `BUILDER_EVOLUTION.md` | Creating future builder versions |
-| `BUILDER_PHASES.md` | Alpha → Beta → General Release quality gates |
-| `FRAMEWORK_LIFECYCLE.md` | Master lifecycle reference |
-| `AI_WORKFLOW.md` | The AI agent workflow |
-| `VERSION.md` | Framework versioning |
-| `NEW_PROJECT_GUIDE.md` | Onboarding a new project |
-| `RELEASE_MANAGER.md` | The generic release process |
-| `TESTING.md` | The generic test-harness pattern |
-| `LESSONS_LEARNED.md` | Reusable engineering lessons |
-| `templates/` | 19 reusable documentation templates |
-
-### Session & planning (`_agent/`, `planning/`, `AI/`)
-
-| Document | Description |
-|----------|-------------|
-| `_agent/SESSION_WORKFLOW.md` | Session start/end/log rules |
-| `_agent/SESSION_LOG.md` | Session history |
-| `_agent/JOURNEY_TO_V3.md` | Live position on the road to V3 |
-| `planning/BDF_ROAD_TO_V3.md` | The vision and definition of V3 |
-| `planning/DECISIONS.md` | Permanent architectural decisions |
-| `AI/` | Build plans, checkpoints, and continuation files |
-
----
-
-## 🧱 Builder Development Framework (World 1 — developers)
-
-**BDF is a builder of builders.** The framework's ONE job, the same for ANY
-open-source coding agent:
-
-1. Discover the agent's config location.
-2. Scan the agent's OWN main JSON (read-only, first).
-3. Split it into sections: mcp / plugin / settings. (Providers are detected for
-   guidance only.)
-4. Seed the three profiles — `coding` (always the main) + `experimental` +
-   `minimal` — each with `settings.json`, `mcp.json`, `plugins.json`.
-5. Generate the builder scripts (`build-<agent>.ps1`, `test-<agent>.ps1`,
-   `scaffold-<agent>.ps1`) via `scaffold-agent.ps1 -Bootstrap`.
-6. Keep providers/models user-owned: the framework creates the `providers/`
-   folder but NEVER writes provider/model files inside it — those are 100%
-   the user's (the **app** writes them on the user's behalf, backup-first).
-
-### The universal scaffold
-
-`scripts/scaffold-agent.ps1` is the V3 UNIVERSAL core: an open-source agent
-registry (opencode, kilo, aider, goose, codex-cli, ...), discovery, `-List`,
-`-Bootstrap` per-agent builder generation. It scans the agent's own main JSON,
-splits mcp/plugin sections, seeds the profiles, and never touches `.jsonc`
-without consent. Closed-source agents are never touched.
-
-### Current builders
-
-| Builder | Agent | Tests |
-|---------|-------|-------|
-| `build-opencode-v2.7.ps1` | OpenCode | 31/31 |
-| `build-kilo-v1.ps1` | KiloCode | 30/30 |
-
-Both share the same pipeline: JSON Schema validation (F1), pre-flight
-dependency check (F2), `-WhatIf` dry run (F3), backup retention (F4),
-provenance sidecar (F5), `-Doctor` diagnostics (F6), merge diff summary (F7),
-active-provider selection with `settings.json` persistence, and a per-provider
-model merge (profile-level `<provider>-models.json` > provider-folder >
-inline > drop-with-warning).
-
----
-
-## 🧪 Testing
-
-- OpenCode V2.7 harness: **31/31**
-- OpenCode V2.5 harness: **13/13**
-- OpenCode V2 harness: **17/17**
-- KiloCode V1 harness: **30/30**
-- App unit tests: **28/28** (`docs/app/tests`, `unittest`, stdlib-only)
-- App E2E: full click-through battery on a real agent config (providers CRUD,
-  models, plugins, MCP, build, proxy, agents) with snapshot backup + hash-verified
-  restore (session 29)
+| Area | Documents |
+|------|-----------|
+| Project | `AGENT.md`, `ARCHITECTURE.md`, `BUILDER_SPEC.md`, the 4 onboarding guides, `FOLDER_STRUCTURE.md`, `JSON_SCHEMAS.md`, `TESTING.md`, `TROUBLESHOOTING.md`, `ROADMAP.md`, `CHANGELOG.md`, `PROJECT_STATE.md`, `ADAPTER.md` |
+| App | `app/README.md` (plain-language user guide), `app/rule.md` (theme + rulebook) |
+| Framework | `bdf/FRAMEWORK.md`, `bdf/AI_WORKFLOW.md`, `bdf/PROJECT_ADAPTER.md`, `bdf/BUILDER_*`, `bdf/templates/` (19 templates) |
+| Session & planning | `_agent/SESSION_WORKFLOW.md`, `_agent/SESSION_LOG.md`, `_agent/JOURNEY_TO_V3.md`, `planning/`, `AI/` |
 
 ---
 
 ## 📦 Releases
 
-Current release: **2.5.0** (Builder V2.7, JSON Schema Validation). Full history
-in `CHANGELOG.md` and `docs/release_registry.json` (regenerated by
+Current release: **2.5.0** (Builder V2.7, JSON Schema Validation). History in
+`CHANGELOG.md` + `docs/release_registry.json` (regenerated by
 `scripts/release-manager.ps1`).
 
 ---
@@ -378,6 +540,6 @@ in `CHANGELOG.md` and `docs/release_registry.json` (regenerated by
 **Version:** 2.5.0
 **Builder Version:** V2.7 (JSON Schema Validation)
 **Framework Version:** 2.2.9
-**Document Version:** 2.3
+**Document Version:** 2.4
 
 Documentation Status: Current Implementation
