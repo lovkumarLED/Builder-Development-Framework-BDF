@@ -126,8 +126,8 @@ Everything here has **two surfaces powered by the same engine**
 Prefer commands? From PowerShell:
 
 ```powershell
-git clone https://github.com/lovkumarLED/opencode-builder.git
-cd opencode-builder\docs\app
+git clone https://github.com/lovkumarLED/Builder-Development-Framework-BDF.git
+cd Builder-Development-Framework-BDF\docs\app
 .\install.bat   # one-time: creates env\, installs packages, adds the desktop shortcut
 ```
 
