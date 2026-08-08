@@ -6,10 +6,10 @@
 > open-source coding agent** — currently powering **OpenCode** and **KiloCode**.
 
 [![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-v27-json-schema-validation)
-[![Framework](https://img.shields.io/badge/BDF-2.2.7-blue)](#builder-development-framework)
+[![Framework](https://img.shields.io/badge/BDF-2.2.9-blue)](#builder-development-framework)
 [![Tests](https://img.shields.io/badge/tests-17%2F13%2F31%2F30%20green-brightgreen)](#testing)
 [![Release](https://img.shields.io/badge/release-2.5.0-orange)](#releases)
-[![Status](https://img.shields.io/badge/status-12%2F13%20phases%20complete-purple)](#roadmap)
+[![Status](https://img.shields.io/badge/status-13%2F14%20phases%20complete%20%2B%20V3%20in%20progress-blue)](#roadmap)
 
 ---
 
@@ -28,6 +28,7 @@ It currently powers **two real projects** built on the same reusable framework:
 |---------|----------------|---------|
 | **OpenCode Configuration Manager** | `opencode.json` from modular sources | `build-opencode-v2.7.ps1` |
 | **KiloCode Configuration Manager** | `kilo.json` from modular sources | `build-kilo-v1.ps1` |
+| **AI Switcher (docs/app/)** | normal-user GUI app: scan → scaffold → build → one-click provider switching | `start.bat` + FastAPI backend + `gui.html` |
 
 And the **V3 universal scaffold** can generate a builder for **any open-source
 coding agent** with a local JSON config (Aider, Goose, Codex-Cli, ...) — not just
@@ -264,9 +265,10 @@ manually** — reruns are byte-identical (deterministic).
 
 ## 🧭 Roadmap
 
-**12 of 13 phases complete** toward **BDF V3** — the first stable public version
+**13 of 14 phases complete** toward **BDF V3** — the first stable public version
 that generates builders for OpenCode, KiloCode, and any same-architecture
-open-source coding agent.
+open-source coding agent. **Phase 13 (BDF V3) is still in progress — the best is
+yet to come.**
 
 | Phase | Status |
 |-------|--------|
@@ -277,7 +279,7 @@ open-source coding agent.
 | Phase 5 — Validation Framework | ✅ |
 | Phase 6 — Automated Testing | ✅ |
 | Phase 7 — Builder Refactoring | ✅ |
-| Phase 8 — Documentation Expansion | ⬜ |
+| Phase 8 — Documentation Expansion | ✅ |
 | Phase 9 — Release Manager V1 | ✅ |
 | Phase 10 — BDF V2.5 Framework Generalization | ✅ |
 | Phase 10.5 — Active-Provider Selector Builder | ✅ |
@@ -285,6 +287,7 @@ open-source coding agent.
 | Phase 11 — Claude Code Builder V1 | ✅ resolved (dropped) |
 | Phase 12 — KiloCode Builder V1 | ✅ |
 | Phase 13 — BDF V3 Universal Builder Generator | 🔄 in progress |
+| Phase 14 — GUI App (AI Switcher) | ✅ |
 
 The journey is tracked live in `_agent/JOURNEY_TO_V3.md`.
 
@@ -302,6 +305,10 @@ The docs are split into two layers. **Framework** (generic, reusable) and
 | `AGENT.md` | AI agent entry guide — read order, rules |
 | `ARCHITECTURE.md` | Overall system architecture |
 | `BUILDER_SPEC.md` | Builder implementation specification (F1–F7, P1–P2) |
+| `DEVELOPER_GUIDE.md` | How to work on the project (human onboarding) |
+| `PROVIDER_DEVELOPMENT_GUIDE.md` | Creating user-owned provider definitions + models |
+| `PROFILE_CREATION_GUIDE.md` | Creating and editing profiles |
+| `BUILDER_EXTENSION_GUIDE.md` | Extending the builder |
 | `FOLDER_STRUCTURE.md` | Directory and file responsibilities |
 | `JSON_SCHEMAS.md` | Configuration file schemas |
 | `TESTING.md` | Testing procedures |
@@ -311,6 +318,7 @@ The docs are split into two layers. **Framework** (generic, reusable) and
 | `PROJECT_STATE.md` | Living state snapshot |
 | `CURRENT_RELEASE.md` | Current release quick reference (generated) |
 | `ADAPTER.md` | Project-specific facts (the adapter) |
+| `app/` | The "AI Switcher" GUI app — self-contained, plain-language README inside |
 | `release_registry.json` | Machine-readable release history (hand-edited) |
 
 ### Framework documents (`bdf/`)
@@ -370,7 +378,7 @@ builder or the release manager.
 
 **Version:** 2.5.0
 **Builder Version:** V2.7 (JSON Schema Validation)
-**Framework Version:** 2.2.7
-**Document Version:** 2.0
+**Framework Version:** 2.2.9
+**Document Version:** 2.1
 
 Documentation Status: Current Implementation

@@ -84,11 +84,11 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 8, 2026 (session 28: FULL_SYSTEM_CHECK v1.1 all 7 parts PASS, 40+ bugs fixed)
+Updated: Aug 8, 2026 (session 29: GUI App built — docs/app/ "AI Switcher", end-to-end green; Phase 14 COMPLETE)
 
 ```
 Step 3 — Universal Agent Framework core
-Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08)
+Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08; GUI app = BDF made autonomous, session 29)
 Progress: ~90%
 ```
 
@@ -138,13 +138,22 @@ What was completed:
       (scan → copy → paste) so generated output carries whatever the user's files
       contain, keys included. Verified: system artifacts 0 leaks, user files restored,
       both builds green.
+- [x] Session 28d: PHASE 8 COMPLETE — Documentation Expansion: 4 onboarding guides
+      (DEVELOPER_GUIDE, PROVIDER_DEVELOPMENT_GUIDE, PROFILE_CREATION_GUIDE,
+      BUILDER_EXTENSION_GUIDE) + 4 mirrored templates (15 → 19). ALL 13 roadmap
+      phases now complete except the final V3 release steps.
+- [x] Session 29: PHASE 14 COMPLETE — GUI App "AI Switcher" (docs/app/): the BDF made
+      autonomous. Modular FastAPI backend (app/ package) + Qwen-built gui.html +
+      start.bat; calls the REAL scaffold-agent.ps1 -Bootstrap engine (one engine, two
+      surfaces) and the generated builders; local OpenAI-compatible /v1 proxy on
+      127.0.0.1:9090 to the ACTIVE provider; No-Secrets + backup-first providers.json.
+      Smoke-tested end-to-end green on the real opencode agent: discover → scan →
+      scaffold (real engine) → build PASS → test harness 31/31 → switch → chat.
 
 Dropped: Claude Code Builder V1 — 2026-08-08 decision (entropic `~/.claude.json`, no
 provider support). See `planning/DECISIONS.md`.
 
-Next: commit docs on request; run the kilo builder test (backup-first, harness + real
-build after the user creates their own providers); real `-Bootstrap` against aider/goose
-only if user installs them; then BUILDER_PHASES Alpha→Beta→General gates for the
+Next: commit docs on request; then BUILDER_PHASES Alpha→Beta→General gates for the
 universal framework, then Step 4 / Step 5.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = KiloCode Builder,

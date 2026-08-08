@@ -1,0 +1,3 @@
+"""AI Switcher backend package."""
+
+APP_VERSION = "1.0.0"

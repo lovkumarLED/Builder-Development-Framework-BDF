@@ -283,20 +283,22 @@ Keep the builder simple even as functionality grows.
 
 ---
 
-## Phase 8 — Documentation Expansion
+## Phase 8 — Documentation Expansion ✅
 
 Status
 
 ```
-Planned
+Completed (2026-08-08) — 4 onboarding guides created
 ```
 
-Possible additions
+Completed work includes:
 
-- Developer Guide.
-- Provider Development Guide.
-- Profile Creation Guide.
-- Builder Extension Guide.
+- `DEVELOPER_GUIDE.md` — how to work on the project (read order, workflow, verification, common tasks).
+- `PROVIDER_DEVELOPMENT_GUIDE.md` — creating user-owned provider definitions + models, No-Secrets `{env:VAR}` policy.
+- `PROFILE_CREATION_GUIDE.md` — the three default profiles, the file contract, creating new profiles.
+- `BUILDER_EXTENSION_GUIDE.md` — the builder pipeline, adding features/tests/CLI flags/merge stages, verification checklist.
+- All four guides mirrored as framework templates (`bdf/templates/*.template.md`) — template count 15 → 19.
+- Registered in `FOLDER_STRUCTURE.md`, `PROJECT_STATE.md`, `README.md`, `bdf/PROJECT_GENERATOR.md` (Stage 4 + 5), `bdf/templates/README.md` (list + matrix).
 
 Goal
 
@@ -571,6 +573,52 @@ V3 is the first stable public milestone — not the end of development.
 
 ---
 
+## Phase 14 — GUI App: "AI Switcher" for Normal Users ✅
+
+Status
+
+```
+COMPLETED 2026-08-08 (session 29) — docs/app/: FastAPI backend + gui.html frontend + start.bat,
+local OpenAI-compatible proxy on 127.0.0.1:9090, calls the real scaffold-agent.ps1 -Bootstrap
+engine (one engine, two surfaces). Smoke-tested end-to-end green on the real opencode agent.
+```
+
+Objective
+
+A normal person (zero dev knowledge) opens the app, follows the wizard alone,
+and the APP does the BDF's work autonomously:
+
+```
+Double-click start.bat → browser opens
+↓
+Wizard: discover agent → scan main JSON → found-sections cards
+↓
+Generate builder scripts (the app calls the real scaffold-agent.ps1 -Bootstrap engine)
+↓
+Add provider (preset or custom, keys stay in the user's providers.json only)
+↓
+Test connection ✓ → Switch to this (one click)
+↓
+Build my config (runs the generated builder)
+↓
+AI tool points at http://127.0.0.1:9090/v1 once — switching is one click forever
+```
+
+Definition of complete
+
+- Full API contract: GET / (gui.html), GET /api/status, POST /api/discover, POST /api/scan,
+  GET/POST /api/providers, PUT/DELETE /api/providers/<id>, POST /api/test, POST /api/switch,
+  POST /api/scaffold (runs scaffold-agent.ps1 -Agent <agent> -NonInteractive -Bootstrap),
+  POST /api/build (runs build-<agent>.ps1 -Profile coding -NonInteractive),
+  POST /v1/* local OpenAI-compatible proxy to the ACTIVE provider.
+- API keys NEVER returned by GET (masked/omitted); providers.json backed up before every write;
+  local-first 127.0.0.1 only; No-Secrets rule.
+- SUCCESS TEST passed: the wizard flow (discover → scan → scaffold on the real opencode agent
+  → build) completed green without any AI agent — build-<agent>.ps1 generated and executed,
+  providers switched, chat through the proxy answered.
+
+---
+
 # Phase Completion Summary
 
 | Phase | Status |
@@ -582,7 +630,7 @@ V3 is the first stable public milestone — not the end of development.
 | Phase 5 — Validation Framework | ✅ Completed |
 | Phase 6 — Automated Testing | ✅ Completed |
 | Phase 7 — Builder Refactoring | ✅ Completed |
-| Phase 8 — Documentation Expansion | ⬜ Planned |
+| Phase 8 — Documentation Expansion | ✅ Completed |
 | Phase 9 — Release Manager V1 | ✅ Completed |
 | Phase 10 — BDF V2.5 Framework Generalization | ✅ Completed |
 | Phase 10.5 — Active-Provider Selector Builder | ✅ Completed |
@@ -590,9 +638,9 @@ V3 is the first stable public milestone — not the end of development.
 | Phase 11 — Claude Code Builder V1 | ✅ Resolved (dropped → KiloCode) |
 | Phase 12 — KiloCode Builder V1 | ✅ Completed |
 | Phase 13 — BDF V3 Universal Builder Generator | 🔄 In Progress |
+| Phase 14 — GUI App (AI Switcher) | ✅ Completed |
 
-**12 of 13 phases complete. Remaining: Phase 8 (documentation expansion guides) and
-the final V3 release steps (Phase 13).**
+**13 of 14 phases complete. Phase 13 (BDF V3) remains IN PROGRESS — not yet released; more development is planned before the official V3 release.**
 
 ---
 
@@ -617,7 +665,6 @@ architecture rather than replacing it.
 
 The following items are intentionally excluded until explicitly planned.
 
-- GUI applications.
 - Cloud synchronization.
 - Automatic internet downloads.
 - Features unrelated to configuration management.
@@ -648,6 +695,6 @@ This ensures that the roadmap always reflects future work rather than project hi
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
 **Status:** Active Development Roadmap

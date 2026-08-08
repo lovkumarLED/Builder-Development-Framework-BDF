@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Switcher</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<script src="lib/anime.min.js"></script>
+<style>
+:root{
+  --bg:#0A0D16; --card:#111527; --border:#232A3D; --border-hi:#35405C;
+  --text:#E8EEF9; --muted:#8B96B0; --accent:#00C8FF; --accent-hi:#4CDEFF;
+  --green:#3FB950; --red:#FF3B30; --amber:#FF9702; --radius:14px; --radius-sm:10px;
+  --flame1:#FF6501; --flame2:#FD9000; --flame3:#FF9702; --flame-soft:rgba(255,101,1,.14);
+  --navy-deep:#070A13; --navy-hi:#0E1424;
+  --shadow:0 10px 32px rgba(0,0,0,.5);
+  --glow-cyan:0 0 0 1px rgba(0,200,255,.35), 0 0 24px rgba(0,200,255,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
+  background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden;
+}
+html{overflow-y:scroll;scrollbar-width:auto;scrollbar-color:var(--flame2) var(--navy-deep)}
+::-webkit-scrollbar{width:14px}
+::-webkit-scrollbar-track{background:var(--navy-deep)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--flame1),var(--flame3));border-radius:99px;border:3px solid var(--navy-deep)}
+::-webkit-scrollbar-thumb:hover{background:var(--flame3)}
+::-webkit-scrollbar-corner{background:var(--navy-deep)}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(900px 500px at 18% -10%, rgba(255,101,1,.10), transparent 60%),
+  radial-gradient(700px 420px at 85% 8%, rgba(0,200,255,.08), transparent 60%),
+  radial-gradient(1000px 600px at 50% 115%, rgba(255,101,1,.06), transparent 60%),
+  var(--navy-deep);
+}
+.embers{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.85}
+.app{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:22px 20px 90px}
+header{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:12px;user-select:none}
+.brand .mark{width:46px;height:46px;flex:none;border-radius:12px;object-fit:cover;border:1px solid rgba(255,151,2,.35);filter:drop-shadow(0 0 12px rgba(255,120,10,.45));animation:logoglow 3.2s ease-in-out infinite}
+@keyframes logoglow{0%,100%{filter:drop-shadow(0 0 8px rgba(255,120,10,.35))}50%{filter:drop-shadow(0 0 18px rgba(0,200,255,.45))}}
+.brand h1{font-size:22px;font-weight:700;letter-spacing:.3px}
+.brand small{display:block;color:var(--muted);font-size:12px;font-weight:400;letter-spacing:1.4px;text-transform:uppercase}
+.spacer{flex:1}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:0 18px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--card);color:var(--text);font:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+.btn:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 6px 18px rgba(0,200,255,.16)}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04121a}
+.btn.primary:hover{box-shadow:0 6px 22px rgba(0,200,255,.35);border-color:var(--accent-hi)}
+.btn.flame{background:linear-gradient(135deg,var(--flame1),var(--flame3));border-color:var(--flame2);color:#1a0a00}
+.btn.flame:hover{box-shadow:0 6px 22px rgba(255,120,10,.4);border-color:var(--flame3)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn.small{min-height:36px;padding:0 12px;font-size:13px}
+.btn.ghost{background:transparent}
+.btn.danger:hover{border-color:var(--red);box-shadow:0 6px 18px rgba(255,59,48,.2)}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.25);border-top-color:currentColor;border-radius:50%;animation:rot .7s linear infinite;display:none}
+.btn.loading .spin{display:inline-block}
+.btn.loading .lbl{opacity:.75}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+.card.hover:hover{border-color:var(--border-hi);transform:translateY(-1px) scale(1.012);box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.hint{color:var(--muted);font-size:13px;line-height:1.55}
+.dot{width:10px;height:10px;border-radius:50%;background:#3a4156;flex:none}
+.dot.ok{background:var(--green);box-shadow:0 0 10px var(--green);animation:glow 2.4s ease-in-out infinite}
+.dot.fail{background:var(--red);box-shadow:0 0 8px var(--red)}
+.dot.testing{background:var(--amber);animation:breathe .8s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 6px var(--green)}50%{box-shadow:0 0 14px var(--green)}}
+@keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.82)}}
+
+.screen{display:none}
+.screen.active{display:block}
+.hidden{display:none!important}
+
+.wstep{display:none}
+.wstep.active{display:block;animation:stepIn .34s ease both}
+@keyframes stepIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+.wbar{height:6px;background:var(--navy-hi);border-radius:99px;overflow:hidden;margin:18px 0 22px}
+.wbar > i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--flame1),var(--flame3),var(--accent));transition:width .5s cubic-bezier(.4,0,.2,1)}
+.wtitle{font-size:24px;font-weight:700;margin-bottom:6px}
+.wsub{color:var(--muted);margin-bottom:22px;font-size:15px}
+.wizard .card{margin-bottom:16px}
+.scanline{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;margin:8px 0;opacity:0;transform:translateX(-8px)}
+.scanline.on{opacity:1;transform:none;transition:all .35s ease}
+.scanline.ok{color:var(--green)}
+.scanline .ck{color:var(--green);font-weight:700}
+.agentpick{display:flex;gap:10px;flex-wrap:wrap}
+.agentpick .apk{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;cursor:pointer;min-width:150px;background:var(--card);transition:all .2s ease}
+.agentpick .apk:hover{border-color:var(--accent)}
+.agentpick .apk.sel{border-color:var(--accent);box-shadow:var(--glow-cyan)}
+.agentpick .apk b{display:block;font-size:15px}
+.agentpick .apk span{color:var(--muted);font-size:12px;word-break:break-all}
+.statrow{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}
+.stat{flex:1;min-width:130px;background:var(--navy-hi);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;text-align:center}
+.stat b{display:block;font-size:26px;background:linear-gradient(135deg,var(--flame3),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{color:var(--muted);font-size:12px;letter-spacing:.6px;text-transform:uppercase}
+.bigcta{margin-top:8px}
+.bigcta .btn{min-height:52px;padding:0 34px;font-size:16px}
+
+.hero{position:relative;overflow:hidden;padding:26px;margin-bottom:20px}
+.hero::before{content:"";position:absolute;inset:-2px;border-radius:calc(var(--radius) + 2px);padding:2px;background:linear-gradient(135deg,var(--flame1),var(--flame3) 30%,var(--accent) 90%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.85;animation:ringpulse 2.6s ease-in-out infinite;pointer-events:none}
+@keyframes ringpulse{0%,100%{opacity:.55}50%{opacity:1}}
+.hero .hrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hero h2{font-size:22px;margin:6px 0 2px}
+.hero .purl{color:var(--muted);font-size:13px;word-break:break-all;margin-bottom:14px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;background:rgba(255,101,1,.14);color:var(--flame3);border:1px solid rgba(255,151,2,.4);animation:breathe 2.2s ease-in-out infinite}
+.badge.off{background:var(--navy-hi);color:var(--muted);border-color:var(--border);animation:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.pcard{position:relative;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;opacity:0}
+.pcard.show{opacity:1}
+.pcard:hover{transform:translateY(-2px) scale(1.015);border-color:var(--border-hi)}
+.pcard.active{border-color:rgba(255,151,2,.55);box-shadow:0 0 0 1px rgba(255,151,2,.35), 0 0 26px rgba(255,120,10,.16)}
+.pcard .prow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pcard .pname{font-weight:700;font-size:16px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard .purl{color:var(--muted);font-size:12px;word-break:break-all;margin-bottom:14px;min-height:16px}
+.pcard .pacts{display:flex;gap:8px;flex-wrap:wrap}
+.pcard .pacts .btn{flex:1;min-height:38px;font-size:13px;padding:0 8px}
+.pcard .ico{min-width:38px!important;flex:0 0 auto!important;width:38px;padding:0!important}
+.empty{text-align:center;padding:44px 20px;border:1px dashed var(--border);border-radius:var(--radius);background:var(--navy-hi)}
+.empty .flame{width:72px;height:72px;margin:0 auto 14px;border-radius:16px;object-fit:cover;border:1px solid rgba(255,151,2,.35);filter:drop-shadow(0 0 14px rgba(255,120,10,.5));animation:logoglow 3.2s ease-in-out infinite}
+.empty h3{margin-bottom:6px}
+.empty .btn{margin-top:16px;animation:bounce 2.2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+.term{background:#04060c;border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;max-height:380px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.term .g{color:var(--green)} .term .r{color:var(--red)} .term .a{color:var(--amber)} .term .c{color:var(--accent)} .term .m{color:var(--muted)}
+.bresult{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--radius-sm);margin-top:12px;font-weight:700}
+.bresult.ok{background:rgba(63,185,80,.1);color:var(--green);border:1px solid rgba(63,185,80,.35)}
+.bresult.fail{background:rgba(255,59,48,.1);color:var(--red);border:1px solid rgba(255,59,48,.35)}
+
+footer{margin-top:34px;text-align:center;color:var(--muted);font-size:12px}
+footer button{background:none;border:none;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+footer button:hover{color:var(--accent)}
+.adv{display:none;margin-top:18px}
+.adv.show{display:block}
+.adv pre{background:var(--navy-hi);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:12px;overflow:auto;max-height:260px;color:var(--muted);white-space:pre-wrap;word-break:break-word}
+
+.overlay{position:fixed;inset:0;background:rgba(4,6,12,.72);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:40;padding:18px;overflow-y:auto}
+.overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:var(--radius);box-shadow:var(--shadow);width:100%;max-width:460px;padding:24px;margin:auto;animation:stepIn .3s ease both}
+.modal h3{font-size:18px;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.field input,.field select{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--navy-hi);color:var(--text);font:inherit;font-size:14px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,200,255,.15)}
+.kwrap{position:relative}
+.kwrap input{padding-right:44px}
+.eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;width:38px;height:38px}
+.eye:hover{color:var(--text)}
+.errline{color:var(--red);font-size:13px;min-height:18px;margin-top:4px}
+.mrow2{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--navy-hi);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;margin-bottom:8px}
+.mrow2 input{flex:1;min-width:120px;min-height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:#0a0f1d;color:var(--text);font:inherit;font-size:13px}
+.mrow2 input:focus{outline:none;border-color:var(--accent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:5px 10px;border:1px solid var(--border);border-radius:99px;font-size:11.5px;font-weight:600;background:transparent;color:var(--muted);cursor:pointer;transition:all .16s ease}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.chip.on{border-color:var(--accent);color:var(--accent);background:rgba(0,200,255,.1);box-shadow:0 0 8px rgba(0,200,255,.2)}
+.mrow2 .rm{flex:none;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-size:14px}
+.mrow2 .rm:hover{border-color:var(--red);color:var(--red)}
+.testline{display:flex;align-items:center;gap:8px;font-size:13px;min-height:22px;margin-top:8px}
+.testline.ok{color:var(--green)} .testline.fail{color:var(--red)} .testline.testing{color:var(--amber)}
+.mrow{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.confirm .mrow{justify-content:center;margin-top:20px}
+.confirm p{margin-bottom:18px;line-height:1.55}
+
+#toasts{position:fixed;right:18px;top:18px;z-index:60;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{min-width:230px;max-width:340px;padding:13px 16px;border-radius:var(--radius-sm);background:var(--navy-hi);border:1px solid var(--border);box-shadow:var(--shadow);font-size:14px;display:flex;align-items:center;gap:10px;opacity:0;transform:translateX(60px)}
+.toast .tdot{width:8px;height:8px;border-radius:50%;flex:none}
+.toast.ok .tdot{background:var(--green);box-shadow:0 0 8px var(--green)}
+.toast.err .tdot{background:var(--red);box-shadow:0 0 8px var(--red)}
+.toast.info .tdot{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<canvas class="embers" aria-hidden="true"></canvas>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <img class="mark" src="assets/logo.jpg" alt="AI Switcher logo">
+      <div>
+        <h1>AI Switcher</h1>
+        <small>Free AI, one click</small>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn primary" id="btnAdd" style="display:none">+ Add provider</button>
+    <button class="btn flame" id="btnBuild" style="display:none">🔥 Build my config</button>
+  </header>
+
+  <!-- ============ SETUP WIZARD ============ -->
+  <section class="screen" id="screenWizard">
+    <div class="wizard card" style="max-width:640px;margin:40px auto;padding:34px">
+      <div class="wstep active" data-step="1">
+        <div class="wtitle">Welcome to AI Switcher</div>
+        <div class="wsub">One small setup, then your AI is yours to switch freely.</div>
+        <div class="bigcta"><button class="btn flame" id="wizGo">Let's get started →</button></div>
+      </div>
+
+      <div class="wstep" data-step="2">
+        <div class="wtitle">Where are your coding agents?</div>
+        <div class="wsub">The app finds them by itself — or you can tell it the folder.</div>
+        <div class="card hover" style="cursor:pointer" id="wizAuto">
+          <b>⚡ Find my agent automatically</b>
+          <div class="hint">The app looks in the usual places on this computer.</div>
+        </div>
+        <div class="hint" style="text-align:center;margin:12px 0">— or —</div>
+        <div class="field">
+          <label>Config folder path</label>
+          <input id="wizPath" placeholder="C:\Users\YourName\.config\opencode">
+        </div>
+        <div class="mrow"><button class="btn primary" id="wizUsePath">Use this folder</button></div>
+      </div>
+
+      <div class="wstep" data-step="3">
+        <div class="wtitle">Looking at your config…</div>
+        <div class="wsub">The app is scanning — it only reads, it changes nothing.</div>
+        <div class="scanline" id="sl1"><span class="ck">✓</span> Looking at your main config file</div>
+        <div class="scanline" id="sl2"><span class="ck">✓</span> Found your MCP servers</div>
+        <div class="scanline" id="sl3"><span class="ck">✓</span> Found your plugins</div>
+        <div class="scanline" id="sl4"><span class="ck">✓</span> Found your profiles</div>
+      </div>
+
+      <div class="wstep" data-step="4">
+        <div class="wtitle">Here's what the app found</div>
+        <div class="wsub">Pick your coding agent, then the app builds your personal builder.</div>
+        <div class="agentpick" id="wizAgents"></div>
+        <div class="statrow" id="wizStats"></div>
+        <div class="bigcta"><button class="btn flame" id="wizGen">⚡ Generate my builder</button></div>
+        <div class="hint" id="wizGenHint" style="margin-top:10px"></div>
+      </div>
+
+      <div class="wstep" data-step="5">
+        <div class="wtitle">All set! 🔥</div>
+        <div class="wsub">Your builder scripts are ready. Now add a provider — it takes one minute.</div>
+        <div class="bigcta"><button class="btn flame" id="wizDone">Add a provider →</button></div>
+      </div>
+      <div class="wbar"><i id="wizBar"></i></div>
+    </div>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section class="screen" id="screenDash">
+    <div class="hero card" id="dashHero"></div>
+    <div class="grid" id="provGrid"></div>
+    <div class="empty hidden" id="emptyState">
+      <img class="flame" src="assets/logo.jpg" alt="">
+      <h3>No providers yet</h3>
+      <p class="hint">Add your first one — it takes one minute.</p>
+      <button class="btn primary" id="emptyAdd">+ Add your first provider</button>
+    </div>
+
+    <div class="card hidden" id="pluginsCard" style="margin-top:22px">
+      <h3 style="margin-bottom:6px">Plugins</h3>
+      <p class="hint" style="margin-bottom:12px">Extra powers for your agent — the app adds them to your coding profile.</p>
+      <div id="plugList"></div>
+      <div class="mrow2" style="margin-bottom:0">
+        <input id="plugIn" placeholder="plugin id (e.g. superpowers@git+https://github.com/obra/superpowers.git)">
+        <button class="btn primary small" id="plugAdd" style="flex:none">Add</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="buildPanel" style="margin-top:22px">
+      <h3 style="margin-bottom:12px">Build my config</h3>
+      <div class="term" id="termOut"></div>
+      <div class="mrow">
+        <button class="btn ghost" id="bldClose">Close</button>
+        <button class="btn flame" id="bldRun">🔥 Build my config</button>
+      </div>
+    </div>
+
+    <div class="adv" id="advPanel">
+      <div class="card">
+        <h3 style="margin-bottom:10px">Advanced</h3>
+        <div class="hint" id="advScripts" style="margin-bottom:12px"></div>
+        <div class="hint" style="margin-bottom:8px">Live theme (from rule.md):</div>
+        <pre id="advTheme"></pre>
+        <div class="hint" style="margin-top:12px">Your providers live in your agent's config (providers\ folder) — the app writes them there, backup-first. Model files are yours; the app never touches them.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <button id="advToggle">Advanced</button>
+  </footer>
+</div>
+
+<!-- ============ PROVIDER MODAL ============ -->
+<div class="overlay" id="modal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3 id="modalTitle">Add a provider</h3>
+    <div class="field">
+      <label>Preset</label>
+      <select id="fPreset">
+        <option value="OmniRoute">OmniRoute</option>
+        <option value="LiteLLM">LiteLLM</option>
+        <option value="CLI Proxy">CLI Proxy</option>
+        <option value="Custom">Custom</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>SDK type <span class="hint">(how your server talks — pick what it is)</span></label>
+      <select id="fSdk"></select>
+      <input id="fSdkCustom" class="hidden" style="margin-top:8px" placeholder="exact npm package name (e.g. @ai-sdk/github)">
+    </div>
+    <div class="field">
+      <label>Name</label>
+      <input id="fName" placeholder="e.g. OmniRoute">
+      <div class="errline" id="eName"></div>
+    </div>
+    <div class="field">
+      <label>Base URL</label>
+      <input id="fUrl" placeholder="http://localhost:PORT/v1">
+      <div class="errline" id="eUrl"></div>
+    </div>
+    <div class="field">
+      <label>API key <span class="hint">(leave empty to keep the current one)</span></label>
+      <div class="kwrap">
+        <input id="fKey" type="password" placeholder="sk-…">
+        <button class="eye" id="fEye" aria-label="Show or hide key">👁</button>
+      </div>
+      <div class="errline" id="eKey"></div>
+    </div>
+    <div class="field">
+      <label>Models <span class="hint">(add at least one or the build skips this provider)</span></label>
+      <div id="mRows"></div>
+      <button class="btn small" id="mAdd" type="button">+ Add model</button>
+    </div>
+    <div class="mrow" style="justify-content:flex-start">
+      <button class="btn" id="fTest">Test connection</button>
+      <div class="testline" id="fTestRes"></div>
+    </div>
+    <div class="mrow">
+      <button class="btn ghost" id="fCancel">Cancel</button>
+      <button class="btn primary" id="fSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM ============ -->
+<div class="overlay confirm" id="confirm">
+  <div class="modal confirm">
+    <h3 id="confTitle">Are you sure?</h3>
+    <p id="confMsg">This will remove the provider.</p>
+    <div class="mrow">
+      <button class="btn ghost" id="confNo">Cancel</button>
+      <button class="btn danger" id="confYes">Yes, delete it</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+"use strict";
+const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const Utils = (() => {
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; };
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const friendly = (err, fallback) => {
+    let msg = fallback;
+    try { const d = JSON.parse(err && err.message ? err.message : ""); msg = d.detail || d.error || (d.message && d.message) || fallback; } catch (e) {}
+    if (typeof msg === "string") return msg;
+    if (msg && msg.detail) return String(msg.detail);
+    return fallback;
+  };
+  const setLoading = (btn, on) => btn.classList.toggle("loading", on);
+  const animate = opts => { if (!reduced && window.anime) return anime(opts); opts.targets && opts.targets.style && (opts.targets.style.opacity = 1); };
+  return { $, $$, el, esc, friendly, setLoading, animate };
+})();
+
+const Api = (() => {
+  const request = async (path, opts) => {
+    const res = await fetch(path, opts && opts.method ? opts : { method: "GET", headers: { "Content-Type": "application/json" }, ...opts });
+    const text = await res.text();
+    let data; try { data = text ? JSON.parse(text) : {}; } catch (e) { data = {}; }
+    if (!res.ok) {
+      const detail = data.detail || data.error || data.message;
+      throw new Error(JSON.stringify({ detail: typeof detail === "string" ? detail : (detail && detail.message) || "Something went wrong. Try again." }));
+    }
+    return data;
+  };
+  const body = b => ({ method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) });
+  return {
+    status: () => request("/api/status"),
+    discover: b => request("/api/discover", body(b || {})),
+    scan: b => request("/api/scan", body(b)),
+    scaffold: b => request("/api/scaffold", body(b)),
+    listProviders: () => request("/api/providers"),
+    createProvider: b => request("/api/providers", body(b)),
+    updateProvider: (id, b) => request("/api/providers/" + encodeURIComponent(id), { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) }),
+    deleteProvider: id => request("/api/providers/" + encodeURIComponent(id), { method: "DELETE" }),
+    test: b => request("/api/test", body(b)),
+    switchTo: b => request("/api/switch", body(b)),
+    build: b => request("/api/build", body(b || { profile: "coding" })),
+    rules: () => request("/api/rules"),
+    listPlugins: () => request("/api/plugins"),
+    addPlugin: b => request("/api/plugins", body(b)),
+    removePlugin: b => request("/api/plugins", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) })
+  };
+})();
+
+const Toast = (() => {
+  const show = (msg, type) => {
+    const box = Utils.$("#toasts");
+    const t = Utils.el("div", "toast " + (type || "info"), "");
+    const d = Utils.el("span", "tdot", "");
+    const s = Utils.el("span", "", Utils.esc(msg));
+    t.appendChild(d); t.appendChild(s); box.appendChild(t);
+    if (reduced) { t.style.opacity = 1; t.style.transform = "none"; setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.remove(), 300); }, 3200); return; }
+    anime({ targets: t, opacity: [0, 1], translateX: [60, 0], duration: 380, easing: "easeOutCubic" });
+    setTimeout(() => anime({ targets: t, opacity: 0, translateX: 40, duration: 320, easing: "easeInCubic", complete: () => t.remove() }), 3400);
+  };
+  return { ok: m => show(m, "ok"), err: m => show(m, "err"), info: m => show(m, "info") };
+})();
+
+const Overlay = (() => {
+  const modal = Utils.$("#modal"), confirm = Utils.$("#confirm");
+  const open = (el2, focusSel) => { el2.classList.add("show"); el2.setAttribute("aria-hidden", "false"); const f = focusSel && el2.querySelector(focusSel); if (f) setTimeout(() => f.focus(), 60); };
+  const close = el2 => { el2.classList.remove("show"); el2.setAttribute("aria-hidden", "true"); };
+  let confCb = null;
+  const ask = (title, msg, cb) => { Utils.$("#confTitle").textContent = title; Utils.$("#confMsg").textContent = msg; confCb = cb; open(confirm); };
+  Utils.$("#confNo").onclick = () => close(confirm);
+  Utils.$("#confYes").onclick = () => { close(confirm); const cb = confCb; confCb = null; cb && cb(); };
+  document.addEventListener("keydown", e => { if (e.key === "Escape") { close(modal); close(confirm); } });
+  [modal, confirm].forEach(ov => ov.addEventListener("click", e => { if (e.target === ov) close(ov); }));
+  return { modal, confirm, open, close, ask };
+})();
+
+const Store = { status: null, wizard: { agents: [], chosen: null, scan: null, generated: [] }, providers: [], activeProvider: null, provStatus: {} };
+
+const UI = (() => {
+  const dotCls = id => (Store.provStatus[id] === "ok" ? "ok" : Store.provStatus[id] === "fail" ? "fail" : Store.provStatus[id] === "testing" ? "testing" : "");
+  const card = p => {
+    const c = Utils.el("div", "card pcard" + (p.id === Store.activeProvider ? " active" : ""), "");
+    c.dataset.id = p.id;
+    c.innerHTML =
+      '<div class="prow"><span class="dot ' + dotCls(p.id) + '"></span><span class="pname">' + Utils.esc(p.name) + "</span></div>" +
+      '<div class="purl">' + Utils.esc(p.baseUrl) + "</div>" +
+      '<div class="pacts">' +
+      (p.id === Store.activeProvider
+        ? '<button class="btn small" disabled>✓ Active</button>'
+        : '<button class="btn small primary act-switch">Switch to this</button>') +
+      '<button class="btn small act-test">Test</button>' +
+      '<button class="btn small ico act-edit" title="Edit">✎</button>' +
+      '<button class="btn small ico act-del" title="Delete">🗑</button>' +
+      "</div>";
+    c.querySelector(".act-switch") && (c.querySelector(".act-switch").onclick = () => Providers.switchTo(p));
+    c.querySelector(".act-test").onclick = () => Providers.test(p);
+    c.querySelector(".act-edit").onclick = () => Providers.edit(p);
+    c.querySelector(".act-del").onclick = () => Providers.del(p);
+    return c;
+  };
+  const hero = () => {
+    const h = Utils.$("#dashHero");
+    const p = Store.providers.find(x => x.id === Store.activeProvider);
+    if (!p) {
+      h.innerHTML = '<div class="hrow"><span class="badge off">No active provider</span></div>' +
+        "<h2>Nothing is switched on yet</h2><p class='hint'>Add a provider and click “Switch to this” — then your AI tool can use it.</p>";
+      return;
+    }
+    h.innerHTML =
+      '<div class="hrow"><span class="badge">🔥 Active</span><span class="hint">' + Utils.esc(p.name) + " is on fire right now</span></div>" +
+      "<h2>" + Utils.esc(p.name) + "</h2>" +
+      '<div class="purl">' + Utils.esc(p.baseUrl) + "</div>" +
+      '<div class="hint">Your tool talks to <code>127.0.0.1:9090</code> and this provider answers. Switching is one click on the cards below.</div>';
+  };
+  const stagger = (els2) => { els2.forEach((e, i) => e.classList.add("show")); if (reduced) return; anime({ targets: els2, translateY: [26, 0], opacity: [0, 1], duration: 460, delay: anime.stagger(90), easing: "easeOutCubic" }); };
+  return { card, hero, stagger };
+})();
+
+const Providers = (() => {
+  const load = async () => {
+    try {
+      const data = await Api.listProviders();
+      Store.providers = data.providers || [];
+      Store.activeProvider = data.activeProvider || null;
+      render();
+    } catch (e) { Toast.err(Utils.friendly(e, "Couldn't load your providers.")); }
+  };
+  const render = () => {
+    UI.hero();
+    const grid = Utils.$("#provGrid");
+    grid.innerHTML = "";
+    Store.providers.forEach(p => grid.appendChild(UI.card(p)));
+    UI.stagger(Utils.$$(".pcard", grid));
+    Utils.$("#emptyState").classList.toggle("hidden", Store.providers.length > 0);
+    Utils.$("#btnAdd").style.display = "";
+    Utils.$("#btnBuild").style.display = "";
+  };
+  const switchTo = async p => {
+    try {
+      await Api.switchTo({ id: p.id });
+      Toast.ok("Switched to " + p.name);
+      await load();
+      const c = Utils.$(".pcard.active");
+      if (c && !reduced) anime({ targets: c, scale: [0.96, 1], boxShadow: ["0 0 0 rgba(255,151,2,0)", "0 0 26px rgba(255,120,10,.2)"], duration: 500, easing: "easeOutCubic" });
+    } catch (e) { Toast.err(Utils.friendly(e, "Couldn't switch.")); }
+  };
+  const test = async p => {
+    Store.provStatus[p.id] = "testing";
+    const c = Utils.$('.pcard[data-id="' + p.id + '"]'); if (c) c.querySelector(".dot").className = "dot testing";
+    try {
+      const r = await Api.test({ id: p.id });
+      Store.provStatus[p.id] = r.ok ? "ok" : "fail";
+      const d = Utils.$('.pcard[data-id="' + p.id + '"]'); if (d) d.querySelector(".dot").className = "dot " + (r.ok ? "ok" : "fail");
+      if (r.ok) Toast.ok(r.message); else Toast.err(r.message);
+    } catch (e) { Store.provStatus[p.id] = "fail"; Toast.err(Utils.friendly(e, "Test failed.")); }
+  };
+  const edit = p => { Store.editingId = p.id; fillForm(p); Overlay.open(Overlay.modal, "#fName"); };
+  const del = p => Overlay.ask("Delete " + p.name + "?", "This removes its provider file from your agent's config. A backup is kept first.", async () => {
+    try { await Api.deleteProvider(p.id); Toast.ok(p.name + " deleted."); await load(); }
+    catch (e) { Toast.err(Utils.friendly(e, "Couldn't delete.")); }
+  });
+  const PRESETS = { "OmniRoute": "http://localhost:20128/v1", "LiteLLM": "http://localhost:4000/v1", "CLI Proxy": "http://localhost:PORT/v1", "Custom": "" };
+  const SDK_OPTIONS = [
+    { label: "OpenAI-compatible (most servers)", npm: "@ai-sdk/openai-compatible" },
+    { label: "OpenAI", npm: "@ai-sdk/openai" },
+    { label: "OpenRouter", npm: "@openrouter/ai-sdk-provider" },
+    { label: "Anthropic (Claude)", npm: "@ai-sdk/anthropic" },
+    { label: "Google (Gemini)", npm: "@ai-sdk/google" },
+    { label: "Mistral", npm: "@ai-sdk/mistral" },
+    { label: "xAI (Grok)", npm: "@ai-sdk/xai" },
+    { label: "DeepSeek", npm: "@ai-sdk/deepseek" },
+    { label: "Groq", npm: "@ai-sdk/groq" },
+    { label: "Perplexity", npm: "@ai-sdk/perplexity" },
+    { label: "Together AI", npm: "@ai-sdk/togetherai" },
+    { label: "Cerebras", npm: "@ai-sdk/cerebras" },
+    { label: "Azure OpenAI", npm: "@ai-sdk/azure" },
+    { label: "Amazon Bedrock", npm: "@ai-sdk/amazon-bedrock" },
+    { label: "Cohere", npm: "@ai-sdk/cohere" },
+    { label: "Other… (type the package)", npm: "" }
+  ];
+  const sdkSelect = Utils.$("#fSdk");
+  SDK_OPTIONS.forEach(o => {
+    const opt = Utils.el("option", "", o.label); opt.value = o.npm; sdkSelect.appendChild(opt);
+  });
+  const setSdk = npm => {
+    const found = SDK_OPTIONS.some(o => o.npm === npm);
+    if (found) { sdkSelect.value = npm; Utils.$("#fSdkCustom").classList.add("hidden"); }
+    else { sdkSelect.value = ""; Utils.$("#fSdkCustom").classList.remove("hidden"); Utils.$("#fSdkCustom").value = npm; }
+  };
+  const sdkValue = () => sdkSelect.value || Utils.$("#fSdkCustom").value.trim();
+  sdkSelect.onchange = () => Utils.$("#fSdkCustom").classList.toggle("hidden", !!sdkSelect.value);
+  const THINK_LEVELS = ["default", "minimal", "high", "max"];
+  let mRows = [];
+  const renderModelRows = () => {
+    const wrap = Utils.$("#mRows");
+    wrap.innerHTML = "";
+    mRows.forEach((row, i) => {
+      const r = Utils.el("div", "mrow2", "");
+      const idIn = Utils.el("input", ""); idIn.value = row.model; idIn.placeholder = "model id (e.g. opencode-zen/deepseek-v4-flash-free)";
+      idIn.oninput = () => row.model = idIn.value.trim();
+      const nameIn = Utils.el("input", ""); nameIn.value = row.name; nameIn.placeholder = "display name (optional)";
+      nameIn.oninput = () => row.name = nameIn.value.trim();
+      const chips = Utils.el("div", "chips", "");
+      THINK_LEVELS.forEach(lv => {
+        const c = Utils.el("button", "chip" + (row.thinking.indexOf(lv) >= 0 ? " on" : ""), lv);
+        c.type = "button";
+        c.onclick = () => {
+          const idx = row.thinking.indexOf(lv);
+          if (idx >= 0) row.thinking.splice(idx, 1); else row.thinking.push(lv);
+          c.classList.toggle("on");
+        };
+        chips.appendChild(c);
+      });
+      const rm = Utils.el("button", "rm", "✕"); rm.type = "button";
+      rm.onclick = () => { mRows.splice(i, 1); renderModelRows(); };
+      r.appendChild(idIn); r.appendChild(nameIn); r.appendChild(chips); r.appendChild(rm);
+      wrap.appendChild(r);
+    });
+  };
+  const setModelRows = list => {
+    mRows = (list || []).map(m => ({ model: m.model || "", name: m.name || "", thinking: (m.thinking || []).slice() }));
+    if (!mRows.length) mRows.push({ model: "", name: "", thinking: [] });
+    renderModelRows();
+  };
+  const modelRowsPayload = () => mRows.filter(r => r.model).map(r => ({ model: r.model, name: r.name, thinking: r.thinking.slice().sort() }));
+  const fillForm = p => {
+    Utils.$("#modalTitle").textContent = "Edit provider";
+    Utils.$("#fName").value = p.name;
+    Utils.$("#fUrl").value = p.baseUrl;
+    Utils.$("#fKey").value = "";
+    Utils.$("#eName").textContent = Utils.$("#eUrl").textContent = Utils.$("#eKey").textContent = "";
+    Utils.$("#fTestRes").textContent = ""; Utils.$("#fTestRes").className = "testline";
+    setSdk(p.npm || "@ai-sdk/openai-compatible");
+    setModelRows(p.models);
+  };
+  const openAdd = () => {
+    Store.editingId = null;
+    Utils.$("#modalTitle").textContent = "Add a provider";
+    Utils.$("#fName").value = ""; Utils.$("#fUrl").value = ""; Utils.$("#fKey").value = "";
+    Utils.$("#eName").textContent = Utils.$("#eUrl").textContent = Utils.$("#eKey").textContent = "";
+    Utils.$("#fTestRes").textContent = ""; Utils.$("#fTestRes").className = "testline";
+    setSdk("@ai-sdk/openai-compatible");
+    setModelRows([]);
+    Overlay.open(Overlay.modal, "#fName");
+  };
+  const save = async () => {
+    const name = Utils.$("#fName").value.trim();
+    const url = Utils.$("#fUrl").value.trim();
+    const key = Utils.$("#fKey").value.trim();
+    Utils.$("#eName").textContent = name ? "" : "Give your provider a name.";
+    Utils.$("#eUrl").textContent = url ? "" : "The address can't be empty.";
+    if (!name || !url) return;
+    const models = modelRowsPayload();
+    const npm = sdkValue();
+    try {
+      if (Store.editingId) {
+        const b = { name, baseUrl: url, models, npm };
+        if (key) b.apiKey = key;
+        await Api.updateProvider(Store.editingId, b);
+        Toast.ok("Saved.");
+      } else {
+        await Api.createProvider({ name, baseUrl: url, apiKey: key, models, npm });
+        Toast.ok(name + " added ✓ — now active");
+      }
+      Overlay.close(Overlay.modal);
+      await load();
+    } catch (e) { Toast.err(Utils.friendly(e, "Couldn't save the provider.")); }
+  };
+  const testModal = async () => {
+    const name = Utils.$("#fName").value.trim();
+    const url = Utils.$("#fUrl").value.trim();
+    const key = Utils.$("#fKey").value.trim();
+    const line = Utils.$("#fTestRes");
+    Utils.$("#eUrl").textContent = url ? "" : "The address can't be empty.";
+    if (!url) return;
+    line.className = "testline testing"; line.innerHTML = "<span class='spin' style='display:inline-block'></span> Testing…";
+    const btn = Utils.$("#fTest"); Utils.setLoading(btn, true);
+    try {
+      const body = Store.editingId && !key ? { id: Store.editingId } : { baseUrl: url, apiKey: key };
+      const r = await Api.test(body);
+      line.className = "testline " + (r.ok ? "ok" : "fail");
+      line.textContent = r.message;
+      if (r.ok) Toast.ok("Connected ✓");
+    } catch (e) { line.className = "testline fail"; line.textContent = Utils.friendly(e, "Test failed."); }
+    finally { Utils.setLoading(btn, false); }
+  };
+  const addModelRow = () => { mRows.push({ model: "", name: "", thinking: [] }); renderModelRows(); };
+  return { load, render, switchTo, test, edit, del, openAdd, save, testModal, setModelRows, addModelRow };
+})();
+
+const Wizard = (() => {
+  let step = 1;
+  const steps = () => Utils.$$(".wstep");
+  const go = async n => {
+    step = n;
+    steps().forEach(s => s.classList.toggle("active", +s.dataset.step === n));
+    Utils.$("#wizBar").style.width = ((n - 1) / 4 * 100) + "%";
+    if (!reduced) anime({ targets: ".wstep.active", translateX: [30, 0], opacity: [0, 1], duration: 420, easing: "easeOutCubic" });
+    if (n === 3) runScan();
+  };
+  const scanLine = (id, ok) => { const l = Utils.$(id); l.classList.add("on"); if (ok) { l.classList.add("ok"); l.querySelector(".ck").textContent = "✓"; } };
+  const runScan = async () => {
+    Utils.$$(".scanline").forEach(l => l.classList.remove("on", "ok"));
+    const agent = Store.wizard.chosen;
+    scanLine("#sl1", true);
+    try {
+      const r = await Api.scan({ agent: agent.name, dir: agent.dir });
+      Store.wizard.scan = r;
+      setTimeout(() => scanLine("#sl2", r.mcps.length > 0), 250);
+      setTimeout(() => scanLine("#sl3", r.plugins.length > 0), 500);
+      setTimeout(() => { scanLine("#sl4", r.profiles.length > 0); setTimeout(() => showFound(), 600); }, 750);
+    } catch (e) {
+      scanLine("#sl2", false); scanLine("#sl3", false); scanLine("#sl4", false);
+      Toast.err(Utils.friendly(e, "Couldn't scan that folder."));
+      setTimeout(() => go(2), 1200);
+    }
+  };
+  const showFound = () => {
+    const box = Utils.$("#wizAgents");
+    box.innerHTML = "";
+    Store.wizard.agents.forEach(a => {
+      const c = Utils.el("div", "apk" + (a.name === Store.wizard.chosen.name ? " sel" : ""), "");
+      c.innerHTML = "<b>" + Utils.esc(a.name) + "</b><span>" + Utils.esc(a.dir) + "</span>";
+      c.onclick = async () => {
+        box.querySelectorAll(".apk").forEach(x => x.classList.remove("sel"));
+        c.classList.add("sel");
+        Store.wizard.chosen = a;
+        Store.wizard.scan = await Api.scan({ agent: a.name, dir: a.dir });
+        renderStats();
+      };
+      box.appendChild(c);
+    });
+    renderStats();
+    go(4);
+  };
+  const renderStats = () => {
+    const s = Store.wizard.scan || { mcps: [], plugins: [], profiles: [] };
+    Utils.$("#wizStats").innerHTML =
+      '<div class="stat"><b>' + (s.mcps || []).length + "</b><span>MCP servers</span></div>" +
+      '<div class="stat"><b>' + (s.plugins || []).length + "</b><span>Plugins</span></div>" +
+      '<div class="stat"><b>' + (s.profiles || []).length + "</b><span>Profiles</span></div>";
+    Utils.$("#wizGenHint").textContent = "Agent: " + Store.wizard.chosen.name + " (" + Store.wizard.chosen.dir + ")";
+  };
+  const generate = async () => {
+    const btn = Utils.$("#wizGen"); Utils.setLoading(btn, true); Utils.$("#wizGen").disabled = true;
+    try {
+      const r = await Api.scaffold({ agent: Store.wizard.chosen.name, dir: Store.wizard.chosen.dir });
+      Store.wizard.generated = r.generated || [];
+      if (r.ok) { Toast.ok("Builder generated ✓"); go(5); }
+      else Toast.err(r.message || "Something went wrong while generating.");
+    } catch (e) { Toast.err(Utils.friendly(e, "Couldn't generate the builder.")); }
+    finally { Utils.setLoading(btn, false); Utils.$("#wizGen").disabled = false; }
+  };
+  return { go, generate };
+})();
+
+const BuildPanel = (() => {
+  const open = () => { Utils.$("#buildPanel").classList.remove("hidden"); Utils.$("#termOut").textContent = ""; Utils.$("#bldRun").disabled = false; };
+  const line = (text, cls) => { const t = Utils.$("#termOut"); const d = Utils.el("div", cls || "m", Utils.esc(text)); t.appendChild(d); t.scrollTop = t.scrollHeight; };
+  const classify = l => /pass|complete|success|generated|written|merged|loaded|\+\]|\[ok|✓/.test(l) ? "g" : /fail|error|invalid|missing|\bx\]|\[!|✗/.test(l) ? "r" : /warn|\bwarning\b/.test(l) ? "a" : /\[\.\]|\[~\]|\[i\]/.test(l) ? "c" : "m";
+  const run = async () => {
+    const btn = Utils.$("#bldRun"); Utils.setLoading(btn, true); btn.disabled = true;
+    line("Starting build…", "c");
+    try {
+      const r = await Api.build({ profile: "coding" });
+      (r.output || "").split(/\r?\n/).forEach(l => l && line(l, classify(l)));
+      const res = Utils.$("#bldRes");
+      if (r.ok) Toast.ok("Build succeeded ✓");
+      else Toast.err("The build ran into a problem. Look at the red lines above.");
+    } catch (e) { line(Utils.friendly(e, "Couldn't run the build."), "r"); Toast.err(Utils.friendly(e, "Couldn't run the build.")); }
+    finally { Utils.setLoading(btn, false); btn.disabled = false; }
+  };
+  return { open, run };
+})();
+
+const Plugins = (() => {
+  const load = async () => {
+    try {
+      const r = await Api.listPlugins();
+      render(r.plugins || []);
+    } catch (e) {}
+  };
+  const render = list => {
+    const card = Utils.$("#pluginsCard");
+    card.classList.remove("hidden");
+    const box = Utils.$("#plugList");
+    box.innerHTML = "";
+    if (!list.length) box.innerHTML = '<div class="hint">No plugins yet — add your first one.</div>';
+    list.forEach(p => {
+      const row = Utils.el("div", "mrow2", "");
+      const span = Utils.el("span", "", Utils.esc(p));
+      span.style.flex = "1"; span.style.fontSize = "13px"; span.style.wordBreak = "break-all";
+      const rm = Utils.el("button", "rm", "✕"); rm.type = "button";
+      rm.onclick = async () => {
+        try { const r = await Api.removePlugin(p); render(r.plugins || []); Toast.ok("Plugin removed."); }
+        catch (e) { Toast.err(Utils.friendly(e, "Couldn't remove it.")); }
+      };
+      row.appendChild(span); row.appendChild(rm);
+      box.appendChild(row);
+    });
+  };
+  const add = async () => {
+    const inp = Utils.$("#plugIn");
+    const val = inp.value.trim();
+    if (!val) { Toast.err("Type a plugin first."); return; }
+    try { const r = await Api.addPlugin(val); inp.value = ""; render(r.plugins || []); Toast.ok("Plugin added ✓"); }
+    catch (e) { Toast.err(Utils.friendly(e, "Couldn't add it.")); }
+  };
+  return { load, add };
+})();
+
+const Advanced = (() => {
+  const toggle = async () => {
+    const p = Utils.$("#advPanel");
+    p.classList.toggle("show");
+    if (!p.classList.contains("show")) return;
+    try {
+      const st = Store.status || await Api.status();
+      const scripts = [];
+      if (st.agent) ["build-" + st.agent + ".ps1", "test-" + st.agent + ".ps1", "scaffold-" + st.agent + ".ps1"].forEach(s => scripts.push(s));
+      if (Store.wizard.generated.length) scripts.push.apply(scripts, Store.wizard.generated);
+      Utils.$("#advScripts").textContent = "Builder scripts: " + (scripts.length ? scripts.join(", ") : "(run the setup wizard to generate them)");
+      const r = await Api.rules();
+      Utils.$("#advTheme").textContent = JSON.stringify(r.theme, null, 2);
+    } catch (e) { Utils.$("#advTheme").textContent = "Couldn't load. " + Utils.friendly(e, ""); }
+  };
+  return { toggle };
+})();
+
+const App = (() => {
+  const showScreen = name => {
+    Utils.$("#screenWizard").classList.toggle("active", name === "wizard");
+    Utils.$("#screenDash").classList.toggle("active", name === "dash");
+  };
+  const boot = async () => {
+    try {
+      Store.status = await Api.status();
+      if (Store.status.ready) { showScreen("dash"); await Providers.load(); Plugins.load(); }
+      else { showScreen("wizard"); }
+    } catch (e) {
+      showScreen("wizard");
+      Toast.err(Utils.friendly(e, "Couldn't reach the app. Is the window still open?"));
+    }
+    bind();
+    if (!reduced) anime({ targets: "header, .card", translateY: [18, 0], opacity: [0, 1], duration: 500, delay: anime.stagger(70), easing: "easeOutCubic" });
+  };
+  const bind = () => {
+    Utils.$("#wizGo").onclick = () => Wizard.go(2);
+    Utils.$("#wizAuto").onclick = async () => {
+      Utils.$("#wizAuto").style.opacity = ".6";
+      try { const r = await Api.discover({}); Store.wizard.agents = r.agents || []; Store.wizard.chosen = r.chosen; await Wizard.go(3); }
+      catch (e) { Toast.err(Utils.friendly(e, "Couldn't find any agents.")); Utils.$("#wizAuto").style.opacity = "1"; }
+    };
+    Utils.$("#wizUsePath").onclick = async () => {
+      const path = Utils.$("#wizPath").value.trim();
+      if (!path) { Toast.err("Type a folder path first."); return; }
+      Utils.setLoading(Utils.$("#wizUsePath"), true);
+      try { const r = await Api.discover({ path }); Store.wizard.agents = r.agents || []; Store.wizard.chosen = r.chosen; await Wizard.go(3); }
+      catch (e) { Toast.err(Utils.friendly(e, "Couldn't use that folder.")); }
+      finally { Utils.setLoading(Utils.$("#wizUsePath"), false); }
+    };
+    Utils.$("#wizGen").onclick = () => Wizard.generate();
+    Utils.$("#wizDone").onclick = () => { showScreen("dash"); Providers.openAdd(); };
+    Utils.$("#btnAdd").onclick = () => Providers.openAdd();
+    Utils.$("#emptyAdd").onclick = () => Providers.openAdd();
+    Utils.$("#btnBuild").onclick = () => BuildPanel.open();
+    Utils.$("#bldRun").onclick = () => BuildPanel.run();
+    Utils.$("#bldClose").onclick = () => Utils.$("#buildPanel").classList.add("hidden");
+    Utils.$("#advToggle").onclick = () => Advanced.toggle();
+    Utils.$("#fPreset").onchange = () => { Utils.$("#fUrl").value = Providers.PRESETS[Utils.$("#fPreset").value] || ""; };
+    Utils.$("#fEye").onclick = () => { const k = Utils.$("#fKey"); k.type = k.type === "password" ? "text" : "password"; };
+    Utils.$("#fTest").onclick = () => Providers.testModal();
+    Utils.$("#fSave").onclick = () => Providers.save();
+    Utils.$("#fCancel").onclick = () => Overlay.close(Overlay.modal);
+    Utils.$("#mAdd").onclick = () => Providers.addModelRow();
+    Utils.$("#plugAdd").onclick = () => Plugins.add();
+    Utils.$("#plugIn").addEventListener("keydown", e => { if (e.key === "Enter") Plugins.add(); });
+    Utils.$("#fKey").addEventListener("keydown", e => { if (e.key === "Enter") Providers.save(); });
+  };
+  return { boot };
+})();
+
+const Embers = (() => {
+  const c = Utils.$(".embers"), ctx = c.getContext("2d");
+  let parts = [], raf = null;
+  const resize = () => { c.width = innerWidth * (window.devicePixelRatio || 1); c.height = innerHeight * (window.devicePixelRatio || 1); ctx.setTransform(devicePixelRatio || 1, 0, 0, devicePixelRatio || 1, 0, 0); };
+  const spawn = () => ({ x: Math.random() * innerWidth, y: innerHeight + 10, r: Math.random() * 2.2 + .6, vy: Math.random() * .7 + .35, vx: (Math.random() - .5) * .3, hue: Math.random() < .75 ? 14 + Math.random() * 22 : 188 + Math.random() * 12, life: Math.random() * 60 + 40, a: Math.random() * .5 + .25 });
+  const tick = () => {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    parts.forEach(p => { p.y -= p.vy; p.x += p.vx + Math.sin(p.y / 40) * .18; p.life -= 1; });
+    parts = parts.filter(p => p.life > 0 && p.y > -20);
+    parts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = "hsla(" + p.hue + ", 95%, 60%, " + Math.max(0, Math.min(1, p.life / 60) * p.a) + ")";
+      ctx.shadowColor = "hsla(" + p.hue + ", 95%, 55%, .9)";
+      ctx.shadowBlur = 8;
+      ctx.fill();
+    });
+    if (parts.length < 46 && Math.random() < .4) parts.push(spawn());
+    raf = requestAnimationFrame(tick);
+  };
+  const start = () => {
+    if (reduced) return;
+    resize();
+    addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", () => { if (document.hidden) { cancelAnimationFrame(raf); raf = null; } else if (!raf) raf = requestAnimationFrame(tick); });
+    raf = requestAnimationFrame(tick);
+  };
+  return { start };
+})();
+
+document.addEventListener("DOMContentLoaded", () => { Embers.start(); App.boot(); });
+</script>
+</body>
+</html>

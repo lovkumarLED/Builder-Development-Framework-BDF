@@ -1,0 +1,6 @@
+env/
+__pycache__/
+*.pyc
+providers.json
+providers.backup.json
+state.json

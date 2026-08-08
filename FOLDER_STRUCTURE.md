@@ -120,6 +120,14 @@ BUILDER_SPEC.md
 
 CONTRIBUTING_FOR_AI.md
 
+DEVELOPER_GUIDE.md
+
+PROVIDER_DEVELOPMENT_GUIDE.md
+
+PROFILE_CREATION_GUIDE.md
+
+BUILDER_EXTENSION_GUIDE.md
+
 TESTING.md
 
 TROUBLESHOOTING.md
@@ -135,6 +143,8 @@ PROJECT_STATE.md
 release_registry.json
 
 ADAPTER.md
+
+app/
 
 AI/
 
@@ -217,11 +227,33 @@ Includes the build-continuation rule:
 AI/CONTINUE_PROJECT_BUILD.md
 ```
 
+- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package, incl. `agentstore.py` — reads/writes the agent's BDF provider files), `gui.html` (frontend), `start.bat` (double-click launcher), `env/` (private venv, auto-created), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage).
+
 ## PROJECT_STATE.md
 
 Contains the living state snapshot of the repository.
 
 Regenerated after every major refactor.
+
+## DEVELOPER_GUIDE.md
+
+How to work on the project as a human developer: read order, workflow,
+verification, common tasks.
+
+## PROVIDER_DEVELOPMENT_GUIDE.md
+
+How to create user-owned provider definitions (`providers/<id>.json`) and
+models, including the No-Secrets `{env:VAR}` policy.
+
+## PROFILE_CREATION_GUIDE.md
+
+How to create and edit profiles (`coding`, `experimental`, `minimal`, custom),
+the file contract, and profile selection.
+
+## BUILDER_EXTENSION_GUIDE.md
+
+How to extend the builder: pipeline stages, adding features, CLI flags, merge
+stages, and the verification checklist.
 
 ## CURRENT_RELEASE.md
 
@@ -939,6 +971,6 @@ Future project ideas are documented exclusively in `ROADMAP.md`.
 
 ---
 
-**Document Version:** 1.2
+**Document Version:** 1.3
 
 **Status:** Current Project Structure
