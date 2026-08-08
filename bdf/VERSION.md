@@ -19,7 +19,7 @@ Every change to the framework must be recorded here.
 Version
 
 ```
-2.2.1
+2.2.7
 ```
 
 Status
@@ -34,9 +34,9 @@ Active
 
 | Item | Value |
 |------|-------|
-| Framework Version | 2.2.1 |
+| Framework Version | 2.2.7 |
 | Supported Builder Versions | V2.7, V2.5, V2.3, V2.1 |
-| Compatible Projects | OpenCode Configuration Manager documentation |
+| Compatible Projects | OpenCode Configuration Manager documentation, KiloCode V1 adapter, V3 universal scaffold |
 | Last Updated | 2026-08-06 |
 | Breaking Changes | None |
 | Migration Required | No |
@@ -117,6 +117,268 @@ Example
 
 # Change History
 
+## Version 2.2.7
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Current
+```
+
+Summary
+
+```
+README.md rebuilt as the project entry point (badges, mermaid architecture
+diagrams, quick start, user-run vs system-run, config organization rules,
+no-secrets rule, testing table, roadmap summary, full docs map). Template
+mirrored with the new sections.
+```
+
+Changed
+
+- `templates/README.template.md` — new sections: User-Run vs System-Run, How Configuration Is Organized (rules incl. No-Secrets), Testing, Roadmap; Source of Truth extended.
+- `templates/README.md` — +1 placeholder row (`{{BUILDER_SCRIPT_ALT}}`).
+- Reference `README.md` — rebuilt entry point (version 2.0).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.6
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Previous
+```
+
+Summary
+
+```
+ROADMAP phase completion markers: every completed phase (1-7, 9, 10, 10.5, 10.6,
+11 resolved, 12) now carries a ✅ in its heading and status; Phase 13 carries 🔄;
+a Phase Completion Summary table was added (12 of 13 complete). Template synced.
+```
+
+Changed
+
+- `templates/ROADMAP.template.md` — all phase headings + statuses synced to the reference (Phases 2-7 Completed, ✅/🔄 markers, summary table).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.5
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Previous
+```
+
+Summary
+
+```
+No-Secrets Rule codified (ULTIMATE, user ruling, corrected session 28c): the
+SYSTEM's own artifacts (scripts, templates, docs, examples) NEVER contain literal
+API keys - only {env:VAR} placeholders. User-owned files (main config, profiles,
+providers) may contain literal keys (user protects them); the system copies user
+content verbatim (scan -> copy -> paste), so generated output reflects the user's
+source files, keys included.
+```
+
+Changed
+
+- `templates/BUILDER_SPEC.template.md` — added "No-Secrets Rule (ULTIMATE)" section to the Scaffold contract (system artifacts never contain keys; user files may; copy verbatim).
+- `BUILDER_SPEC_KILO_ADAPTER.md` — same No-Secrets section (kilo reality).
+- Reference `BUILDER_SPEC.md` — P1 API key policy rewritten as two-world rule: user files may hold keys (user protects), system artifacts never do; system copies verbatim.
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.4
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Previous
+```
+
+Summary
+
+```
+Scaffold contract finalized (V3 universal, user ruling): the framework creates the
+providers/ folder (like the profile folders) but NEVER writes provider/model JSON
+files inside it (100% user-owned); ONE job = scan the agent's OWN main JSON, split
+mcp/plugin sections, seed profiles (coding main + experimental + minimal, three files
+each); mcp/plugins user-owned after creation; settings.json = schema + activeProviders
+only.
+```
+
+Changed
+
+- `templates/BUILDER_SPEC.template.md` — Contract rewritten (own-main-JSON scan, never providers/models, empty experimental/minimal shells, settings minimal).
+- `BUILDER_SPEC_KILO_ADAPTER.md` — same contract sync (kilo reality).
+- Reference `BUILDER_SPEC.md` — same universal-scaffold contract section.
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.3
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Previous
+```
+
+Summary
+
+```
+Full-system check (session 28): template ↔ reference sync fixes — ROADMAP
+Destination section, PROJECT_STATE contents rows, JSON_SCHEMAS plugin array type,
+ARCHITECTURE status section, TESTING three-harness coverage, CHANGELOG date typo,
+placeholder table +7 rows (63/63 audit clean).
+```
+
+Changed
+
+- `templates/ROADMAP.template.md` — Destination block + completed phase statuses.
+- `templates/PROJECT_STATE.template.md` — bdf contents rows + CURRENT_RELEASE/release_registry doc-structure rows.
+- `templates/JSON_SCHEMAS.template.md` — plugins.json `plugin` type corrected to array of strings.
+- `templates/ARCHITECTURE.template.md` — Implemented list + schema validation; Not-Implemented item corrected.
+- `templates/TESTING.template.md` — three-harness coverage (17/13/31) + new tokens `{{V25_TEST_HARNESS}}`, `{{V27_TEST_HARNESS}}`.
+- `templates/CHANGELOG.template.md` — `YYY-MM-DD` → `YYYY-MM-DD`.
+- `templates/README.md` — example values refreshed (2.5.0/V2.7, 31/31); +4 placeholder rows (`{{DESTINATION_NAME}}`, `{{DESTINATION_DESCRIPTION}}`, `{{DESTINATION_TAG}}`, `{{FIRST_VALIDATION_PROJECT}}`, `{{CURRENT_BUILDER_NAME}}`, `{{V25_TEST_HARNESS}}`, `{{V27_TEST_HARNESS}}`).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.2
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Previous
+```
+Summary
+
+```
+Universal scaffold documentation added to the builder spec + template:
+Discovery (V3 rule), Contract, refresh-with-backup policy, Non-JSON guard,
+extensible agent registry; Claude Code removed as a supported target
+(planning/DECISIONS.md).
+```
+
+Changed
+
+- `templates/BUILDER_SPEC.template.md` — "Scaffold Mode (Universal, V3)" section (Discovery / Contract / Non-JSON Guard / Agent Registry).
+- `templates/README.md` — placeholder table +2 rows (`{{UNIVERSAL_SCRIPT}}`, `{{AGENT_WRAPPER_SCRIPT}}`).
+- Reference `BUILDER_SPEC.md` — same universal-scaffold section added (opencode reality).
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
 ## Version 2.2.1
 
 Date
@@ -128,9 +390,8 @@ Date
 Status
 
 ```
-Current
+Previous
 ```
-
 Summary
 
 ```
@@ -144,7 +405,7 @@ Changed
 - `templates/FOLDER_STRUCTURE.template.md` — Root Directory, schemas/, mcp.json, `<provider>-models.json`, target.json, provenance sidecar; obsolete file entries removed.
 - `templates/JSON_SCHEMAS.template.md` — mcp.json, per-provider models, target.json, builder-written files, schema table, validation subset.
 - `templates/CHANGELOG.template.md` — modern entry subsections (Highlights, New Features, Improvements, Bug Fixes, Testing Summary, Known Issues, Docs Updated).
-- `templates/ROADMAP.template.md` — Phases 9-13 incl. Framework Generalization, Active-Provider Selector, JSON Schema Validation, Claude Code/KiloCode builders, Destination BDF V3.
+- `templates/ROADMAP.template.md` — Phases 9-13 incl. Framework Generalization, Active-Provider Selector, JSON Schema Validation, KiloCode builder (Claude Code variant dropped 2026-08-08), Destination BDF V3.
 - `templates/TESTING.template.md` — V2.5 Active-Provider Selector and V2.7 JSON Schema Validation test groups.
 - `templates/AGENT.template.md`, `templates/PROJECT_STATE.template.md` — Build Continuation + Release Workflow sections.
 - `templates/README.template.md` — Documentation Architecture + Releases sections.
@@ -216,7 +477,7 @@ Date
 Status
 
 ```
-Current
+Previous
 ```
 
 Summary
@@ -433,7 +694,13 @@ No
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.2.1 | Current | Full template-to-reference sync (15 pairs, placeholder audit 54/54) |
+| 2.2.7 | Current | README rebuilt (badges, mermaid diagrams, quick start, rules); template mirrored |
+| 2.2.6 | Previous | ROADMAP phase completion markers (✅ on 12/13 phases) + summary table; template synced |
+| 2.2.5 | Previous | No-Secrets Rule (ULTIMATE): system artifacts never contain literal keys ({env:VAR} only); user files may hold keys; system copies verbatim |
+| 2.2.4 | Previous | V3 scaffold contract finalized: providers/ folder created, provider/model files user-owned, own-main-JSON scan, 3-profile seed (coding main), settings minimal |
+| 2.2.3 | Previous | Template↔reference sync round 2: ROADMAP destination, PROJECT_STATE rows, plugin array type, 3-harness coverage, placeholder audit 63/63 |
+| 2.2.2 | Previous | Universal scaffold (V3) registered in builder spec + template; Claude dropped as target |
+| 2.2.1 | Previous | Full template-to-reference sync (15 pairs, placeholder audit 54/54) |
 | 2.2.0 | Previous | Builder V2.7 (JSON Schema Validation) registered |
 | 2.1.1 | Previous | Template sync: ADAPTER template release fields |
 | 2.1.0 | Previous | BDF V2.5 framework generalization |
@@ -459,6 +726,6 @@ When the framework changes:
 
 ---
 
-**Document Version:** 1.1
+**Document Version:** 1.2
 
 **Status:** Active Framework Version

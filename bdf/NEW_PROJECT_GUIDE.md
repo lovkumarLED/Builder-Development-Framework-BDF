@@ -82,7 +82,7 @@ The entire project begins with research.
 
 Answer these questions about the target:
 
-- What is the software? (OpenCode, Claude Code, KiloCode, or another supported target)
+- What is the software? (OpenCode, KiloCode, or another same-architecture supported target)
 - Where does the software store its configuration?
 - What is the configuration file called?
 - What fields exist in that configuration?
@@ -90,30 +90,32 @@ Answer these questions about the target:
 - What is the configuration's JSON schema or format?
 - How does the software read the configuration at startup?
 
-### Example — Claude Code
+### Example — KiloCode
 
-Claude Code stores its configuration in:
-
-```
-claude.json
-```
-
-The file lives in the user configuration directory, for example:
+KiloCode stores its configuration in:
 
 ```
-Windows:   %USERPROFILE%\.claude.json  or  %APPDATA%\Claude\claude.json
-macOS:     ~/.claude.json  or  ~/Library/Application Support/Claude/claude.json
-Linux:     ~/.claude.json  or  ~/.config/Claude/claude.json
+kilo.jsonc
 ```
 
-Claude Code also reads project-adjacent files in specific locations, for example:
+The file lives in the configuration root directory, for example:
 
 ```
-.claude/       project-scoped settings and commands
-CLAUDE.md      project instructions
+Windows:   %USERPROFILE%\.config\kilo\kilo.jsonc
+macOS:     ~/.config/kilo/kilo.jsonc
+Linux:     ~/.config/kilo/kilo.jsonc
+```
+
+KiloCode also reads project-adjacent files in specific locations, for example:
+
+```
+kilo/        config root with schemas, providers, profiles
+AGENTS.md    project instructions
 ```
 
 The exact file name, location, and fields are the research output of this step.
+
+> Note: Claude Code was the original second-target example. It was dropped on 2026-08-08 — its config (`~/.claude.json`) is entropic and cannot support multiple providers (see `planning/DECISIONS.md`).
 
 ### Example — OpenCode
 
@@ -297,11 +299,11 @@ Before committing:
 
 ---
 
-# What Is claude.json?
+# What Is the Target Config File?
 
-The question "What is claude.json?" is a research question, not a framework question.
+The question "What is `kilo.jsonc`?" is a research question, not a framework question.
 
-`claude.json` is the configuration artifact of Claude Code, just as `opencode.json` is the
+`kilo.jsonc` is the configuration artifact of KiloCode, just as `opencode.json` is the
 configuration artifact of OpenCode.
 
 The framework does not define either file.
@@ -318,16 +320,17 @@ write the facts into ADAPTER.md (Step 2)
 build from the adapter (Steps 3-9)
 ```
 
-Where Claude stores config, what fields exist, and how they are shaped are project
+Where a target stores config, what fields exist, and how they are shaped are project
 knowledge.
 
-That knowledge belongs in the Claude Code project's `ADAPTER.md` — never in the framework.
+That knowledge belongs in that project's `ADAPTER.md` — never in the framework.
 
 The same rule applies to any target:
 
 - OpenCode knowledge → the OpenCode adapter.
-- Claude Code knowledge → the Claude Code adapter.
 - KiloCode knowledge → the KiloCode adapter.
+
+(Claude Code is out of scope — dropped 2026-08-08, see `planning/DECISIONS.md`.)
 
 ---
 

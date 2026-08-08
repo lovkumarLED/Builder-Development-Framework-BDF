@@ -36,10 +36,10 @@ The framework must become capable of producing builders for multiple supported C
 The supported projects are:
 
 - OpenCode
-- Claude Code
 - KiloCode
+- Any other open-source coding agent with the same architecture (universal scaffold mode)
 
-No additional targets are planned until these three are fully supported.
+Claude Code is NOT a supported target (see DECISIONS.md — 2026-08-08).
 
 ---
 
@@ -110,25 +110,30 @@ No unnecessary redesigns after this point.
 
 ---
 
-# Phase 3 — Build Claude Builder V1
+# Phase 3 — Build KiloCode Builder V1
 
-This is the first proof that BDF is reusable.
+This is the first proof that BDF is reusable on a second project.
 
 IMPORTANT:
 
 Do NOT manually copy documentation.
 
-The Builder Development Framework itself should create the Claude Builder project.
+The Builder Development Framework itself should create the KiloCode Builder project.
+
+Note: Claude Code was originally planned as this second proof project. It was dropped on
+2026-08-08 — Claude Code config format (huge single `~/.claude.json`) is entropic,
+hard to maintain, and cannot support adding providers. KiloCode uses the same
+architecture as OpenCode, so V3 stays universal. Full decision: `planning/DECISIONS.md`.
 
 ---
 
-## Claude Builder Location
+## KiloCode Builder Location
 
-The Claude Builder should live alongside the real Claude configuration.
+The KiloCode Builder lives alongside the real KiloCode configuration.
 
 Example:
 
-C:\Users\<user>\.claude\
+C:\Users\<user>\.config\kilo\
 
 The framework should create all required builder folders inside this project.
 
@@ -143,30 +148,30 @@ backups/
 tests/
 adapter/
 
-alongside the existing Claude configuration files.
+alongside the existing KiloCode configuration files.
 
 ---
 
-## Claude Builder Responsibilities
+## KiloCode Builder Responsibilities
 
-Claude Builder V1 should support only the core configuration.
+KiloCode Builder V1 supports the core configuration plus the full KiloCode shape.
 
-Initial targets:
+Delivered (2026-08-07):
 
-- .claude.json
+- kilo.jsonc (main config)
 - settings.json
-
-Ignore advanced Claude features during V1.
-
-Plugins, hooks, skills, MCP extensions, and other advanced functionality can be added later.
+- profiles (multiple, per-profile mcp.json / plugins.json / <provider>-models.json)
+- schemas/ (JSON Schema validation, F1)
+- backup retention, provenance sidecar, -Doctor / -WhatIf
+- ~13 top-level kilo.jsonc sections modeled (skills, MCP, providers, plugins included)
 
 The objective is to prove that the framework works.
 
 ---
 
-## Claude Project Adapter
+## KiloCode Project Adapter
 
-Claude should be implemented entirely through a Project Adapter.
+KiloCode should be implemented entirely through a Project Adapter.
 
 The Builder itself should remain generic.
 
@@ -182,7 +187,7 @@ The adapter should define:
 
 # Phase 4 — Improve Framework
 
-After Claude Builder V1 is working:
+After KiloCode Builder V1 is working:
 
 Review the framework.
 
@@ -198,24 +203,30 @@ Update BDF accordingly.
 
 ---
 
-# Phase 5 — Build KiloCode Builder V1
+# Phase 5 — Universal Agent Support (V3 core)
 
-Repeat exactly the same process.
+The V3 core works for ANY open-source coding agent with a local JSON config
+(Aider, Goose, Codex-Cli, ...), not only OpenCode/KiloCode-architecture agents:
 
-Do not redesign the framework.
+- The scaffold discovers whatever open-source agents are installed; if none are
+  found it asks the user for the location of their coding agents.
+- The framework's ONE job per agent: scan the agent's OWN main JSON, split it
+  into mcp / plugin sections, seed `profiles/{coding,experimental,minimal}`.
+- The framework creates the `providers/` folder but NEVER writes provider or
+  model files inside it — providers and models are 100% user-owned.
+- Closed-source agents are never scanned or written.
 
-Only improve it where necessary.
+Claude Code (entropic `~/.claude.json`, one provider at a time, provider configs
+hard to maintain) does not fit this architecture and is NOT supported.
 
-KiloCode should become the third validation project.
-
----
+Universal scaffold compatibility is proven by real builders generated for OpenCode
+and KiloCode. Any open-source agent with a local JSON config is a candidate.
 
 # Phase 6 — Framework Stabilization
 
-After three successful builders exist:
+After two successful builders exist:
 
 - OpenCode
-- Claude Code
 - KiloCode
 
 Review every framework document.
@@ -240,13 +251,16 @@ The same framework can successfully generate and maintain:
 
 ✓ OpenCode Builder
 
-✓ Claude Builder
-
 ✓ KiloCode Builder
+
+✓ ANY open-source coding agent (scaffold mode — discovery, ask-for-location,
+  own-main-JSON seeding, never writes providers/models)
 
 without architectural redesign.
 
 Only Project Adapters should differ.
+
+Claude Code is permanently out of scope (entropic config design — see DECISIONS.md 2026-08-08).
 
 ---
 
@@ -272,21 +286,17 @@ OpenCode Adapter
 
 opencode.json
 
-Claude Adapter
-
-↓
-
-.claude.json
-
-↓
-
-settings.json
-
 Kilo Adapter
 
 ↓
 
-(kilo-specific outputs)
+kilo.jsonc
+
+Any-agent Adapter (scaffold)
+
+↓
+
+agent-specific outputs
 
 The Builder should never contain project-specific logic.
 

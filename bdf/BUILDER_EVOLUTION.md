@@ -10,7 +10,7 @@ This document describes how future builder versions are created.
 
 Builder evolution is predictable.
 
-Creating Builder V2.2 means updating the entire ecosystem, not only modifying the builder script.
+Creating the next builder version means updating the entire ecosystem, not only modifying the builder script.
 
 The user describes the requested improvements.
 
@@ -188,7 +188,15 @@ Builder V2.1
 
 ↓
 
-Builder V2.2
+Builder V2.3
+
+↓
+
+Builder V2.5
+
+↓
+
+Builder V2.7
 
 ↓
 
@@ -200,7 +208,7 @@ A new version is created from the current version, never from an older version.
 ```
 Builder V2 + Improvements = Builder V2.1
 
-Builder V2.1 + Improvements = Builder V2.2
+Builder V2.1 + Improvements = Builder V2.3
 ```
 
 ---

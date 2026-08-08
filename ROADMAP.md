@@ -45,7 +45,8 @@ Every phase below serves one destination:
 > **BDF V3 — the first stable public version of the Builder Development Framework.**
 
 V3 is complete when the same engineering framework can successfully create and maintain
-builders for **OpenCode**, **Claude Code**, and **KiloCode** without redesigning the framework.
+builders for **OpenCode**, **KiloCode**, and any open-source coding agent sharing their
+architecture, without redesigning the framework.
 
 Only Project Adapters should differ between supported projects.
 
@@ -54,12 +55,12 @@ The path is:
 ```
 Current (Builder V2.7 JSON Schema Validation) ✅
 ↓
-Claude Code Builder V1
+KiloCode Builder V1 ✅ (Kilo V1, harness 30/30)
 ↓
-KiloCode Builder V1
-↓
-BDF V3 (Builder Generator)
+BDF V3 (Universal Builder Generator) — in progress
 ```
+
+Claude Code is NOT on this path (entropic config, no provider support — DECISIONS.md 2026-08-08).
 
 Each step is built, tested, and validated before the next begins.
 
@@ -84,7 +85,7 @@ Builder V2.7 JSON Schema Validation
 Journey Position
 
 ```
-BDF V2.5 — Completed; next step: Claude Code Builder V1
+Step 3 Universal Agent Framework core — IN PROGRESS (~90%); BDF V2.5 ✅, V2.7 gate ✅, KiloCode V1 COMPLETE ✅; next: BUILDER_PHASES gates for the universal framework, then Step 4 / Step 5
 ```
 
 The project currently provides:
@@ -166,12 +167,12 @@ Completed work includes:
 
 ---
 
-## Phase 4 — Additional Providers
+## Phase 4 — Additional Providers ✅
 
 Status
 
 ```
-Planned
+Completed — dynamic provider loading (V2.2) + all-provider discovery (V2.5)
 ```
 
 Objectives
@@ -198,7 +199,7 @@ Goals
 
 ---
 
-## Phase 5 — Validation Framework
+## Phase 5 — Validation Framework ✅
 
 Status
 
@@ -229,7 +230,7 @@ Catch configuration errors before generation begins.
 
 ---
 
-## Phase 6 — Automated Testing
+## Phase 6 — Automated Testing ✅
 
 Status
 
@@ -256,7 +257,7 @@ Reduce manual testing effort.
 
 ---
 
-## Phase 7 — Builder Refactoring
+## Phase 7 — Builder Refactoring ✅
 
 Status
 
@@ -369,16 +370,17 @@ Not included
 
 Goal
 
-Make the framework reusable across OpenCode, Claude Code, and KiloCode without redesign.
+Make the framework reusable across OpenCode, KiloCode, and any same-architecture
+open-source coding agent without redesign.
 
 ---
 
-## Phase 10.5 — Active-Provider Selector Builder (V2.5 Builder)
+## Phase 10.5 — Active-Provider Selector Builder (V2.5 Builder) ✅
 
 Status
 
 ```
-Planned — first build of this feature set
+Completed — released as registry 2.4.0 (2026-08-05)
 ```
 
 Objective
@@ -404,12 +406,12 @@ registry 2.4.0
 
 ---
 
-## Phase 10.6 — JSON Schema Validation (schemas/)
+## Phase 10.6 — JSON Schema Validation (schemas/) ✅
 
 Status
 
 ```
-Planned — gate before Claude Code Builder V1
+Completed — gate before KiloCode Builder V1 (V2.7, F1-F7, harness 31/31)
 ```
 
 Objective
@@ -454,68 +456,51 @@ Generate opencode.json
 
 Required before
 
-Claude Code Builder V1 (Phase 11). Not built yet — record only.
+KiloCode Builder V1 (Phase 12 — COMPLETED 2026-08-07, harness 30/30).
+
+Note: Claude Code Builder V1 (Phase 11) is DROPPED — decision 2026-08-08,
+see `planning/DECISIONS.md`. Claude config (`~/.claude.json`) is entropic and does not
+support adding providers; it will never work with this framework.
 
 ---
 
-## Phase 11 — Claude Code Builder V1
+## Phase 11 — Claude Code Builder V1 — SUPERSEDED ✅
 
 Status
 
 ```
-Planned — after gates (Phases 10.5, 10.6)
+RESOLVED — DROPPED, replaced by KiloCode (Phase 12) + universal scaffold (Phase 13)
 ```
 
-Objective
-
-Use the generalized framework (V2.5) to build the first Claude Code builder.
-
-Do not redesign anything. Use the framework as-is.
-
-This is the first real validation of the framework against a second project.
-
-Discoveries made here (config format, provider system, validation differences) shape V3.
-
-Per-project work is limited to:
-
-```
-ADAPTER.md
-
-PROJECT_STATE.md
-
-README.md
-
-Folder Structure
-
-Schema docs
-```
-
-Everything else is reused from the framework.
+Decision: 2026-08-08. Claude Code config is a huge entropic `~/.claude.json` with no way
+to add providers (one provider at a time) — building a maintainable Claude builder from
+BDF is not feasible. Record kept for history.
 
 ---
 
-## Phase 12 — KiloCode Builder V1
+## Phase 12 — KiloCode Builder V1 ✅
 
 Status
 
 ```
-Planned
+COMPLETED 2026-08-07 — Kilo V1: build-kilo-v1.ps1, test-kilo-v1.ps1, scaffold-kilo-v1.ps1; harness 30/30 (KILO_ADAPTER + real ~/.config/kilo)
 ```
 
 Objective
 
 Use the same framework to build the KiloCode builder.
 
-Second real validation of the framework against a third project.
+Second real validation of the framework against a second project.
 
 ---
 
-## Phase 13 — BDF V3: Builder Generator
+## Phase 13 — BDF V3: Universal Builder Generator 🔄
 
 Status
 
 ```
-Destination
+IN PROGRESS — core built (session 24b) + scaffold contract finalized (session 28):
+scaffold-agent.ps1 universal, registry opencode/kilo/other, -Bootstrap generates per-agent builders
 ```
 
 Objective
@@ -529,7 +514,11 @@ Create New Builder Project
 
 ↓
 
-What software? (OpenCode / Claude Code / KiloCode)
+Discover installed open-source coding agents (OpenCode / Kilo / any same-architecture)
+
+↓
+
+Choose agent
 
 ↓
 
@@ -562,11 +551,48 @@ Done
 
 Definition of complete
 
-- The same framework creates and maintains builders for OpenCode, Claude Code, and KiloCode.
+- The same framework creates and maintains builders for OpenCode, KiloCode, and ANY
+  open-source coding agent (Aider, Goose, Codex-Cli, ...) — discovery finds whatever
+  open-source agents are installed; if none are found, the framework asks the user for
+  the location of their coding agents.
 - Only Project Adapters differ.
-- No framework redesign is required per project.
+- No framework redesign is required per project — main configs (JSON), profiles, MCP,
+  plugin-splitting, per-agent generated build/test/scaffold scripts.
+- The scaffold's ONE job for any agent: scan the agent's OWN main JSON, split it into
+  mcp / plugin sections, and seed the profiles — `coding` (always the main profile) +
+  `experimental` + `minimal`, each with `settings.json`, `mcp.json`, `plugins.json`.
+- The framework creates the `providers/` folder but NEVER writes provider or model
+  files inside it — providers and models are 100% user-owned. The framework never
+  copies another agent's config into a project; each agent's profiles are seeded
+  from its own main JSON.
+- Claude Code is NOT supported (DECISIONS.md 2026-08-08).
 
 V3 is the first stable public milestone — not the end of development.
+
+---
+
+# Phase Completion Summary
+
+| Phase | Status |
+|-------|--------|
+| Phase 1 — Foundation | ✅ Completed |
+| Phase 2 — Builder Improvements | ✅ Completed |
+| Phase 3 — Multiple Profiles | ✅ Completed |
+| Phase 4 — Additional Providers | ✅ Completed |
+| Phase 5 — Validation Framework | ✅ Completed |
+| Phase 6 — Automated Testing | ✅ Completed |
+| Phase 7 — Builder Refactoring | ✅ Completed |
+| Phase 8 — Documentation Expansion | ⬜ Planned |
+| Phase 9 — Release Manager V1 | ✅ Completed |
+| Phase 10 — BDF V2.5 Framework Generalization | ✅ Completed |
+| Phase 10.5 — Active-Provider Selector Builder | ✅ Completed |
+| Phase 10.6 — JSON Schema Validation | ✅ Completed |
+| Phase 11 — Claude Code Builder V1 | ✅ Resolved (dropped → KiloCode) |
+| Phase 12 — KiloCode Builder V1 | ✅ Completed |
+| Phase 13 — BDF V3 Universal Builder Generator | 🔄 In Progress |
+
+**12 of 13 phases complete. Remaining: Phase 8 (documentation expansion guides) and
+the final V3 release steps (Phase 13).**
 
 ---
 
@@ -581,8 +607,9 @@ The long-term objective is to build a configuration management system that is:
 - Easy for both humans and AI agents to maintain
 
 The framework's destination is BDF V3 — the first stable public version that generates
-builders for OpenCode, Claude Code, and KiloCode from a single reusable engineering
-framework. Future features should extend the existing architecture rather than replacing it.
+builders for OpenCode, KiloCode, and any same-architecture open-source coding agent from
+a single reusable engineering framework. Future features should extend the existing
+architecture rather than replacing it.
 
 ---
 

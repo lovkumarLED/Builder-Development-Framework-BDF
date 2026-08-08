@@ -99,10 +99,21 @@ docs/
 │   ├── BUILD_BLUEPRINT_FRAMEWORK.md
 │   ├── BUILD_BUILDER_V2.1.md
 │   ├── BUILD_BUILDER_V2.5.md
+│   ├── BUILD_BUILDER_V2.5_SELECTOR.md
+│   ├── BUILD_BUILDER_V2.7_JSON_SCHEMA_VALIDATION.md
+│   ├── BUILD_KILOCODE_V1.md
 │   ├── BUILD_RELEASE_MANAGER.md
+│   ├── CONTINUE_BUILDER_V2.7_ISSUES_PATCH.md
+│   ├── CONTINUE_BUILDER_V2.7_TASK9.md
+│   ├── CONTINUE_FULL_SYSTEM_CHECK_SESSION_26.md
+│   ├── CONTINUE_KILO_BUILD_STEP2.md
+│   ├── CONTINUE_KILO_BUILD_STEP3.md
 │   ├── CONTINUE_PROJECT_BUILD.md
 │   ├── CONTINUE_RELEASE_MANAGER.md
+│   ├── CONTINUE_V3_UNIVERSAL_FRAMEWORK.md
+│   ├── CONTINUE_V3_UNIVERSAL_FRAMEWORK_v2.md
 │   ├── DISTRIBUTE_SUBAGENTS.md
+│   ├── FULL_SYSTEM_CHECK.md
 │   ├── PLAN_RELEASE_MANAGER.md
 │   ├── START_TASK.md
 │   └── UPGRADE_BLUEPRINT_FRAMEWORK.md
@@ -110,6 +121,7 @@ docs/
 │   ├── BDF_ROAD_TO_V3.md
 │   ├── DECISIONS.md
 │   ├── FUTURE_IDEAS.md
+│   ├── NEXT_PHASE_IMPLEMENTATION_PLAN.md
 │   └── VERSION_STRATEGY.md
 ├── bdf/
 │   ├── AI_WORKFLOW.md
@@ -363,10 +375,20 @@ Profile-level provider models (`profiles/<profile>/<provider>-models.json`, V2.5
 Contains automation scripts.
 
 ```
+build-opencode-v2.7.ps1
+```
+
+The current builder (Builder V2.7, JSON Schema Validation): config sources validated
+against `schemas/*.schema.json` before builder validation (F1), pre-flight dependency
+check (F2), `-WhatIf` dry run (F3), backup retention (F4), provenance sidecar (F5),
+`-Doctor` diagnostics (F6), merge diff summary (F7), 9-stage pipeline, dynamic target
+artifact (P2) and env-key policy (P1).
+
+```
 build-opencode-v2.5.ps1
 ```
 
-The current builder (Builder V2.5, Active-Provider Selector): provider discovery, provider selection via prompt or `-Provider` argument, persisted `activeProviders`, profile-level `<provider>-models.json` precedence.
+The established builder (Builder V2.5, Active-Provider Selector): provider discovery, provider selection via prompt or `-Provider` argument, persisted `activeProviders`, profile-level `<provider>-models.json` precedence.
 
 ```
 build-opencode-v2.ps1
@@ -375,10 +397,23 @@ build-opencode-v2.ps1
 The established builder (Builder V2.1, evolved in place from V2.0), retained alongside V2.5.
 
 ```
+build-opencode.ps1
+```
+
+The legacy builder, retained for reference.
+
+```
+test-opencode-v2.7.ps1
+```
+
+The V2.7 test harness (31 tests), including schema validation, P1/P2 policy, and
+docs-spec sync tests.
+
+```
 test-opencode-v2.5.ps1
 ```
 
-The V2.5 test harness (12 tests), including the docs-spec sync test `Test-BuilderSpecCoversV25`.
+The V2.5 test harness (13 tests), including the docs-spec sync test `Test-BuilderSpecCoversV25`.
 
 ```
 test-opencode-v2.ps1
@@ -393,10 +428,32 @@ release-manager.ps1
 The release manager: generates all release documentation from `release_registry.json`.
 
 ```
-build-opencode.ps1
+scaffold-agent.ps1
 ```
 
-The legacy builder, retained for reference.
+The V3 UNIVERSAL core: open-source agent registry (opencode, kilo, claudecode — allowed
+name only, aider, goose, codex-cli), discovery, `-List`, `-Bootstrap` per-agent builder
+generation. ONE job: scan the agent's own main JSON, split mcp/plugin sections, seed
+`profiles/coding/mcp.json` + `plugins.json` (user-owned after creation), create
+`profiles/{coding,experimental,minimal}` with settings/mcp/plugins. Creates the
+`providers/` folder but NEVER writes provider/model files inside it (user-owned),
+never touches `.jsonc` without consent. Closed-source agents never touched.
+
+SYSTEM-RUN ONLY — the user never runs the scaffolds directly; they only run the
+builders (`build-opencode-v2.7.ps1` / `build-kilo-v1.ps1`).
+
+```
+scaffold-opencode.ps1
+```
+
+Wrapper delegating to the universal scaffold for OpenCode (moved). SYSTEM-RUN ONLY.
+
+```
+scaffold-kilo-v1.ps1
+```
+
+KiloCode V1 scaffold wrapper — lives in the Kilo builder project
+(`~/.config/kilo/scripts/`), not in this repository's `scripts/`. SYSTEM-RUN ONLY.
 
 ## backup/
 
@@ -622,7 +679,7 @@ Recorded in `bdf/VERSION.md`.
 Current framework version:
 
 ```
-2.1.0
+2.2.7
 ```
 
 ---
@@ -646,7 +703,8 @@ Current framework version:
 - Builder V2.1 (extended validation, modular merge pipeline, provider-specific models, output verification)
 - Builder V2.3 / BDF V2.5 (framework generalization: NEW_PROJECT_GUIDE, RELEASE_MANAGER, TESTING framework docs, adapter validation checklist, Impact Analysis record)
 - Builder V2.5 (Active-Provider Selector: provider discovery, persisted activeProviders, profile-level `<provider>-models.json` precedence)
-- Automated test harnesses (V2.1: 17 tests — 9 builder + 8 Release Docs; V2.5: 12 tests)
+- Builder V2.7 (JSON Schema Validation F1-F7, 9-stage pipeline, dynamic target artifact, env-key policy; released as version 2.5.0)
+- Automated test harnesses (V2.1: 17 tests — 9 builder + 8 Release Docs; V2.5: 13 tests; V2.7: 31 tests)
 - Release Manager V1 (registry-driven release documentation)
 - Documentation framework
 - Builder Development Framework
@@ -654,12 +712,14 @@ Current framework version:
 - Project adapter
 - Session continuity system
 - Project state system
+- KiloCode Builder V1 (Kilo project: build/test/scaffold-kilo-v1, harness 30/30)
+- V3 Universal Agent Framework core (scaffold-agent.ps1: agent registry, discovery, -List, -Bootstrap per-agent builder generation)
 
 ## Not Implemented
 
 - Additional providers
-- JSON Schema validation
 - Extended CLI features
+- Additional same-architecture agents beyond opencode/kilo (registry is open — add-a-line)
 
 Planned features are documented only in `ROADMAP.md`.
 
@@ -671,7 +731,6 @@ Planned features are documented only in `ROADMAP.md`.
 - One provider definition (dynamic loading supported).
 - One generated configuration.
 - One active builder.
-- JSON Schema validation not implemented (duplicate and structure validation handled by the builder).
 - Documentation expanded only after implementation.
 
 These limitations simplify development and provide a stable foundation for future expansion.
@@ -682,7 +741,7 @@ These limitations simplify development and provide a stable foundation for futur
 
 ## Immediate
 
-- Commit the docs repository (BDF V2.5 changes, `bdf/` new + modified docs, `ADAPTER.md`, `_agent/`, `AI/`).
+- Commit the docs repository on request (Claude-drop decision, universal scaffold docs, V3 plan updates).
 
 ## Roadmap Phases
 
@@ -690,9 +749,15 @@ Phase 4 — Additional Providers
 
 Phase 8 — Documentation Expansion
 
-Phase 11 — Claude Code Builder V1 (next on the road to V3)
+Phase 12 — KiloCode Builder V1 (COMPLETED 2026-08-07, harness 30/30)
 
-Phases 5, 6, and 7 (Validation Framework, Automated Testing, Builder Refactoring) were completed in Builder V2.1 (version 2.2.0).
+Phase 13 — V3 Universal Builder Generator (IN PROGRESS — universal scaffold core,
+sessions 24b-26b)
+
+Phase 11 — Claude Code Builder V1 — DROPPED 2026-08-08 (entropic `~/.claude.json`, no
+provider support; see `planning/DECISIONS.md`)
+
+Phases 3, 5, 6, and 7 (Validation Framework, Automated Testing, Builder Refactoring, BDF Generalization) were completed in Builder V2.1 (version 2.2.0).
 
 Phase 10 (BDF V2.5: Framework Generalization) was completed in version 2.3.0.
 

@@ -91,7 +91,7 @@ At session end:
 
 # Build Continuation
 
-Every version (V2.5, Claude Code Builder, KiloCode Builder, V3) must be built, tested,
+Every version (V2.5, V2.7, KiloCode Builder V1, Universal V3) must be built, tested,
 and validated completely before the next begins.
 
 If a version build is too large to finish within 70-80% of the 200,000-token context

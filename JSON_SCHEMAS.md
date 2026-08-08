@@ -74,7 +74,9 @@ If validation fails, the build process must terminate immediately.
 
 | Key | Type | Required | Description |
 |------|------|----------|-------------|
+| $schema | String | No | Schema reference URL. |
 | activeProviders | Array<String> | Yes | List of provider identifiers to load. |
+| instructions | Array<String> | No | File paths relative to the config root, injected into the agent's system context (for example `AGENTS.md`). |
 
 ---
 
@@ -82,8 +84,12 @@ If validation fails, the build process must terminate immediately.
 
 ```json
 {
+    "$schema": "https://opencode.ai/config.schema.json",
     "activeProviders": [
         "omniroute"
+    ],
+    "instructions": [
+        "AGENTS.md"
     ]
 }
 ```
@@ -95,6 +101,7 @@ If validation fails, the build process must terminate immediately.
 - The array must contain at least one provider.
 - Provider names must be unique.
 - Every provider listed must exist inside the `providers/` directory.
+- `instructions` is optional (only present on real profiles, e.g. `coding`); values must be strings.
 
 ---
 
@@ -177,7 +184,7 @@ Each model entry has the same shape as a `models.json` entry (for example `name`
 
 | Key | Type | Required | Description |
 |------|------|----------|-------------|
-| plugin | Object | Yes | Collection of plugin definitions. |
+| plugin | Array of strings | Yes | Collection of plugin identifiers. |
 
 ---
 
@@ -226,7 +233,7 @@ profiles/<profile>/target.json
 - Validated against `schemas/targets.schema.json` when present (`artifact`: string, `additionalProperties: false`).
 - Missing, unreadable, or schema-invalid `target.json` falls back to `opencode.json` (backward compatible).
 - The builder derives the backup prefix (`<base>_*`), provenance sidecar (`<base>.provenance.json`), WhatIf names, and retention prefix from the artifact base name.
-- A future Claude profile would set `"artifact": "claude.json"` — no builder code change required.
+- A future same-architecture profile (e.g. KiloCode) would set its own artifact name — no builder code change required.
 
 ---
 
@@ -313,6 +320,7 @@ Validation is performed by the builder before configuration generation.
 - <provider>-models.json
 - plugins.json
 - mcp.json
+- target.json (P2 dynamic target artifact)
 - omniroute.json
 
 ## Planned
@@ -332,7 +340,7 @@ The seven live schema files live in `schemas/`.
 | File | Validates | Required | additionalProperties |
 |------|-----------|----------|----------------------|
 | `schema.json` | Root shape of the generated `opencode.json` (documentation only; not validated by the builder pipeline) | — | — |
-| `settings.schema.json` | `profiles/<profile>/settings.json` | `activeProviders` (array of strings) | false |
+| `settings.schema.json` | `profiles/<profile>/settings.json` | `activeProviders` (array of strings); optional `instructions` (array of strings) | false |
 | `provider.schema.json` | `providers/<id>.json` | `id` (string), `provider` (object) | false |
 | `models.schema.json` | Covers BOTH `models.json` AND `<provider>-models.json` (profile-level per-provider model files) | `models` (object); model entries require `name` (string) | false |
 | `plugins.schema.json` | `profiles/<profile>/plugins.json` | `plugin` (array of strings) | false |

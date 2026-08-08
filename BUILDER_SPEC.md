@@ -1115,19 +1115,37 @@ Resolution rules (Stage 1 / Load Profile):
 - Provenance sidecar: `<ConfigRoot>\<artifactBase>.provenance.json`
 - WhatIf messages, F7 diff scan, and F4 retention prune on the artifact prefix
 
-A future Claude target profile would set `"artifact": "claude.json"` (or whatever the
-consumer needs) in its `target.json` — code stays untouched. The target file is validated
-against `schemas/targets.schema.json` during Stage 3 (optional source; skipped if absent).
+A future same-architecture target profile (for example KiloCode) would set its own artifact
+name (e.g. `"artifact": "kilo.json"`) in its `target.json` — code stays untouched. The target
+file is validated against `schemas/targets.schema.json` during Stage 3 (optional source;
+skipped if absent). Claude Code is not a supported target (DECISIONS.md 2026-08-08).
 
-## API key policy (P1, mandatory)
+## API key policy (P1, mandatory — THE ULTIMATE RULE)
 
-- Provider source files (`providers/<id>.json`) and the generated artifact must contain
-  **only** `{env:VAR_NAME}` placeholders, never literal API key values.
-- The builder NEVER carries, restores, or invents API keys. A key may appear in generated
-  output only if a provider source file already contains it (as a placeholder).
+**The SYSTEM's own artifacts NEVER contain a literal API key or any secret. Ever.**
+
+Two separate worlds:
+
+1. **User-owned files** (the agent's main config, `profiles/*.json`,
+   `providers/<id>.json`, `<provider>-models.json`): may contain literal API
+   keys — they are the user's files and the user protects them. The framework
+   treats them as-is.
+2. **System artifacts** (builder scripts, scaffold scripts, test harnesses,
+   templates, framework docs, examples): NEVER contain a literal key, token, or
+   secret — only `{env:VAR_NAME}` placeholders or fictional example values.
+
+The system's ONLY job is scan → copy → paste:
+
+- It scans the agent's main JSON and copies sections verbatim into profiles.
+- It copies whatever the user's source files contain — including API keys —
+  into the generated artifact. That is REQUIRED: many MCPs and providers need
+  their API keys to work.
+- The builder NEVER carries, invents, or restores keys on its own; it only
+  passes through what the user's files already contain.
 - Missing provider files are reported by the pre-flight F2 check; they are never "restored"
   from backups.
-- Example: `providers/omniroute.json` uses `{env:OMNIROUTE_API_KEY_OPENCODE}`.
+- Example (system artifact): `bdf/templates/ADAPTER.template.md` uses
+  `{env:EXAMPLE_API_KEY}` placeholders, never a real key.
 
 ---
 
@@ -1255,7 +1273,7 @@ Params
 [int]$Keep
 ```
 
-Keeps the newest N files per prefix (`opencode_*`, `settings_*`) in `backup/`.
+Keeps the newest N files per artifact prefix (`<TargetBase>_*`, `settings_*`) in `backup/` (the prefix derives from the resolved target artifact, P2; `opencode_*` when the target is `opencode.json`).
 
 ---
 
@@ -1267,7 +1285,7 @@ Params
 [string]$OutputSha256
 ```
 
-Writes the `opencode.provenance.json` sidecar.
+Writes the `<TargetBase>.provenance.json` sidecar (`opencode.provenance.json` when the target artifact is `opencode.json`).
 
 ---
 
@@ -1275,7 +1293,7 @@ Writes the `opencode.provenance.json` sidecar.
 
 No parameters.
 
-Returns the parsed content of the newest `backup/opencode_*.json`.
+Returns the parsed content of the newest `backup/<TargetBase>_*.json`.
 
 Returns `$null` when no backup artifact exists.
 
@@ -1307,11 +1325,11 @@ Prints a `File | Status | Detail` table. Returns `$true` when clean, `$false` wh
 
 - Schema failure: `Schema '<schema-name>': <file> failed: <property> <message>.`
 - Schema skip: `[!] No schema directory found at <SchemaDir> - skipping schema validation.`
-- Pre-flight fail: `['] 'Pre-flight failed: N (missing up-front rows)mber of missing inputs.` then per file `[+] (See `[x] Missing: <path>`
+- Pre-flight fail: `Pre-flight failed: N missing input(s)` then per file `Missing: <path>`
 - Pre-flight pass: `[+] All input dependencies present.`
 - Schema pass: `[+] All sources pass schema validation.`
 - Pre-flight-File pass: `[+] All input files present.`
-- WhatIf: `[WhatIf] Would write <OutputFile>` / `[WhatIf] Would write <ProvenancePath>` / `[WhatIf] Planned changes:` (both paths derive from the resolved target artifact)
+- WhatIf: `[WhatIf] Would write <TargetArtifact>` / `[WhatIf] Would write <TargetBase>.provenance.json` / `[WhatIf] Planned changes:` (both paths derive from the resolved target artifact)
 - Doctor summary: `Doctor: N file(s) checked, M issue(s) found.` then `Doctor: configuration is clean.` / `Doctor: configuration has issues.`
 - Diff line: `Added provider: <id>` / `Removed provider: <id>` / `Provider '<id>' model count: <n> -> <n>` / `Added mcp server: <name>` / `Removed mcp server: <name>` / `Added plugin: <id>` / `Removed plugin: <id>`
 - No diff: `No changes detected vs previous backup.` / `No prior backup artifact found: no diff to report.`
@@ -1385,6 +1403,121 @@ V2.1 (build-opencode-v2.ps1)    documented in the pipeline section
 ```
 
 Future versions of the builder will update this document after implementation.
+
+---
+
+# Scaffold Mode (Universal, V3)
+
+The framework ships a UNIVERSAL scaffold that works the SAME way for EVERY
+open-source coding agent (OpenCode, KiloCode, Aider, Goose, Codex-Cli, ...)
+in the registry — not only OpenCode and KiloCode. (Claude Code is in the
+registry for discovery only; it is NOT a scaffold target — dropped 2026-08-08.)
+
+Script
+
+```
+opencode\scripts\scaffold-agent.ps1   (universal core)
+kilo\scripts\scaffold-kilo-v1.ps1     (wrapper -> universal, agent kilo)
+opencode\scripts\scaffold-opencode.ps1 (wrapper -> universal, agent opencode)
+```
+
+Arguments: `-Agent <name>`, `-ConfigRoot` (defaults to the agent's
+`~/.config/<agent>`), `-NonInteractive`, `-List`, `-Bootstrap`.
+
+## User-Run vs System-Run (rule)
+
+The scaffolds are SYSTEM-RUN ONLY. The user never runs them. The only scripts the
+user runs are the BUILDERS (`build-opencode-v2.7.ps1`, `build-kilo-v1.ps1`).
+The system (AI) runs the scaffold once per agent to create the profile structure
+and seed `mcp.json`/`plugins.json` from the agent's own main JSON. After seeding,
+the user edits profiles/providers and runs only the builder.
+
+## Discovery (V3 rule)
+
+Before anything else the framework discovers which coding agents are installed:
+
+1. Probes the open-source agent registry (opencode, kilo, claudecode, aider,
+   goose, codex-cli) in standard locations.
+2. One found -> uses it. Multiple found -> user picks. None found -> the
+   framework ASKS: "Give me the location of your coding agents" (a config
+   folder) and scaffolds whatever the user points at.
+3. `-List` prints discovered open-source coding agents only.
+   Closed-source agents are never scanned or written.
+
+## Contract
+
+The framework's ONE job is scanning + splitting + seeding the profiles. It never
+invents content and never writes into user-owned files.
+
+1. Scan the agent's OWN MAIN `.json` config file FIRST, read-only. Only the
+   agent's own primary main file (registry order) is the source of truth — the
+   framework never scans another agent's config.
+   - `.provenance.json` files are NEVER scanned as main configs (excluded from
+     discovery; they are builder-generated sidecars, not agent input).
+2. Split the scanned sections: provider (guidance only) / mcp / plugin.
+3. Paste into `profiles/<profile>/` (coding is ALWAYS the default / main profile):
+   - `mcp` section    -> `profiles/coding/mcp.json` (seeded if missing)
+   - plugin section   -> `profiles/coding/plugins.json` (seeded if missing)
+   - experimental/minimal -> mcp.json + plugins.json created EMPTY, never filled.
+   - **mcp.json / plugins.json are USER-OWNED after creation.** The framework
+     NEVER overwrites them on later runs. The user edits MCPs and plugins by
+     hand; the framework's job is to create the files once.
+4. The framework creates the `providers/` folder (like the profile folders), but
+   NEVER writes `providers/<id>.json` or `<id>-models.json` — provider and model
+   files are 100% user-owned. The framework prints guidance about the detected
+   provider section only.
+5. Ensure profiles always exist: `coding` (main) + `experimental` + `minimal`.
+   Each profile carries exactly three files: `settings.json`, `mcp.json`,
+   `plugins.json`.
+6. `settings.json` is the ONLY file the framework writes freely (like the
+   reference implementation):
+   - File missing  -> create with `$schema` + `activeProviders` (detected from
+     the main config's provider section). NEVER copy-paste the whole config.
+   - File exists   -> merge ONLY `$schema` + `activeProviders` when missing;
+     NEVER clobber any user key, never paste the agent shape.
+7. The user may add more profiles or edit any file at any time. The framework
+   only ever ensures the three profile folders + the three files per profile.
+8. `-Bootstrap` generates `build-<agent>.ps1`, `test-<agent>.ps1`,
+   `scaffold-<agent>.ps1` for that agent from a source builder (verified on a
+   sandbox custom agent).
+
+## No-Secrets Rule (ULTIMATE)
+
+The SYSTEM's own artifacts — scripts, templates, docs, examples — NEVER contain
+a literal API key or secret; only `{env:VAR}` placeholders or fictional examples.
+User-owned files (main config, profiles, providers) may contain literal keys —
+the user protects them. The scaffold and builder COPY user content verbatim
+(scan → copy → paste), so generated output reflects whatever the user's source
+files contain, keys included. See "API key policy (P1, mandatory)" above.
+
+## Non-JSON Guard
+
+The framework NEVER touches `.jsonc` or any non-`.json` file on its own. If a
+non-`.json` config candidate exists at the config root, the scaffold ASKS the
+user `[y/N]` before reading it. In `-NonInteractive` mode it silently skips
+them.
+
+## Agent Registry (extensible)
+
+Add any open-source coding agent here so the framework can discover it:
+
+```
+scaffold-agent.ps1 -> $AgentRegistry
+  Name, Home (config dir), Main (.json file names), PlugKeys, Schema
+```
+
+## Agent Map (inference)
+
+| Agent    | Main JSON     | Settings schema                          |
+|----------|---------------|------------------------------------------|
+| opencode | opencode.json | https://opencode.ai/config.schema.json   |
+| kilo     | kilo.json     | https://app.kilo.ai/config.json          |
+
+For kilo, `kilo.json` is the primary main file and the builder's canonical
+artifact; `kilo.jsonc` is only read if the user explicitly grants the prompt.
+
+Claude Code is NOT a supported target (extra entropic global `~/.claude.json`,
+no provider support — see planning/DECISIONS.md 2026-08-08).
 
 ---
 

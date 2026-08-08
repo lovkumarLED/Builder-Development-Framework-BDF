@@ -9,7 +9,9 @@
 Software never truly has a "final" version.
 
 V3 is not the end. It is the **first stable public milestone** — the point where the
-framework is mature enough to generate builders for OpenCode, Claude Code, and KiloCode.
+framework is mature enough to generate builders for OpenCode, KiloCode, and any
+open-source coding agent sharing their architecture. (Claude Code is excluded —
+see `DECISIONS.md` 2026-08-08.)
 
 After V3: V3.1, V4, and so on.
 
@@ -18,19 +20,19 @@ After V3: V3.1, V4, and so on.
 # The Road
 
 ```
-Current (Builder V2.2.0)
+Current (Builder V2.7 JSON Schema Validation, project 2.5.0)
 ↓
-BDF V2.5 — framework generalization (prepare for V3)
+BDF V2.5 — framework generalization (prepare for V3) ✅
 ↓
-Claude Code Builder V1 — first real validation
+Builder V2.7 — JSON Schema Validation gate ✅
 ↓
-Framework improvements (learned from Claude)
+KiloCode Builder V1 — first real validation ✅
 ↓
-KiloCode Builder V1 — second real validation
+Universal Agent Framework core (scaffold-agent.ps1) — in progress
 ↓
-Framework improvements (learned from KiloCode)
+Framework improvements (learned from universal)
 ↓
-BDF V3 — Builder Generator (destination)
+BDF V3 — Universal Builder Generator (destination)
 ```
 
 Real projects shape the framework. Never assumptions.

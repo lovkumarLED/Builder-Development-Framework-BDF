@@ -51,12 +51,11 @@ The framework can be adapted to any application.
 Examples:
 
 - OpenCode
-- Claude Code
-- Kilo Code
-- Cursor
-- Continue
-- Codex
+- KiloCode
+- any open-source coding agent sharing their architecture
 - Future applications
+
+Claude Code is not a target (dropped 2026-08-08 — see `planning/DECISIONS.md`).
 
 Every application follows the same process:
 
@@ -74,7 +73,7 @@ The adapter field table lives in exactly ONE place:
 templates/ADAPTER.template.md
 ```
 
-The template defines the nine adapter fields and their definitions.
+The template defines the twelve adapter fields and their definitions.
 
 This document describes each field and refers to the template; it does not duplicate the
 table.
@@ -128,6 +127,22 @@ The final generated configuration file.
 The builder generates this artifact.
 
 It is never edited manually.
+
+### Release Registry
+
+The machine-readable release history file.
+
+The only hand-edited release artifact.
+
+### Release Artifacts
+
+The generated release documentation files.
+
+Never edited manually; generated from the registry.
+
+### Release Manager Entry Point
+
+The script or command that generates the release documentation from the registry.
 
 ### Builder Entry Point
 
@@ -357,9 +372,10 @@ New Builder Project
 Examples:
 
 - OpenCode Builder → OpenCode Adapter
-- Claude Builder → Claude Adapter
 - Kilo Builder → Kilo Adapter
 - Future Builder → Future Adapter
+
+(Claude Builder was dropped 2026-08-08 — see `planning/DECISIONS.md`.)
 
 The framework never requires rewriting.
 

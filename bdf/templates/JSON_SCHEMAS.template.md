@@ -191,7 +191,7 @@ Each model entry has the same shape as a `models.json` entry (for example `name`
 
 | Key | Type | Required | Description |
 |------|------|----------|-------------|
-| plugin | Object | Yes | Collection of plugin definitions. |
+| plugin | Array of strings | Yes | Collection of plugin identifiers. |
 
 ---
 

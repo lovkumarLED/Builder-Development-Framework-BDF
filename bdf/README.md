@@ -42,9 +42,8 @@ Builder Development Framework (BDF)
         │
 
         ├── OpenCode Builder
-        ├── Claude Builder
         ├── Kilo Builder
-        └── Future Builders
+        └── Future Builders (same architecture)
 ```
 
 The framework is generic.

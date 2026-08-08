@@ -87,7 +87,7 @@ The following diagram illustrates the overall system structure.
                          │
                          ▼
 
-                build-opencode-v2.5.ps1
+                build-opencode-v2.7.ps1
 
                          │
                          ▼
@@ -502,6 +502,7 @@ Future architectural improvements will be introduced only after the current impl
 - OmniRoute provider
 - Profile configuration
 - Builder
+- JSON Schema validation (F1, schemas/*.schema.json)
 - Backup system
 - Generated configuration
 - Documentation
@@ -510,7 +511,7 @@ Future architectural improvements will be introduced only after the current impl
 
 The following are intentionally outside the current architecture.
 
-- Advanced validation
+- Additional provider integrations
 
 These features are considered future enhancements and are not part of the current implementation.
 

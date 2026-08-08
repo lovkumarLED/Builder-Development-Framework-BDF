@@ -40,17 +40,23 @@ The long-term objective is:
 
 # Supported Projects
 
-BDF is intentionally specialized.
-
-It is **not** intended to generate builders for every AI tool.
+BDF is universal by design for open-source coding agents.
 
 The official supported targets are:
 
 - OpenCode
-- Claude Code
 - KiloCode
+- ANY open-source coding agent with a local JSON config (Aider, Goose, Codex-Cli, ...) —
+  the scaffold discovers what is installed; if none are found it asks the user for the
+  location of their coding agents.
 
-Supporting these three extremely well is more valuable than supporting dozens of unrelated tools.
+Claude Code is NOT a supported target (dropped 2026-08-08 — entropic `~/.claude.json`, cannot add multiple providers; see `DECISIONS.md`).
+
+The framework's ONE job for any target: scan the agent's OWN main JSON, split it into
+mcp / plugin sections, and seed the profiles (coding main + experimental + minimal).
+The framework creates the `providers/` folder but NEVER writes provider or model
+files inside it — providers and models are 100% user-owned. Closed-source agents are
+never touched.
 
 Future support for additional projects should only happen if they naturally fit the framework.
 
@@ -138,7 +144,7 @@ Information unique to one project.
 Examples:
 
 - OpenCode configuration
-- Claude configuration
+- KiloCode configuration
 - folder layouts
 - provider schemas
 
@@ -331,15 +337,11 @@ OpenCode Validation
 
 ↓
 
-Claude Builder
-
-↓
-
 Framework Improvements
 
 ↓
 
-KiloCode Builder
+KiloCode Builder V1
 
 ↓
 
@@ -354,6 +356,8 @@ Real projects should shape the framework.
 
 The framework should never evolve from assumptions alone.
 
+> Note: Claude Code Builder (previously planned between OpenCode Validation and KiloCode) was DROPPED 2026-08-08 — entropic config, no multi-provider support.
+
 ---
 
 # Definition of V3
@@ -363,12 +367,26 @@ Builder Development Framework V3 is considered complete when:
 The same engineering framework can successfully create and maintain builders for:
 
 - OpenCode
-- Claude Code
 - KiloCode
+- ANY open-source coding agent with a local JSON config (Aider, Goose, Codex-Cli, ...)
 
-without redesigning the framework.
+without redesigning the framework — the scaffold discovers whatever open-source
+agents are installed (and asks the user for a location when none are found), seeds
+the profile structure from each agent's OWN main JSON, and generates a per-agent
+builder. Only project adapters should differ.
 
-Only project adapters should differ.
+V3 scaffolding rules (mandatory):
+
+- Never write provider or model files — the framework creates the `providers/`
+  folder (like the profile folders), but the JSON files inside are 100% user-owned
+  (guidance only).
+- Never copy another agent's config into a project — each project is seeded from
+  its own main JSON.
+- Always create `coding` (the main profile) + `experimental` + `minimal`, each with
+  exactly `settings.json`, `mcp.json`, `plugins.json`.
+- `mcp.json`/`plugins.json` are user-owned after creation; the framework only writes
+  `settings.json` (`$schema` + `activeProviders`).
+- Closed-source agents are never scanned or written.
 
 ---
 

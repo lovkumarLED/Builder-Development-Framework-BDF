@@ -105,7 +105,7 @@ Rules:
 - EVERY session ends with a session log entry in `_agent/SESSION_LOG.md` — short or partial
   sessions included. Format: `### (date) (session N) — description ← recent session` with
   `Done:` / `Broken:` / `Journey:` / `Next:` / `Learned:` lines.
-- Write it when I say "end session" / "wrap up", AND automatically at 65-70% context.
+- Write it when I say "end session" / "wrap up", AND automatically at 75-80% context (canonical table in `_agent/SESSION_WORKFLOW.md`).
 - Also update `_agent/JOURNEY_TO_V3.md` `Current Position` (road to V3) at session end.
 - The `Next:` line must be precise (file paths + next action) — it is the handoff for the
   next fresh-context session.

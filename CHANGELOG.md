@@ -83,14 +83,14 @@ Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.
 - F7 merge diff summary vs previous backup
 - P2 dynamic target artifact: optional profiles/<profile>/target.json -> {artifact} drives output, backup prefix, provenance, WhatIf; default opencode.json
 - P1 env-key policy: builder never carries/restores/invents API keys; providers carry {env:VAR} placeholders only
-- 30-test V2.7 harness in addition to 17/17 (V2.1) + 13/13 (V2.5)
+- 31-test V2.7 harness in addition to 17/17 (V2.1) + 13/13 (V2.5)
 
 ---
 
 ## New Features
 
 - scripts/build-opencode-v2.7.ps1
-- scripts/test-opencode-v2.7.ps1 (30 tests)
+- scripts/test-opencode-v2.7.ps1 (31 tests)
 - schemas/schema.json, settings.schema.json, provider.schema.json, models.schema.json, plugins.schema.json, mcp.schema.json, targets.schema.json
 - -SchemaDir, -WhatIf, -KeepBackups, -Doctor, -ProvenancePath CLI flags
 - profiles/<profile>/target.json (P2 dynamic artifact)
@@ -128,7 +128,7 @@ No
 
 ## Testing Summary
 
-17/17 (V2.1) + 13/13 (V2.5) + 30/30 (V2.7) tests passed, exit code 0
+17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7) tests passed, exit code 0
 
 ---
 
@@ -839,7 +839,9 @@ ROADMAP.md
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.3.0 | Current | BDF V2.5 framework generalization |
+| 2.5.0 | Current | Builder V2.7 JSON Schema Validation (F1-F7, P1 env-key policy, P2 dynamic target artifact) |
+| 2.4.0 | Previous | Builder V2.5 Active-Provider Selector |
+| 2.3.0 | Previous | BDF V2.5 framework generalization |
 | 2.2.0 | Previous | Builder V2.1 (validation, merge pipeline, provider-specific models, verification, automated tests) |
 | 2.1.0 | Previous | Builder Development Framework adoption |
 | 2.0.3 | Previous | Project state system |

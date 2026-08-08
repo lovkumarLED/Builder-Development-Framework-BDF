@@ -79,8 +79,10 @@ sessions get an entry, so the next session can resume from the `Next:` line.
 # Context Window Budget
 
 The user's context window is **200,000 tokens**. The hard ceiling for task work is
-**70% (≈140,000 tokens)**. The workflow protects this budget so work is never lost to a
-full context window.
+**80% (≈160,000 tokens)**; wrap-up starts at **75% (≈150,000 tokens)**. The workflow
+protects this budget so work is never lost to a full context window. (AGENT.md and
+`AI/CONTINUE_PROJECT_BUILD.md` state the same 70-80% range; this document is the
+canonical table.)
 
 ## Budget allocation
 
@@ -93,16 +95,16 @@ full context window.
 
 | Context level | Action |
 |---------------|--------|
-| < 50% | Normal operation. |
-| 50-64% | Avoid new bulk reads. Delegate everything possible. |
-| 65% | **WRAP UP.** Finish the current subtask, write the session log entry, and tell the user to start a fresh session. |
-| 70% | Stop all work immediately. Write the session log entry. Do not start new tasks. |
+| < 60% | Normal operation. |
+| 60-75% | Avoid new bulk reads. Delegate everything possible. |
+| 75% | **WRAP UP.** Finish the current subtask, write the session log entry, and tell the user to start a fresh session. |
+| 80% | Stop all work immediately. Write the session log entry. Do not start new tasks. |
 
 ## Handoff
 
 1. Session log entry must contain a precise `Next:` line (file paths + next action).
 2. The next session reads SESSION_LOG.md's latest entry and continues from `Next:`.
-3. Never attempt to "push through" past 70% — a full window loses all work.
+3. Never attempt to "push through" past 80% — a full window loses all work.
 
 ---
 

@@ -147,7 +147,7 @@ the main context (docs ≈ 560 KB ≈ 140k tokens ≈ 70% of the window by itsel
 A version counts as complete only when ALL of these are true:
 
 - Built: all planned features exist and are documented.
-- Tested: the test harness passes (17/17 for the current OpenCode implementation).
+- Tested: all three OpenCode test harnesses pass (17/17 V2.1 + 13/13 V2.5 + 31/31 V2.7).
 - Validated: a real end-to-end run confirms the builder works.
 - Released: registry updated + release manager run + release docs generated.
 - Tracked: CHANGELOG, ROADMAP, PROJECT_STATE, and JOURNEY_TO_V3 updated.

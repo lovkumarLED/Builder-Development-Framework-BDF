@@ -38,7 +38,10 @@ Every placeholder must be replaced before a project document is released.
 | `{{APP_NAME}}` | The application that consumes the generated configuration. | OpenCode |
 | `{{GENERATED_ARTIFACT}}` | The final generated configuration file. | opencode.json |
 | `{{BUILDER_SCRIPT}}` | The builder entry script. | build-opencode-v2.ps1 |
+| `{{BUILDER_SCRIPT_ALT}}` | The alternative/second-project builder entry script. | build-kilo-v1.ps1 |
 | `{{TEST_HARNESS}}` | The automated test harness script. | test-opencode-v2.ps1 |
+| `{{V25_TEST_HARNESS}}` | The V2.5 test harness script. | test-opencode-v2.5.ps1 |
+| `{{V27_TEST_HARNESS}}` | The V2.7 test harness script. | test-opencode-v2.7.ps1 |
 | `{{DEFAULT_PROFILE}}` | The default profile name. | default |
 | `{{CURRENT_PROVIDER}}` | The current provider identifier. | omniroute |
 | `{{CONFIG_SOURCE_DIR}}` | The source configuration directory. | profiles |
@@ -48,9 +51,9 @@ Every placeholder must be replaced before a project document is released.
 | `{{BACKUP_DIR}}` | The backup directory. | backup |
 | `{{SHELL}}` | The scripting language used by the builder. | PowerShell |
 | `{{OS}}` | The supported operating system. | Windows 11 |
-| `{{CURRENT_VERSION}}` | The current project version. | 2.2.0 |
-| `{{PROJECT_STATUS}}` | The current project status. | Stable Foundation |
-| `{{VERSION_DESCRIPTION}}` | The summary of the current version. | Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing |
+| `{{CURRENT_VERSION}}` | The current project version. | 2.5.0 |
+| `{{PROJECT_STATUS}}` | The current project status. | Builder V2.7 JSON Schema Validation |
+| `{{VERSION_DESCRIPTION}}` | The summary of the current version. | Builder V2.7: JSON Schema Validation, pre-flight dependency check, dry-run, backup retention, provenance sidecar, diagnostics, diff summary |
 | `{{PROJECT_ROOT}}` | The root directory of the project. | .config/opencode |
 | `{{CONFIG_FILE}}` | The source configuration files and their format. | profiles/*/settings.json, models.json |
 | `{{SUPPORTED_PROVIDERS}}` | The providers the project supports. | omniroute |
@@ -84,10 +87,17 @@ Every placeholder must be replaced before a project document is released.
 | `{{BUG_FIX_1}}` | First bug fix of a release. | Diff summary enumerates OrderedDictionary |
 | `{{BREAKING_CHANGES}}` | Breaking-changes note of a release. | None |
 | `{{MIGRATION_REQUIRED}}` | Migration-required note of a release. | No |
-| `{{TESTING_SUMMARY}}` | Testing summary of a release. | 17/17 + 13/13 + 30/30 passed |
+| `{{TESTING_SUMMARY}}` | Testing summary of a release. | 17/17 + 13/13 + 31/31 passed |
 | `{{KNOWN_ISSUES}}` | Known-issues note of a release. | None |
 | `{{DOC_UPDATED_1}}` | First doc updated by a release. | BUILDER_SPEC.md |
 | `{{DOC_UPDATED_2}}` | Second doc updated by a release. | JSON_SCHEMAS.md |
+| `{{UNIVERSAL_SCRIPT}}` | The universal scaffold core script. | scaffold-agent.ps1 |
+| `{{AGENT_WRAPPER_SCRIPT}}` | The per-agent scaffold wrapper. | scaffold-opencode.ps1 |
+| `{{CURRENT_BUILDER_NAME}}` | The current builder version label (e.g. V2.7). | Builder V2.7 |
+| `{{DESTINATION_NAME}}` | The roadmap destination milestone. | BDF V3 |
+| `{{DESTINATION_DESCRIPTION}}` | Why the destination milestone matters. | V3 is complete when the same framework builds builders for multiple agents without redesign |
+| `{{DESTINATION_TAG}}` | Short label for the destination phase. | Universal Builder Generator |
+| `{{FIRST_VALIDATION_PROJECT}}` | The first second-project validation. | KiloCode |
 
 The example values come from the reference implementation.
 

@@ -25,11 +25,12 @@ Testing ensures that:
 
 This document describes the manual testing process.
 
-Automated testing is provided by two test harnesses:
+Automated testing is provided by three test harnesses:
 
 ```
 scripts/test-opencode-v2.ps1
 scripts/test-opencode-v2.5.ps1
+scripts/test-opencode-v2.7.ps1
 ```
 
 The V2.1 harness runs the builder against isolated temporary fixtures and verifies both success and failure behavior.
@@ -37,6 +38,8 @@ The V2.1 harness runs the builder against isolated temporary fixtures and verifi
 It also runs the release manager against a temp copy of the docs and verifies the generated release documentation.
 
 The V2.5 harness (Active-Provider Selector) verifies the V2.5 builder against isolated temporary fixtures in the same style.
+
+The V2.7 harness (JSON Schema Validation) verifies the V2.7 builder against isolated temporary fixtures: schema validation, pre-flight checks, dry-run, retention, provenance, diagnostics, diff summary, P1/P2 policy.
 
 V2.1 harness coverage (17 tests: 9 builder + 8 Release Docs):
 
@@ -71,9 +74,7 @@ powershell -File scripts/test-opencode-v2.ps1
 
 The harness exits non-zero when any test fails.
 
-The full suite is BOTH harnesses green: 17/17 (V2.1) + 13/13 (V2.5).
-
-The full suite is now ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 28/28 (V2.7).
+The full suite is ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7).
 
 ---
 
@@ -123,6 +124,7 @@ Configuration Builder
 ```
 build-opencode-v2.ps1 (Builder V2.1)
 build-opencode-v2.5.ps1 (Builder V2.5, Active-Provider Selector)
+build-opencode-v2.7.ps1 (Builder V2.7, JSON Schema Validation)
 ```
 
 Test Harness
@@ -130,6 +132,7 @@ Test Harness
 ```
 test-opencode-v2.ps1
 test-opencode-v2.5.ps1
+test-opencode-v2.7.ps1
 ```
 
 Provider
@@ -945,9 +948,7 @@ powershell -File scripts/test-opencode-v2.5.ps1
 
 Expected: 13/13 PASSED, exit 0.
 
-The definition of complete is BOTH harnesses green: 17/17 (V2.1) + 13/13 (V2.5).
-
-The definition of complete is now ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 28/28 (V2.7).
+The definition of complete is ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7).
 
 ---
 
@@ -957,7 +958,7 @@ The V2.7 group verifies the JSON Schema builder (`scripts/build-opencode-v2.7.ps
 
 | Group | Coverage |
 |-------|----------|
-| Schema Validation | Valid sources pass; settings missing `required` fails; wrong `type` fails; `additionalProperties` fails; provider violation fails; models violation fails; missing `schemas/` directory warns and continues |
+| Schema Validation | Valid sources pass; settings missing `required` fails; wrong `type` fails; `additionalProperties` fails; real settings accepted; provider violation fails; models violation fails; missing `schemas/` directory warns and continues |
 | Pre-flight | Missing provider file aborts with "Pre-flight failed" |
 | WhatIf | Nothing written, exit 0 |
 | Doctor | Clean exits 0, corrupt exits 1 |
@@ -971,7 +972,7 @@ Run the V2.7 harness with:
 powershell -File scripts/test-opencode-v2.7.ps1
 ```
 
-Expected: 28/28 PASSED, exit 0.
+Expected: 31/31 PASSED, exit 0.
 
 ---
 

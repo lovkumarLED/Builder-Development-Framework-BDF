@@ -1078,6 +1078,98 @@ Future versions of the builder will update this document after implementation.
 
 ---
 
+# Scaffold Mode (Universal, V3)
+
+The framework ships a UNIVERSAL scaffold that works the SAME way for EVERY
+open-source coding agent, not only the framework's own projects.
+
+Script
+
+```
+{{UNIVERSAL_SCRIPT}}      (universal core)
+{{AGENT_WRAPPER_SCRIPT}}  (wrapper = universal, this agent)
+```
+
+Arguments: `-Agent <name>`, `-ConfigRoot` (defaults to the agent's
+`~/.config/<agent>`), `-NonInteractive`, `-List`, `-Bootstrap`.
+
+## User-Run vs System-Run (rule)
+
+The scaffolds are SYSTEM-RUN ONLY. The user never runs them. The only scripts the
+user runs are the BUILDERS (`{{BUILDER_SCRIPT}}` for this project, and the
+per-agent builder for any other). The system (AI) runs the scaffold once per agent
+to create the profile structure and seed `mcp.json`/`plugins.json` from the agent's
+own main JSON. After seeding, the user edits profiles/providers and runs only the
+builder.
+
+## Discovery (V3 rule)
+
+1. Probes the open-source agent registry (extensible `$AgentRegistry`, see
+   "Agent Registry") in standard locations.
+2. One found -> use it. Multiple found -> user picks. None found -> the
+   framework ASKS: "Give me the location of your coding agents" (a config
+   folder) and scaffolds whatever the user points at.
+3. `-List` prints discovered open-source coding agents only.
+   Closed-source agents are never scanned or written.
+
+## Contract
+
+The framework's ONE job is scanning + splitting + seeding the profiles. It never
+invents content and never writes into user-owned files.
+
+1. Scan the agent's OWN MAIN `.json` config file FIRST, read-only. Only the
+   agent's own primary main file (registry order) is the source of truth —
+   the framework never scans another agent's config.
+   - `.provenance.json` files are NEVER scanned as main configs.
+2. Split the scanned sections: provider (guidance only) / mcp / plugin.
+3. Paste into `profiles/<profile>/` (coding is ALWAYS the default profile):
+   - `mcp` section    -> `profiles/coding/mcp.json` (seeded if missing)
+   - plugin section   -> `profiles/coding/plugins.json` (seeded if missing)
+   - experimental/minimal -> mcp.json + plugins.json created EMPTY, never filled.
+   - **mcp.json / plugins.json are USER-OWNED after creation.** The framework
+     NEVER overwrites them on later runs. The user edits MCPs and plugins by
+     hand; the framework's job is to create the files once.
+4. The framework creates the `providers/` folder (like the profile folders), but
+   NEVER writes `providers/<id>.json` or `<id>-models.json` — provider and model
+   files are 100% user-owned. The framework prints guidance about the detected
+   provider section only.
+5. Ensure profiles always exist: `coding` (main) + `experimental` + `minimal`.
+   Each profile carries exactly three files: `settings.json`, `mcp.json`,
+   `plugins.json`.
+6. `settings.json` is the ONLY file the framework writes freely:
+   - File missing  -> create with `$schema` + `activeProviders` (detected from
+     the main config's provider section). NEVER copy-paste the whole config.
+   - File exists   -> merge ONLY `$schema` + `activeProviders` when missing;
+     NEVER clobber any user key, never paste the agent shape.
+7. The user may add more profiles or edit any file at any time. The framework
+   only ever ensures the three profile folders + the three files per profile.
+8. `-Bootstrap` generates `build-<agent>.ps1`, `test-<agent>.ps1`,
+   `scaffold-<agent>.ps1` for that agent from a source builder.
+
+## No-Secrets Rule (ULTIMATE)
+
+The SYSTEM's own artifacts — scripts, templates, docs, examples — NEVER contain
+a literal API key or secret; only `{env:VAR}` placeholders or fictional examples.
+User-owned files (main config, profiles, providers) may contain literal keys —
+the user protects them. The scaffold and builder COPY user content verbatim
+(scan → copy → paste), so generated output reflects whatever the user's source
+files contain, keys included.
+
+## Non-JSON Guard
+
+Never touch `.jsonc` or any non-`.json` file on its own. A non-`.json` config
+candidate asks the user `[y/N]` before reading; in `-NonInteractive` mode it is
+silently skipped.
+
+## Agent Registry (extensible)
+
+```
+{{UNIVERSAL_SCRIPT}} -> $AgentRegistry
+  Name, Home (config dir), Main (.json file names), PlugKeys, Schema
+```
+
+---
+
 **Document Version:** {{DOC_VERSION}}
 
 **Status:** Current Builder Specification

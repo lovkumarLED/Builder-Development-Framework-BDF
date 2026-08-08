@@ -26,17 +26,22 @@ V3 is complete when the same engineering framework can successfully create and m
 builders for:
 
 - OpenCode
-- Claude Code
 - KiloCode
+- Any open-source coding agent sharing their architecture
 
 without redesigning the framework. Only Project Adapters should differ.
+
+Claude Code is NOT supported (entropic `~/.claude.json`, no provider support —
+decision 2026-08-08, `planning/DECISIONS.md`).
 
 V3 turns the framework into a **Builder Generator**:
 
 ```
 Create New Builder Project
 ↓
-What software? (OpenCode / Claude Code / KiloCode)
+Discover installed open-source coding agents (OpenCode / KiloCode / same-architecture)
+↓
+Choose agent
 ↓
 Read project schema
 ↓
@@ -62,15 +67,14 @@ Step 0 — Current (Builder V2.2.0, Release Manager V1)          ✅ complete
 ↓
 Step 1 — BDF V2.5: Framework Generalization                    ✅ complete
 ↓
-Step 2 — Claude Code Builder V1 (first validation)             ← we are here
+Step 2 — KiloCode Builder V1 (first validation)                ✅ complete
+       Claude Code V1 DROPPED (2026-08-08, entropic config)
 ↓
-Step 3 — Framework Improvements (learned from Claude)
+Step 3 — Universal Agent Framework core (scaffold-agent.ps1)   ← we are here
 ↓
-Step 4 — KiloCode Builder V1 (second validation)
+Step 4 — Framework Improvements (learned from universal)
 ↓
-Step 5 — Framework Improvements (learned from KiloCode)
-↓
-Step 6 — BDF V3: Builder Generator                             ← destination
+Step 5 — BDF V3: Universal Builder Generator                    ← destination
 ```
 
 Each step is built, tested, and validated before the next begins.
@@ -80,41 +84,71 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 6, 2026 (session 22 end)
+Updated: Aug 8, 2026 (session 28: FULL_SYSTEM_CHECK v1.1 all 7 parts PASS, 40+ bugs fixed)
 
 ```
-Step 1 — BDF V2.5: Framework Generalization
-Status: COMPLETE
-Progress: 100%
+Step 3 — Universal Agent Framework core
+Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08)
+Progress: ~90%
 ```
 
-What was completed in V2.5:
+What was completed:
 
-- [x] `NEW_PROJECT_GUIDE.md` — documented onboarding process for new projects.
-- [x] Better `PROJECT_ADAPTER.md` — cleaner generic/project boundary (single source of truth + validation checklist).
-- [x] More generic templates (placeholder audit, cross-reference matrix, sync rule).
-- [x] Better Blueprint Engine (Impact Analysis record).
-- [x] Cleaner framework boundaries (OpenCode-specific knowledge removed from `bdf/`).
-- [x] Improved validation, testing, adapters, templates, documentation,
-      provider handling, and release system (bdf/TESTING.md, bdf/RELEASE_MANAGER.md).
-- [x] V2.5 released (registry entry 2.3.0 + release pipeline run + 17/17 tests green).
+- [x] Step 1 — BDF V2.5: Framework Generalization (COMPLETE 100%).
+- [x] Side goal: JSON Schema Validation (`schemas/`) — Builder V2.7 (F1-F7), P1 env-key
+      policy + P2 dynamic target artifact. Battery 17/13/31 green, snapshot-22 pinned
+      (FULL_SYSTEM_CHECK v1.1 all 7 parts PASS, sessions 22 + 26).
+- [x] Step 2 — KiloCode Builder V1 (replaces dropped Claude V1): Kilo directory,
+      `build-kilo-v1.ps1` / `test-kilo-v1.ps1` / `scaffold-kilo-v1.ps1`, harness 30/30,
+      real `~/.config/kilo` verified (sessions 24-24b).
+- [x] Step 3 core — `scaffold-agent.ps1` rebuilt as the V3 UNIVERSAL core:
+      agent registry (opencode, kilo, claudecode, aider, goose, codex-cli; any
+      open-source agent), discovery, -List, -Bootstrap (generates build-/test-/scaffold-
+      per agent), scan-first contract, never writes provider/model files, never touches
+      .jsonc without consent (session 24b).
+- [x] Bootstrap fix (session 27): scaffold's generated `test-<agent>.ps1` copied raw
+      (stale `build-opencode-v2.7.ps1`/kilo refs) → now token-replaced like the builder;
+      sandbox `custom` agent bootstrap verified 30/30 harness.
+- [x] Real-config scaffolds verified: kilo + opencode refreshed with backup, settings
+      merged full-shape, harness 30/30 both, AGENTS.md relocation reverted (no AGENTS.md
+      anywhere; session 26b claim corrected in session 28).
+- [x] Session 28: FULL_SYSTEM_CHECK v1.1 rerun — all 7 parts PASS; V2.7 harness count
+      corrected to 31/31 everywhere; framework 2.2.3 (template sync round 2); experimental/
+      minimal omniroute-models.json restored (recurring async-deletion fix).
+- [x] Session 28b: SCAFFOLD CONTRACT FINALIZED (per user ruling):
+      - The framework creates the `providers/` folder (like the profile folders) but
+        NEVER writes provider or model JSON files inside it — the JSON files are
+        100% user-owned.
+      - ONE job: scan the agent's OWN main JSON (kilo.json for kilo, never another
+        agent's config), split mcp / plugin sections, seed `profiles/coding/mcp.json` +
+        `plugins.json` (user-owned after creation), create `profiles/{coding,experimental,
+        minimal}` with exactly settings/mcp/plugins three files each.
+      - experimental/minimal mcp.json + plugins.json created EMPTY, never filled.
+      - settings.json = `$schema` + `activeProviders` only (never copy-paste the config).
+      - Removed framework-created model files: kilo coding omniroute-models.json,
+        opencode experimental + minimal omniroute-models.json. User's own
+        kilo/providers/omniroute.json restored (user-owned).
+      - Kilo test re-run: backup made first, test-kilo-v1.ps1 30/30, main kilo.json
+        byte-identical (backup policy verified). Real build correctly fails pre-flight
+        without user-created providers (by design).
+- [x] Session 28c: NO-SECRETS RULE (ULTIMATE) codified — the SYSTEM's own artifacts
+      (scripts, templates, docs, examples) never contain literal API keys ({env:VAR}
+      only); USER-owned files (main config, profiles, providers) may contain literal
+      keys and the user protects them; the system copies user content verbatim
+      (scan → copy → paste) so generated output carries whatever the user's files
+      contain, keys included. Verified: system artifacts 0 leaks, user files restored,
+      both builds green.
 
-Side goals (build before Step 2 — Claude Code Builder V1):
+Dropped: Claude Code Builder V1 — 2026-08-08 decision (entropic `~/.claude.json`, no
+provider support). See `planning/DECISIONS.md`.
 
-- [x] Active-Provider Selector Builder — `scripts/build-opencode-v2.5.ps1`
-      (released, registry 2.4.0). Builder considers all `providers/*.json`, interactive
-      active-provider selection persisted to profile `settings.json`, and
-      profile-level `profiles/<profile>/<provider>-models.json` attach when the
-      provider is active. Plan: `AI/BUILD_BUILDER_V2.5_SELECTOR.md`.
-- [x] JSON Schema Validation (`schemas/`) — gate before Step 2. Built (V2.7, F1-F7),
-      patched (P1 env-key policy + P2 dynamic target artifact, session 20), and fully
-      verified (session 21 battery 17/13/30 + session 22 FULL_SYSTEM_CHECK all 7 parts
-      green, snapshot-22 pinned). Status: COMPLETE.
+Next: commit docs on request; run the kilo builder test (backup-first, harness + real
+build after the user creates their own providers); real `-Bootstrap` against aider/goose
+only if user installs them; then BUILDER_PHASES Alpha→Beta→General gates for the
+universal framework, then Step 4 / Step 5.
 
-Next: Step 2 — Claude Code Builder V1 (first validation of the generalized framework),
-then KiloCode Builder V1, then V3.
-
-Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = Claude Builder V1).
+Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = KiloCode Builder,
+Phases 5-7 = universal V3).
 
 Phase gates: every builder build on the road to V3 must pass the Alpha → Beta →
 General Release gates in `bdf/BUILDER_PHASES.md` before it becomes the main builder

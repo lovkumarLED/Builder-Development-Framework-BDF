@@ -32,6 +32,30 @@ This roadmap is intended to guide future development while keeping the overall p
 
 ---
 
+# Destination — {{DESTINATION_NAME}}
+
+Every phase below serves one destination:
+
+> **{{DESTINATION_NAME}} — the first stable public version of the Builder Development Framework.**
+
+{{DESTINATION_DESCRIPTION}}
+
+The path is:
+
+```
+Current ({{CURRENT_BUILDER_NAME}}) ✅
+↓
+{{FIRST_VALIDATION_PROJECT}} Builder V1 ✅
+↓
+{{DESTINATION_NAME}} ({{DESTINATION_TAG}}) — in progress
+```
+
+Each step is built, tested, and validated before the next begins.
+
+Real projects shape the framework — never assumptions.
+
+---
+
 # Project Status
 
 Current Version
@@ -63,7 +87,7 @@ The next development phases focus on expanding flexibility while preserving the 
 
 # Development Phases
 
-## Phase 1 — Foundation
+## Phase 1 — Foundation ✅
 
 Status
 
@@ -82,12 +106,12 @@ Completed work includes:
 
 ---
 
-## Phase 2 — Builder Improvements
+## Phase 2 — Builder Improvements ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objectives
@@ -101,12 +125,12 @@ Objectives
 
 ---
 
-## Phase 3 — Additional Profiles
+## Phase 3 — Additional Profiles ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objectives
@@ -136,12 +160,12 @@ Possible Benefits
 
 ---
 
-## Phase 4 — Additional Providers
+## Phase 4 — Additional Providers ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objectives
@@ -168,12 +192,12 @@ Goals
 
 ---
 
-## Phase 5 — Validation Framework
+## Phase 5 — Validation Framework ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objectives
@@ -194,12 +218,12 @@ Catch configuration errors before generation begins.
 
 ---
 
-## Phase 6 — Automated Testing
+## Phase 6 — Automated Testing ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objectives
@@ -220,12 +244,12 @@ Reduce manual testing effort.
 
 ---
 
-## Phase 7 — Builder Refactoring
+## Phase 7 — Builder Refactoring ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objectives
@@ -268,12 +292,12 @@ Make onboarding easier for future contributors.
 
 ---
 
-## Phase 9 - Release Manager
+## Phase 9 - Release Manager V1 ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objective
@@ -286,17 +310,17 @@ Framework generalization (Phase 10).
 
 ---
 
-## Phase 10 - BDF V2.5: Framework Generalization
+## Phase 10 - BDF V2.5: Framework Generalization ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objective
 
-Generalize the framework so it can be reused across multiple builder targets (OpenCode, Claude Code, KiloCode).
+Generalize the framework so it can be reused across multiple builder targets (OpenCode, KiloCode, any same-architecture open-source agent).
 
 Required before
 
@@ -304,12 +328,12 @@ Target-specific builders (Phases 11-12).
 
 ---
 
-## Phase 10.5 - Active-Provider Selector Builder
+## Phase 10.5 - Active-Provider Selector Builder ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objective
@@ -318,12 +342,12 @@ Builder gains provider discovery, interactive active-provider selection, per-pro
 
 ---
 
-## Phase 10.6 - JSON Schema Validation
+## Phase 10.6 - JSON Schema Validation ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objective
@@ -332,28 +356,30 @@ Builder validates config sources against schema files before its own validation;
 
 ---
 
-## Phase 11 - Claude Code Builder V1
+## Phase 11 - First Validation Project V1 (DROPPED VARIANT: Claude Code) ✅
 
 Status
 
 ```
-Planned - after gates (Phases 10.5, 10.6)
+DROPPED - if Claude Code was planned here, it is out of scope now (entropic
+~/.claude.json, no multi-provider support). Replace with the actual first
+validation project (e.g. KiloCode).
 ```
 
 Objective
 
-Use the generalized framework to build the first Claude Code builder. Do not redesign anything; use the framework as-is.
+Use the generalized framework to build the first real second-project builder. Do not redesign anything; use the framework as-is.
 
 This is the first real validation of the framework against a second project.
 
 ---
 
-## Phase 12 - KiloCode Builder V1
+## Phase 12 - KiloCode (second validation project) Builder V1 ✅
 
 Status
 
 ```
-Planned
+Completed
 ```
 
 Objective
@@ -362,12 +388,12 @@ Build a KiloCode builder on the same generalized framework.
 
 ---
 
-## Phase 13 - BDF V3: Builder Generator
+## Phase 13 - BDF V3: Builder Generator 🔄
 
 Status
 
 ```
-Planned
+In Progress
 ```
 
 Objective

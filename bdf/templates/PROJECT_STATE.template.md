@@ -184,11 +184,15 @@ bdf/
 | `BLUEPRINT_ENGINE.md` | The intelligence layer |
 | `PROJECT_ADAPTER.md` | Making the framework project-specific |
 | `BUILDER_EVOLUTION.md` | Creating future builder versions |
+| `BUILDER_PHASES.md` | The Alpha → Beta → General Release quality gates every builder build must pass |
 | `FRAMEWORK_LIFECYCLE.md` | The master lifecycle reference |
 | `AI_WORKFLOW.md` | The AI agent workflow |
 | `VERSION.md` | Framework versioning |
 | `MIGRATION.md` | Adopting the framework in an existing project |
 | `PROJECT_GENERATOR.md` | Creating a new builder project |
+| `NEW_PROJECT_GUIDE.md` | Onboarding process for starting a new project |
+| `RELEASE_MANAGER.md` | The generic release process |
+| `TESTING.md` | The generic test-harness pattern |
 | `LESSONS_LEARNED.md` | Reusable engineering lessons |
 | `templates/` | Reusable documentation templates |
 
@@ -335,6 +339,8 @@ After every major refactor:
 | `TROUBLESHOOTING.md` | Common issues and fixes |
 | `ROADMAP.md` | Planned future improvements |
 | `CHANGELOG.md` | Project version history |
+| `CURRENT_RELEASE.md` | Quick reference for the current release (generated) |
+| `release_registry.json` | Machine-readable release history (the only hand-edited release artifact) |
 | `PROJECT_STATE.md` | Living state snapshot |
 | `LESSONS_LEARNED.md` | Reusable engineering lessons |
 | `ADAPTER.md` | Project-specific facts |

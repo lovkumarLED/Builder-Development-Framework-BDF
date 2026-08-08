@@ -466,6 +466,7 @@ Future architectural improvements will be introduced only after the current impl
 - Provider integration
 - Source configuration
 - Builder
+- Schema validation (JSON Schema, F1)
 - Backup system
 - Generated configuration
 - Documentation
@@ -474,7 +475,7 @@ Future architectural improvements will be introduced only after the current impl
 
 The following are intentionally outside the current architecture.
 
-- Advanced validation
+- Additional provider integrations
 
 These features are considered future enhancements and are not part of the current implementation.
 

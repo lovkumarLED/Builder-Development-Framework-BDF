@@ -275,9 +275,34 @@ experimental/
 minimal/
 ```
 
-The `default` profile is the primary profile (settings, plugins, mcp, per-provider models). It currently exposes `omniroute` via `omniroute-models.json`. No provider files carry literal keys (P1 env-key policy; `{env:VAR}` placeholders only).
+The `default` profile is the primary profile of this project (settings, plugins, mcp, per-provider models). It currently exposes `omniroute` via `omniroute-models.json`. No provider files carry literal keys (P1 env-key policy; `{env:VAR}` placeholders only).
 
-`coding/` is a fully developed secondary profile (settings, `<provider>-models.json`, plugins, mcp). `experimental/` and `minimal/` carry `settings.json`, a small `omniroute-models.json` (so the active-provider guard keeps omniroute), and a `target.json` each; they contribute their provider selection to the build.
+`coding/` is a fully developed secondary profile (settings, `<provider>-models.json`, plugins, mcp). `experimental/` and `minimal/` carry `settings.json`, `mcp.json`, and `plugins.json` (three files each); they contribute their provider selection to the build. `target.json` is optional (P2) — absent profiles fall back to `opencode.json`.
+
+## V3 scaffold profile shape (any agent)
+
+The UNIVERSAL scaffold (`scaffold-agent.ps1`) always creates three profiles for
+ANY open-source agent: `coding` (the main profile) + `experimental` + `minimal`.
+Each profile carries exactly three files:
+
+```
+profiles/<profile>/
+
+settings.json
+mcp.json
+plugins.json
+```
+
+- `coding` is ALWAYS the main profile; its `mcp.json`/`plugins.json` are seeded
+  from the agent's own main config (once, if missing).
+- `experimental/` and `minimal/` get EMPTY `mcp.json`/`plugins.json` — the
+  framework never fills them; the user does.
+- `mcp.json`/`plugins.json` are USER-OWNED after creation — the framework never
+  overwrites them on later runs.
+- `settings.json` is the only file the framework writes freely
+  (`$schema` + `activeProviders`).
+- The framework creates the `providers/` folder (like the profile folders) but
+  NEVER writes provider or model files inside it — those are 100% user-owned.
 
 ---
 
@@ -538,6 +563,32 @@ The previous builder is retained as a legacy script.
 build-opencode.ps1
 ```
 
+The universal scaffold seeds the profile structure for ANY open-source coding
+agent. SYSTEM-RUN ONLY — the user never runs it directly.
+
+```
+scaffold-agent.ps1
+```
+
+Per-agent scaffold wrappers delegate to the universal scaffold. SYSTEM-RUN ONLY.
+
+```
+scaffold-opencode.ps1
+scaffold-kilo-v1.ps1   (lives in the kilo project's scripts/, not here)
+```
+
+## User-Run vs System-Run
+
+The user only ever runs the BUILDERS directly:
+
+- `build-opencode-v2.7.ps1` (OpenCode)
+- `build-kilo-v1.ps1` (KiloCode, in `~/.config/kilo/scripts/`)
+
+Everything else — test harnesses, the release manager, and the scaffolds — is
+system/AI-run machinery. The scaffolds run once per agent (to create the profile
+folders and seed `mcp.json`/`plugins.json` from the agent's own main JSON); after
+that the user edits profiles/providers and runs only the builder.
+
 ---
 
 ## build-opencode-v2.7.ps1
@@ -673,7 +724,7 @@ Responsibilities
 - Verify the P1 gate (no literal API keys in generated output).
 - Report pass/fail results.
 
-Covers 30 tests.
+Covers 31 tests.
 
 ---
 

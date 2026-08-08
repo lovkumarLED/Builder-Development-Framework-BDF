@@ -33,9 +33,15 @@ The harness runs the builder against isolated temporary fixtures and verifies bo
 
 It also runs the release manager against a temp copy of the docs and verifies the generated release documentation.
 
-Current automated coverage (17 tests: 9 builder + 8 Release Docs):
+Current automated coverage (all harnesses green = done):
 
-Builder tests:
+- {{TEST_HARNESS}} — 17 tests (9 builder + 8 Release Docs).
+- V2.5 harness ({{V25_TEST_HARNESS}}) — 13 tests (active-provider selector).
+- V2.7 harness ({{V27_TEST_HARNESS}}) — 31 tests (JSON Schema validation + hardening).
+
+Definition of complete: 17/17 + 13/13 + 31/31 PASSED, exit code 0.
+
+Builder tests (V2.1 harness):
 
 - Valid profile (real profile, no manual editing).
 - Invalid JSON.
@@ -898,9 +904,11 @@ Run the harness with:
 
 ```
 powershell -File {{SCRIPTS_DIR}}/{{TEST_HARNESS}}
+powershell -File {{SCRIPTS_DIR}}/{{V25_TEST_HARNESS}}
+powershell -File {{SCRIPTS_DIR}}/{{V27_TEST_HARNESS}}
 ```
 
-Expected: 17/17 PASSED, exit 0.
+Expected: 17/17 + 13/13 + 31/31 PASSED, exit 0.
 
 ---
 

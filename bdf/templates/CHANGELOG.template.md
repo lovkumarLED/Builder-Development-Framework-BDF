@@ -289,7 +289,7 @@ Every new version should include:
 Date
 
 ```
-YYY-MM-DD
+YYYY-MM-DD
 ```
 
 ### Added

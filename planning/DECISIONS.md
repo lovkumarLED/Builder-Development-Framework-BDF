@@ -35,6 +35,16 @@ Context: User originally treated V3 as the final version; the vision doc
 
 Reversal: None.
 
+### 2026-08-08 — Drop Claude Code builder; V3 universal targets OpenCode + KiloCode architecture agents
+
+Decision: Claude Code builder V1 is dead. The second proof project is KiloCode (Kilo Code), and V3 "BDF Universal" targets only open-source coding agents that share the OpenCode/KiloCode architecture (same folders, same config layout).
+
+Why: Claude Code does not fit this framework. Its config is a huge, entropic `~/.claude.json` plus `~/.claude/settings.json`, designed to be hard for third-party tooling to maintain. It cannot add multiple providers; only one provider works at a time, and maintaining providers under its JSON format is painful and can never work automatically. OpenCode and KiloCode share the same architecture, so the same BDF builds for both — and for any similar open-source agent.
+
+Context: User evaluated Claude Code internals (providers, settings, `~/.claude.json` structure) after Builder V2.5 completed, before starting proof-project 2. This updates the planning file NEXT_PHASE_IMPLEMENTATION_PLAN.md and replaces the three-target scope in ROADMAP.md.
+
+Reversal: Supersedes the 2026-08-04 "Only three supported targets" entry to the extent Claude Code is removed. OpenCode + KiloCode + any same-architecture open-source agent remain supported.
+
 ### 2026-08-04 — Only three supported targets
 
 Decision: BDF generates builders only for OpenCode, Claude Code, and KiloCode.
@@ -44,7 +54,8 @@ the three most-used CLI agents.
 
 Context: Explicit user ruling. New targets are admitted only if they naturally fit.
 
-Reversal: None.
+Reversal: Superseded by the 2026-08-08 "Drop Claude Code builder" entry — Claude Code
+removed as a target; OpenCode + KiloCode + any same-architecture open-source agent remain.
 
 ### 2026-08-04 — Keep the roadmap and vision inside docs/
 

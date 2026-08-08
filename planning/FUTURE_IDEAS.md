@@ -30,10 +30,8 @@ All must preserve the core architecture established by V3.
 
 - **CLI Proxy integration** — treat `cliproxy` as a first-class provider path.
 - **More providers** — provider definitions without builder changes (Phase 4 idea).
-- **Better validation** — unknown-key detection, JSON Schema validation against `schemas/`.
+- **Better validation** — unknown-key detection beyond the JSON Schema subset.
 - **Release channels** — channel and support-status fields in the release registry.
-- **Project Generator as a real tool** — the V3 document exists; one day it becomes
-  an actual script instead of a process.
 - **Product README** — a non-technical GitHub README positioning the repo as
   "Builder Development Framework" rather than "OpenCode Builder".
 - **Configuration comparison across builds** — test harness idea.
@@ -51,6 +49,8 @@ All must preserve the core architecture established by V3.
 | `NEW_PROJECT_GUIDE.md` | V2.5 planned work |
 | Session journey tracking | `_agent/JOURNEY_TO_V3.md` |
 | Checkpoint + resume for large builds | `AI/CONTINUE_PROJECT_BUILD.md` |
+| JSON Schema validation against `schemas/` | Builder V2.7 F1 (seven live schemas under `schemas/`) |
+| Project Generator as a real tool | `scripts/scaffold-agent.ps1` `-Bootstrap` (V3 universal core) |
 
 ---
 

@@ -48,6 +48,49 @@ The project is organized into several independent components.
 | `{{SCRIPTS_DIR}}/` | Builder scripts |
 | `{{DOCS_DIR}}/` | Project documentation |
 
+### User-Run vs System-Run
+
+The user only ever runs the BUILDERS (`{{BUILDER_SCRIPT}}` / `{{BUILDER_SCRIPT_ALT}}`).
+Everything else — test harnesses (`{{TEST_HARNESS}}`), the release manager
+(`{{RELEASE_MANAGER_SCRIPT}}`), and the scaffold (`{{UNIVERSAL_SCRIPT}}`) — is
+system/AI-run machinery.
+
+---
+
+## How Configuration Is Organized
+
+```
+{{PROJECT_ROOT}}/
+├── profiles/            ← YOU edit these
+│   ├── coding/          ← the MAIN profile (always)
+│   │   ├── settings.json          (framework-writable: $schema + activeProviders)
+│   │   ├── mcp.json               (user-owned after creation)
+│   │   ├── plugins.json           (user-owned after creation)
+│   │   └── <provider>-models.json (user-owned models)
+│   ├── experimental/    ← settings.json + EMPTY mcp/plugins
+│   └── minimal/         ← settings.json + EMPTY mcp/plugins
+├── {{PROVIDER_DIR}}/    ← YOU own the JSON files inside (e.g. <provider>.json)
+├── schemas/             ← JSON Schemas used for validation
+├── {{SCRIPTS_DIR}}/     ← builder + test harnesses (system-run)
+├── {{BACKUP_DIR}}/      ← automatic timestamped backups (system-made)
+├── {{GENERATED_ARTIFACT}}            ← GENERATED artifact (never edit)
+└── {{GENERATED_ARTIFACT}}.provenance.json  ← GENERATED sidecar (never edit)
+```
+
+**The rules:**
+
+- 🔒 **Providers and models are 100% user-owned.** The framework creates the
+  providers folder but never writes files inside it.
+- 🔑 **No-Secrets Rule (ULTIMATE):** the system's own artifacts (scripts,
+  templates, docs, examples) never contain a literal API key — only `{env:VAR}`
+  placeholders. User files may contain keys; the user protects them. The system
+  copies user content verbatim — it never invents keys.
+- 🧬 **mcp.json / plugins.json are user-owned after creation.** The system seeds
+  them once from the agent's own main JSON, then never overwrites them.
+- 💾 **Backup-first:** before touching anything, the system backs up the previous
+  state.
+- 🚫 **Never touch `.jsonc` without user consent.**
+
 ---
 
 ## Documentation
@@ -150,16 +193,44 @@ These files are intended to be edited manually.
 - Profile configuration
 - Documentation
 - Builder scripts
+- `{{RELEASE_REGISTRY}}` (the only hand-edited release artifact)
 
 ### Generated Files
 
 Generated files are never edited manually.
 
-Current generated file:
+Current generated files:
 
 - `{{GENERATED_ARTIFACT}}`
+- `CURRENT_RELEASE.md`
+- The marker sections in `CHANGELOG.md` and `PROJECT_STATE.md`
+- The compatibility rows in `{{DOCS_DIR}}/bdf/VERSION.md`
 
-All changes should always be made to the source files and regenerated using the builder.
+All changes should always be made to the source files and regenerated using the
+builder or the release manager.
+
+---
+
+## Testing
+
+Automated test harnesses keep the system green:
+
+| Harness | Covers | Result |
+|---------|--------|--------|
+| `{{TEST_HARNESS}}` | Builder + release pipeline | 17/17 ✅ |
+| `{{V25_TEST_HARNESS}}` | Active-Provider Selector | 13/13 ✅ |
+| `{{V27_TEST_HARNESS}}` | JSON Schema validation + hardening | 31/31 ✅ |
+
+Every builder build must pass the **Alpha → Beta → General Release** gates in
+`{{DOCS_DIR}}/bdf/BUILDER_PHASES.md` before it becomes the main builder.
+
+---
+
+## Roadmap
+
+The journey to the destination milestone is tracked in
+`{{DOCS_DIR}}/_agent/JOURNEY_TO_V3.md`; planned phases live in `ROADMAP.md`.
+Completed phases carry ✅ markers so the current position is always visible.
 
 ---
 

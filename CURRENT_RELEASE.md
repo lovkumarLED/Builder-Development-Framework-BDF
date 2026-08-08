@@ -47,7 +47,7 @@ No
 Testing
 
 ```
-17/17 (V2.1) + 13/13 (V2.5) + 30/30 (V2.7) tests passed, exit code 0
+17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7) tests passed, exit code 0
 ```
 
 ---
