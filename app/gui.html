@@ -725,7 +725,7 @@ const Providers = (() => {
     finally { Utils.setLoading(btn, false); }
   };
   const addModelRow = () => { mRows.push({ model: "", name: "", thinking: [] }); renderModelRows(); };
-  return { load, render, switchTo, test, edit, del, openAdd, save, testModal, setModelRows, addModelRow, PRESETS };
+  return { load, render, switchTo, test, edit, del, openAdd, save, testModal, setModelRows, addModelRow, setSdk, PRESETS };
 })();
 
 const Wizard = (() => {
@@ -823,7 +823,6 @@ const BuildPanel = (() => {
     try {
       const r = await Api.build({ profile: "coding" });
       (r.output || "").split(/\r?\n/).forEach(l => l && line(l, classify(l)));
-      const res = Utils.$("#bldRes");
       if (r.ok) Toast.ok("Build succeeded ✓");
       else Toast.err("The build ran into a problem. Look at the red lines above.");
     } catch (e) { line(Utils.friendly(e, "Couldn't run the build."), "r"); Toast.err(Utils.friendly(e, "Couldn't run the build.")); }
@@ -1018,7 +1017,7 @@ const Models = (() => {
       const data = await Api.listProviders();
       const providers = data.providers || [];
       sel.innerHTML = "";
-      providers.forEach(p => { const o = Utils.el("option", "", p.name); o.value = p.id; sel.appendChild(o); });
+      providers.forEach(p => { const o = Utils.el("option", "", ""); o.textContent = p.name; o.value = p.id; sel.appendChild(o); });
       if (!providers.length) { Utils.$("#mCardRows").innerHTML = '<div class="hint">Add a provider first.</div>'; return; }
       if (prev && providers.some(p => p.id === prev)) sel.value = prev; else sel.value = providers[0].id;
       await loadFor(sel.value);

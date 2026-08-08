@@ -28,6 +28,8 @@ KEY_MAP = {name[2:]: name for name in DEFAULT_THEME}
 
 _COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 _SIZE_RE = re.compile(r"^\d+(px|rem|%|em)?$")
+_FONT_RE = re.compile(r"^[A-Za-z0-9 ,._\"'-]+$")
+_BREAKOUT_CHARS = set("<>{;}\n\r")
 
 _cache = {"mtime": None, "theme": None, "rulebook": None, "problem": None}
 
@@ -69,8 +71,10 @@ def _parse_rule_file(text):
                 else:
                     problems.append(f"invalid size '{value}' for {key}")
             elif css_key == "--font":
-                if value:
+                if value and _FONT_RE.match(value) and not _BREAKOUT_CHARS.intersection(value):
                     theme[css_key] = value
+                else:
+                    problems.append(f"invalid font '{value}' for {key}")
             elif _COLOR_RE.match(value):
                 theme[css_key] = value
             else:

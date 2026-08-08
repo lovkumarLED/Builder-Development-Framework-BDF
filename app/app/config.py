@@ -18,7 +18,7 @@ PORT = 9090
 PRESETS = {
     "OmniRoute": "http://localhost:20128/v1",
     "LiteLLM": "http://localhost:4000/v1",
-    "CLI Proxy": "http://localhost:xxxxx/v1",
+    "CLI Proxy": "http://localhost:PORT/v1",
     "TokenRouter": "https://api.tokenrouter.com/v1",
     "Modal": "https://inference.us-west.modal.direct/v1",
     "OpenAI": "https://api.openai.com/v1",

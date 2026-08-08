@@ -51,7 +51,17 @@ def current_agent():
     return entry["name"], Path(entry["dir"])
 
 
+AGENT_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def _require_valid_agent_name(name):
+    """Reject agent names that could escape their config directory lookups."""
+    if not isinstance(name, str) or not AGENT_NAME_RE.match(name):
+        raise HTTPException(400, "Invalid agent name - use letters, numbers, dots, dashes and underscores only.")
+
+
 def add_agent(name, directory):
+    _require_valid_agent_name(name)
     agents, active = _normalize_state()
     if any(a.get("name") == name for a in agents):
         raise HTTPException(400, f"An agent named '{name}' already exists.")
@@ -64,6 +74,7 @@ def add_agent(name, directory):
 
 
 def upsert_agent(name, directory):
+    _require_valid_agent_name(name)
     agents, _ = _normalize_state()
     agents = [a for a in agents if a.get("name") != name]
     agents.append({"name": name, "dir": str(directory)})
@@ -103,6 +114,15 @@ def require_agent_dir():
 
 def slugify(name):
     return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
+
+
+PROVIDER_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+
+
+def _require_valid_provider_id(provider_id):
+    """Reject ids that could escape the providers/ directory (path traversal)."""
+    if not isinstance(provider_id, str) or not PROVIDER_ID_RE.match(provider_id):
+        raise HTTPException(400, "Invalid provider id - use letters, numbers and dashes only.")
 
 
 def _builder_version(path):
@@ -187,6 +207,7 @@ def list_providers(agent_dir):
 
 
 def read_provider(agent_dir, provider_id):
+    _require_valid_provider_id(provider_id)
     provider_file = agent_dir / "providers" / f"{provider_id}.json"
     if not provider_file.is_file():
         return None
@@ -194,6 +215,7 @@ def read_provider(agent_dir, provider_id):
 
 
 def write_provider(agent_dir, provider_id, name, base_url, api_key, npm=None):
+    _require_valid_provider_id(provider_id)
     providers_dir = agent_dir / "providers"
     providers_dir.mkdir(parents=True, exist_ok=True)
     provider_file = providers_dir / f"{provider_id}.json"
@@ -219,6 +241,7 @@ MODEL_PROFILE = "coding"
 
 
 def models_file(agent_dir, provider_id, profile=MODEL_PROFILE):
+    _require_valid_provider_id(provider_id)
     return agent_dir / "profiles" / profile / f"{provider_id}-models.json"
 
 
@@ -326,6 +349,7 @@ def remove_mcp(agent_dir, name, profile=MODEL_PROFILE):
 
 
 def delete_provider(agent_dir, provider_id):
+    _require_valid_provider_id(provider_id)
     provider_file = agent_dir / "providers" / f"{provider_id}.json"
     if provider_file.is_file():
         _backup(provider_file)

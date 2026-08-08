@@ -84,6 +84,8 @@ def scaffold(body: ScaffoldBody):
 
 @router.post("/build")
 def build(body: BuildBody):
+    if any(part in body.profile for part in ("/", "\\", "..")):
+        raise HTTPException(400, "Invalid profile name.")
     agent, directory = agentstore.current_agent()
     if not agent or not directory:
         raise HTTPException(400, "No agent is set up yet. Run the setup wizard first.")
@@ -93,5 +95,8 @@ def build(body: BuildBody):
             400,
             f"No builder script for '{agent}' was found. Run 'Generate my builder' first.",
         )
-    code, output = _run_ps1([str(script), "-Profile", body.profile, "-NonInteractive"], 300)
+    code, output = _run_ps1(
+        [str(script), "-Profile", body.profile, "-NonInteractive", "-ConfigRoot", str(directory)],
+        300,
+    )
     return {"ok": code == 0, "output": output}

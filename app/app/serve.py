@@ -40,8 +40,15 @@ PLACEHOLDER = """<!doctype html>
 """
 
 
+def _sanitize_css_value(value):
+    """Belt-and-braces: no CSS/HTML breakout characters in theme values."""
+    return "".join(ch for ch in str(value) if ch not in "<>{;}\n\r\t")
+
+
 def build_theme_style(theme):
-    declarations = ";".join(f"{key}:{value}" for key, value in theme.items())
+    declarations = ";".join(
+        f"{key}:{_sanitize_css_value(value)}" for key, value in theme.items()
+    )
     return f"<style>:root{{{declarations}}}</style>"
 
 

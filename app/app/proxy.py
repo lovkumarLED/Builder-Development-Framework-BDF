@@ -11,6 +11,17 @@ from . import agentstore
 router = APIRouter()
 
 
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Never follow upstream redirects: a redirect must not re-point the
+    bearer token at an arbitrary host (SSRF-via-redirect)."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_OPENER = urllib.request.build_opener(_NoRedirectHandler)
+
+
 @router.api_route("/v1/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy(path: str, request: Request):
     try:
@@ -44,12 +55,17 @@ async def proxy(path: str, request: Request):
         headers=headers,
     )
     try:
-        response = urllib.request.urlopen(upstream, timeout=120)
+        response = _OPENER.open(upstream, timeout=120)
     except urllib.error.HTTPError as error:
         try:
             detail = error.read().decode("utf-8", "replace")
         except OSError:
             detail = ""
+        finally:
+            try:
+                error.close()
+            except Exception:
+                pass
         return Response(content=detail, status_code=error.code, media_type="application/json")
     except (urllib.error.URLError, OSError) as error:
         reason = getattr(error, "reason", str(error))
