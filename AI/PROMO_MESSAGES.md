@@ -6,6 +6,29 @@
 
 ---
 
+## 0. Launch map — where to post (researched 2026-08-09)
+
+**Reddit — post here first, in this order:**
+1. **r/SideProject** (~500K+ members) — self-promotion is the whole point. Use the full post (section 3).
+2. **r/vibecoding** (~330K members) — self-promo is common; the "built with coding agents" story fits perfectly. Full post.
+3. **r/buildinpublic** — journey-style, promo allowed with conditions (share the process, not just the link).
+4. **r/IMadeThis** / **r/somethingimade** — open promo, visual content wins.
+5. **r/alphaandbetausers** — if you want early testers specifically.
+6. **Hacker News "Show HN"** (not Reddit, but the biggest dev launch stage) — "Show HN:" post title + the full post text.
+
+Rules of thumb:
+- Post to 1-2 subs first, not all at once — identical mass-posting = spam flag = ban risk.
+- Reply to every comment in the first hour (visibility + karma).
+- New accounts often get link posts auto-removed; if that happens, re-post as a text post with the link inside.
+- The messages contain NO code and NO secrets — safe to post anywhere.
+
+**Discord:** search Discord for "vibe coding" / "AI tooling" / "local LLM" servers; look for a `#show-and-tell` or `#projects` channel; read the server rules first; then paste the Discord message (section 5). Invite links change constantly — find them fresh.
+
+**LinkedIn:** post section 2 as a normal status update.
+**Twitter/X:** pick a tweet variant from section 4.
+
+---
+
 ## 1. Short ad message ("check this out")
 
 So I built this thing.
@@ -39,6 +62,16 @@ I built it with coding agents, days of debugging, and a lot of trial and error �
 If you're juggling AI tools and configs like I was — check it out. Contributions are welcome. It genuinely makes me happy when something I built helps someone else.
 
 https://github.com/lovkumarLED/Builder-Development-Framework-BDF
+
+**LinkedIn tips (2026):** hashtags still matter there (2-5, three is the sweet
+spot); saves drive ~5x the reach of a like; comments beat likes; post
+weekdays 8-10 AM or 4-6 PM; no engagement bait ("comment YES if...").
+
+**End the post with:**
+If you're juggling AI tools and configs — what's your current setup? I'd love to hear how others manage it.
+
+**Hashtags (3):**
+`#Python #OpenSource #MachineLearning`
 
 ---
 
@@ -81,18 +114,34 @@ I built an open-source AI Switcher — a GUI + builders to manage your coding ag
 
 ---
 
-## 4. Tweet (two variants)
+## 4. Tweet (two variants — algorithm-optimized 2026)
 
-A) I had too many API keys. Too many providers. Config files getting bigger and bigger.
-So I built a system to manage it all — builders + a GUI app for your coding agents. Free. Local-first. Keys never leave your PC.
-If you're learning AI like me: 👇
+**X/Twitter rules (2026):** 0-1 hashtags max (3+ triggers spam filters); put the
+link in a REPLY to your own tweet (links in the main tweet cut reach ~50%);
+end with a question (replies are weighted ~27x more than likes); reply to
+every comment in the first 30 minutes.
+
+### Variant A — main tweet (no hashtags)
+
+I had too many API keys. Too many providers. Config files getting bigger and bigger. 😅
+So I built an open-source system to manage it all — config builders + a GUI for your coding agents. Free. Local-first. Keys never leave your PC.
+How many API keys are YOU managing right now?
+
+### Variant A — reply (post immediately after; the link lives here)
+
+If you're learning AI like me 👇
 https://github.com/lovkumarLED/Builder-Development-Framework-BDF
 
-B) Built an "AI Switcher" — one dashboard for your coding agents, providers, models, MCPs and plugins. No cloud. No account. Free.
+### Variant B — main tweet (one hashtag only)
+
+Built an "AI Switcher" — one dashboard for your coding agents, providers, models, MCPs and plugins. No cloud. No account. Free.
 Built by me + coding agents, days of debugging, lots of coffee. ☕
+What does YOUR agent config look like? Mine was chaos. #buildinpublic
+
+### Variant B — reply
+
 Check it out 👇
 https://github.com/lovkumarLED/Builder-Development-Framework-BDF
-#opensource #AI #vibecoding #buildinpublic
 
 ---
 
