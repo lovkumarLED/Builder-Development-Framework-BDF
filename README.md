@@ -13,11 +13,49 @@
 
 [![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-development-framework)
 [![Framework](https://img.shields.io/badge/BDF-2.2.10-blue)](#builder-development-framework)
-[![Tests](https://img.shields.io/badge/tests-kilo%2031%2F31%20%2B%20opencode%2031%2F31%20%2B%20app%2034%20green-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-kilo%2031%2F31%20%2B%20opencode%2031%2F31%20%2B%20app%2048%20green-brightgreen)](#testing)
 [![Release](https://img.shields.io/badge/release-2.5.1-orange)](#releases)
 [![Status](https://img.shields.io/badge/status-13%2F15%20phases%20complete%20%2B%20V3%20in%20progress-blue)](#roadmap)
 
 ---
+
+## 📖 The Story Behind the Project
+
+It started with a pretty simple problem: **too many API keys, too many providers, and configuration files that kept growing.** 😅
+
+I'm just a normal guy trying to learn **Python and Machine Learning** - intermediate Python so far, still working my way toward the ML part of the journey. To learn without spending a fortune, I hunted down every free model and free API I could find. Different providers, different coding agents, different websites - anything that gave me more useful AI tools.
+
+And it worked. Maybe too well.
+
+Before long I had a drawer full of API keys, provider files, model lists, MCP servers, plugins, and profiles. My JSON configs were getting bigger and bigger - and the real kicker is that **every agent reads them differently**. OpenCode reads a provider key from `provider.<id>.apiKey`, KiloCode reads it from `provider.<id>.options.apiKey`. One provider file, two contracts. And a stray `opencode.jsonc` can silently shadow the config you just spent an hour building.
+
+At some point I thought:
+
+> **"There has to be a better way to manage all of this."**
+
+So I built one.
+
+**This project is that way.** It has two halves that share one engine:
+
+- **The BDF builders** (`build-kilo-v1.ps1`, `build-opencode-v2.7.ps1`): they read your `providers/` and `profiles/`, validate everything against JSON schemas, back up before they touch anything, merge, and generate the final config - with a dry-run (`-WhatIf`), a doctor (`-Doctor`), and a provenance sidecar so you always know what happened and why.
+
+- **The AI Switcher app**: a GUI on top of that same engine. The wizard discovers your agents, scans their configs, and generates their builders. One dashboard shows your agents, providers, models, plugins, and MCP servers. The Add-provider form carries presets - my local proxies (OmniRoute, LiteLLM), TokenRouter, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM - that auto-fill the URL, the SDK, and the name. Test a connection, switch the active provider, hit build: done.
+
+Every provider file is written for **both** agent contracts (dual-key), backups are made first, and keys never leave your machine - the proxy on `127.0.0.1:9090` is the only "cloud" involved.
+
+I didn't know how to build any of this when I started. I know Python, but I had never built a web app, and the builders are PowerShell - a language I don't speak at all. So I built them with the help of **coding agents**, one experiment at a time: days of debugging, breaking things, fixing them, and slowly figuring out how the pieces fit together. That's what made it fun.
+
+I'm not finished. Claude Code and more providers are on the list. But right now, this is the system I built because I actually needed it - and if you like it, you're welcome to contribute. That would make me genuinely happy. ❤️
+
+---
+
+### 😄 One Last Thing...
+
+If you ever wonder why the generated JSON files - kilo.json, opencode.json - look completely cursed after running a builder...
+
+**Just press `Shift + Alt + F`.**
+
+You're welcome. 😂
 
 ## Table of Contents
 
@@ -484,7 +522,7 @@ automatically (SHA256 hash marker detects the change).
 docs/
 ├── app/                    ← the AI Switcher app (self-contained)
 │   ├── app/                ← Python package (see module table above)
-│   ├── tests/              ← 34 unit tests (unittest, stdlib-only)
+│   ├── tests/              ← 48 unit tests (unittest, stdlib-only)
 │   ├── assets/             ← logo + favicon
 │   ├── lib/                ← anime.min.js (local)
 │   ├── gui.html            ← the whole frontend (one file)
