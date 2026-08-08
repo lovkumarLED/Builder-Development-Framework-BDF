@@ -227,7 +227,7 @@ Includes the build-continuation rule:
 AI/CONTINUE_PROJECT_BUILD.md
 ```
 
-- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package, incl. `agentstore.py` — reads/writes the agent's BDF provider files), `gui.html` (frontend), `start.bat` (double-click launcher), `env/` (private venv, auto-created), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage).
+- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js — no CDN), `tests/` (28 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage).
 
 ## PROJECT_STATE.md
 

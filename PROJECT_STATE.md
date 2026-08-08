@@ -713,7 +713,7 @@ Current framework version:
 
 ## Implemented
 
-- GUI App 'AI Switcher' (docs/app/) BUILT + smoke-tested end-to-end green on the real opencode agent (session 29, 2026-08-08) — scaffold → build → switch → chat, no AI agent involved.
+- GUI App 'AI Switcher' (docs/app/) COMPLETE - the BDF made autonomous (session 29, 2026-08-08): FastAPI backend + gui.html + start.bat + local /v1 proxy on 127.0.0.1:9090; calls the real scaffold-agent.ps1 engine and the generated builders. BDF-exact data model: the app reads/writes the agent's own providers/, <provider>-models.json, plugins.json, mcp.json and settings.json activeProviders (a LIST - every listed provider merges into the build), all backup-first. MULTI-AGENT management: Agents card registers any agent config folder, switches the managed agent instantly, loads already-set-up folders directly (no wizard forced). Features: models with thinking levels (default/minimal/high/max) in the provider modal + Models card, plugins card, MCP servers card, SDK type selector (15 npm packages, registry-verified), active hero showing every active provider side-by-side, flame startup banner with local addresses, self-contained Python env (env/ auto-bootstrapped), rule.md live theme + agent rulebook. Verified live on opencode and kilo (kilo.json: omniroute 18 models + tokenrouter 1 model, 19 merged); full E2E click-through battery with snapshot backup + hash-verified restore (32/32). Committed 459d407 + b3a0bdb.
 - Modular configuration architecture
 - OmniRoute provider integration
 - Profile-based configuration
@@ -767,7 +767,7 @@ These limitations simplify development and provide a stable foundation for futur
 
 ## Immediate
 
-- Commit the docs repository on request (Claude-drop decision, universal scaffold docs, V3 plan updates).
+- Committed: 459d407 (docs batch, sessions 28b-28f) + b3a0bdb (AI Switcher app, session 29).
 
 ## Roadmap Phases
 
@@ -776,6 +776,10 @@ Phase 4 — Additional Providers
 Phase 8 — Documentation Expansion
 
 Phase 12 — KiloCode Builder V1 (COMPLETED 2026-08-07, harness 30/30)
+
+Phase 14 — GUI App (COMPLETED 2026-08-08, session 29)
+
+Phase 15 — More Coding Agents (PLANNED — OpenCode + KiloCode verified; other open-source coding agents expected to work with the universal engine but untested yet)
 
 Phase 13 — V3 Universal Builder Generator (IN PROGRESS — universal scaffold core,
 sessions 24b-26b)

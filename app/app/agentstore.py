@@ -8,15 +8,94 @@ from pathlib import Path
 
 from fastapi import HTTPException
 
-from .storage import get_state
+from .storage import get_state, set_state
 
 NPM_OPENAI_COMPATIBLE = "@ai-sdk/openai-compatible"
 
 
-def require_agent_dir():
+def get_agents():
     state = get_state()
-    agent = state.get("agent")
-    directory = state.get("dir")
+    if "agents" in state:
+        agents = state.get("agents")
+        return agents if isinstance(agents, list) else []
+    agent, directory = state.get("agent"), state.get("dir")
+    if agent and directory:
+        return [{"name": agent, "dir": directory}]
+    return []
+
+
+def _normalize_state():
+    state = get_state()
+    agents = get_agents()
+    active = state.get("activeAgent")
+    if not active or not any(a.get("name") == active for a in agents):
+        active = agents[0]["name"] if agents else None
+    if "agents" not in state or state.get("activeAgent") != active:
+        data = dict(state)
+        data["agents"] = agents
+        data["activeAgent"] = active
+        set_state(**data)
+    return agents, active
+
+
+def active_agent_name():
+    _, active = _normalize_state()
+    return active
+
+
+def current_agent():
+    agents, active = _normalize_state()
+    entry = next((a for a in agents if a.get("name") == active), None)
+    if not entry:
+        return None, None
+    return entry["name"], Path(entry["dir"])
+
+
+def add_agent(name, directory):
+    agents, active = _normalize_state()
+    if any(a.get("name") == name for a in agents):
+        raise HTTPException(400, f"An agent named '{name}' already exists.")
+    agents.append({"name": name, "dir": str(directory)})
+    data = dict(get_state())
+    data["agents"] = agents
+    data["activeAgent"] = active
+    set_state(**data)
+    return agents
+
+
+def upsert_agent(name, directory):
+    agents, _ = _normalize_state()
+    agents = [a for a in agents if a.get("name") != name]
+    agents.append({"name": name, "dir": str(directory)})
+    data = dict(get_state())
+    data["agents"] = agents
+    data["activeAgent"] = name
+    set_state(**data)
+
+
+def remove_agent(name):
+    agents, active = _normalize_state()
+    agents = [a for a in agents if a.get("name") != name]
+    if active == name:
+        active = agents[0]["name"] if agents else None
+    data = dict(get_state())
+    data["agents"] = agents
+    data["activeAgent"] = active
+    set_state(**data)
+    return agents, active
+
+
+def switch_agent(name):
+    agents, _ = _normalize_state()
+    if not any(a.get("name") == name for a in agents):
+        raise HTTPException(404, "That agent doesn't exist.")
+    data = dict(get_state())
+    data["activeAgent"] = name
+    set_state(**data)
+
+
+def require_agent_dir():
+    agent, directory = current_agent()
     if not agent or not directory:
         raise HTTPException(400, "No agent is set up yet. Run the setup wizard first.")
     return Path(directory)
@@ -36,6 +115,11 @@ def find_builder_script(agent_dir, agent):
         if matches:
             return matches[0]
     return None
+
+
+def has_any_builder(agent_dir):
+    scripts_dir = agent_dir / "scripts"
+    return bool(scripts_dir.is_dir() and any(scripts_dir.glob("build-*.ps1")))
 
 
 def _agent_dir_of(path):
@@ -189,6 +273,43 @@ def write_plugins(agent_dir, plugins, profile=MODEL_PROFILE):
     data["plugin"] = [p for p in plugins if p]
     _write_json(path, data)
     return read_plugins(agent_dir, profile)
+
+
+def mcp_file(agent_dir, profile=MODEL_PROFILE):
+    return agent_dir / "profiles" / profile / "mcp.json"
+
+
+def read_mcp(agent_dir, profile=MODEL_PROFILE):
+    data = _read_json(mcp_file(agent_dir, profile), {})
+    mcps = data.get("mcp")
+    return mcps if isinstance(mcps, dict) else {}
+
+
+def write_mcp(agent_dir, name, config, profile=MODEL_PROFILE):
+    path = mcp_file(agent_dir, profile)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = _read_json(path, {})
+    _backup(path)
+    mcps = data.get("mcp")
+    if not isinstance(mcps, dict):
+        mcps = {}
+    mcps[name] = config
+    data["mcp"] = mcps
+    _write_json(path, data)
+    return mcps
+
+
+def remove_mcp(agent_dir, name, profile=MODEL_PROFILE):
+    path = mcp_file(agent_dir, profile)
+    data = _read_json(path, {})
+    mcps = data.get("mcp")
+    if not isinstance(mcps, dict) or name not in mcps:
+        return False
+    _backup(path)
+    del mcps[name]
+    data["mcp"] = mcps
+    _write_json(path, data)
+    return True
 
 
 def delete_provider(agent_dir, provider_id):

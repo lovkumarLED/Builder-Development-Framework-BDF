@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from app import agentstore
+from app.storage import set_state
 
 
 class AgentStoreTests(unittest.TestCase):
@@ -11,6 +12,27 @@ class AgentStoreTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.agent_dir = Path(self.tmp.name)
+        self._orig_state = None
+        self._backup_state_file()
+        from app import config
+        if config.STATE_FILE.is_file():
+            config.STATE_FILE.unlink()
+
+    def _backup_state_file(self):
+        from app import config
+        state = config.STATE_FILE
+        self._orig_state = state.read_text(encoding="utf-8") if state.is_file() else None
+
+    def _reset_state(self):
+        from app import config
+        state = config.STATE_FILE
+        if self._orig_state is None:
+            state.unlink(missing_ok=True)
+        else:
+            state.write_text(self._orig_state, encoding="utf-8")
+
+    def tearDown(self):
+        self._reset_state()
 
     def test_slugify(self):
         self.assertEqual(agentstore.slugify("OmniRoute"), "omniroute")
@@ -124,3 +146,51 @@ class AgentStoreTests(unittest.TestCase):
         agentstore.write_plugins(self.agent_dir, ["another"])
         self.assertEqual(agentstore.read_plugins(self.agent_dir), ["another"])
         self.assertEqual(len(list((self.agent_dir / "backup").glob("plugins_*.json"))), 1)
+
+    def test_agent_registry_migrates_legacy_and_switches(self):
+        set_state(agent="kilo", dir=str(self.agent_dir))
+        self.assertEqual(agentstore.get_agents(), [{"name": "kilo", "dir": str(self.agent_dir)}])
+        self.assertEqual(agentstore.active_agent_name(), "kilo")
+        self.assertEqual(agentstore.current_agent()[0], "kilo")
+
+    def test_agent_add_remove_switch(self):
+        set_state(agent="kilo", dir=str(self.agent_dir))
+        other = Path(self.tmp.name) / "other-agent"
+        other.mkdir()
+        agentstore.add_agent("opencode", str(other))
+        names = [a["name"] for a in agentstore.get_agents()]
+        self.assertEqual(names, ["kilo", "opencode"])
+        self.assertEqual(agentstore.active_agent_name(), "kilo")
+        agentstore.switch_agent("opencode")
+        self.assertEqual(agentstore.active_agent_name(), "opencode")
+        self.assertEqual(agentstore.current_agent()[1], other)
+        agentstore.remove_agent("opencode")
+        self.assertEqual(agentstore.active_agent_name(), "kilo")
+        self.assertEqual([a["name"] for a in agentstore.get_agents()], ["kilo"])
+
+    def test_agent_remove_active_falls_back(self):
+        set_state(agent="kilo", dir=str(self.agent_dir))
+        agentstore.remove_agent("kilo")
+        self.assertIsNone(agentstore.active_agent_name())
+        self.assertEqual(agentstore.get_agents(), [])
+
+    def test_upsert_agent(self):
+        set_state(agent="kilo", dir=str(self.agent_dir))
+        other = Path(self.tmp.name) / "other-agent"
+        other.mkdir()
+        agentstore.upsert_agent("kilo", str(other))
+        self.assertEqual(len(agentstore.get_agents()), 1)
+        self.assertEqual(agentstore.get_agents()[0]["dir"], str(other))
+        self.assertEqual(agentstore.active_agent_name(), "kilo")
+
+    def test_mcp_roundtrip_remove_and_backup(self):
+        self.assertEqual(agentstore.read_mcp(self.agent_dir), {})
+        agentstore.write_mcp(self.agent_dir, "context7", {"type": "local", "command": ["npx", "-y", "@upstash/context7-mcp"]})
+        agentstore.write_mcp(self.agent_dir, "files", {"type": "local", "command": ["npx", "x"]})
+        mcps = agentstore.read_mcp(self.agent_dir)
+        self.assertEqual(sorted(mcps.keys()), ["context7", "files"])
+        self.assertEqual(mcps["context7"]["command"][2], "@upstash/context7-mcp")
+        self.assertTrue(agentstore.remove_mcp(self.agent_dir, "context7"))
+        self.assertFalse(agentstore.remove_mcp(self.agent_dir, "context7"))
+        self.assertEqual(list(agentstore.read_mcp(self.agent_dir).keys()), ["files"])
+        self.assertGreaterEqual(len(list((self.agent_dir / "backup").glob("mcp_*.json"))), 1)

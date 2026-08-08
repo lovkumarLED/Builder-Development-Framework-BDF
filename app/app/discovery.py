@@ -50,11 +50,10 @@ def _agent_entry(name):
 
 @router.get("/status")
 def status():
-    state = get_state()
-    agent = state.get("agent") or None
+    agent, directory = agentstore.current_agent()
     has_builder = False
-    if agent and state.get("dir"):
-        has_builder = agentstore.find_builder_script(Path(state["dir"]), agent) is not None
+    if agent and directory:
+        has_builder = agentstore.find_builder_script(directory, agent) is not None
     return {"ready": bool(agent and has_builder), "agent": agent, "hasBuilder": has_builder}
 
 
@@ -115,4 +114,5 @@ def scan(body: ScanBody):
 
     profiles_dir = directory / "profiles"
     profiles = [p.name for p in profiles_dir.glob("*") if p.is_dir()] if profiles_dir.is_dir() else []
-    return {"agent": body.agent, "mcps": mcps, "plugins": plugins, "profiles": profiles}
+    has_builder = agentstore.has_any_builder(directory)
+    return {"agent": body.agent, "mcps": mcps, "plugins": plugins, "profiles": profiles, "hasBuilder": has_builder}

@@ -67,6 +67,24 @@ The first time you open the app, it walks you through 5 easy steps:
 
 ---
 
+## Agents (which coding agent the app manages)
+
+The **Agents card** sits at the top of the home screen:
+
+- It shows every agent the app knows about — name, config folder, and who's
+  **Active** (the one being managed right now).
+- **Add agent**: type a name + the config folder (e.g.
+  `C:\Users\YourName\.config\opencode`) → the app can manage it too. You can
+  have kilo AND opencode (and more) registered at once.
+- **Switch to this**: the whole app — providers, models, plugins, MCP, build —
+  instantly starts managing the chosen agent. Nothing is mixed up between
+  agents; each one keeps its own config.
+- ✕ removes an agent from the list (never deletes its files).
+
+After the first-time wizard, your agent is registered automatically.
+
+---
+
 ## Adding a provider
 
 A *provider* is an AI server that speaks the OpenAI way. Common ones:
@@ -112,21 +130,30 @@ To add one:
 > **Plugins:** the app has a Plugins card on the home screen — type a plugin
 > id and click Add; the app writes your `profiles\coding\plugins.json`.
 > Remove is one click (backup kept first).
+>
+> **MCP servers:** an MCP card next to Plugins — your agent's MCP servers with
+> their type, each removable in one click. Add a new one with a name + its
+> config (JSON — e.g. `{"type": "local", "command": ["npx", "-y", "@example/mcp"]}`),
+> validated before it's written to `profiles\coding\mcp.json` (backup-first).
+>
+> **Models card:** the home screen also has a Models card — pick a provider
+> and its models load as rows (model id, display name, thinking chips).
+> Remove a dead model, add a new one (e.g. when a provider swaps models),
+> click **Save models** — the app writes
+> `profiles\coding\<provider>-models.json` for you, backup-first. No JSON
+> editing ever.
 
 ---
 
 ## Switching providers
 
-On the home screen you see all your providers as cards.
+On the home screen you see all your providers as cards, and the big glowing
+hero shows **every active provider** — all of them 🔥 Active, side by side.
 
-- The **active** one has a glowing ring and an "Active" badge.
-- Click **"Switch to this"** on any other card — the app makes it the primary
-  provider (first in your agent's `activeProviders` list) and the app's own
-  connection (`127.0.0.1:9090`) forwards to it.
-- **Every provider you add stays in the build** — the app keeps them all in
-  `activeProviders`, so a build merges every provider (each with its own
-  models) into your agent's main JSON. The one at the front is just the
-  default/primary. Add one, click "Switch to this", build — it's in.
+- The **first** one in the list is the primary — the one your tool talks to
+  through `127.0.0.1:9090` (the note under the hero says so).
+- Click **"Switch to this"** on any other card — it moves to the front and
+  becomes the primary; **every active provider is still merged into the build**.
 - **Test** re-checks a provider's connection (green = working, red = not
   reachable, gray = never tested).
 
@@ -173,6 +200,7 @@ Everything stays inside the `app` folder (or next to your agent):
 | `<agent>\providers\` | your providers — the app writes them here (backup-first), exactly where your agent's builder reads them |
 | `<agent>\profiles\coding\<provider>-models.json` | your models (with thinking levels) — the app writes them when you add models |
 | `<agent>\profiles\coding\plugins.json` | your plugins — the app writes them from the Plugins card |
+| `<agent>\profiles\coding\mcp.json` | your MCP servers — the app writes them from the MCP card |
 | `<agent>\profiles\coding\settings.json` | which provider is active (`activeProviders`) — the app updates it when you switch |
 | `<agent>\backup\` | automatic backups of everything the app changes |
 | `profiles\` | your agent's profiles (`coding`, `experimental`, `minimal`) |

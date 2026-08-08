@@ -9,8 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app import APP_VERSION, config
+from app.agents import router as agents_router
+from app.banner import print_banner
 from app.discovery import router as discovery_router
 from app.engine import router as engine_router
+from app.mcp import router as mcp_router
 from app.plugins import router as plugins_router
 from app.providers import router as providers_router
 from app.proxy import router as proxy_router
@@ -30,14 +33,17 @@ app.add_middleware(
 )
 
 app.include_router(serve_router)
+app.include_router(agents_router)
 app.include_router(discovery_router)
 app.include_router(providers_router)
 app.include_router(engine_router)
 app.include_router(testing_router)
 app.include_router(plugins_router)
+app.include_router(mcp_router)
 app.include_router(proxy_router)
 
 if __name__ == "__main__":
+    print_banner()
     url = f"http://{config.HOST}:{config.PORT}"
     threading.Timer(1.2, lambda: webbrowser.open(url)).start()
     uvicorn.run(app, host=config.HOST, port=config.PORT, log_level="info")

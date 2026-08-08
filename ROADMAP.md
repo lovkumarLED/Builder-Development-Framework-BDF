@@ -581,6 +581,17 @@ Status
 COMPLETED 2026-08-08 (session 29) — docs/app/: FastAPI backend + gui.html frontend + start.bat,
 local OpenAI-compatible proxy on 127.0.0.1:9090, calls the real scaffold-agent.ps1 -Bootstrap
 engine (one engine, two surfaces). Smoke-tested end-to-end green on the real opencode agent.
+Feature set: BDF-exact data model (app reads/writes the agent's own providers/,
+<provider>-models.json, plugins.json, mcp.json, settings.json activeProviders — backup-first),
+MULTI-AGENT management (Agents card: add any agent's config folder, switch the managed agent
+instantly, already-set-up folders load directly without the wizard), models with thinking
+levels (default/minimal/high/max, provider modal + Models card), plugins card, MCP servers
+card, SDK type selector (15 npm packages, registry-verified), active-hero showing EVERY
+active provider side-by-side, self-contained Python env (env/ bootstrapped by start.bat),
+flame ASCII-art startup banner with local addresses, rule.md live theme + agent rulebook,
+kilo verified live (omniroute + tokenrouter, 19 models in kilo.json). Full E2E click-through
+battery on a real agent config with snapshot backup + hash-verified restore (32/32).
+Committed: 459d407 (docs batch) + b3a0bdb (feat app).
 ```
 
 Objective
@@ -619,6 +630,32 @@ Definition of complete
 
 ---
 
+## Phase 15 — More Coding Agents 🔜
+
+Status
+
+```
+PLANNED — OpenCode + KiloCode verified today (app + universal scaffold). Other
+open-source coding agents are expected to work with the same universal engine,
+but have NOT been tested yet — we will find out when we try them.
+```
+
+Objective
+
+The app and the framework should work with more coding agents — not just the
+ones verified so far. The universal scaffold-agent.ps1 registry already knows
+several agents; the goal is to verify and support each one end-to-end (discover
+→ scan → scaffold → build → manage providers/models/plugins) through the same
+two surfaces: the MD framework and the GUI app.
+
+Definition of complete (when tried)
+
+- Each new agent verified end-to-end through the app and the framework.
+- The scaffold registry and the app's agent store handle its config shape.
+- Verification documented in this roadmap and the project state.
+
+---
+
 # Phase Completion Summary
 
 | Phase | Status |
@@ -639,8 +676,9 @@ Definition of complete
 | Phase 12 — KiloCode Builder V1 | ✅ Completed |
 | Phase 13 — BDF V3 Universal Builder Generator | 🔄 In Progress |
 | Phase 14 — GUI App (AI Switcher) | ✅ Completed |
+| Phase 15 — More Coding Agents | 🔜 Planned (untested) |
 
-**13 of 14 phases complete. Phase 13 (BDF V3) remains IN PROGRESS — not yet released; more development is planned before the official V3 release.**
+**13 of 15 phases complete. Phase 13 (BDF V3) remains IN PROGRESS — not yet released; more development is planned before the official V3 release. Phase 15 (More Coding Agents) is planned but untested.**
 
 ---
 

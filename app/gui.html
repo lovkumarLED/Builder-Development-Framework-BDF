@@ -17,16 +17,17 @@
   --glow-cyan:0 0 0 1px rgba(0,200,255,.35), 0 0 24px rgba(0,200,255,.18);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html,body{height:100%;overflow:hidden}
 body{
   font-family:-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
-  background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden;
+  background:var(--bg); color:var(--text);
 }
-html{overflow-y:scroll;scrollbar-width:auto;scrollbar-color:var(--flame2) var(--navy-deep)}
-::-webkit-scrollbar{width:14px}
+html{scrollbar-width:auto;scrollbar-color:var(--flame2) var(--navy-deep)}
+::-webkit-scrollbar{width:12px}
 ::-webkit-scrollbar-track{background:var(--navy-deep)}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--flame1),var(--flame3));border-radius:99px;border:3px solid var(--navy-deep)}
+::-webkit-scrollbar-thumb{background:var(--flame2);border-radius:99px;border:2px solid var(--navy-deep);min-height:44px}
 ::-webkit-scrollbar-thumb:hover{background:var(--flame3)}
+::-webkit-scrollbar-thumb:active{background:var(--flame1)}
 ::-webkit-scrollbar-corner{background:var(--navy-deep)}
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
   radial-gradient(900px 500px at 18% -10%, rgba(255,101,1,.10), transparent 60%),
@@ -35,7 +36,7 @@ html{overflow-y:scroll;scrollbar-width:auto;scrollbar-color:var(--flame2) var(--
   var(--navy-deep);
 }
 .embers{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.85}
-.app{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:22px 20px 90px}
+.app{position:relative;z-index:1;max-width:1600px;width:100%;margin:0 auto;padding:22px 26px 90px;height:100%;overflow-y:auto;scrollbar-width:auto;scrollbar-color:var(--flame2) var(--navy-deep)}
 header{display:flex;align-items:center;gap:14px;margin-bottom:26px}
 .brand{display:flex;align-items:center;gap:12px;user-select:none}
 .brand .mark{width:46px;height:46px;flex:none;border-radius:12px;object-fit:cover;border:1px solid rgba(255,151,2,.35);filter:drop-shadow(0 0 12px rgba(255,120,10,.45));animation:logoglow 3.2s ease-in-out infinite}
@@ -103,15 +104,17 @@ header{display:flex;align-items:center;gap:14px;margin-bottom:26px}
 .bigcta{margin-top:8px}
 .bigcta .btn{min-height:52px;padding:0 34px;font-size:16px}
 
-.hero{position:relative;overflow:hidden;padding:26px;margin-bottom:20px}
+.hero{position:relative;overflow:hidden;padding:26px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
 .hero::before{content:"";position:absolute;inset:-2px;border-radius:calc(var(--radius) + 2px);padding:2px;background:linear-gradient(135deg,var(--flame1),var(--flame3) 30%,var(--accent) 90%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.85;animation:ringpulse 2.6s ease-in-out infinite;pointer-events:none}
 @keyframes ringpulse{0%,100%{opacity:.55}50%{opacity:1}}
 .hero .hrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.hero h2{font-size:22px;margin:6px 0 2px}
-.hero .purl{color:var(--muted);font-size:13px;word-break:break-all;margin-bottom:14px}
+.hero-inner{flex:1 1 250px;min-width:0}
+.hero-inner h2{font-size:22px;margin:6px 0 2px}
+.hero .purl{color:var(--muted);font-size:13px;word-break:break-all;margin-bottom:0}
+.hero-note{flex-basis:100%;margin-top:6px;padding-top:14px;border-top:1px solid var(--border)}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;background:rgba(255,101,1,.14);color:var(--flame3);border:1px solid rgba(255,151,2,.4);animation:breathe 2.2s ease-in-out infinite}
 .badge.off{background:var(--navy-hi);color:var(--muted);border-color:var(--border);animation:none}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .pcard{position:relative;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;opacity:0}
 .pcard.show{opacity:1}
 .pcard:hover{transform:translateY(-2px) scale(1.015);border-color:var(--border-hi)}
@@ -143,7 +146,9 @@ footer button:hover{color:var(--accent)}
 
 .overlay{position:fixed;inset:0;background:rgba(4,6,12,.72);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:40;padding:18px;overflow-y:auto}
 .overlay.show{display:flex}
-.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:var(--radius);box-shadow:var(--shadow);width:100%;max-width:460px;padding:24px;margin:auto;animation:stepIn .3s ease both}
+.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:var(--radius);box-shadow:var(--shadow);width:100%;max-width:460px;max-height:92vh;overflow-y:auto;padding:24px;margin:auto;animation:stepIn .3s ease both}
+.modal::-webkit-scrollbar{width:8px}
+.modal::-webkit-scrollbar-thumb{border:1px solid var(--navy-deep);background:var(--flame2)}
 .modal h3{font-size:18px;margin-bottom:16px}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
@@ -201,7 +206,7 @@ footer button:hover{color:var(--accent)}
 
   <!-- ============ SETUP WIZARD ============ -->
   <section class="screen" id="screenWizard">
-    <div class="wizard card" style="max-width:640px;margin:40px auto;padding:34px">
+    <div class="wizard card" style="max-width:820px;margin:40px auto;padding:34px">
       <div class="wstep active" data-step="1">
         <div class="wtitle">Welcome to AI Switcher</div>
         <div class="wsub">One small setup, then your AI is yours to switch freely.</div>
@@ -252,6 +257,19 @@ footer button:hover{color:var(--accent)}
 
   <!-- ============ DASHBOARD ============ -->
   <section class="screen" id="screenDash">
+    <div class="card hidden" id="agentsCard" style="margin-bottom:20px">
+      <h3 style="margin-bottom:4px">Agents</h3>
+      <p class="hint" style="margin-bottom:12px">Which coding agent the app manages right now — add more and switch freely.</p>
+      <div id="agentList"></div>
+      <div class="mrow2" style="margin-bottom:8px">
+        <input id="agentName" placeholder="name (e.g. opencode)" style="max-width:200px">
+        <input id="agentDir" placeholder="config folder (e.g. C:\Users\You\.config\opencode)">
+      </div>
+      <div class="mrow" style="justify-content:flex-start">
+        <button class="btn primary small" id="agentAdd">Add agent</button>
+        <div class="errline" id="agentErr" style="margin-left:10px;align-self:center"></div>
+      </div>
+    </div>
     <div class="hero card" id="dashHero"></div>
     <div class="grid" id="provGrid"></div>
     <div class="empty hidden" id="emptyState">
@@ -269,6 +287,32 @@ footer button:hover{color:var(--accent)}
         <input id="plugIn" placeholder="plugin id (e.g. superpowers@git+https://github.com/obra/superpowers.git)">
         <button class="btn primary small" id="plugAdd" style="flex:none">Add</button>
       </div>
+    </div>
+
+    <div class="card hidden" id="mcpCard" style="margin-top:22px">
+      <h3 style="margin-bottom:6px">MCP servers</h3>
+      <p class="hint" style="margin-bottom:12px">Tools your agent can use — the app adds them to your coding profile.</p>
+      <div id="mcpList"></div>
+      <div class="mrow2" style="margin-bottom:8px">
+        <input id="mcpName" placeholder="server name (e.g. context7)">
+      </div>
+      <textarea id="mcpCfg" placeholder='{ "type": "local", "command": ["npx", "-y", "@example/mcp"] }' style="width:100%;min-height:70px;background:#0a0f1d;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font:inherit;font-size:13px;resize:vertical;margin-bottom:8px"></textarea>
+      <div class="mrow" style="justify-content:flex-start">
+        <button class="btn primary small" id="mcpAdd">Add server</button>
+        <div class="errline" id="mcpErr" style="margin-left:10px;align-self:center"></div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="modelsCard" style="margin-top:22px">
+      <h3 style="margin-bottom:6px">Models</h3>
+      <p class="hint" style="margin-bottom:12px">Keep a provider's models up to date — add new ones, remove dead ones. The app writes <code>&lt;provider&gt;-models.json</code> for you.</p>
+      <div class="field" style="max-width:320px">
+        <label>Provider</label>
+        <select id="modelsProv"></select>
+      </div>
+      <div id="mCardRows"></div>
+      <button class="btn small" id="mCardAdd" type="button">+ Add model</button>
+      <div class="mrow"><button class="btn flame" id="mCardSave">Save models</button></div>
     </div>
 
     <div class="card hidden" id="buildPanel" style="margin-top:22px">
@@ -408,8 +452,15 @@ const Api = (() => {
     build: b => request("/api/build", body(b || { profile: "coding" })),
     rules: () => request("/api/rules"),
     listPlugins: () => request("/api/plugins"),
-    addPlugin: b => request("/api/plugins", body(b)),
-    removePlugin: b => request("/api/plugins", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) })
+    addPlugin: p => request("/api/plugins", body({ plugin: p })),
+    removePlugin: p => request("/api/plugins", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plugin: p }) }),
+    listMcp: () => request("/api/mcp"),
+    addMcp: (name, config) => request("/api/mcp", body({ name, config })),
+    removeMcp: name => request("/api/mcp", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) }),
+    listAgents: () => request("/api/agents"),
+    addAgent: b => request("/api/agents", body(b)),
+    removeAgent: name => request("/api/agents/" + encodeURIComponent(name), { method: "DELETE" }),
+    switchAgent: name => request("/api/agents/switch", body({ name }))
   };
 })();
 
@@ -445,13 +496,13 @@ const Store = { status: null, wizard: { agents: [], chosen: null, scan: null, ge
 const UI = (() => {
   const dotCls = id => (Store.provStatus[id] === "ok" ? "ok" : Store.provStatus[id] === "fail" ? "fail" : Store.provStatus[id] === "testing" ? "testing" : "");
   const card = p => {
-    const c = Utils.el("div", "card pcard" + (p.id === Store.activeProvider ? " active" : ""), "");
+    const c = Utils.el("div", "card pcard" + (p.active ? " active" : ""), "");
     c.dataset.id = p.id;
     c.innerHTML =
       '<div class="prow"><span class="dot ' + dotCls(p.id) + '"></span><span class="pname">' + Utils.esc(p.name) + "</span></div>" +
       '<div class="purl">' + Utils.esc(p.baseUrl) + "</div>" +
       '<div class="pacts">' +
-      (p.id === Store.activeProvider
+      (p.active
         ? '<button class="btn small" disabled>✓ Active</button>'
         : '<button class="btn small primary act-switch">Switch to this</button>') +
       '<button class="btn small act-test">Test</button>' +
@@ -466,17 +517,22 @@ const UI = (() => {
   };
   const hero = () => {
     const h = Utils.$("#dashHero");
-    const p = Store.providers.find(x => x.id === Store.activeProvider);
-    if (!p) {
+    const activeList = Store.providers.filter(p => p.active);
+    if (!activeList.length) {
       h.innerHTML = '<div class="hrow"><span class="badge off">No active provider</span></div>' +
-        "<h2>Nothing is switched on yet</h2><p class='hint'>Add a provider and click “Switch to this” — then your AI tool can use it.</p>";
+        "<h2>Nothing is switched on yet</h2><p class='hint'>Add a provider — it joins the active list and the build includes it.</p>";
       return;
     }
-    h.innerHTML =
-      '<div class="hrow"><span class="badge">🔥 Active</span><span class="hint">' + Utils.esc(p.name) + " is on fire right now</span></div>" +
-      "<h2>" + Utils.esc(p.name) + "</h2>" +
-      '<div class="purl">' + Utils.esc(p.baseUrl) + "</div>" +
-      '<div class="hint">Your tool talks to <code>127.0.0.1:9090</code> and this provider answers. Switching is one click on the cards below.</div>';
+    h.innerHTML = activeList.map(p => {
+      return (
+        '<div class="hero-inner">' +
+        '<div class="hrow"><span class="badge">🔥 Active</span></div>' +
+        "<h2>" + Utils.esc(p.name) + "</h2>" +
+        '<div class="purl">' + Utils.esc(p.baseUrl) + "</div>" +
+        "</div>"
+      );
+    }).join("") +
+      '<div class="hero-note hint">Your tool talks to <code>127.0.0.1:9090</code> and the first provider answers. Every active provider is merged into the build.</div>';
   };
   const stagger = (els2) => { els2.forEach((e, i) => e.classList.add("show")); if (reduced) return; anime({ targets: els2, translateY: [26, 0], opacity: [0, 1], duration: 460, delay: anime.stagger(90), easing: "easeOutCubic" }); };
   return { card, hero, stagger };
@@ -651,7 +707,7 @@ const Providers = (() => {
     finally { Utils.setLoading(btn, false); }
   };
   const addModelRow = () => { mRows.push({ model: "", name: "", thinking: [] }); renderModelRows(); };
-  return { load, render, switchTo, test, edit, del, openAdd, save, testModal, setModelRows, addModelRow };
+  return { load, render, switchTo, test, edit, del, openAdd, save, testModal, setModelRows, addModelRow, PRESETS };
 })();
 
 const Wizard = (() => {
@@ -700,22 +756,35 @@ const Wizard = (() => {
     go(4);
   };
   const renderStats = () => {
-    const s = Store.wizard.scan || { mcps: [], plugins: [], profiles: [] };
+    const s = Store.wizard.scan || { mcps: [], plugins: [], profiles: [], hasBuilder: false };
     Utils.$("#wizStats").innerHTML =
       '<div class="stat"><b>' + (s.mcps || []).length + "</b><span>MCP servers</span></div>" +
       '<div class="stat"><b>' + (s.plugins || []).length + "</b><span>Plugins</span></div>" +
       '<div class="stat"><b>' + (s.profiles || []).length + "</b><span>Profiles</span></div>";
     Utils.$("#wizGenHint").textContent = "Agent: " + Store.wizard.chosen.name + " (" + Store.wizard.chosen.dir + ")";
+    const ready = !!s.hasBuilder;
+    const btn = Utils.$("#wizGen");
+    btn.textContent = ready ? "Looks good — open it →" : "⚡ Generate my builder";
+    btn.dataset.ready = ready ? "1" : "0";
   };
   const generate = async () => {
-    const btn = Utils.$("#wizGen"); Utils.setLoading(btn, true); Utils.$("#wizGen").disabled = true;
+    const btn = Utils.$("#wizGen");
+    if (btn.dataset.ready === "1") {
+      const chosen = Store.wizard.chosen;
+      try { await Api.addAgent({ name: chosen.name, dir: chosen.dir }); }
+      catch (e) { await Api.switchAgent(chosen.name); }
+      Toast.ok("Already set up — everything loaded ✓");
+      await App.route();
+      return;
+    }
+    Utils.setLoading(btn, true); btn.disabled = true;
     try {
       const r = await Api.scaffold({ agent: Store.wizard.chosen.name, dir: Store.wizard.chosen.dir });
       Store.wizard.generated = r.generated || [];
       if (r.ok) { Toast.ok("Builder generated ✓"); go(5); }
       else Toast.err(r.message || "Something went wrong while generating.");
     } catch (e) { Toast.err(Utils.friendly(e, "Couldn't generate the builder.")); }
-    finally { Utils.setLoading(btn, false); Utils.$("#wizGen").disabled = false; }
+    finally { Utils.setLoading(btn, false); btn.disabled = false; }
   };
   return { go, generate };
 })();
@@ -746,6 +815,14 @@ const Plugins = (() => {
       render(r.plugins || []);
     } catch (e) {}
   };
+  const pluginLabel = p => {
+    const s = String(p);
+    const m = s.match(/^([^@]+)@/);
+    if (m) return m[1];
+    const u = s.match(/github\.com\/[^\/]+\/([^\/#?]+)/);
+    if (u) return u[1];
+    return s.split(/[\\/]/).pop() || s;
+  };
   const render = list => {
     const card = Utils.$("#pluginsCard");
     card.classList.remove("hidden");
@@ -754,14 +831,16 @@ const Plugins = (() => {
     if (!list.length) box.innerHTML = '<div class="hint">No plugins yet — add your first one.</div>';
     list.forEach(p => {
       const row = Utils.el("div", "mrow2", "");
-      const span = Utils.el("span", "", Utils.esc(p));
-      span.style.flex = "1"; span.style.fontSize = "13px"; span.style.wordBreak = "break-all";
+      const label = Utils.el("span", "", Utils.esc(pluginLabel(p)));
+      label.style.flex = "0 0 auto"; label.style.fontWeight = "600"; label.style.fontSize = "13px";
+      const id = Utils.el("span", "hint", Utils.esc(p));
+      id.style.flex = "1"; id.style.wordBreak = "break-all";
       const rm = Utils.el("button", "rm", "✕"); rm.type = "button";
       rm.onclick = async () => {
         try { const r = await Api.removePlugin(p); render(r.plugins || []); Toast.ok("Plugin removed."); }
         catch (e) { Toast.err(Utils.friendly(e, "Couldn't remove it.")); }
       };
-      row.appendChild(span); row.appendChild(rm);
+      row.appendChild(label); row.appendChild(id); row.appendChild(rm);
       box.appendChild(row);
     });
   };
@@ -773,6 +852,173 @@ const Plugins = (() => {
     catch (e) { Toast.err(Utils.friendly(e, "Couldn't add it.")); }
   };
   return { load, add };
+})();
+
+const Agents = (() => {
+  const load = async () => {
+    Utils.$("#agentsCard").classList.remove("hidden");
+    try {
+      const r = await Api.listAgents();
+      render(r.agents || [], r.active);
+    } catch (e) {}
+  };
+  const render = (agents, active) => {
+    const box = Utils.$("#agentList");
+    box.innerHTML = "";
+    if (!agents.length) box.innerHTML = '<div class="hint">No agents yet — run the setup wizard or add one below.</div>';
+    agents.forEach(a => {
+      const row = Utils.el("div", "mrow2", "");
+      const name = Utils.el("span", "", Utils.esc(a.name));
+      name.style.flex = "0 0 auto"; name.style.fontWeight = "700"; name.style.fontSize = "14px";
+      const dir = Utils.el("span", "hint", Utils.esc(a.dir));
+      dir.style.flex = "1"; dir.style.wordBreak = "break-all";
+      let sw;
+      if (a.name === active) { sw = Utils.el("button", "btn small", "✓ Active"); sw.disabled = true; }
+      else {
+        sw = Utils.el("button", "btn small primary", "Switch to this");
+        sw.onclick = () => switchTo(a.name);
+      }
+      const rm = Utils.el("button", "rm", "✕"); rm.type = "button";
+      rm.onclick = async () => {
+        try { const r = await Api.removeAgent(a.name); render(r.agents || [], r.active); Toast.ok(a.name + " removed."); await App.route(); }
+        catch (e) { Toast.err(Utils.friendly(e, "Couldn't remove it.")); }
+      };
+      row.appendChild(name); row.appendChild(dir); row.appendChild(sw); row.appendChild(rm);
+      box.appendChild(row);
+    });
+  };
+  const switchTo = async name => {
+    try {
+      await Api.switchAgent(name);
+      const r = await Api.listAgents();
+      render(r.agents || [], r.active);
+      Toast.ok("Now managing " + name);
+      await App.route();
+    } catch (e) { Toast.err(Utils.friendly(e, "Couldn't switch.")); }
+  };
+  const reloadAll = async () => { await Providers.load(); Plugins.load(); Mcp.load(); Models.load(); };
+  const add = async () => {
+    const name = Utils.$("#agentName").value.trim();
+    const dir = Utils.$("#agentDir").value.trim();
+    Utils.$("#agentErr").textContent = "";
+    if (!dir) { Utils.$("#agentErr").textContent = "Type the config folder path."; return; }
+    try {
+      const r = await Api.addAgent({ name, dir });
+      Utils.$("#agentName").value = ""; Utils.$("#agentDir").value = "";
+      render(r.agents || [], r.active);
+      if (r.ready) { Toast.ok("Agent loaded ✓ — it was already set up"); await App.route(); }
+      else { Toast.ok("New agent added — run the setup wizard to set it up"); await App.route(); }
+    } catch (e) { Utils.$("#agentErr").textContent = Utils.friendly(e, "Couldn't add it."); }
+  };
+  return { load, add };
+})();
+
+const Mcp = (() => {
+  const load = async () => {
+    try { const r = await Api.listMcp(); render(r.mcps || {}); } catch (e) {}
+  };
+  const render = mcps => {
+    Utils.$("#mcpCard").classList.remove("hidden");
+    const box = Utils.$("#mcpList");
+    box.innerHTML = "";
+    const names = Object.keys(mcps);
+    if (!names.length) box.innerHTML = '<div class="hint">No MCP servers yet — add your first one.</div>';
+    names.forEach(n => {
+      const row = Utils.el("div", "mrow2", "");
+      const span = Utils.el("span", "", Utils.esc(n));
+      span.style.flex = "1"; span.style.fontSize = "13px"; span.style.fontWeight = "600";
+      const kind = Utils.el("span", "hint", Utils.esc((mcps[n] && mcps[n].type) || ""));
+      kind.style.flex = "1";
+      const rm = Utils.el("button", "rm", "✕"); rm.type = "button";
+      rm.onclick = async () => {
+        try { const r = await Api.removeMcp(n); render(r.mcps || {}); Toast.ok(n + " removed."); }
+        catch (e) { Toast.err(Utils.friendly(e, "Couldn't remove it.")); }
+      };
+      row.appendChild(span); row.appendChild(kind); row.appendChild(rm);
+      box.appendChild(row);
+    });
+  };
+  const add = async () => {
+    const name = Utils.$("#mcpName").value.trim();
+    const cfgText = Utils.$("#mcpCfg").value.trim();
+    Utils.$("#mcpErr").textContent = "";
+    if (!name) { Utils.$("#mcpErr").textContent = "Give it a name."; return; }
+    let cfg;
+    try { cfg = JSON.parse(cfgText); } catch (e) { Utils.$("#mcpErr").textContent = "The config isn't valid JSON."; return; }
+    if (!cfg || typeof cfg !== "object" || Array.isArray(cfg)) { Utils.$("#mcpErr").textContent = "The config must be an object."; return; }
+    try {
+      const r = await Api.addMcp(name, cfg);
+      Utils.$("#mcpName").value = ""; Utils.$("#mcpCfg").value = "";
+      render(r.mcps || {}); Toast.ok(name + " added ✓");
+    } catch (e) { Toast.err(Utils.friendly(e, "Couldn't add it.")); }
+  };
+  return { load, add };
+})();
+
+const Models = (() => {
+  const THINK_LEVELS = ["default", "minimal", "high", "max"];
+  let prov = null;
+  let rows = [];
+  const chip = (row, lv) => {
+    const c = Utils.el("button", "chip" + (row.thinking.indexOf(lv) >= 0 ? " on" : ""), lv);
+    c.type = "button";
+    c.onclick = () => {
+      const idx = row.thinking.indexOf(lv);
+      if (idx >= 0) row.thinking.splice(idx, 1); else row.thinking.push(lv);
+      c.classList.toggle("on");
+    };
+    return c;
+  };
+  const render = () => {
+    const box = Utils.$("#mCardRows");
+    box.innerHTML = "";
+    rows.forEach((row, i) => {
+      const r = Utils.el("div", "mrow2", "");
+      const idIn = Utils.el("input", ""); idIn.value = row.model; idIn.placeholder = "model id";
+      idIn.oninput = () => row.model = idIn.value.trim();
+      const nameIn = Utils.el("input", ""); nameIn.value = row.name; nameIn.placeholder = "display name (optional)";
+      nameIn.oninput = () => row.name = nameIn.value.trim();
+      const chips = Utils.el("div", "chips", "");
+      THINK_LEVELS.forEach(lv => chips.appendChild(chip(row, lv)));
+      const rm = Utils.el("button", "rm", "✕"); rm.type = "button";
+      rm.onclick = () => { rows.splice(i, 1); render(); };
+      r.appendChild(idIn); r.appendChild(nameIn); r.appendChild(chips); r.appendChild(rm);
+      box.appendChild(r);
+    });
+  };
+  const load = async () => {
+    Utils.$("#modelsCard").classList.remove("hidden");
+    const sel = Utils.$("#modelsProv");
+    const prev = sel.value;
+    try {
+      const data = await Api.listProviders();
+      const providers = data.providers || [];
+      sel.innerHTML = "";
+      providers.forEach(p => { const o = Utils.el("option", "", p.name); o.value = p.id; sel.appendChild(o); });
+      if (!providers.length) { Utils.$("#mCardRows").innerHTML = '<div class="hint">Add a provider first.</div>'; return; }
+      if (prev && providers.some(p => p.id === prev)) sel.value = prev; else sel.value = providers[0].id;
+      await loadFor(sel.value);
+    } catch (e) {}
+  };
+  const loadFor = async id => {
+    prov = id;
+    try {
+      const data = await Api.listProviders();
+      const p = (data.providers || []).find(x => x.id === id);
+      rows = (p && p.models || []).map(m => ({ model: m.model || "", name: m.name || "", thinking: (m.thinking || []).slice() }));
+      if (!rows.length) rows.push({ model: "", name: "", thinking: [] });
+      render();
+    } catch (e) {}
+  };
+  const addRow = () => { rows.push({ model: "", name: "", thinking: [] }); render(); };
+  const save = async () => {
+    if (!prov) return;
+    const items = rows.filter(r => r.model).map(r => ({ model: r.model, name: r.name, thinking: r.thinking.slice().sort() }));
+    if (!items.length) { Toast.err("Add at least one model."); return; }
+    try { await Api.updateProvider(prov, { models: items }); Toast.ok("Models saved ✓"); await loadFor(prov); }
+    catch (e) { Toast.err(Utils.friendly(e, "Couldn't save models.")); }
+  };
+  return { load, loadFor, addRow, save };
 })();
 
 const Advanced = (() => {
@@ -798,11 +1044,18 @@ const App = (() => {
     Utils.$("#screenWizard").classList.toggle("active", name === "wizard");
     Utils.$("#screenDash").classList.toggle("active", name === "dash");
   };
+  const route = async () => {
+    try {
+      Store.status = await Api.status();
+      if (Store.status.ready) { showScreen("dash"); await Providers.load(); Agents.load(); Plugins.load(); Mcp.load(); Models.load(); }
+      else { showScreen("wizard"); }
+    } catch (e) { showScreen("wizard"); }
+  };
   const boot = async () => {
     try {
       Store.status = await Api.status();
-      if (Store.status.ready) { showScreen("dash"); await Providers.load(); Plugins.load(); }
-      else { showScreen("wizard"); }
+      if (Store.status.ready) { showScreen("dash"); await Providers.load(); Agents.load(); Plugins.load(); Mcp.load(); Models.load(); }
+      else { showScreen("wizard"); Agents.load(); }
     } catch (e) {
       showScreen("wizard");
       Toast.err(Utils.friendly(e, "Couldn't reach the app. Is the window still open?"));
@@ -841,9 +1094,15 @@ const App = (() => {
     Utils.$("#mAdd").onclick = () => Providers.addModelRow();
     Utils.$("#plugAdd").onclick = () => Plugins.add();
     Utils.$("#plugIn").addEventListener("keydown", e => { if (e.key === "Enter") Plugins.add(); });
+    Utils.$("#mcpAdd").onclick = () => Mcp.add();
+    Utils.$("#agentAdd").onclick = () => Agents.add();
+    Utils.$("#agentDir").addEventListener("keydown", e => { if (e.key === "Enter") Agents.add(); });
+    Utils.$("#mCardAdd").onclick = () => Models.addRow();
+    Utils.$("#mCardSave").onclick = () => Models.save();
+    Utils.$("#modelsProv").onchange = e => Models.loadFor(e.target.value);
     Utils.$("#fKey").addEventListener("keydown", e => { if (e.key === "Enter") Providers.save(); });
   };
-  return { boot };
+  return { boot, route };
 })();
 
 const Embers = (() => {

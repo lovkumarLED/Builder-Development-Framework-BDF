@@ -84,13 +84,15 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 8, 2026 (session 29: GUI App built — docs/app/ "AI Switcher", end-to-end green; Phase 14 COMPLETE)
+Updated: Aug 8, 2026 (session 29: AI Switcher app COMPLETE — Phase 14 done; env/theme; BDF-exact data model; kilo live; commits 459d407 + b3a0bdb)
 
 ```
 Step 3 — Universal Agent Framework core
 Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08; GUI app = BDF made autonomous, session 29)
 Progress: ~90%
 ```
+
+Phase map (roadmap): Phase 14 GUI App COMPLETE; Phase 15 More Coding Agents PLANNED — the app + universal scaffold are expected to work with additional open-source coding agents, but only OpenCode + KiloCode are verified so far; the rest is untested until tried.
 
 What was completed:
 
@@ -149,6 +151,17 @@ What was completed:
       127.0.0.1:9090 to the ACTIVE provider; No-Secrets + backup-first providers.json.
       Smoke-tested end-to-end green on the real opencode agent: discover → scan →
       scaffold (real engine) → build PASS → test harness 31/31 → switch → chat.
+- [x] Session 29 (continued): BDF-EXACT data model — the app reads/writes the AGENT's own
+      files (providers/, <provider>-models.json, plugins.json, mcp.json, settings.json
+      activeProviders list), backup-first; models with thinking levels; plugins + MCP
+      cards; SDK type selector (15 npm packages verified); MULTI-AGENT management
+      (Agents card, instant switch, ready detection skips the wizard for set-up agents);
+      active hero shows every active provider; flame startup banner; self-contained
+      Python env; rule.md live theme + rulebook; kilo live (omniroute + tokenrouter,
+      19 models in kilo.json); full E2E click-through battery with hash-verified
+      restore; commits 459d407 + b3a0bdb.
+- [ ] FUTURE (Phase 15): extend the app + universal scaffold to MORE coding agents
+      (OpenCode + KiloCode verified; others expected to work — untested yet).
 
 Dropped: Claude Code Builder V1 — 2026-08-08 decision (entropic `~/.claude.json`, no
 provider support). See `planning/DECISIONS.md`.

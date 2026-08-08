@@ -65,7 +65,7 @@ def scaffold(body: ScaffoldBody):
         ],
         180,
     )
-    set_state(agent=body.agent, dir=str(directory))
+    agentstore.upsert_agent(body.agent, str(directory))
     scripts_dir = directory / "scripts"
     generated = [
         name
@@ -84,9 +84,7 @@ def scaffold(body: ScaffoldBody):
 
 @router.post("/build")
 def build(body: BuildBody):
-    state = get_state()
-    agent = state.get("agent")
-    directory = state.get("dir")
+    agent, directory = agentstore.current_agent()
     if not agent or not directory:
         raise HTTPException(400, "No agent is set up yet. Run the setup wizard first.")
     script = agentstore.find_builder_script(Path(directory), agent)
