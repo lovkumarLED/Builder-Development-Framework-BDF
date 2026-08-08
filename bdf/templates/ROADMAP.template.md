@@ -125,7 +125,7 @@ Objectives
 
 ---
 
-## Phase 3 — Additional Profiles ✅
+## Phase 3 — Multiple Profiles ✅
 
 Status
 
@@ -356,7 +356,7 @@ Builder validates config sources against schema files before its own validation;
 
 ---
 
-## Phase 11 - First Validation Project V1 (DROPPED VARIANT: Claude Code) ✅
+## Phase 11 - Claude Code Builder V1 - SUPERSEDED ✅
 
 Status
 
@@ -399,6 +399,34 @@ In Progress
 Objective
 
 BDF V3 is the destination: a builder-generator framework where a generic framework plus a project adapter produces a project-specific builder.
+
+---
+
+## Phase 14 - GUI App: "AI Switcher" for Normal Users
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+A normal user switches the active provider through a GUI, without touching configuration files.
+
+---
+
+## Phase 15 - More Coding Agents
+
+Status
+
+```
+Planned
+```
+
+Objective
+
+Support additional coding agents end-to-end; each new agent is verified before it is documented.
 
 ---
 

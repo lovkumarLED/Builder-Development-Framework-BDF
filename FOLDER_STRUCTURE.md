@@ -44,7 +44,6 @@ opencode/
 ├── .gitignore
 ├── opencode.json
 ├── opencode.provenance.json
-├── opencode.jsonc
 ├── package-lock.json
 └── package.json
 ```
@@ -64,6 +63,10 @@ backup/
 ## Purpose
 
 Stores automatically created backups of the generated `opencode.json`.
+
+> **Agent config warning:** do NOT create `opencode.jsonc` next to the generated
+> `opencode.json` - OpenCode reads the `.jsonc` instead of the `.json` when
+> both exist, and your built config silently disappears from `/models`.
 
 Before generating a new configuration, the builder creates a timestamped backup of the previous configuration.
 
@@ -155,6 +158,9 @@ _agent/
 bdf/
 
 .superpowers/
+superpowers/
+.claude/
+.gitignore
 ```
 
 ## _agent/
@@ -227,7 +233,7 @@ Includes the build-continuation rule:
 AI/CONTINUE_PROJECT_BUILD.md
 ```
 
-- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js — no CDN), `tests/` (34 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage). Add-provider presets cover proxies (OmniRoute, LiteLLM, CLI Proxy) AND real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill; the app writes the key in both agent contracts (`apiKey` + `options.apiKey`).
+- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `requirements.txt` (fastapi + uvicorn), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js — no CDN), `tests/` (34 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage). Add-provider presets cover proxies (OmniRoute, LiteLLM, CLI Proxy) AND real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill; the app writes the key in both agent contracts (`apiKey` + `options.apiKey`).
 
 ## PROJECT_STATE.md
 
@@ -434,12 +440,14 @@ Contains provider definitions.
 
 Each provider describes how OpenCode communicates with an AI provider.
 
-The current implementation contains one provider.
+The current implementation contains two providers (`omniroute.json` and
+`tokenrouter.json`); the builders discover every `*.json` in this folder.
 
 ```
 providers/
 
 omniroute.json
+tokenrouter.json
 ```
 
 ---
@@ -569,6 +577,10 @@ The automated test harness verifies the builder and the release pipeline.
 
 ```
 test-opencode-v2.7.ps1
+```
+
+The current harness is also available under its unversioned name
+(`test-opencode.ps1` - kept byte-identical to `test-opencode-v2.7.ps1`).
 ```
 
 The V2.5 test harness is retained.

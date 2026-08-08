@@ -392,6 +392,18 @@ Future configuration formats belong exclusively in `ROADMAP.md`.
 
 Implemented in Builder {{CURRENT_VERSION}}.
 
+## JSON Schema Files (Builder V2.7)
+
+The live schema files live in `{{SCHEMA_DIR}}/`.
+
+Each configuration source file has a matching `*.schema.json` file.
+
+## Validation Subset (PS 5.1)
+
+The builder implements schema validation inside the script.
+
+{{SHELL}} has no native schema test, so a compact validator is used.
+
 ---
 
 # Configuration Relationships

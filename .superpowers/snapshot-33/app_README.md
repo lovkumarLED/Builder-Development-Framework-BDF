@@ -205,7 +205,7 @@ merged into its main config file).
   terminal-style panel with colored lines while it works.
   - Green lines = done ✓
   - Amber lines = warnings
-  - Red lines = problems (the Run button re-enables so you can retry)
+  - Red lines = problems (the app shows a "Try again" button)
 
 The build **backs up your old config first**, so nothing is ever lost.
 

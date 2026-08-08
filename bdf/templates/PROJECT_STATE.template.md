@@ -75,6 +75,14 @@ The project is organized into independent directories.
 
 {{FOLDER_PURPOSE_TABLE}}
 
+## docs/
+
+Contains all project documentation.
+
+The documentation explains the project architecture, configuration files, testing procedures, troubleshooting steps, and future roadmap.
+
+Documentation is intended for both humans and AI coding agents.
+
 ---
 
 # 4. Architecture Overview
@@ -301,6 +309,14 @@ At session end:
 
 Large version builds that exceed the context budget stop at a clean checkpoint, write `AI/CONTINUE_BUILD_<VERSION>_<STEP>.md`, and resume from it in the next session.
 
+## Project State
+
+After every major refactor:
+
+- Regenerate `PROJECT_STATE.md`.
+- Keep the 15-section structure.
+- Never leave it stale.
+
 ## Release Workflow
 
 Releases follow one workflow:
@@ -312,14 +328,6 @@ Releases follow one workflow:
 5. Commit.
 
 Generated release files are never edited manually. The registry is the sequence authority.
-
-## Project State
-
-After every major refactor:
-
-- Regenerate `PROJECT_STATE.md`.
-- Keep the 15-section structure.
-- Never leave it stale.
 
 ---
 

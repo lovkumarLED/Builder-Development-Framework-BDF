@@ -84,7 +84,7 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 8, 2026 (session 32: real-provider story complete — Kilo 401 fixed + accepted, OpenCode jsonc shadow fixed, real-provider presets, builder dual-key parity, docs overhaul, committed)
+Updated: Aug 8, 2026 (session 33: FINAL FULL SYSTEM CHECK - pre-public gate all green: docs coherence + version 2.5.1 + template sync, builders tested + Doctor fix, app security review + regression tests, full GUI click-through with hash-verified restore; committed - READY TO GO PUBLIC)
 
 ```
 Step 3 — Universal Agent Framework core
@@ -188,6 +188,14 @@ What was completed:
       docs overhaul (root README, app README rules, PROVIDER_DEVELOPMENT_GUIDE +
       template, DEVELOPER_GUIDE, CHANGELOG 2.5.1, PROJECT_STATE, FOLDER_STRUCTURE,
       ROADMAP); committed.
+- [x] SESSION 33 (COMPLETE, 2026-08-08): FINAL FULL SYSTEM CHECK (pre-public gate) per
+      AI/CONTINUE_FULL_SYSTEM_CHECK_SESSION_33.md — docs coherence audit
+      (FSC v1.1 parts 1-7 + dual-key/jsonc/app-docs truth), builder testing
+      (kilo 31/31, opencode 31/31, legacy, real builds, sandbox bootstrap),
+      adversarial app code review (path traversal, CORS, proxy SSRF, XSS,
+      theme injection, secrets/PII leak scan), full GUI click-through on the
+      real kilo config with snapshot + hash-verified restore, fix loop until
+      green, report + commit — then the repo goes public.
 - [ ] FUTURE: app update to generate BOTH opencode.json and opencode.jsonc (planned,
       not yet — documented); add Modal/other real providers via the app when wanted.
 - [ ] FUTURE (Phase 15): extend the app + universal scaffold to MORE coding agents
@@ -196,8 +204,8 @@ What was completed:
 Dropped: Claude Code Builder V1 — 2026-08-08 decision (entropic `~/.claude.json`, no
 provider support). See `planning/DECISIONS.md`.
 
-Next: BUILDER_PHASES Alpha→Beta→General gates for the universal framework, then Step 4 /
-Step 5; user adds more real providers via the app when wanted.
+Next: user makes the repo public (decide bdf_dashboard.png first); after the gate: BUILDER_PHASES Alpha->Beta->General gates for the universal framework, then Step 4 / Step 5; user adds more real providers via the app when wanted.
+after the gate: BUILDER_PHASES Alpha→Beta→General + Step 4 / Step 5.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = KiloCode Builder,
 Phases 5-7 = universal V3).

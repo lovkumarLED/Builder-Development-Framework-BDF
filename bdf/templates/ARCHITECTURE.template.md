@@ -360,6 +360,27 @@ The release pipeline mirrors the build pipeline: one source of facts, one genera
 
 Generated release artifacts are never edited manually.
 
+## Data Flow
+
+- Release facts are recorded once in {{RELEASE_REGISTRY}}.
+- The release manager validates the registry (unique versions, one Current, required fields).
+- The manager rewrites only the marker sections and generated rows.
+- Manual prose is preserved verbatim.
+- Generation is all-or-nothing: if validation fails, nothing is written.
+
+## Ownership Rules
+
+| File | Owner |
+|------|-------|
+| {{RELEASE_REGISTRY}} | AI (edits release facts) + user (reviews before generation) |
+| CHANGELOG marker section | Release Manager |
+| {{RELEASE_ARTIFACTS}} | Release Manager |
+| Manual prose in release docs | Developer |
+
+Generated release artifacts are never edited manually.
+
+The registry is the sequence authority for version documentation.
+
 ---
 
 # Separation of Responsibilities

@@ -137,6 +137,9 @@ Active providers are read from `settings.json` → `activeProviders`.
 # Rules
 
 - `coding` is ALWAYS the main profile — never delete or rename it.
+- The generated main config must never be shadowed by a `.jsonc` of the same
+  name — OpenCode reads the `.jsonc` *instead of* the `.json` when both exist,
+  and the built config silently disappears from `/models`.
 - mcp.json / plugins.json are user-owned after creation — the framework never
   overwrites them.
 - The user may add more profiles or edit any file at any time.

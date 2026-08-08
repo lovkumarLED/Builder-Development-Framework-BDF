@@ -19,7 +19,7 @@ Every change to the framework must be recorded here.
 Version
 
 ```
-2.2.9
+2.2.10
 ```
 
 Status
@@ -34,10 +34,10 @@ Active
 
 | Item | Value |
 |------|-------|
-| Framework Version | 2.2.9 |
+| Framework Version | 2.2.10 |
 | Supported Builder Versions | V2.7, V2.5, V2.3, V2.1 |
 | Compatible Projects | OpenCode Configuration Manager documentation, KiloCode V1 adapter, V3 universal scaffold |
-| Last Updated | 2026-08-06 |
+| Last Updated | 2026-08-08 |
 | Breaking Changes | None |
 | Migration Required | No |
 
@@ -117,7 +117,7 @@ Example
 
 # Change History
 
-## Version 2.2.9
+## Version 2.2.10
 
 Date
 
@@ -129,6 +129,62 @@ Status
 
 ```
 Current
+```
+
+Summary
+
+```
+Final full-system check (session 33, pre-public gate): template-to-reference
+sync round 3 — ARCHITECTURE (Data Flow, Ownership Rules), BUILDER_SPEC
+(Verification Additions, V2 Verbatim Messages V2.7, Agent Map, function
+contracts), CONTRIBUTING_FOR_AI (Rule 11), DEVELOPER_GUIDE (Layer 1/2 +
+common tasks), FOLDER_STRUCTURE (User-Run vs System-Run, test harness),
+JSON_SCHEMAS (V2.7 files + validation subset), PROJECT_STATE (docs/
+subsection, section-7 order), ROADMAP (Phases 14-15 + naming), TESTING
+(JSON Schema test group). jsonc-shadow warning added to every reference
+doc + template that discusses generated configs. Placeholder audit 66/66.
+```
+
+Changed
+
+- `templates/ARCHITECTURE.template.md` — Data Flow + Ownership Rules sections.
+- `templates/BUILDER_SPEC.template.md` — Verification Additions, V2 Verbatim Messages V2.7, Agent Map, V2.7 function-contract block (+`{{FUNCTION_NAME}}`, `{{FUNCTION_PURPOSE}}` tokens).
+- `templates/CONTRIBUTING_FOR_AI.template.md` — Rule 11 (Keep README Current).
+- `templates/DEVELOPER_GUIDE.template.md` — Layer 1/2 + Keep Documentation Synchronized + four common-task subsections.
+- `templates/FOLDER_STRUCTURE.template.md` — User-Run vs System-Run + test-harness section.
+- `templates/JSON_SCHEMAS.template.md` — V2.7 schema-files + validation-subset sections.
+- `templates/PROJECT_STATE.template.md` — docs/ subsection + section-7 order.
+- `templates/ROADMAP.template.md` — Phases 14-15 + Phase 3/11 naming aligned.
+- `templates/TESTING.template.md` — JSON Schema (V2.7) test group.
+- `templates/README.md` — placeholder table +2 rows (66 total).
+- jsonc-shadow warning added to `DEVELOPER_GUIDE.md`, `BUILDER_EXTENSION_GUIDE.md`, `TROUBLESHOOTING.md`, `ADAPTER.md`, `ARCHITECTURE.md`, `BUILDER_SPEC.md`, `PROFILE_CREATION_GUIDE.md`, `app/rule.md`, and the `.template.md` mirrors.
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
+## Version 2.2.9
+
+Date
+
+```
+2026-08-08
+```
+
+Status
+
+```
+Previous
 ```
 
 Summary
@@ -779,7 +835,8 @@ No
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.2.9 | Current | README Synchronization Rule (README updated in same change, versions in sync, no false status claims) |
+| 2.2.10 | Current | Template sync round 3 (session 33): 9 templates gained missing sections, jsonc-shadow warning everywhere, placeholder audit 66/66 |
+| 2.2.9 | Previous | README Synchronization Rule (README updated in same change, versions in sync, no false status claims) |
 | 2.2.8 | Previous | Phase 8: 4 onboarding guides + 4 templates (15 → 19) |
 | 2.2.7 | Previous | README rebuilt (badges, mermaid diagrams, quick start, rules); template mirrored |
 | 2.2.6 | Previous | ROADMAP phase completion markers (✅ on 12/13 phases) + summary table; template synced |

@@ -67,6 +67,12 @@ The builder is fully reproducible from `BUILDER_SPEC.md`.
 - Touch `.jsonc` without consent.
 - Maintain configuration data — it only automates.
 
+> **Agent config warning:** the builders generate `{{GENERATED_ARTIFACT}}`
+> (the agent's main config). Do NOT create a `.jsonc` next to it — the agent
+> reads the `.jsonc` *instead of* the `.json` when both exist, and your built
+> config silently disappears from its model list. Generating both formats is
+> planned for a future update — not right now.
+
 ---
 
 # Adding a New Provider Type

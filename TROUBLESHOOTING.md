@@ -147,6 +147,12 @@ Use a JSON validator or editor with syntax highlighting.
 
 Keep configuration files small and focused.
 
+> **Agent config warning:** the builders generate `opencode.json` (OpenCode) /
+> `kilo.json` (Kilo). Do NOT create `opencode.jsonc` next to `opencode.json` —
+> OpenCode reads the `.jsonc` *instead of* the `.json` when both exist, and your
+> built config silently disappears from `/models`. Generating both formats is
+> planned for a future update — not right now.
+
 ---
 
 # Provider Issues

@@ -12,7 +12,7 @@
 > want to touch JSON, PowerShell, or an AI agent.
 
 [![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-development-framework)
-[![Framework](https://img.shields.io/badge/BDF-2.2.10-blue)](#builder-development-framework)
+[![Framework](https://img.shields.io/badge/BDF-2.2.9-blue)](#builder-development-framework)
 [![Tests](https://img.shields.io/badge/tests-kilo%2031%2F31%20%2B%20opencode%2031%2F31%20%2B%20app%2034%20green-brightgreen)](#testing)
 [![Release](https://img.shields.io/badge/release-2.5.1-orange)](#releases)
 [![Status](https://img.shields.io/badge/status-13%2F15%20phases%20complete%20%2B%20V3%20in%20progress-blue)](#roadmap)

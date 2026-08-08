@@ -73,7 +73,7 @@ Key documents:
 - `PROJECT_ADAPTER.md` — how projects are made framework-specific.
 - `BUILDER_EVOLUTION.md` — how builder versions evolve.
 - `BUILDER_PHASES.md` — Alpha → Beta → General Release quality gates.
-- `templates/` — 15 reusable documentation templates.
+- `templates/` — 19 reusable documentation templates.
 
 ## Layer 2 — Project Implementation (this repository's root docs)
 
@@ -135,6 +135,12 @@ Edit only source files. Never edit generated files:
 - mcp.json / plugins.json are user-owned after creation — never overwritten.
 - Backup-first: the system backs up before touching anything.
 - Never touch `.jsonc` without user consent.
+
+> **Agent config warning:** the builders generate `opencode.json` (OpenCode) /
+> `kilo.json` (Kilo). Do NOT create `opencode.jsonc` next to `opencode.json` —
+> OpenCode reads the `.jsonc` *instead of* the `.json` when both exist, and your
+> built config silently disappears from `/models`. Generating both formats is
+> planned for a future update — not right now.
 
 ## 3. Verify Your Work
 

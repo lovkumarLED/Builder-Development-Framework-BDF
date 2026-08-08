@@ -118,8 +118,8 @@ Harness batteries must stay green for OpenCode (17/13/30).
 ## Task 5: Docs + generated
 
 Docs to create/update:
-- `docs/BUILDER_SPEC_KILO.md`
-- `docs/ADAPTER_KILO.md`
+- `BUILDER_SPEC_KILO_ADAPTER.md` (lives in the kilo project: `~/.config/kilo/docs/` - the kilo adapter spec, created in a later session)
+- `ADAPTER_KILO.md` (planned name; realized as `BUILDER_SPEC_KILO_ADAPTER.md` in the kilo project)
 - Kilo section in templates README placeholder tables
 - Project State (a single line so the system knows Kilo exists)
 

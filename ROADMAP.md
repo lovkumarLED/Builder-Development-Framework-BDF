@@ -55,7 +55,7 @@ The path is:
 ```
 Current (Builder V2.7 JSON Schema Validation) ✅
 ↓
-KiloCode Builder V1 ✅ (Kilo V1, harness 30/30)
+KiloCode Builder V1 ✅ (Kilo V1, harness 31/31)
 ↓
 BDF V3 (Universal Builder Generator) — in progress
 ```
@@ -73,7 +73,7 @@ Real projects shape the framework — never assumptions.
 Current Version
 
 ```
-2.5.0
+2.5.1
 ```
 
 Current Status
@@ -458,7 +458,7 @@ Generate opencode.json
 
 Required before
 
-KiloCode Builder V1 (Phase 12 — COMPLETED 2026-08-07, harness 30/30).
+KiloCode Builder V1 (Phase 12 — COMPLETED 2026-08-07, harness 31/31).
 
 Note: Claude Code Builder V1 (Phase 11) is DROPPED — decision 2026-08-08,
 see `planning/DECISIONS.md`. Claude config (`~/.claude.json`) is entropic and does not
@@ -485,7 +485,7 @@ BDF is not feasible. Record kept for history.
 Status
 
 ```
-COMPLETED 2026-08-07 — Kilo V1: build-kilo-v1.ps1, test-kilo-v1.ps1, scaffold-kilo-v1.ps1; harness 30/30 (KILO_ADAPTER + real ~/.config/kilo)
+COMPLETED 2026-08-07 — Kilo V1: build-kilo-v1.ps1, test-kilo-v1.ps1, scaffold-kilo-v1.ps1; harness 31/31 (KILO_ADAPTER + real ~/.config/kilo)
 ```
 
 Objective

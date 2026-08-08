@@ -1,18 +1,20 @@
-# TESTING Template
-
-> Template: verification guide. Becomes `TESTING.md`.
-
----
-
 # TESTING
 
-> Verification guide for {{PROJECT_NAME}}.
+> Verification guide for the OpenCode Configuration Manager.
 
 ---
 
 # Purpose
 
-This document defines the testing process used to verify that {{PROJECT_NAME}} is functioning correctly.
+This document defines the testing process used to verify that the OpenCode Configuration Manager is functioning correctly.
+
+The generic testing pattern is defined in:
+
+```
+bdf/TESTING.md
+```
+
+This document is the project-specific mirror of the framework pattern.
 
 Testing ensures that:
 
@@ -21,29 +23,29 @@ Testing ensures that:
 - Generated configuration is valid.
 - Existing functionality has not been broken by recent changes.
 
-This document describes the current testing process.
+This document describes the manual testing process.
 
-Automated testing is provided by the test harness:
+Automated testing is provided by three test harnesses:
 
 ```
-{{TEST_HARNESS}}
+scripts/test-opencode-v2.ps1
+scripts/test-opencode-v2.5.ps1
+scripts/test-opencode-v2.7.ps1
 ```
 
-The harness runs the builder against isolated temporary fixtures and verifies both success and failure behavior.
+The V2.1 harness runs the builder against isolated temporary fixtures and verifies both success and failure behavior.
 
 It also runs the release manager against a temp copy of the docs and verifies the generated release documentation.
 
-Current automated coverage (all harnesses green = done):
+The V2.5 harness (Active-Provider Selector) verifies the V2.5 builder against isolated temporary fixtures in the same style.
 
-- {{TEST_HARNESS}} — 17 tests (9 builder + 8 Release Docs).
-- V2.5 harness ({{V25_TEST_HARNESS}}) — 13 tests (active-provider selector).
-- V2.7 harness ({{V27_TEST_HARNESS}}) — 31 tests (JSON Schema validation + hardening).
+The V2.7 harness (JSON Schema Validation) verifies the V2.7 builder against isolated temporary fixtures: schema validation, pre-flight checks, dry-run, retention, provenance, diagnostics, diff summary, P1/P2 policy.
 
-Definition of complete: 17/17 + 13/13 + 31/31 PASSED, exit code 0.
+V2.1 harness coverage (17 tests: 9 builder + 8 Release Docs):
 
-Builder tests (V2.1 harness):
+Builder tests:
 
-- Valid profile (real profile, no manual editing).
+- Valid profile (real coding profile, no manual editing).
 - Invalid JSON.
 - Missing provider.
 - Duplicate model IDs.
@@ -67,10 +69,12 @@ Release Docs tests:
 Run it with:
 
 ```
-powershell -File {{SCRIPTS_DIR}}/{{TEST_HARNESS}}
+powershell -File scripts/test-opencode-v2.ps1
 ```
 
 The harness exits non-zero when any test fails.
+
+The full suite is ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7).
 
 ---
 
@@ -85,6 +89,12 @@ Testing follows four principles.
 
 Testing is considered part of development rather than an optional step.
 
+The harness and its test results are part of a version's definition of complete: a version
+whose tests fail is not released.
+
+The documented test groups mirror the framework pattern (valid build, failure modes,
+release docs), applied to this project as the manual and automated tests below.
+
 ---
 
 # Test Environment
@@ -94,43 +104,53 @@ Current environment
 Operating System
 
 ```
-{{OS}}
+Windows 11
 ```
 
 Shell
 
 ```
-{{SHELL}}
+Windows PowerShell 5.1 (or PowerShell 7+)
 ```
 
 Application
 
 ```
-{{APP_NAME}}
+OpenCode
 ```
 
 Configuration Builder
 
 ```
-{{BUILDER_SCRIPT}}
+build-opencode-v2.ps1 (Builder V2.1)
+build-opencode-v2.5.ps1 (Builder V2.5, Active-Provider Selector)
+build-opencode-v2.7.ps1 (Builder V2.7, JSON Schema Validation)
+```
+
+Test Harness
+
+```
+test-opencode-v2.ps1
+test-opencode-v2.5.ps1
+test-opencode-v2.7.ps1
 ```
 
 Provider
 
 ```
-{{CURRENT_PROVIDER}}
+OmniRoute
 ```
 
 Profile
 
 ```
-{{DEFAULT_PROFILE}}
+default
 ```
 
 Profile Selection
 
 ```
--Profile {{DEFAULT_PROFILE}}
+-Profile default
 ```
 
 ---
@@ -139,7 +159,7 @@ Profile Selection
 
 Before testing begins verify:
 
-□ Configuration files exist.
+□ JSON files exist.
 
 □ Provider configuration exists.
 
@@ -147,7 +167,9 @@ Before testing begins verify:
 
 □ Backup directory exists.
 
-□ {{APP_NAME}} is installed.
+□ OpenCode is installed.
+
+□ OmniRoute is running.
 
 □ Required environment variables are configured.
 
@@ -162,7 +184,7 @@ The current implementation is verified using the following categories.
 | Category | Purpose |
 |----------|---------|
 | Folder Structure | Verify project layout |
-| Configuration Validation | Verify configuration syntax |
+| JSON Validation | Verify configuration syntax |
 | Builder | Verify builder execution |
 | Generated Configuration | Verify generated output |
 | Backup | Verify backup creation |
@@ -187,29 +209,29 @@ Verify that the required project structure exists.
 Confirm the following directories exist.
 
 ```
-{{CONFIG_SOURCE_DIR}}/
+profiles/
 
-{{PROVIDER_DIR}}/
+providers/
 
-{{SCRIPTS_DIR}}/
+scripts/
 
-{{BACKUP_DIR}}/
+backup/
 ```
 
 Confirm the following files exist.
 
 ```
-{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/settings.json
+profiles/default/settings.json
 
-{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/models.json
+profiles/default/omniroute-models.json
 
-{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/plugins.json
+profiles/default/plugins.json
 
-{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/service.json
+profiles/default/mcp.json
 
-{{PROVIDER_DIR}}/{{CURRENT_PROVIDER}}.json
+providers/omniroute.json
 
-{{SCRIPTS_DIR}}/{{BUILDER_SCRIPT}}
+scripts/build-opencode-v2.ps1
 ```
 
 ### Expected Result
@@ -237,7 +259,7 @@ Verify that generated files are not stored inside the source directories.
 Confirm that
 
 ```
-{{GENERATED_ARTIFACT}}
+opencode.json
 ```
 
 exists only in the expected output location.
@@ -262,7 +284,7 @@ JS-001
 
 ### Purpose
 
-Verify that every configuration file contains valid configuration.
+Verify that every configuration file contains valid JSON.
 
 ### Procedure
 
@@ -277,14 +299,14 @@ models.json
 
 plugins.json
 
-service.json
+mcp.json
 
-{{CURRENT_PROVIDER}}.json
+omniroute.json
 ```
 
 ### Expected Result
 
-Every file contains valid configuration.
+Every file contains valid JSON.
 
 ### Failure Result
 
@@ -336,13 +358,19 @@ Verify that the builder starts successfully.
 
 Run the builder.
 
+```powershell
+.\build-opencode-v2.ps1
 ```
-{{BUILDER_SCRIPT}}
+
+or
+
+```powershell
+.\build-opencode-v2.ps1 -Profile default
 ```
 
 ### Expected Result
 
-The builder starts without syntax errors.
+The builder starts without PowerShell syntax errors.
 
 The build process begins.
 
@@ -366,14 +394,18 @@ Verify that the builder loads the selected profile correctly.
 
 ### Procedure
 
-Execute the builder with the profile parameter.
+Execute the builder.
+
+```powershell
+.\build-opencode-v2.ps1 -Profile default
+```
 
 Observe the console output.
 
 Verify that the builder loads:
 
 ```
-{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/
+profiles/default/
 ```
 
 ### Expected Result
@@ -407,7 +439,7 @@ Execute the builder.
 Confirm that the provider configuration is read from:
 
 ```
-{{PROVIDER_DIR}}/{{CURRENT_PROVIDER}}.json
+providers/omniroute.json
 ```
 
 ### Expected Result
@@ -445,7 +477,7 @@ Introduce an intentional configuration error.
 Examples:
 
 - Remove a required key.
-- Break configuration syntax.
+- Break JSON syntax.
 
 Run the builder.
 
@@ -482,7 +514,7 @@ Verify that the following sections appear in the generated configuration.
 - Provider
 - Models
 - Plugins
-- Service
+- MCP
 
 ### Expected Result
 
@@ -511,14 +543,14 @@ Run the builder.
 Open:
 
 ```
-{{GENERATED_ARTIFACT}}
+opencode.json
 ```
 
 ### Expected Result
 
 The file exists.
 
-The configuration is valid.
+The JSON is valid.
 
 The configuration contains all expected sections.
 
@@ -526,7 +558,7 @@ The configuration contains all expected sections.
 
 Missing file.
 
-Invalid configuration.
+Invalid JSON.
 
 Incomplete configuration.
 
@@ -570,7 +602,11 @@ Verify that a partial profile builds successfully.
 
 ### Procedure
 
-Execute the builder with a profile that contains only the settings file.
+Execute the builder with a profile that contains only settings.json.
+
+```powershell
+.\build-opencode-v2.ps1 -Profile minimal
+```
 
 ### Expected Result
 
@@ -605,7 +641,7 @@ Run the builder.
 Verify that the following file exists.
 
 ```
-{{GENERATED_ARTIFACT}}
+opencode.json
 ```
 
 ### Expected Result
@@ -626,21 +662,21 @@ GEN-002
 
 ### Purpose
 
-Verify that the generated configuration contains valid configuration.
+Verify that the generated configuration contains valid JSON.
 
 ### Procedure
 
 Open
 
 ```
-{{GENERATED_ARTIFACT}}
+opencode.json
 ```
 
 Parse the file using:
 
-- {{APP_NAME}}
-- A code editor
-- A configuration validator
+- OpenCode
+- VS Code
+- JSON Validator
 
 ### Expected Result
 
@@ -648,9 +684,9 @@ The file parses successfully.
 
 ### Failure Result
 
-Invalid configuration syntax.
+Invalid JSON syntax.
 
-The application cannot load the configuration.
+OpenCode cannot load the configuration.
 
 ---
 
@@ -677,7 +713,7 @@ models
 
 plugin
 
-service
+mcp
 ```
 
 ### Expected Result
@@ -705,13 +741,13 @@ Verify model injection.
 Compare:
 
 ```
-{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/models.json
+profiles/default/omniroute-models.json
 ```
 
 with
 
 ```
-{{GENERATED_ARTIFACT}}
+opencode.json
 ```
 
 Verify that every configured model appears inside the provider configuration.
@@ -745,7 +781,7 @@ Generate a configuration twice.
 Inspect:
 
 ```
-{{BACKUP_DIR}}/
+backup/
 ```
 
 ### Expected Result
@@ -755,9 +791,9 @@ A new timestamped backup is created before the previous configuration is overwri
 Example
 
 ```
-{{BACKUP_DIR}}/
+backup/
 
-{{GENERATED_ARTIFACT}}_2026-08-03_10-15-42.json
+opencode_2026-08-03_10-15-42.json
 ```
 
 ### Failure Result
@@ -810,7 +846,7 @@ After any modification to the builder:
 
 1. Run the builder.
 2. Verify successful generation.
-3. Verify the application starts successfully.
+3. Verify OpenCode starts successfully.
 4. Verify the configured models are available.
 
 ### Expected Result
@@ -838,7 +874,7 @@ Verify reproducibility.
 Without changing any source configuration:
 
 1. Run the builder.
-2. Delete `{{GENERATED_ARTIFACT}}`.
+2. Delete `opencode.json`.
 3. Run the builder again.
 
 Compare the generated configurations.
@@ -853,34 +889,6 @@ Different outputs indicate a regression or non-deterministic behavior.
 
 ---
 
-# Active-Provider Selector Test Group (V2.5 Builder)
-
-The V2.5 group verifies provider discovery, interactive selection persistence, per-provider model files, and the `-Provider`/`-NonInteractive` switches.
-
-| Test | Name | Asserts |
-|------|------|---------|
-| 1 | Provider discovery | Every provider under `{{PROVIDER_DIR}}/` is discovered |
-| 2 | Selection persistence | Selected active providers persist to profile settings; unchanged list rewrites nothing |
-| 3 | Per-provider model precedence | Profile `<provider>-models.json` wins over provider-folder and inline models |
-| 4 | Model source drop | Active provider without any models source is dropped with a warning, not a failure |
-| 5 | CLI switches | `-Provider` and `-NonInteractive` behave per spec |
-
-# JSON Schema Validation Test Group (V2.7 Builder)
-
-The V2.7 group verifies the schema-validation entry gate and the F1-F7 feature set: pre-flight, dry-run, backup retention, provenance, diagnostics, merge diff, dynamic target artifact, and the no-literal-keys policy.
-
-| Test | Name | Asserts |
-|------|------|---------|
-| 1 | Schema compliance | Config sources validate against `{{SCHEMA_DIR}}` schemas before builder validation |
-| 2 | Pre-flight deps | Missing provider/profile/schema files reported together, then abort |
-| 3 | WhatIf dry-run | Validates + merges only; writes nothing; prints planned changes; exit 0 |
-| 4 | Backup retention | Backups pruned to newest N per artifact prefix (`-KeepBackups`) |
-| 5 | Provenance sidecar | Sidecar written with builder version, profile, providers, timestamp, output hash |
-| 6 | Doctor diagnostics | Read-only diagnostics; exit 0 clean / 1 issues; no writes |
-| 7 | Merge diff summary | Diff vs previous backup reported; no prior backup = no diff |
-| 8 | Dynamic target artifact | `target.json` artifact name drives output, backup prefix, provenance, WhatIf |
-| 9 | No literal keys | Generated artifact contains only `{env:VAR}` apiKey placeholders |
-
 # Release Docs Test Group (Tests 10-17)
 
 The Release Docs group verifies the release pipeline (registry → release manager → generated documentation).
@@ -893,7 +901,7 @@ All tests except test 17 run against an isolated temp copy of the docs.
 | 11 | Release manager generates all outputs | Exit 0, CURRENT_RELEASE.md created, markers intact, every registry version present in CHANGELOG |
 | 12 | Release manager deterministic | Two runs produce identical CHANGELOG and CURRENT_RELEASE.md |
 | 13 | CURRENT_RELEASE matches registry | Quick reference contains the Current entry's builder version, project version, date, and testing summary |
-| 14 | Registry and CHANGELOG consistent | Every registry entry present in CHANGELOG with its summary; legacy entries preserved; exactly one Current in the generated section |
+| 14 | Registry and CHANGELOG consistent | Every registry entry present in CHANGELOG with its summary; legacy entries (2.1.0 → 1.0.0) preserved; exactly one Current in the generated section |
 | 15 | VERSION.md rows updated | Last Updated row matches the Current release date |
 | 16 | Missing markers abort safely | Removing a marker makes the manager fail with exit non-zero and leaves CHANGELOG untouched |
 | 17 | Real docs consistent (read-only) | Real `release_registry.json`, `CHANGELOG.md`, and `CURRENT_RELEASE.md` are consistent |
@@ -903,19 +911,68 @@ Test 17 is the only test in the harness that reads the real docs, and it is stri
 Run the harness with:
 
 ```
-powershell -File {{SCRIPTS_DIR}}/{{TEST_HARNESS}}
-powershell -File {{SCRIPTS_DIR}}/{{V25_TEST_HARNESS}}
-powershell -File {{SCRIPTS_DIR}}/{{V27_TEST_HARNESS}}
+powershell -File scripts/test-opencode-v2.ps1
 ```
 
-Expected: 17/17 + 13/13 + 31/31 PASSED, exit 0.
+Expected: 17/17 PASSED, exit 0.
+
+---
+
+# V2.5 Builder Test Group
+
+The V2.5 group verifies the Active-Provider Selector builder (`scripts/build-opencode-v2.5.ps1`) against isolated temporary fixtures.
+
+| Test | Name | Asserts |
+|------|------|---------|
+| 1 | All providers discovered | `-Provider` with both ids emits both provider sections |
+| 2 | Malformed provider fails | Non-zero exit, error names the bad file, no output written |
+| 3 | Non-interactive uses stored | Stored `activeProviders` reused, settings.json byte-identical |
+| 4 | Provider arg skips prompt | `-Provider` selection persists order to settings.json |
+| 5 | Provider arg unknown fails | Clear "Provider not found" error |
+| 6 | Profile models highest precedence | Profile-level `<provider>-models.json` wins over the provider-folder file |
+| 7 | Non-active profile models ignored | Inactive provider models never leak into the output |
+| 8 | Settings persist round-trip | `activeProviders` and `$schema` preserved exactly |
+| 9 | Settings backup created | `backup\` holds the original settings.json content |
+| 10 | Empty selection fails | Empty stored list fails with an activeProviders error |
+| 11 | Profile models dup key fails | Duplicate model key in `<provider>-models.json` fails, no output written |
+| 12 | Builder spec covers V2.5 | Docs-spec sync test: BUILDER_SPEC.md contains the V2.5 feature tokens |
+| 13 | Active provider no models dropped | Provider without a models source is dropped from output + settings.json with a warning |
+
+Test 12 (`Test-BuilderSpecCoversV25`) is a docs-spec sync test: it greps `BUILDER_SPEC.md` for the V2.5 feature tokens (`Discover-Providers`, `Select-ActiveProviders`, `Persist-ActiveProviders`, `Get-ProfileProviderModels`, `-NonInteractive`, `<provider>-models.json`), so the spec must be updated in lockstep with the builder.
+
+Run the V2.5 harness with:
+
+```
+powershell -File scripts/test-opencode-v2.5.ps1
+```
+
+Expected: 13/13 PASSED, exit 0.
+
+The definition of complete is ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7).
+
+---
 
 ## JSON Schema (V2.7) test group
 
-The V2.7 group verifies the JSON Schema builder ({{V27_TEST_HARNESS}}) against isolated temporary fixtures, in the same style as the other test groups.
+The V2.7 group verifies the JSON Schema builder (`scripts/build-opencode-v2.7.ps1`) against isolated temporary fixtures, in the same style as the V2.1 and V2.5 harnesses.
 
-- Schema compliance: config sources validate against {{SCHEMA_DIR}} schemas before builder validation.
-- Hardening: pre-flight dependency check, dry-run, backup retention, provenance, doctor diagnostics, merge diff summary.
+| Group | Coverage |
+|-------|----------|
+| Schema Validation | Valid sources pass; settings missing `required` fails; wrong `type` fails; `additionalProperties` fails; real settings accepted; provider violation fails; models violation fails; missing `schemas/` directory warns and continues |
+| Pre-flight | Missing provider file aborts with "Pre-flight failed" |
+| WhatIf | Nothing written, exit 0 |
+| Doctor | Clean exits 0, corrupt exits 1 |
+| Backup retention | `-KeepBackups` honored |
+| Provenance | Sidecar fields and SHA correct |
+| Diff summary | Added/Removed lines; identical input silent |
+
+Run the V2.7 harness with:
+
+```
+powershell -File scripts/test-opencode-v2.7.ps1
+```
+
+Expected: 31/31 PASSED, exit 0.
 
 ---
 
@@ -924,11 +981,11 @@ The V2.7 group verifies the JSON Schema builder ({{V27_TEST_HARNESS}}) against i
 Perform the following steps in order.
 
 1. Verify project structure.
-2. Verify configuration syntax.
+2. Verify JSON syntax.
 3. Execute the builder.
 4. Verify backup creation.
 5. Verify generated configuration.
-6. Launch the application.
+6. Launch OpenCode.
 7. Confirm configured models are available.
 8. Confirm no unexpected errors occur.
 
@@ -948,7 +1005,7 @@ A successful test session satisfies all of the following.
 
 ✓ Generated configuration is valid.
 
-✓ Application starts successfully.
+✓ OpenCode starts successfully.
 
 ✓ Configured models are available.
 
@@ -959,10 +1016,10 @@ A successful test session satisfies all of the following.
 Testing should be considered unsuccessful if any of the following occur.
 
 - Builder fails to start.
-- Invalid configuration is generated.
+- Invalid JSON is generated.
 - Backup is missing.
 - Required configuration sections are missing.
-- Application fails to load the generated configuration.
+- OpenCode fails to load the generated configuration.
 - Configured models are unavailable.
 
 Any failure should be investigated before continuing development.
@@ -983,7 +1040,7 @@ Before considering a build complete:
 
 □ Generated configuration verified.
 
-□ Application launched.
+□ OpenCode launched.
 
 □ Models available.
 
@@ -1003,6 +1060,6 @@ Future versions may extend automated testing with:
 
 ---
 
-**Document Version:** {{DOC_VERSION}}
+**Document Version:** 1.0
 
-**Status:** Testing Guide
+**Status:** Manual Testing Guide

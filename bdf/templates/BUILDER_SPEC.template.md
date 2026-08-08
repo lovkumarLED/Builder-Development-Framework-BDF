@@ -895,6 +895,22 @@ before overwrite.
 
 ---
 
+## Verification Additions
+
+Active providers without a models source are dropped after merge, before generation.
+
+The drop is announced with a warning and the reduced list is persisted to the profile settings file.
+
+The provider is absent from {{GENERATED_ARTIFACT}} and from the settings file.
+
+Stage 8 round-trip check.
+
+After writing, the settings file `activeProviders` must match the resolved list.
+
+The build fails before finishing if the round-trip check fails.
+
+---
+
 ## Regeneration Guarantee
 
 This specification fully describes the current builder and its predecessors.
@@ -1026,6 +1042,40 @@ The following functions are introduced by V2.7 (names are illustrative identifie
 | `Get-LatestBackupConfig` | Returns the parsed content of the newest backup artifact. |
 | `Compare-BackupDiff` | Returns diff lines (added / removed / updated) against the previous backup artifact. |
 | `Invoke-Doctor` | Runs read-only diagnostics; prints a status table; reports whether the configuration is clean. |
+
+Each function is documented as its own subsection.
+
+### {{FUNCTION_NAME}} — {{FUNCTION_PURPOSE}}
+
+Params
+
+```
+[type]$Param
+```
+
+Returns
+
+```
+<return value>
+```
+
+Every function name, parameter, and message in the contract matches the script verbatim.
+
+---
+
+## V2 Verbatim Messages V2.7
+
+The builder emits the following verbatim messages.
+
+- Schema failure: `Schema '<schema-name>': <file> failed: <property> <message>.`
+- Schema skip: `[!] No schema directory found at <SchemaDir> - skipping schema validation.`
+- Pre-flight fail: `Pre-flight failed: N missing input(s)` then per file `Missing: <path>`
+- Pre-flight pass: `[+] All input dependencies present.`
+- WhatIf: `[WhatIf] Would write <TargetArtifact>` / `[WhatIf] Would write <TargetBase>.provenance.json`
+- Doctor summary: `Doctor: N file(s) checked, M issue(s) found.`
+- Success: `[+] Builder finished successfully.`
+
+{{SHELL}} has no native schema test, so the validator runs inside the builder.
 
 ---
 
@@ -1161,12 +1211,28 @@ Never touch `.jsonc` or any non-`.json` file on its own. A non-`.json` config
 candidate asks the user `[y/N]` before reading; in `-NonInteractive` mode it is
 silently skipped.
 
+> **Agent config warning:** the builders generate `{{GENERATED_ARTIFACT}}`
+> (the agent's main config). Do NOT create a `.jsonc` next to it — the agent
+> reads the `.jsonc` *instead of* the `.json` when both exist, and your built
+> config silently disappears from its model list. Generating both formats is
+> planned for a future update — not right now.
+
 ## Agent Registry (extensible)
 
 ```
 {{UNIVERSAL_SCRIPT}} -> $AgentRegistry
   Name, Home (config dir), Main (.json file names), PlugKeys, Schema
 ```
+
+## Agent Map (inference)
+
+| Agent | Main JSON | Settings schema |
+|-------|-----------|-----------------|
+| <agent-name> | <main-json> | <settings-schema-url> |
+
+The project adapter maintains this map.
+
+The map records only the agents the scaffold registry handles.
 
 ---
 

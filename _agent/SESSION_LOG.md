@@ -2,6 +2,19 @@
 
 > History of completed sessions in this documentation repository.
 
+### Aug 8, 2026 (session 33) - FINAL FULL SYSTEM CHECK (pre-public gate): all green, committed - repo ready to go public ← recent session
+Done:
+- PART A (docs coherence): FSC v1.1 Parts 1-7 re-run on the current state + fixed: version DECISION - promoted 2.5.1 into release_registry.json (Current) after finding the hand-written 2.5.1 CHANGELOG entry inside the AUTO-GENERATED region vs registry 2.5.0; release-manager -Update ran twice (generated + deterministic no-op); README badge/footer/current-release, ROADMAP, CHANGELOG history table, templates example synced to 2.5.1. Kilo harness counts 30/30 -> 31/31 in current-state text (PROJECT_STATE, ROADMAP). Fixed README/CHANGELOG app paths (app/X -> app/app/X), FOLDER_STRUCTURE tree (removed phantom opencode.jsonc; added test-opencode.ps1, tokenrouter.json, requirements.txt, superpowers/, .claude/, .gitignore), BUILD_KILOCODE_V1 kilo-doc refs. 10 template pairs synced to references (ARCHITECTURE, BUILDER_SPEC, CONTRIBUTING_FOR_AI, DEVELOPER_GUIDE, FOLDER_STRUCTURE, JSON_SCHEMAS, PROJECT_STATE, ROADMAP, TESTING; CHANGELOG resolved by regen) - placeholder audit 66/66 clean; framework bumped 2.2.9 -> 2.2.10. jsonc-shadow warning added to 8 reference docs + app/rule.md + 4 templates + FOLDER_STRUCTURE/AGENT.md. Dual-key contract resolved in JSON_SCHEMAS.md (options.apiKey table). snapshot-33 pin created (11 files).
+- PART B (builders): kilo 31/31, opencode 31/31, legacy 17/17 + 13/13 all green. Real builds on the real configs (snapshot + hash-verified restore): kilo green + idempotent (rerun = "No changes detected"), dual keys verified in output JSON, provenance stamped. -WhatIf (writes nothing) + -Doctor both. FOUND + FIXED: K1 and V2.7 -Doctor crashed on a missing default profile (threw before the Doctor branch) - now falls back to the first available profile; harnesses re-run 31/31. scaffold-agent.ps1 -List registry OK; sandbox -Bootstrap for a throwaway agent generated a builder with dual-key normalization + a 31/31 harness. Hash-compare: build-kilo.ps1/build-opencode.ps1/test-kilo.ps1 aliases byte-identical; test-opencode.ps1 was stale -> synced from v2.7. Real opencode.json on disk was STALE (18->16 models + missing tokenrouter) - rebuilt to match sources; rerun = no changes.
+- PART C (app code review): adversarial review of every app module + gui.html. FOUND + FIXED + regression-tested: (1) path traversal in provider ids on PUT/DELETE /api/providers/{id}, /api/switch, /api/test (id validated ^[a-z0-9][a-z0-9-]*$ in agentstore + routes); (2) theme injection - rule.md font value unvalidated into <style> (font regex + breakout-char rejection in rules.py + sanitize in serve.py); (3) proxy SSRF-via-redirect - urllib followed upstream redirects (no-redirect opener now); (4) gui.html XSS - provider name via innerHTML into an <option> (textContent now); (5) agent-name path-char guard + build-profile traversal guard. CORS confirmed localhost-only; keys never in responses (hasKey only); secrets scan zero hits; state.json/backups/env git-ignored verified. 48/48 unit tests green (34 + 14 new security tests incl. a live redirecting-server proxy test).
+- PART D (GUI click-through on the REAL kilo config): snapshot + hash-verified restore 39/39 byte-identical. Clicked everything: every preset (10) with URL+SDK+name autofill, Custom, eye toggle, SDK Other, empty-name/empty-url inline errors, duplicate rejection (server toast), modal + card test connection (omniroute green), save/delete/re-add (real omniroute delete + re-add via preset, restored), switch/activate flows, plugins add/remove, MCP invalid-JSON error + add/remove, models add/save/remove/save (16 restored), build panel (real K1 build through the app), Advanced panel (theme + scripts), proxy chat through 127.0.0.1:9090 (upstream responses relayed with the key), wizard in a temp dir (discover -> scan -> scaffold -> add provider -> build, all writing only to the temp dir). Console JS errors: zero after fixes. FOUND + FIXED by the click-through: Providers.setSdk not exported (preset SDK+name autofill dead - fixed); /api/build never passed -ConfigRoot so building a non-default agent overwrote the REAL opencode.json (fixed - regression test); opencode V2.7 Verify-Plugins/Verify-Mcp false-failed on empty sections (fresh scaffold) - fixed, harness 31/31 re-run; dead #bldRes reference removed.
+- PART E: full fix loop green; docs updated in the same changes (README sync rule); report written to AI/FULL_SYSTEM_CHECK_REPORT_2026-08-08.md; SESSION_LOG + JOURNEY updated; COMMITTED everything (docs + app fixes).
+Broken:
+- None - clean session. Collateral notes: builder keep-10 backup rotation pruned 2 pre-existing backups during the real-build tests + 1 extra pre-existing backup removed by the cleanup window by mistake (user-visible config files all restored byte-identical); bdf_dashboard.png (untracked orphan) left for the user's decision; historical AI/ + session-log refs to planned/never-created files documented in the report, not rewritten.
+Journey: Step 3 IN PROGRESS ~94%; Phase 14 COMPLETE (incl. security hardening + pre-public gate PASS); Phase 15 PLANNED - repo READY TO GO PUBLIC (user action: set the GitHub repo public after reviewing the report).
+Next: user makes the repo public (bdf_dashboard.png decision first); after the gate: BUILDER_PHASES Alpha->Beta->General gates + Step 4/5 (per JOURNEY Next).
+Learned: The public gate caught what regular sessions miss - a config build silently writing to the WRONG config root, a dead GUI feature (unexported module function), and builder verification false-fails on empty sections; the snapshot + hash-verify restore discipline made destructive GUI testing on the real config safe.
+
 > Read AGENT.md for the full project context.
 
 > Read _agent/SESSION_WORKFLOW.md for the session rules.
@@ -9,7 +22,7 @@
 ---
 
 ## Session History
-### Aug 8, 2026 (session 32) - Real-provider story COMPLETE: builder parity (dual-key merge normalization), harness fixes, docs overhaul, committed ← recent session
+### Aug 8, 2026 (session 32) - Real-provider story COMPLETE: builder parity (dual-key merge normalization), harness fixes, docs overhaul, committed
 Done:
 - USER ACCEPTANCE PASSED: Kilo chat with TokenRouter works (no 401) - the options.apiKey fix proven live.
 - Fixed the SECOND agent issue: OpenCode /models hid tokenrouter because a user-created opencode.jsonc (with disabled_providers:["tokenrouter"]) SHADOWED the built opencode.json (OpenCode reads .jsonc INSTEAD of .json when both exist). Backed up + removed the jsonc; /models now shows tokenrouter + omniroute. User rule documented: never create opencode.jsonc next to opencode.json.
@@ -75,17 +88,3 @@ Journey: Step 3 Universal Agent Framework core IN PROGRESS ~90%; Phase 14 GUI Ap
 Next: verify kilo API after restart; extend the app/framework to more coding agents when directed.
 Learned: activeProviders is a LIST - the builder merges EVERY provider in it (each with its own models file); only listed providers merge, and providers without any models are dropped by the model guard. The GUI app + MD framework are the same engine with two surfaces - the app just calls scaffold-agent.ps1 and the generated builders.
 
-### Aug 8, 2026 (session 28f) - BDF GUI App plan finalized (UI spec + autonomous engine) - handoff ready
-Done:
-- User clarified the CORE PRINCIPLE: the app performs EXACTLY like BDF but AUTONOMOUSLY - a normal user never needs an AI agent. The app itself scans the main JSON, seeds profiles, GENERATES the .ps1 builder scripts (via the real scaffold-agent.ps1 -Bootstrap engine), and runs the build.
-- Two-worlds model locked: World 1 = developers edit docs/bdf/*.md + ask AI; World 2 = normal users use the GUI app. Same engine, two surfaces.
-- UI requirement captured: SIMPLE + CLEAN + COOL ANIMATIONS. Full UI/UX SPEC added to the plan (dark theme, accent color, provider cards, status dots, fade-up load, glowing active card, pulsing dots, button lift, wizard transitions, toasts, spinners, prefers-reduced-motion).
-- User decision: build the full feature set first with a tasteful default look; colors/animations come later per their direction.
-- App location confirmed: docs/app/ (user's explicit choice; research noted the mainstream apps/ convention + future extraction path).
-- Plan MD finalized: AI/CONTINUE_BDF_GUI_APP.md (426 lines, 11 sections, resume prompt included).
-Broken: None.
-Journey: unchanged (Step 3 ~90%); GUI app = Phase 14 idea, V3 still not released.
-Next: NEXT SESSION - build the app per AI/CONTINUE_BDF_GUI_APP.md (fresh context, full plan + UI spec + prompt ready).
-Learned: This session hit its useful limit - the MD plan is the correct handoff for a big build; the app deserves fresh context.
-
----

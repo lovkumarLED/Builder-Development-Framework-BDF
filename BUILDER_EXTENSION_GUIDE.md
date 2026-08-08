@@ -97,6 +97,12 @@ powershell -File scripts/test-opencode-v2.7.ps1      # 31 tests
 - Touch `.jsonc` without consent.
 - Maintain configuration data — it only automates.
 
+> **Agent config warning:** the builders generate `opencode.json` (OpenCode) /
+> `kilo.json` (Kilo). Do NOT create `opencode.jsonc` next to `opencode.json` —
+> OpenCode reads the `.jsonc` *instead of* the `.json` when both exist, and your
+> built config silently disappears from `/models`. Generating both formats is
+> planned for a future update — not right now.
+
 ---
 
 # Adding a New Provider Type

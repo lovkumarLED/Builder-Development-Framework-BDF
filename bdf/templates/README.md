@@ -51,7 +51,7 @@ Every placeholder must be replaced before a project document is released.
 | `{{BACKUP_DIR}}` | The backup directory. | backup |
 | `{{SHELL}}` | The scripting language used by the builder. | PowerShell |
 | `{{OS}}` | The supported operating system. | Windows 11 |
-| `{{CURRENT_VERSION}}` | The current project version. | 2.5.0 |
+| `{{CURRENT_VERSION}}` | The current project version. | 2.5.1 |
 | `{{PROJECT_STATUS}}` | The current project status. | Builder V2.7 JSON Schema Validation |
 | `{{VERSION_DESCRIPTION}}` | The summary of the current version. | Builder V2.7: JSON Schema Validation, pre-flight dependency check, dry-run, backup retention, provenance sidecar, diagnostics, diff summary |
 | `{{PROJECT_ROOT}}` | The root directory of the project. | .config/opencode |
@@ -98,6 +98,8 @@ Every placeholder must be replaced before a project document is released.
 | `{{DESTINATION_DESCRIPTION}}` | Why the destination milestone matters. | V3 is complete when the same framework builds builders for multiple agents without redesign |
 | `{{DESTINATION_TAG}}` | Short label for the destination phase. | Universal Builder Generator |
 | `{{FIRST_VALIDATION_PROJECT}}` | The first second-project validation. | KiloCode |
+| `{{FUNCTION_NAME}}` | The name of a builder function in a function contract. | Test-SchemaCompliance |
+| `{{FUNCTION_PURPOSE}}` | The purpose of a builder function in a function contract. | Validates a file against a schema object |
 
 The example values come from the reference implementation.
 

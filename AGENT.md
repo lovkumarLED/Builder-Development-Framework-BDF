@@ -212,6 +212,10 @@ docs/
 
 The following file is generated automatically.
 
+> **Agent config warning:** do NOT create `opencode.jsonc` next to the generated
+> `opencode.json` - OpenCode reads the `.jsonc` instead of the `.json` when
+> both exist, and your built config silently disappears from `/models`.
+
 ```
 opencode.json
 ```

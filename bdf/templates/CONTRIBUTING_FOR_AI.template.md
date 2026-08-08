@@ -169,6 +169,20 @@ Every generated file must be reproducible from the source configuration.
 
 ---
 
+## Rule 11 — Keep README Current (README Synchronization Rule)
+
+`README.md` is the public face of the project and must never go stale.
+
+Whenever something is added, changed, or fixed:
+
+1. Check whether `README.md` mentions the affected area.
+2. If it does, update the corresponding section in the SAME change — never in a later commit.
+3. User-visible changes (new features, scripts, rules, status changes) MUST be reflected in `README.md` before the work is considered done.
+4. Keep the README footer versions in sync.
+5. Never claim a status the project has not reached.
+
+---
+
 # Preferred Development Workflow
 
 The expected workflow is:

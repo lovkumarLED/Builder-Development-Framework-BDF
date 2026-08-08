@@ -63,6 +63,10 @@ Tooling directories, package manifests, and lockfiles belong to the project tool
 
 Stores automatically created backups of the generated `{{GENERATED_ARTIFACT}}`.
 
+> **Agent config warning:** do NOT create a `.jsonc` next to the generated
+> `{{GENERATED_ARTIFACT}}` - the agent reads the `.jsonc` instead when both
+> exist, and the built config silently disappears from its model list.
+
 Before generating a new configuration, the builder creates a timestamped backup of the previous configuration.
 
 This allows recovery if a configuration change introduces errors.
@@ -385,6 +389,18 @@ The primary script is the configuration builder.
 
 ---
 
+## User-Run vs System-Run
+
+The user only ever runs the BUILDERS directly.
+
+Everything else — test harnesses, the release manager, and scaffold scripts — is system/AI-run machinery.
+
+The scaffolds run once per agent to create the profile structure and seed the user-owned files.
+
+After that, the user edits profiles and providers and runs only the builder.
+
+---
+
 ## {{BUILDER_SCRIPT}}
 
 Purpose
@@ -407,6 +423,14 @@ Supports
 - Provider-specific models with profile-level precedence.
 
 The builder never edits source configuration files.
+
+## {{TEST_HARNESS}}
+
+Automated test harness.
+
+Runs the builder against isolated temporary fixtures and verifies both success and failure behavior.
+
+System-run only; exits non-zero when any test fails.
 
 ---
 

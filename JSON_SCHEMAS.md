@@ -258,6 +258,16 @@ profiles/<profile>/target.json
 | options | Object | Yes |
 | models | Object | Yes |
 
+The `options` object carries the agent-specific keys; the dual-key contract
+(`apiKey` + `options.apiKey`) is documented in `PROVIDER_DEVELOPMENT_GUIDE.md`.
+
+### provider.omniroute.options
+
+| Key | Type | Required | Description |
+|------|------|----------|-------------|
+| baseURL | String | Yes | The provider endpoint (e.g. `http://localhost:20128/v1`). |
+| apiKey | String | Yes | The API key - mirrored from the top-level `apiKey` by the app and the builders (Kilo reads the key from `options.apiKey`; OpenCode from `apiKey`). |
+
 ---
 
 ## Validation Rules
