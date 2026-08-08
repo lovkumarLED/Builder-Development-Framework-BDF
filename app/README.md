@@ -22,10 +22,11 @@ That's it. No other setup, no terminal commands.
 ## How to start
 
 1. Open the `app` folder.
-2. Double-click **`start.bat`**.
-3. Your browser opens the app automatically.
-
-A small black window stays open — that's the app running. **Close it to stop
+2. Double-click **`install.bat`** once - it creates the environment, installs
+   the packages, and adds an **"AI Switcher"** shortcut to your desktop.
+3. From now on, double-click the desktop shortcut (or `start.bat`).
+4. Your browser opens the app automatically.
+A small black window stays open - that's the app running. **Close it to stop
 the app** (or just leave it open while you work).
 
 > If a browser tab doesn't open, go to `http://127.0.0.1:9090` yourself.

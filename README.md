@@ -116,10 +116,11 @@ Everything here has **two surfaces powered by the same engine**
 **For normal people (use the app):**
 
 1. Install **Python** on Windows (tick *"Add python.exe to PATH"*).
-2. Double-click **`docs\app\start.bat`**. First run creates the app's own
-   Python environment (`env\`) and installs its packages (one-time, needs
-   internet). Second run is instant.
-3. Your browser opens **`http://127.0.0.1:9090`**. Follow the wizard.
+2. Double-click **`docs\app\install.bat`** once. It creates the app's own
+   Python environment (`env\`), installs its packages (one-time, needs
+   internet), and puts an **"AI Switcher"** shortcut on your desktop.
+3. From now on, double-click the desktop shortcut (or `docs\app\start.bat`) — your
+   browser opens **`http://127.0.0.1:9090`**. Follow the wizard.
 4. Close the window = the app stops. It is not a background service.
 
 **For developers (use the framework):**

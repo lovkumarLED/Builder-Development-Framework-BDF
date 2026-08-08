@@ -235,7 +235,7 @@ Includes the build-continuation rule:
 AI/CONTINUE_PROJECT_BUILD.md
 ```
 
-- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `requirements.txt` (fastapi + uvicorn), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js — no CDN), `tests/` (34 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage). Add-provider presets cover proxies (OmniRoute, LiteLLM, CLI Proxy) AND real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill; the app writes the key in both agent contracts (`apiKey` + `options.apiKey`).
+- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `install.bat` (one-time installer: env + packages + desktop shortcut), `requirements.txt` (fastapi + uvicorn), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js — no CDN), `tests/` (34 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage). Add-provider presets cover proxies (OmniRoute, LiteLLM, CLI Proxy) AND real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill; the app writes the key in both agent contracts (`apiKey` + `options.apiKey`).
 
 ## PROJECT_STATE.md
 
