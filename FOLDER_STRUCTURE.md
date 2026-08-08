@@ -161,6 +161,8 @@ bdf/
 superpowers/
 .claude/
 .gitignore
+bdf_dashboard.png
+bdf_add_provider.png
 ```
 
 ## _agent/

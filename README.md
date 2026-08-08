@@ -207,6 +207,18 @@ backup retention → provenance sidecar → merge-diff summary
 
 ## 🤖 How the AI Switcher app works
 
+### Screenshots
+
+The dashboard manages your coding agent(s) - providers, plugins, MCP servers,
+models, and the build - all on your machine, nothing leaves 127.0.0.1:
+
+![AI Switcher dashboard](bdf_dashboard.png)
+
+The Add-provider form carries the presets (proxies + real providers) with
+automatic URL + SDK + name fill:
+
+![Add-provider presets](bdf_add_provider.png)
+
 ### The core idea
 
 The app is BDF made autonomous. It never re-implements the engine — it calls
