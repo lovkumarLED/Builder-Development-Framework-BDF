@@ -123,6 +123,17 @@ Everything here has **two surfaces powered by the same engine**
    browser opens **`http://127.0.0.1:9090`**. Follow the wizard.
 4. Close the window = the app stops. It is not a background service.
 
+Prefer commands? From PowerShell:
+
+```powershell
+git clone https://github.com/lovkumarLED/opencode-builder.git
+cd opencode-builder\docs\app
+.\install.bat   # one-time: creates env\, installs packages, adds the desktop shortcut
+```
+
+From then on: double-click the **"AI Switcher"** shortcut (or `start.bat`) - the app is instant.
+
+
 **For developers (use the framework):**
 
 ```powershell
@@ -247,6 +258,11 @@ backup retention → provenance sidecar → merge-diff summary
 ## 🤖 How the AI Switcher app works
 
 ### Screenshots
+
+![AI Switcher in motion](ai-switcher-demo.gif)
+
+*The dashboard, live - entrance animation, floating embers, and the Add-provider
+modal.*
 
 The dashboard manages your coding agent(s) - providers, plugins, MCP servers,
 models, and the build - all on your machine, nothing leaves 127.0.0.1:
@@ -460,34 +476,11 @@ the app warns about this.
 2. **Rulebook** (markdown): the design/feature/architecture rules AI agents
    must follow when changing the app.
 
-### Animations — how they work, how to add new ones
+### Animations
 
-Animations use **Anime.js** (`docs/app/lib/anime.min.js` — local copy, no
-CDN, works offline) plus pure CSS keyframes. Every animation respects
-`prefers-reduced-motion` (the app checks it once into a `reduced` flag).
-
-- Page load: header + cards stagger in (`anime({ targets, translateY, delay:
-  anime.stagger(70) })`).
-- Provider cards: staggered pop-in on every render (`UI.stagger`).
-- Wizard steps: slide + fade per step.
-- Toasts: slide in from the right, fade out.
-- Embers: a canvas particle system (orange/cyan sparks) in the background.
-- Hover/active states: CSS transitions + the hero's flame-ring pulse.
-
-**To add a new animation:**
-
-```js
-// one-off tween
-anime({ targets: "#myCard", translateY: [24, 0], opacity: [0, 1],
-        duration: 500, easing: "easeOutCubic" });
-
-// staggered block entrance
-anime({ targets: ".my-cards", translateY: [26, 0], opacity: [0, 1],
-        duration: 460, delay: anime.stagger(90), easing: "easeOutCubic" });
-
-// CSS-only alternative: define a @keyframes and apply it (reduced-motion is
-// already handled globally by the media query in gui.html)
-```
+The GUI animates with a local copy of Anime.js (no CDN, works offline) and
+respects `prefers-reduced-motion`. Subtle touches only - staggered entrances,
+toasts, and the ember particles in the background.
 
 ### Assets & images
 

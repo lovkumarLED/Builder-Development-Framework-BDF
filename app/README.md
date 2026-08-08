@@ -26,6 +26,15 @@ That's it. No other setup, no terminal commands.
    the packages, and adds an **"AI Switcher"** shortcut to your desktop.
 3. From now on, double-click the desktop shortcut (or `start.bat`).
 4. Your browser opens the app automatically.
+
+Prefer commands? From PowerShell:
+
+```powershell
+git clone https://github.com/lovkumarLED/opencode-builder.git
+cd opencode-builder\docs\app
+.\install.bat   # one-time: creates env\, installs packages, adds the desktop shortcut
+```
+
 A small black window stays open - that's the app running. **Close it to stop
 the app** (or just leave it open while you work).
 
