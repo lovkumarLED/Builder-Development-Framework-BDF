@@ -4,9 +4,16 @@ import os
 from pathlib import Path
 
 APP_DIR = Path(__file__).resolve().parent.parent
-CONFIG_ROOT = APP_DIR.parent.parent
-SCRIPT_DIR = Path(os.environ.get("BDF_SCRIPTS_DIR", str(CONFIG_ROOT / "scripts")))
+
+# The app is self-contained: the full engine (scaffold generator, opencode
+# builder + harness, kilo adapter + harness, JSON schemas) ships inside the
+# repo under app/engine/. Anyone who downloads the app can generate working
+# builders for opencode / kilo without any preinstalled scripts. BDF_SCRIPTS_DIR
+# is kept as an escape hatch for power users who maintain their own copy.
+ENGINE_DIR = APP_DIR / "engine"
+SCRIPT_DIR = Path(os.environ.get("BDF_SCRIPTS_DIR", str(ENGINE_DIR)))
 SCAFFOLD_SCRIPT = SCRIPT_DIR / "scaffold-agent.ps1"
+ENGINE_SCHEMAS = ENGINE_DIR / "schemas"
 
 STATE_FILE = APP_DIR / "state.json"
 

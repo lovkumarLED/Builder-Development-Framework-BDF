@@ -1,0 +1,27 @@
+﻿{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Model Definitions",
+    "description": "Validates models.json AND <provider>-models.json (profile-level provider model files). Model ids are arbitrary keys; each entry must carry a 'name'. 'variants' is a map of named reasoning overlays: each value is a settings object whose keys follow the provider's reasoning format - reasoningEffort (opencode / openai), thinking.type + thinking.budgetTokens (claude), or thinkingConfig.thinkingBudget (gemini).",
+    "type": "object",
+    "properties": {
+        "models": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "variants": {
+                        "type": "object",
+                        "description": "Named reasoning overlays (e.g. { low: { reasoningEffort: low } }). Supported settings keys include reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget; additional keys are allowed and pass through unchanged."
+                    },
+                    "reasoning": { "type": "boolean" },
+                    "temperature": { "type": "number" },
+                    "limit": { "type": "number" }
+                },
+                "required": [ "name" ]
+            }
+        }
+    },
+    "required": [ "models" ],
+    "additionalProperties": false
+}

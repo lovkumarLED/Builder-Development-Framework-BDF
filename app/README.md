@@ -12,10 +12,16 @@ whichever provider you pick. Switching providers = one click in the app.
 ## What you need
 
 - **Windows** (10 or 11)
-- **Python** â€” install it from <https://www.python.org/downloads/>
+- **Python** �?" install it from <https://www.python.org/downloads/>
   (during installation, tick **"Add python.exe to PATH"**)
 
-That's it. No other setup, no terminal commands.
+That's it. No other setup, no terminal commands. The app is **self-contained**:
+its full engine (the builder generator, the OpenCode builder + tester, the
+Kilo adapter + tester, and the JSON schemas) ships inside the repo under
+`app\engine\`. Download the repo, run the app, pick your coding agent (OpenCode
+or Kilo), and the app creates the agent's profiles, schemas, builders, testers,
+and scaffolds **by itself** �?" nothing lives outside the repo. (Power users can
+point `BDF_SCRIPTS_DIR` at their own copy of the engine.)
 
 ---
 

@@ -67,6 +67,11 @@ theme:
   (`plugins.json`) from the GUI — the user never edits JSON by hand; every
   write preserves unknown content and is backup-first.
 - Local-first: the server binds 127.0.0.1 only.
+- Self-contained engine: the app ships its own generator + builders + testers
+  + schemas in `app/engine/` and NEVER depends on scripts outside the repo.
+  A downloaded copy must be able to generate a working builder for any
+  registered agent (opencode -> V2.7 builder, kilo -> K1 adapter) with zero
+  setup. `BDF_SCRIPTS_DIR` is an escape hatch only, never a requirement.
 - The builders generate `opencode.json` (OpenCode) / `kilo.json` (Kilo). Never
   create a `.jsonc` next to the built config — it shadows it and the built
   config silently disappears from the agent's model list.

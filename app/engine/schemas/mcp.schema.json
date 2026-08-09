@@ -1,0 +1,26 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "MCP Servers",
+    "description": "Validates profiles/<profile>/mcp.json. Root is strict; individual server entries are permissive by design (server-specific fields vary).",
+    "type": "object",
+    "properties": {
+        "mcp": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "type": { "enum": [ "local", "remote" ] },
+                    "command": { "type": "array", "items": { "type": "string" } },
+                    "url": { "type": "string" },
+                    "enabled": { "type": "boolean" },
+                    "env": { "type": "object" },
+                    "environment": { "type": "object" },
+                    "headers": { "type": "object" },
+                    "oauth": { "type": "object" }
+                }
+            }
+        }
+    },
+    "required": [ "mcp" ],
+    "additionalProperties": false
+}

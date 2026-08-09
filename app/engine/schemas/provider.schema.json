@@ -1,0 +1,12 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Provider Definition",
+    "description": "Validates providers/<id>.json. The 'id' must equal the file name and the provider section must be a non-empty object.",
+    "type": "object",
+    "properties": {
+        "id": { "type": "string" },
+        "provider": { "type": "object" }
+    },
+    "required": [ "id", "provider" ],
+    "additionalProperties": false
+}

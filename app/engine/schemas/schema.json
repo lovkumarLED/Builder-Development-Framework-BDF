@@ -1,0 +1,13 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Root OpenCode Configuration",
+    "description": "Top-level schema for the generated opencode.json. Builder V2.7 validates profile sources, not this output file.",
+    "type": "object",
+    "properties": {
+        "$schema": { "type": "string" },
+        "provider": { "type": "object" },
+        "plugin": { "type": "array", "items": { "type": "string" } },
+        "mcp": { "type": "object" }
+    },
+    "required": [ "provider" ]
+}

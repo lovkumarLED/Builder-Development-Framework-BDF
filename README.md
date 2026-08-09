@@ -191,9 +191,14 @@ The agent's real config folder (e.g. C:\Users\You\.config\kilo)
    │     │                             thinkingConfig.thinkingBudget)
    │     ├── plugins.json
    │     └── mcp.json
-   ├── scripts\build-<agent>.ps1 ← generated builder (the real engine)
+   ├── scripts\build-<agent>.ps1 ← generated builder (created by the app's
+   │                               bundled engine, app\engine\scaffold-agent.ps1)
    └── backup\                   ← every write is backed up here first
 ```
+
+The app is fully self-contained: `app\engine\` ships the generator, both
+builders + testers, and the schemas, so a downloaded copy creates everything
+above for OpenCode or Kilo with zero external setup.
 
 ### Request flow — one example end to end
 

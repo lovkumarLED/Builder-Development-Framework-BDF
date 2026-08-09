@@ -101,6 +101,32 @@ Copy this block into Entries when a fix lands:
   of truth).
 - **Verified:** 56/56 app unit tests green; no imports reference it.
 
+### 2026-08-09 — App depended on scripts outside the repo (not self-contained)
+
+- **Symptom:** A fresh download of the repo could not generate builders. The
+  wizard's "Generate my builder" failed with "The engine script
+  (scaffold-agent.ps1) was not found" unless the machine happened to have a
+  copy in `~/.config/opencode/scripts/`.
+- **Root cause:** `config.py` defaulted `SCRIPT_DIR` to the user's own config
+  folder (`CONFIG_ROOT/scripts`), outside the repo. The scaffold's builder
+  templates also resolved to a machine-specific path
+  (`..\kilo\scripts\build-kilo-v1.ps1`). The app worked on the author's PC and
+  nowhere else — a public-repo blocker.
+- **Fix:** The app is now self-contained. `app/engine/` bundles the full BDF
+  engine: `scaffold-agent.ps1` (generator), `build-opencode-v2.7.ps1` +
+  `test-opencode-v2.7.ps1`, `kilo/build-kilo-v1.ps1` + `test-kilo-v1.ps1`
+  (K1 adapter), and `schemas/` (7 schemas). `config.py` defaults to the
+  bundled engine (`BDF_SCRIPTS_DIR` remains an escape hatch). The bundled
+  scaffold resolves the builder source per agent (opencode → V2.7 builder,
+  kilo → K1 adapter) instead of a hardcoded path, and `engine.py` seeds the
+  agent's `schemas/` folder from the bundle on scaffold.
+- **Verified:** Fresh temp agents end-to-end — opencode agent: wizard
+  generated profiles (3) + providers/ + schemas/ (8 files) +
+  build/test/scaffold-opencode.ps1, build → `opencode.json` (BUILD COMPLETE,
+  schema validation on). kilo agent: build/test/scaffold-kilo.ps1 (K1
+  adapter with reasoning formats), build → `kilo.json` + provenance; generated
+  kilo tester harness passes. Real configs untouched (state restored).
+
 ### 2026-08-09 — PowerShell: new properties on parsed JSON throw in PS 5.1
 
 - **Symptom:** `$obj.newProp = value` on a PSCustomObject from

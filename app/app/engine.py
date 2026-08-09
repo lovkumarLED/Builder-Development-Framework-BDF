@@ -1,5 +1,6 @@
-"""Runs the real BDF engine (scaffold-agent.ps1) and the generated builders."""
+"""Runs the bundled BDF engine (scaffold-agent.ps1) and the generated builders."""
 
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -7,13 +8,27 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from . import agentstore
-from .config import SCAFFOLD_SCRIPT
+from .config import ENGINE_SCHEMAS, SCAFFOLD_SCRIPT
 from .storage import get_state, set_state
 
 router = APIRouter(prefix="/api")
 
 PS1 = "powershell.exe"
 PS1_ARGS = ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
+
+
+def _seed_schemas(directory):
+    """Give a freshly scaffolded agent the bundled JSON schemas so its
+    generated builder can run schema validation out of the box."""
+    if not ENGINE_SCHEMAS.is_dir():
+        return
+    target = Path(directory) / "schemas"
+    if target.is_dir():
+        return
+    try:
+        shutil.copytree(ENGINE_SCHEMAS, target)
+    except OSError:
+        pass
 
 
 class ScaffoldBody(BaseModel):
@@ -66,6 +81,8 @@ def scaffold(body: ScaffoldBody):
         180,
     )
     agentstore.upsert_agent(body.agent, str(directory))
+    if code == 0:
+        _seed_schemas(directory)
     scripts_dir = directory / "scripts"
     generated = [
         name

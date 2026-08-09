@@ -1,0 +1,11 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Target Artifact",
+    "description": "Validates profiles/<profile>/target.json. The optional 'artifact' names the generated target file (default 'opencode.json'); the builder derives the backup prefix and provenance filename from its base name.",
+    "type": "object",
+    "properties": {
+        "artifact": { "type": "string" }
+    },
+    "required": [ "artifact" ],
+    "additionalProperties": false
+}
