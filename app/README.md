@@ -79,7 +79,9 @@ The first time you open the app, it walks you through 5 easy steps:
 4. **What it found** â€” the app shows cards: your MCP servers, your plugins,
    your profiles. Click **"Generate my builder"**.
 5. **Done** â€” the app has created your profiles and your personal builder
-   scripts. Now add a provider.
+   scripts, using the engine that ships with the app itself
+   (`app\engine\` - no downloads, nothing lives outside the repo). Now add a
+   provider.
 
 ---
 
@@ -264,7 +266,7 @@ Everything stays inside the `app` folder (or next to your agent):
 | `<agent>\profiles\coding\settings.json` | which provider is active (`activeProviders`) â€” the app updates it when you switch |
 | `<agent>\backup\` | automatic backups of everything the app changes |
 | `profiles\` | your agent's profiles (`coding`, `experimental`, `minimal`) |
-| `<agent>\scripts\build-<agent>.ps1` etc. | your generated builder scripts |
+| `<agent>\scripts\build-<agent>.ps1` etc. | your generated builder scripts (created by the app's bundled engine in `app\engine\`) |
 | `env\` | the app's private Python environment (created on first run â€” safe to delete, recreated next launch) |
 | `rule.md` | the app's look (theme colors) + the rulebook for AI agents |
 
