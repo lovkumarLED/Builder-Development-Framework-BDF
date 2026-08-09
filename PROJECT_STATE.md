@@ -1,4 +1,4 @@
-# PROJECT STATE
+﻿# PROJECT STATE
 
 > Living snapshot of the OpenCode Configuration Manager.
 
@@ -55,7 +55,7 @@ Builder V2.7 JSON Schema Validation
 <!-- AUTO-GENERATED START -->
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.5.1 | Current | Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. 34 app unit tests, kilo harness 31/31, opencode harness 31/31. |
+| 2.5.1 | Current | Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. 56 app unit tests, kilo harness 31/31, opencode harness 33/33. |
 | 2.5.0 | Previous | Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.schema.json before builder validation (F1), pre-flight dependency check (F2), -WhatIf dry run (F3), backup retention (F4), provenance sidecar (F5), -Doctor diagnostics (F6), merge diff summary (F7), 9-stage pipeline. P2 dynamic target artifact (profiles/<profile>/target.json) + P1 env-key policy. |
 | 2.4.0 | Previous | Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level <provider>-models.json with highest precedence. |
 | 2.3.0 | Previous | BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets. |
@@ -68,7 +68,7 @@ Builder V2.7 JSON Schema Validation
 
 ```
 .config/
-└── opencode/
+â””â”€â”€ opencode/
 ```
 
 The `opencode` directory is the root of the entire project.
@@ -76,13 +76,13 @@ The `opencode` directory is the root of the entire project.
 ```
 opencode/
 
-├── backup/
-├── docs/
-├── profiles/
-├── providers/
-├── schemas/
-├── scripts/
-└── opencode.json
+â”œâ”€â”€ backup/
+â”œâ”€â”€ docs/
+â”œâ”€â”€ profiles/
+â”œâ”€â”€ providers/
+â”œâ”€â”€ schemas/
+â”œâ”€â”€ scripts/
+â””â”€â”€ opencode.json
 ```
 
 ## docs/
@@ -92,86 +92,86 @@ Contains all project documentation.
 ```
 docs/
 
-├── _agent/
-│   ├── SESSION_LOG.md
-│   ├── SESSION_WORKFLOW.md
-│   └── JOURNEY_TO_V3.md
-├── AI/
-│   ├── BUILD_BLUEPRINT_FRAMEWORK.md
-│   ├── BUILD_BUILDER_V2.1.md
-│   ├── BUILD_BUILDER_V2.5.md
-│   ├── BUILD_BUILDER_V2.5_SELECTOR.md
-│   ├── BUILD_BUILDER_V2.7_JSON_SCHEMA_VALIDATION.md
-│   ├── BUILD_KILOCODE_V1.md
-│   ├── BUILD_RELEASE_MANAGER.md
-│   ├── CONTINUE_BUILDER_V2.7_ISSUES_PATCH.md
-│   ├── CONTINUE_BUILDER_V2.7_TASK9.md
-│   ├── CONTINUE_FULL_SYSTEM_CHECK_SESSION_26.md
-│   ├── CONTINUE_KILO_BUILD_STEP2.md
-│   ├── CONTINUE_KILO_BUILD_STEP3.md
-│   ├── CONTINUE_PROJECT_BUILD.md
-│   ├── CONTINUE_RELEASE_MANAGER.md
-│   ├── CONTINUE_V3_UNIVERSAL_FRAMEWORK.md
-│   ├── CONTINUE_V3_UNIVERSAL_FRAMEWORK_v2.md
-│   ├── DISTRIBUTE_SUBAGENTS.md
-│   ├── FULL_SYSTEM_CHECK.md
-│   ├── PLAN_RELEASE_MANAGER.md
-│   ├── START_TASK.md
-│   └── UPGRADE_BLUEPRINT_FRAMEWORK.md
-├── planning/
-│   ├── BDF_ROAD_TO_V3.md
-│   ├── DECISIONS.md
-│   ├── FUTURE_IDEAS.md
-│   ├── NEXT_PHASE_IMPLEMENTATION_PLAN.md
-│   └── VERSION_STRATEGY.md
-├── bdf/
-│   ├── AI_WORKFLOW.md
-│   ├── BLUEPRINT_ENGINE.md
-│   ├── BUILDER_EVOLUTION.md
-│   ├── BUILDER_PHASES.md
-│   ├── FRAMEWORK.md
-│   ├── FRAMEWORK_LIFECYCLE.md
-│   ├── LESSONS_LEARNED.md
-│   ├── MIGRATION.md
-│   ├── NEW_PROJECT_GUIDE.md
-│   ├── PROJECT_ADAPTER.md
-│   ├── PROJECT_GENERATOR.md
-│   ├── README.md
-│   ├── RELEASE_MANAGER.md
-│   ├── TESTING.md
-│   ├── VERSION.md
-│   └── templates/
-│       ├── README.md
-│       └── *.template.md
-├── ADAPTER.md
-├── app/
-│   ├── app/        (Python package: config, storage, discovery, providers, agentstore, engine, testing, proxy, serve, rules)
-│   ├── gui.html    (frontend — built by parallel agent)
-│   ├── state.json  (runtime state: which agent, where)
-│   ├── env/        (private Python venv, auto-created on first run)
-│   ├── rule.md     (theme colors + AI-agent rulebook)
-│   ├── server.py   (FastAPI backend + /v1 proxy)
-│   ├── start.bat   (double-click launcher)
-│   └── README.md   (plain-language usage)
-├── AGENT.md
-├── ARCHITECTURE.md
-├── BUILDER_EXTENSION_GUIDE.md
-├── BUILDER_SPEC.md
-├── CHANGELOG.md
-├── CONTRIBUTING_FOR_AI.md
-├── CURRENT_RELEASE.md
-├── DESIGN_PRINCIPLES.md
-├── DEVELOPER_GUIDE.md
-├── FOLDER_STRUCTURE.md
-├── JSON_SCHEMAS.md
-├── PROFILE_CREATION_GUIDE.md
-├── PROJECT_STATE.md
-├── PROVIDER_DEVELOPMENT_GUIDE.md
-├── README.md
-├── release_registry.json
-├── ROADMAP.md
-├── TESTING.md
-└── TROUBLESHOOTING.md
+â”œâ”€â”€ _agent/
+â”‚   â”œâ”€â”€ SESSION_LOG.md
+â”‚   â”œâ”€â”€ SESSION_WORKFLOW.md
+â”‚   â””â”€â”€ JOURNEY_TO_V3.md
+â”œâ”€â”€ AI/
+â”‚   â”œâ”€â”€ BUILD_BLUEPRINT_FRAMEWORK.md
+â”‚   â”œâ”€â”€ BUILD_BUILDER_V2.1.md
+â”‚   â”œâ”€â”€ BUILD_BUILDER_V2.5.md
+â”‚   â”œâ”€â”€ BUILD_BUILDER_V2.5_SELECTOR.md
+â”‚   â”œâ”€â”€ BUILD_BUILDER_V2.7_JSON_SCHEMA_VALIDATION.md
+â”‚   â”œâ”€â”€ BUILD_KILOCODE_V1.md
+â”‚   â”œâ”€â”€ BUILD_RELEASE_MANAGER.md
+â”‚   â”œâ”€â”€ CONTINUE_BUILDER_V2.7_ISSUES_PATCH.md
+â”‚   â”œâ”€â”€ CONTINUE_BUILDER_V2.7_TASK9.md
+â”‚   â”œâ”€â”€ CONTINUE_FULL_SYSTEM_CHECK_SESSION_26.md
+â”‚   â”œâ”€â”€ CONTINUE_KILO_BUILD_STEP2.md
+â”‚   â”œâ”€â”€ CONTINUE_KILO_BUILD_STEP3.md
+â”‚   â”œâ”€â”€ CONTINUE_PROJECT_BUILD.md
+â”‚   â”œâ”€â”€ CONTINUE_RELEASE_MANAGER.md
+â”‚   â”œâ”€â”€ CONTINUE_V3_UNIVERSAL_FRAMEWORK.md
+â”‚   â”œâ”€â”€ CONTINUE_V3_UNIVERSAL_FRAMEWORK_v2.md
+â”‚   â”œâ”€â”€ DISTRIBUTE_SUBAGENTS.md
+â”‚   â”œâ”€â”€ FULL_SYSTEM_CHECK.md
+â”‚   â”œâ”€â”€ PLAN_RELEASE_MANAGER.md
+â”‚   â”œâ”€â”€ START_TASK.md
+â”‚   â””â”€â”€ UPGRADE_BLUEPRINT_FRAMEWORK.md
+â”œâ”€â”€ planning/
+â”‚   â”œâ”€â”€ BDF_ROAD_TO_V3.md
+â”‚   â”œâ”€â”€ DECISIONS.md
+â”‚   â”œâ”€â”€ FUTURE_IDEAS.md
+â”‚   â”œâ”€â”€ NEXT_PHASE_IMPLEMENTATION_PLAN.md
+â”‚   â””â”€â”€ VERSION_STRATEGY.md
+â”œâ”€â”€ bdf/
+â”‚   â”œâ”€â”€ AI_WORKFLOW.md
+â”‚   â”œâ”€â”€ BLUEPRINT_ENGINE.md
+â”‚   â”œâ”€â”€ BUILDER_EVOLUTION.md
+â”‚   â”œâ”€â”€ BUILDER_PHASES.md
+â”‚   â”œâ”€â”€ FRAMEWORK.md
+â”‚   â”œâ”€â”€ FRAMEWORK_LIFECYCLE.md
+â”‚   â”œâ”€â”€ LESSONS_LEARNED.md
+â”‚   â”œâ”€â”€ MIGRATION.md
+â”‚   â”œâ”€â”€ NEW_PROJECT_GUIDE.md
+â”‚   â”œâ”€â”€ PROJECT_ADAPTER.md
+â”‚   â”œâ”€â”€ PROJECT_GENERATOR.md
+â”‚   â”œâ”€â”€ README.md
+â”‚   â”œâ”€â”€ RELEASE_MANAGER.md
+â”‚   â”œâ”€â”€ TESTING.md
+â”‚   â”œâ”€â”€ VERSION.md
+â”‚   â””â”€â”€ templates/
+â”‚       â”œâ”€â”€ README.md
+â”‚       â””â”€â”€ *.template.md
+â”œâ”€â”€ ADAPTER.md
+â”œâ”€â”€ app/
+â”‚   â”œâ”€â”€ app/        (Python package: config, storage, discovery, providers, agentstore, engine, testing, proxy, serve, rules)
+â”‚   â”œâ”€â”€ gui.html    (frontend â€” built by parallel agent)
+â”‚   â”œâ”€â”€ state.json  (runtime state: which agent, where)
+â”‚   â”œâ”€â”€ env/        (private Python venv, auto-created on first run)
+â”‚   â”œâ”€â”€ rule.md     (theme colors + AI-agent rulebook)
+â”‚   â”œâ”€â”€ server.py   (FastAPI backend + /v1 proxy)
+â”‚   â”œâ”€â”€ start.bat   (double-click launcher)
+â”‚   â””â”€â”€ README.md   (plain-language usage)
+â”œâ”€â”€ AGENT.md
+â”œâ”€â”€ ARCHITECTURE.md
+â”œâ”€â”€ BUILDER_EXTENSION_GUIDE.md
+â”œâ”€â”€ BUILDER_SPEC.md
+â”œâ”€â”€ CHANGELOG.md
+â”œâ”€â”€ CONTRIBUTING_FOR_AI.md
+â”œâ”€â”€ CURRENT_RELEASE.md
+â”œâ”€â”€ DESIGN_PRINCIPLES.md
+â”œâ”€â”€ DEVELOPER_GUIDE.md
+â”œâ”€â”€ FOLDER_STRUCTURE.md
+â”œâ”€â”€ JSON_SCHEMAS.md
+â”œâ”€â”€ PROFILE_CREATION_GUIDE.md
+â”œâ”€â”€ PROJECT_STATE.md
+â”œâ”€â”€ PROVIDER_DEVELOPMENT_GUIDE.md
+â”œâ”€â”€ README.md
+â”œâ”€â”€ release_registry.json
+â”œâ”€â”€ ROADMAP.md
+â”œâ”€â”€ TESTING.md
+â””â”€â”€ TROUBLESHOOTING.md
 ```
 
 ## Purpose of Each Folder
@@ -200,15 +200,15 @@ The architecture separates configuration, implementation, and generated output.
 ```
 Configuration
 
-↓
+â†“
 
 Builder
 
-↓
+â†“
 
 Generated Configuration
 
-↓
+â†“
 
 Application
 ```
@@ -232,35 +232,35 @@ Dependencies always point downward.
 ```
 Source Files
 
-↓
+â†“
 
 Profile
 
-↓
+â†“
 
 Provider
 
-↓
+â†“
 
 Builder
 
-↓
+â†“
 
 Validation
 
-↓
+â†“
 
 Backup
 
-↓
+â†“
 
 Generation
 
-↓
+â†“
 
 opencode.json
 
-↓
+â†“
 
 OpenCode
 ```
@@ -300,7 +300,7 @@ bdf/
 | `BLUEPRINT_ENGINE.md` | The intelligence layer |
 | `PROJECT_ADAPTER.md` | Making the framework project-specific |
 | `BUILDER_EVOLUTION.md` | Creating future builder versions |
-| `BUILDER_PHASES.md` | The Alpha → Beta → General Release quality gates every builder build must pass |
+| `BUILDER_PHASES.md` | The Alpha â†’ Beta â†’ General Release quality gates every builder build must pass |
 | `FRAMEWORK_LIFECYCLE.md` | The master lifecycle reference |
 | `AI_WORKFLOW.md` | The AI agent workflow |
 | `VERSION.md` | Framework versioning |
@@ -453,7 +453,7 @@ The release manager: generates all release documentation from `release_registry.
 scaffold-agent.ps1
 ```
 
-The V3 UNIVERSAL core: open-source agent registry (opencode, kilo, claudecode — allowed
+The V3 UNIVERSAL core: open-source agent registry (opencode, kilo, claudecode â€” allowed
 name only, aider, goose, codex-cli), discovery, `-List`, `-Bootstrap` per-agent builder
 generation. ONE job: scan the agent's own main JSON, split mcp/plugin sections, seed
 `profiles/coding/mcp.json` + `plugins.json` (user-owned after creation), create
@@ -461,20 +461,20 @@ generation. ONE job: scan the agent's own main JSON, split mcp/plugin sections, 
 `providers/` folder but NEVER writes provider/model files inside it (user-owned),
 never touches `.jsonc` without consent. Closed-source agents never touched.
 
-SYSTEM-RUN ONLY — the user never runs the scaffolds directly; they only run the
+SYSTEM-RUN ONLY â€” the user never runs the scaffolds directly; they only run the
 builders (`build-opencode-v2.7.ps1` / `build-kilo-v1.ps1`).
 
 ```
 scaffold-opencode.ps1
 ```
 
-Wrapper delegating to the universal scaffold for OpenCode (moved). SYSTEM-RUN ONLY. (regenerated as the bootstrap wrapper by the GUI app scaffold, session 29 — old version at backup/scaffold-opencode.ps1.pre-gui-app)
+Wrapper delegating to the universal scaffold for OpenCode (moved). SYSTEM-RUN ONLY. (regenerated as the bootstrap wrapper by the GUI app scaffold, session 29 â€” old version at backup/scaffold-opencode.ps1.pre-gui-app)
 
 ```
 scaffold-kilo-v1.ps1
 ```
 
-KiloCode V1 scaffold wrapper — lives in the Kilo builder project
+KiloCode V1 scaffold wrapper â€” lives in the Kilo builder project
 (`~/.config/kilo/scripts/`), not in this repository's `scripts/`. SYSTEM-RUN ONLY.
 
 ## backup/
@@ -510,35 +510,35 @@ bdf/AI_WORKFLOW.md
 ```
 README.md
 
-↓
+â†“
 
 PROJECT_STATE.md
 
-↓
+â†“
 
 ADAPTER.md
 
-↓
+â†“
 
 ARCHITECTURE.md
 
-↓
+â†“
 
 BUILDER_SPEC.md
 
-↓
+â†“
 
 DESIGN_PRINCIPLES.md
 
-↓
+â†“
 
 FOLDER_STRUCTURE.md
 
-↓
+â†“
 
 JSON_SCHEMAS.md
 
-↓
+â†“
 
 CONTRIBUTING_FOR_AI.md
 ```
@@ -552,7 +552,7 @@ At session start:
 - Read `_agent/SESSION_WORKFLOW.md`.
 - Read `_agent/SESSION_LOG.md`.
 - Check the `Next:` line of the most recent entry.
-- Read `_agent/JOURNEY_TO_V3.md` — current position on the road to V3.
+- Read `_agent/JOURNEY_TO_V3.md` â€” current position on the road to V3.
 
 At session end:
 
@@ -580,7 +580,7 @@ Releases follow one workflow:
 
 1. The AI records the release facts in `docs/release_registry.json`.
 2. The user reviews the release facts.
-3. Run `release-manager.ps1` — it generates CHANGELOG.md, CURRENT_RELEASE.md, bdf/VERSION.md, and this version history table.
+3. Run `release-manager.ps1` â€” it generates CHANGELOG.md, CURRENT_RELEASE.md, bdf/VERSION.md, and this version history table.
 4. Run the test harness (Release Docs group must pass).
 5. Commit.
 
@@ -690,7 +690,7 @@ Bug fixes and documentation improvements.
 
 Recorded in `CHANGELOG.md`.
 
-The release sequence is defined by `docs/release_registry.json` — the registry is the sequence authority.
+The release sequence is defined by `docs/release_registry.json` â€” the registry is the sequence authority.
 
 All version documentation (CHANGELOG marker section, CURRENT_RELEASE.md, bdf/VERSION.md compatibility rows, this version history table) is generated from the registry by the release manager.
 
@@ -714,8 +714,8 @@ Current framework version:
 
 ## Implemented
 
-- GUI App 'AI Switcher' (docs/app/) COMPLETE - the BDF made autonomous (session 29, 2026-08-08): FastAPI backend + gui.html + start.bat + local /v1 proxy on 127.0.0.1:9090; calls the real scaffold-agent.ps1 engine and the generated builders. BDF-exact data model: the app reads/writes the agent's own providers/, <provider>-models.json, plugins.json, mcp.json and settings.json activeProviders (a LIST - every listed provider merges into the build), all backup-first. MULTI-AGENT management: Agents card registers any agent config folder, switches the managed agent instantly, loads already-set-up folders directly (no wizard forced). Features: models with thinking levels (default/minimal/high/max) in the provider modal + Models card, plugins card, MCP servers card, SDK type selector (15 npm packages, registry-verified), active hero showing every active provider side-by-side, flame startup banner with local addresses, self-contained Python env (env/ auto-bootstrapped), rule.md live theme + agent rulebook. Verified live on opencode and kilo (kilo.json: omniroute 18 models + tokenrouter 1 model, 19 merged); full E2E click-through battery with snapshot backup + hash-verified restore (32/32). Committed 459d407 + b3a0bdb.
-- Real-provider fix + presets (session 31, 2026-08-08): the app writes the key in BOTH agent contracts (provider.<id>.apiKey for OpenCode + provider.<id>.options.apiKey for Kilo) — fixes Kilo's TokenRouter 401; the builders mirror the dual key at merge time (builder-only parity); Add-provider presets for TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter, NVIDIA NIM with SDK auto-fill; 34 app unit tests, kilo harness 31/31, opencode harness 31/31.
+- GUI App 'AI Switcher' (docs/app/) COMPLETE - the BDF made autonomous (session 29, 2026-08-08): FastAPI backend + gui.html + start.bat + local /v1 proxy on 127.0.0.1:9090; calls the real scaffold-agent.ps1 engine and the generated builders. BDF-exact data model: the app reads/writes the agent's own providers/, <provider>-models.json, plugins.json, mcp.json and settings.json activeProviders (a LIST - every listed provider merges into the build), all backup-first. MULTI-AGENT management: Agents card registers any agent config folder, switches the managed agent instantly, loads already-set-up folders directly (no wizard forced). Features: models with per-provider reasoning formats (opencode/openai/claude/gemini/none - correct variant JSON per format) in the provider modal + Models card, plugins card, MCP servers card, SDK type selector (15 npm packages, registry-verified), active hero showing every active provider side-by-side, flame startup banner with local addresses, self-contained Python env (env/ auto-bootstrapped), rule.md live theme + agent rulebook. Verified live on opencode and kilo (kilo.json: omniroute 18 models + tokenrouter 1 model, 19 merged); full E2E click-through battery with snapshot backup + hash-verified restore (32/32). Committed 459d407 + b3a0bdb.
+- Real-provider fix + presets (session 31, 2026-08-08): the app writes the key in BOTH agent contracts (provider.<id>.apiKey for OpenCode + provider.<id>.options.apiKey for Kilo) â€” fixes Kilo's TokenRouter 401; the builders mirror the dual key at merge time (builder-only parity); Add-provider presets for TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter, NVIDIA NIM with SDK auto-fill; 56 app unit tests, kilo harness 31/31, opencode harness 33/33.
 - Modular configuration architecture
 - OmniRoute provider integration
 - Profile-based configuration
@@ -732,7 +732,7 @@ Current framework version:
 - Builder V2.3 / BDF V2.5 (framework generalization: NEW_PROJECT_GUIDE, RELEASE_MANAGER, TESTING framework docs, adapter validation checklist, Impact Analysis record)
 - Builder V2.5 (Active-Provider Selector: provider discovery, persisted activeProviders, profile-level `<provider>-models.json` precedence)
 - Builder V2.7 (JSON Schema Validation F1-F7, 9-stage pipeline, dynamic target artifact, env-key policy; released as version 2.5.0)
-- Automated test harnesses (V2.1: 17 tests — 9 builder + 8 Release Docs; V2.5: 13 tests; V2.7: 31 tests)
+- Automated test harnesses (V2.1: 17 tests â€” 9 builder + 8 Release Docs; V2.5: 13 tests; V2.7: 31 tests)
 - Release Manager V1 (registry-driven release documentation)
 - Documentation framework
 - Builder Development Framework
@@ -747,7 +747,7 @@ Current framework version:
 
 - Additional providers
 - Extended CLI features
-- Additional same-architecture agents beyond opencode/kilo (registry is open — add-a-line)
+- Additional same-architecture agents beyond opencode/kilo (registry is open â€” add-a-line)
 
 Planned features are documented only in `ROADMAP.md`.
 
@@ -770,24 +770,24 @@ These limitations simplify development and provide a stable foundation for futur
 ## Immediate
 
 - Committed: 459d407 (docs batch, sessions 28b-28f) + b3a0bdb (AI Switcher app, session 29) + session 31 commit (real-provider fix + presets + builder parity + docs).
-- Pending: user acceptance of Kilo chat with TokenRouter (done — works), then commit; future app update to generate BOTH opencode.json and opencode.jsonc (planned, not yet).
+- Pending: user acceptance of Kilo chat with TokenRouter (done â€” works), then commit; future app update to generate BOTH opencode.json and opencode.jsonc (planned, not yet).
 
 ## Roadmap Phases
 
-Phase 4 — Additional Providers
+Phase 4 â€” Additional Providers
 
-Phase 8 — Documentation Expansion
+Phase 8 â€” Documentation Expansion
 
-Phase 12 — KiloCode Builder V1 (COMPLETED 2026-08-07, harness 31/31)
+Phase 12 â€” KiloCode Builder V1 (COMPLETED 2026-08-07, harness 31/31)
 
-Phase 14 — GUI App (COMPLETED 2026-08-08, session 29)
+Phase 14 â€” GUI App (COMPLETED 2026-08-08, session 29)
 
-Phase 15 — More Coding Agents (PLANNED — OpenCode + KiloCode verified; other open-source coding agents expected to work with the universal engine but untested yet)
+Phase 15 â€” More Coding Agents (PLANNED â€” OpenCode + KiloCode verified; other open-source coding agents expected to work with the universal engine but untested yet)
 
-Phase 13 — V3 Universal Builder Generator (IN PROGRESS — universal scaffold core,
+Phase 13 â€” V3 Universal Builder Generator (IN PROGRESS â€” universal scaffold core,
 sessions 24b-26b)
 
-Phase 11 — Claude Code Builder V1 — DROPPED 2026-08-08 (entropic `~/.claude.json`, no
+Phase 11 â€” Claude Code Builder V1 â€” DROPPED 2026-08-08 (entropic `~/.claude.json`, no
 provider support; see `planning/DECISIONS.md`)
 
 Phases 3, 5, 6, and 7 (Validation Framework, Automated Testing, Builder Refactoring, BDF Generalization) were completed in Builder V2.1 (version 2.2.0).

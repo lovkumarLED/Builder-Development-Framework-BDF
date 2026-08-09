@@ -1,4 +1,4 @@
-# CHANGELOG
+﻿# CHANGELOG
 
 > Chronological history of the OpenCode Configuration Manager.
 
@@ -68,15 +68,17 @@ Current
 
 ## Summary
 
-Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. 34 app unit tests, kilo harness 31/31, opencode harness 31/31.
+Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. Reasoning formats: per-provider reasoning levels (opencode / openai / claude / gemini / none) with correct variant JSON per format (`reasoningEffort`, `thinking.budgetTokens`, `thinkingConfig.thinkingBudget`); interactive builder runs ask the developer, persist the choice backup-first, and filter invalid levels from the generated config. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.
 
 ---
 
 ## Highlights
 
 - Dual key placement in app/app/agentstore.py write_provider (top-level apiKey + options.apiKey), options preserved on write
-- Builder merge-stage dual-key normalization (K1 + V2.7 builders) — fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)
+- Builder merge-stage dual-key normalization (K1 + V2.7 builders) ï¿½?" fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)
 - Real-provider presets in the Add-provider form (URL + SDK auto-filled), presets kept in sync in app/app/config.py
+- Reasoning formats: REASONING_FORMATS registry (opencode/openai/claude/gemini/none) in agentstore.py, GET /api/formats, Reasoning format dropdown in the provider modal + Models card, preset auto-pick (CLI Proxy/OpenAI -> openai, Google -> gemini); models written with the format's variant JSON, invalid levels dropped (e.g. max is never written for openai)
+- Builder reasoning formats (V2.7 + K1): interactive prompt when a provider has models without a format or with invalid levels; choice persisted to providers/<id>.json backup-first; merged output filtered per format with [!] warnings
 - Kilo harness fixtures updated to per-provider models (the global models.json lookup was removed earlier; the fixtures still used it)
 - Stale exact-name harness copy (test-kilo.ps1) replaced with the real K1 harness (backed up)
 - User rules documented: never hand-edit the generated main config, never create opencode.jsonc next to opencode.json (it shadows the built config); generating both formats planned for a future update
@@ -101,7 +103,7 @@ Real-provider compatibility: the app and the builders now write the API key in b
 
 - Kilo 401 "Token not provided": key now lands in options.apiKey for runtime reading
 - OpenCode /models not showing a provider: a stray opencode.jsonc (with disabled_providers) was shadowing the built opencode.json
-- Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change — fixtures now use per-provider models
+- Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change â€” fixtures now use per-provider models
 - PS 5.1: Add-Member required when creating a missing options object on parsed JSON
 
 ---
@@ -120,7 +122,7 @@ No
 
 ## Testing Summary
 
-17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7) + 31/31 (Kilo K1) tests passed, exit code 0; 34 app unit tests
+17/17 (V2.1) + 13/13 (V2.5) + 33/33 (V2.7) + 31/31 (Kilo K1) tests passed, exit code 0; 56 app unit tests
 
 ---
 
@@ -582,13 +584,13 @@ Documentation architecture: adopted the Builder Development Framework (BDF) upgr
 
 ## Added
 
-- `bdf/BLUEPRINT_ENGINE.md` — the intelligence layer and change pipeline.
-- `bdf/PROJECT_ADAPTER.md` — the project adapter concept.
-- `bdf/BUILDER_EVOLUTION.md` — predictable builder evolution workflow.
-- `bdf/FRAMEWORK_LIFECYCLE.md` — master lifecycle reference.
-- `bdf/AI_WORKFLOW.md` — the master AI agent workflow.
-- `bdf/templates/ADAPTER.template.md` — project adapter template.
-- `ADAPTER.md` — the OpenCode project adapter (first implementation).
+- `bdf/BLUEPRINT_ENGINE.md` â€” the intelligence layer and change pipeline.
+- `bdf/PROJECT_ADAPTER.md` â€” the project adapter concept.
+- `bdf/BUILDER_EVOLUTION.md` â€” predictable builder evolution workflow.
+- `bdf/FRAMEWORK_LIFECYCLE.md` â€” master lifecycle reference.
+- `bdf/AI_WORKFLOW.md` â€” the master AI agent workflow.
+- `bdf/templates/ADAPTER.template.md` â€” project adapter template.
+- `ADAPTER.md` â€” the OpenCode project adapter (first implementation).
 
 ---
 

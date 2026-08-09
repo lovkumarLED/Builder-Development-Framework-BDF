@@ -84,7 +84,7 @@ Real projects shape the framework — never assumptions.
 
 # Current Position
 
-Updated: Aug 8, 2026 (session 33: FINAL FULL SYSTEM CHECK - pre-public gate all green: docs coherence + version 2.5.1 + template sync, builders tested + Doctor fix, app security review + regression tests, full GUI click-through with hash-verified restore; committed - READY TO GO PUBLIC)
+Updated: Aug 9, 2026 (session 34: LAUNCH DAY - repo PUBLIC on GitHub, promo pack + algorithm-optimized messages ready; README storefront (story + demo GIF + install.bat); next: Claude Code + more agents)
 
 ```
 Step 3 — Universal Agent Framework core
@@ -204,7 +204,7 @@ What was completed:
 Dropped: Claude Code Builder V1 — 2026-08-08 decision (entropic `~/.claude.json`, no
 provider support). See `planning/DECISIONS.md`.
 
-Next: user makes the repo public (decide bdf_dashboard.png first); after the gate: BUILDER_PHASES Alpha->Beta->General gates for the universal framework, then Step 4 / Step 5; user adds more real providers via the app when wanted.
+Next: Phase 15 - make the app + universal scaffold work for Claude Code and more open-source coding agents; commit session-34 updates on the owner's request.
 after the gate: BUILDER_PHASES Alpha→Beta→General + Step 4 / Step 5.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = KiloCode Builder,
@@ -258,3 +258,4 @@ continues exactly where the build stopped. Rules: `AI/CONTINUE_PROJECT_BUILD.md`
 **Document Version:** 1.0
 
 **Status:** Active Journey Tracker
+- PART F: FULL SYSTEM CHECK 2026-08-09 (pre-public gate) - all harnesses green (17/17 + 13/13 + 33/33 + 31/31), 56/56 app tests, full GUI click-through PASS; fixed scaffold-bootstrap harness spec paths (relative + skip-if-absent), stale exact-name builder/harness copies re-synced, dead config.PRESETS removed, release-doc counts updated to reasoning-formats state; report: AI/FULL_SYSTEM_CHECK_REPORT_2026-08-09.md

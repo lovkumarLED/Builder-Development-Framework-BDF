@@ -1,4 +1,4 @@
-# ROADMAP
+﻿# ROADMAP
 
 > Planned evolution of the OpenCode Configuration Manager toward the Builder Development Framework (BDF) V3.
 
@@ -38,11 +38,11 @@ This roadmap is intended to guide future development while keeping the overall p
 
 ---
 
-# Destination — BDF V3
+# Destination â€” BDF V3
 
 Every phase below serves one destination:
 
-> **BDF V3 — the first stable public version of the Builder Development Framework.**
+> **BDF V3 â€” the first stable public version of the Builder Development Framework.**
 
 V3 is complete when the same engineering framework can successfully create and maintain
 builders for **OpenCode**, **KiloCode**, and any open-source coding agent sharing their
@@ -53,18 +53,18 @@ Only Project Adapters should differ between supported projects.
 The path is:
 
 ```
-Current (Builder V2.7 JSON Schema Validation) ✅
-↓
-KiloCode Builder V1 ✅ (Kilo V1, harness 31/31)
-↓
-BDF V3 (Universal Builder Generator) — in progress
+Current (Builder V2.7 JSON Schema Validation) âœ…
+â†“
+KiloCode Builder V1 âœ… (Kilo V1, harness 31/31)
+â†“
+BDF V3 (Universal Builder Generator) â€” in progress
 ```
 
-Claude Code is NOT on this path (entropic config, no provider support — DECISIONS.md 2026-08-08).
+Claude Code is NOT on this path (entropic config, no provider support â€” DECISIONS.md 2026-08-08).
 
 Each step is built, tested, and validated before the next begins.
 
-Real projects shape the framework — never assumptions.
+Real projects shape the framework â€” never assumptions.
 
 ---
 
@@ -85,7 +85,7 @@ Builder V2.7 JSON Schema Validation
 Journey Position
 
 ```
-Step 3 Universal Agent Framework core — IN PROGRESS (~90%); BDF V2.5 ✅, V2.7 gate ✅, KiloCode V1 COMPLETE ✅; next: BUILDER_PHASES gates for the universal framework, then Step 4 / Step 5
+Step 3 Universal Agent Framework core â€” IN PROGRESS (~90%); BDF V2.5 âœ…, V2.7 gate âœ…, KiloCode V1 COMPLETE âœ…; next: BUILDER_PHASES gates for the universal framework, then Step 4 / Step 5
 ```
 
 The project currently provides:
@@ -106,7 +106,7 @@ The next development phases focus on expanding flexibility while preserving the 
 
 # Development Phases
 
-## Phase 1 — Foundation ✅
+## Phase 1 â€” Foundation âœ…
 
 Status
 
@@ -126,7 +126,7 @@ Completed work includes:
 
 ---
 
-## Phase 2 — Builder Improvements ✅
+## Phase 2 â€” Builder Improvements âœ…
 
 Status
 
@@ -151,7 +151,7 @@ BUILDER_SPEC.md
 
 ---
 
-## Phase 3 — Multiple Profiles ✅
+## Phase 3 â€” Multiple Profiles âœ…
 
 Status
 
@@ -167,12 +167,12 @@ Completed work includes:
 
 ---
 
-## Phase 4 — Additional Providers ✅
+## Phase 4 â€” Additional Providers âœ…
 
 Status
 
 ```
-Completed — dynamic provider loading (V2.2) + all-provider discovery (V2.5)
+Completed â€” dynamic provider loading (V2.2) + all-provider discovery (V2.5)
 ```
 
 Objectives
@@ -199,7 +199,7 @@ Goals
 
 ---
 
-## Phase 5 — Validation Framework ✅
+## Phase 5 â€” Validation Framework âœ…
 
 Status
 
@@ -230,7 +230,7 @@ Catch configuration errors before generation begins.
 
 ---
 
-## Phase 6 — Automated Testing ✅
+## Phase 6 â€” Automated Testing âœ…
 
 Status
 
@@ -257,7 +257,7 @@ Reduce manual testing effort.
 
 ---
 
-## Phase 7 — Builder Refactoring ✅
+## Phase 7 â€” Builder Refactoring âœ…
 
 Status
 
@@ -283,21 +283,21 @@ Keep the builder simple even as functionality grows.
 
 ---
 
-## Phase 8 — Documentation Expansion ✅
+## Phase 8 â€” Documentation Expansion âœ…
 
 Status
 
 ```
-Completed (2026-08-08) — 4 onboarding guides created
+Completed (2026-08-08) â€” 4 onboarding guides created
 ```
 
 Completed work includes:
 
-- `DEVELOPER_GUIDE.md` — how to work on the project (read order, workflow, verification, common tasks).
-- `PROVIDER_DEVELOPMENT_GUIDE.md` — creating user-owned provider definitions + models, No-Secrets `{env:VAR}` policy.
-- `PROFILE_CREATION_GUIDE.md` — the three default profiles, the file contract, creating new profiles.
-- `BUILDER_EXTENSION_GUIDE.md` — the builder pipeline, adding features/tests/CLI flags/merge stages, verification checklist.
-- All four guides mirrored as framework templates (`bdf/templates/*.template.md`) — template count 15 → 19.
+- `DEVELOPER_GUIDE.md` â€” how to work on the project (read order, workflow, verification, common tasks).
+- `PROVIDER_DEVELOPMENT_GUIDE.md` â€” creating user-owned provider definitions + models, No-Secrets `{env:VAR}` policy.
+- `PROFILE_CREATION_GUIDE.md` â€” the three default profiles, the file contract, creating new profiles.
+- `BUILDER_EXTENSION_GUIDE.md` â€” the builder pipeline, adding features/tests/CLI flags/merge stages, verification checklist.
+- All four guides mirrored as framework templates (`bdf/templates/*.template.md`) â€” template count 15 â†’ 19.
 - Registered in `FOLDER_STRUCTURE.md`, `PROJECT_STATE.md`, `README.md`, `bdf/PROJECT_GENERATOR.md` (Stage 4 + 5), `bdf/templates/README.md` (list + matrix).
 
 Goal
@@ -306,7 +306,7 @@ Make onboarding easier for future contributors.
 
 ---
 
-## Phase 9 — Release Manager V1 ✅
+## Phase 9 â€” Release Manager V1 âœ…
 
 Status
 
@@ -322,8 +322,8 @@ Completed on
 
 Completed work includes:
 
-- `docs/release_registry.json` — machine-readable release history (the only hand-edited release artifact).
-- `scripts/release-manager.ps1` — generates all release documentation from the registry.
+- `docs/release_registry.json` â€” machine-readable release history (the only hand-edited release artifact).
+- `scripts/release-manager.ps1` â€” generates all release documentation from the registry.
 - Rich CHANGELOG marker section, `CURRENT_RELEASE.md`, `bdf/VERSION.md` compatibility rows, and the PROJECT_STATE version history table.
 - Marker policy: the manager rewrites only generated sections; manual prose is preserved.
 - All-or-nothing failure policy: nothing is written when validation fails.
@@ -339,7 +339,7 @@ Make every version release one command instead of a manual 10-file edit.
 
 ---
 
-## Phase 10 — BDF V2.5: Framework Generalization ✅
+## Phase 10 â€” BDF V2.5: Framework Generalization âœ…
 
 Status
 
@@ -359,8 +359,8 @@ Prepare the framework for becoming V3.
 
 Planned work includes:
 
-- `NEW_PROJECT_GUIDE.md` — documented process for onboarding a new project.
-- Better `PROJECT_ADAPTER.md` — cleaner generic/project boundary.
+- `NEW_PROJECT_GUIDE.md` â€” documented process for onboarding a new project.
+- Better `PROJECT_ADAPTER.md` â€” cleaner generic/project boundary.
 - More generic templates.
 - Better Blueprint Engine.
 - Cleaner framework boundaries.
@@ -377,12 +377,12 @@ open-source coding agent without redesign.
 
 ---
 
-## Phase 10.5 — Active-Provider Selector Builder (V2.5 Builder) ✅
+## Phase 10.5 â€” Active-Provider Selector Builder (V2.5 Builder) âœ…
 
 Status
 
 ```
-Completed — released as registry 2.4.0 (2026-08-05)
+Completed â€” released as registry 2.4.0 (2026-08-05)
 ```
 
 Objective
@@ -408,12 +408,12 @@ registry 2.4.0
 
 ---
 
-## Phase 10.6 — JSON Schema Validation (schemas/) ✅
+## Phase 10.6 â€” JSON Schema Validation (schemas/) âœ…
 
 Status
 
 ```
-Completed — gate before KiloCode Builder V1 (V2.7, F1-F7, harness 31/31)
+Completed â€” gate before KiloCode Builder V1 (V2.7, F1-F7, harness 31/31)
 ```
 
 Objective
@@ -438,19 +438,19 @@ Reserved location and workflow
 
 Configuration Files
 
-↓
+â†“
 
 JSON Schema Validation
 
-↓
+â†“
 
 Builder Validation
 
-↓
+â†“
 
 Configuration Merge
 
-↓
+â†“
 
 Generate opencode.json
 
@@ -458,34 +458,34 @@ Generate opencode.json
 
 Required before
 
-KiloCode Builder V1 (Phase 12 — COMPLETED 2026-08-07, harness 31/31).
+KiloCode Builder V1 (Phase 12 â€” COMPLETED 2026-08-07, harness 31/31).
 
-Note: Claude Code Builder V1 (Phase 11) is DROPPED — decision 2026-08-08,
+Note: Claude Code Builder V1 (Phase 11) is DROPPED â€” decision 2026-08-08,
 see `planning/DECISIONS.md`. Claude config (`~/.claude.json`) is entropic and does not
 support adding providers; it will never work with this framework.
 
 ---
 
-## Phase 11 — Claude Code Builder V1 — SUPERSEDED ✅
+## Phase 11 â€” Claude Code Builder V1 â€” SUPERSEDED âœ…
 
 Status
 
 ```
-RESOLVED — DROPPED, replaced by KiloCode (Phase 12) + universal scaffold (Phase 13)
+RESOLVED â€” DROPPED, replaced by KiloCode (Phase 12) + universal scaffold (Phase 13)
 ```
 
 Decision: 2026-08-08. Claude Code config is a huge entropic `~/.claude.json` with no way
-to add providers (one provider at a time) — building a maintainable Claude builder from
+to add providers (one provider at a time) â€” building a maintainable Claude builder from
 BDF is not feasible. Record kept for history.
 
 ---
 
-## Phase 12 — KiloCode Builder V1 ✅
+## Phase 12 â€” KiloCode Builder V1 âœ…
 
 Status
 
 ```
-COMPLETED 2026-08-07 — Kilo V1: build-kilo-v1.ps1, test-kilo-v1.ps1, scaffold-kilo-v1.ps1; harness 31/31 (KILO_ADAPTER + real ~/.config/kilo)
+COMPLETED 2026-08-07 â€” Kilo V1: build-kilo-v1.ps1, test-kilo-v1.ps1, scaffold-kilo-v1.ps1; harness 31/31 (KILO_ADAPTER + real ~/.config/kilo)
 ```
 
 Objective
@@ -496,12 +496,12 @@ Second real validation of the framework against a second project.
 
 ---
 
-## Phase 13 — BDF V3: Universal Builder Generator 🔄
+## Phase 13 â€” BDF V3: Universal Builder Generator ðŸ”„
 
 Status
 
 ```
-IN PROGRESS — core built (session 24b) + scaffold contract finalized (session 28):
+IN PROGRESS â€” core built (session 24b) + scaffold contract finalized (session 28):
 scaffold-agent.ps1 universal, registry opencode/kilo/other, -Bootstrap generates per-agent builders
 ```
 
@@ -514,39 +514,39 @@ One command flow:
 ```
 Create New Builder Project
 
-↓
+â†“
 
 Discover installed open-source coding agents (OpenCode / Kilo / any same-architecture)
 
-↓
+â†“
 
 Choose agent
 
-↓
+â†“
 
 Read project schema
 
-↓
+â†“
 
 Generate adapter
 
-↓
+â†“
 
 Generate docs
 
-↓
+â†“
 
 Generate folder structure
 
-↓
+â†“
 
 Generate builder
 
-↓
+â†“
 
 Generate tests
 
-↓
+â†“
 
 Done
 ```
@@ -554,35 +554,35 @@ Done
 Definition of complete
 
 - The same framework creates and maintains builders for OpenCode, KiloCode, and ANY
-  open-source coding agent (Aider, Goose, Codex-Cli, ...) — discovery finds whatever
+  open-source coding agent (Aider, Goose, Codex-Cli, ...) â€” discovery finds whatever
   open-source agents are installed; if none are found, the framework asks the user for
   the location of their coding agents.
 - Only Project Adapters differ.
-- No framework redesign is required per project — main configs (JSON), profiles, MCP,
+- No framework redesign is required per project â€” main configs (JSON), profiles, MCP,
   plugin-splitting, per-agent generated build/test/scaffold scripts.
 - The scaffold's ONE job for any agent: scan the agent's OWN main JSON, split it into
-  mcp / plugin sections, and seed the profiles — `coding` (always the main profile) +
+  mcp / plugin sections, and seed the profiles â€” `coding` (always the main profile) +
   `experimental` + `minimal`, each with `settings.json`, `mcp.json`, `plugins.json`.
 - The framework creates the `providers/` folder but NEVER writes provider or model
-  files inside it — providers and models are 100% user-owned. The framework never
+  files inside it â€” providers and models are 100% user-owned. The framework never
   copies another agent's config into a project; each agent's profiles are seeded
   from its own main JSON.
 - Claude Code is NOT supported (DECISIONS.md 2026-08-08).
 
-V3 is the first stable public milestone — not the end of development.
+V3 is the first stable public milestone â€” not the end of development.
 
 ---
 
-## Phase 14 — GUI App: "AI Switcher" for Normal Users ✅
+## Phase 14 â€” GUI App: "AI Switcher" for Normal Users âœ…
 
 Status
 
 ```
-COMPLETED 2026-08-08 (session 29) — docs/app/: FastAPI backend + gui.html frontend + start.bat,
+COMPLETED 2026-08-08 (session 29) â€” docs/app/: FastAPI backend + gui.html frontend + start.bat,
 local OpenAI-compatible proxy on 127.0.0.1:9090, calls the real scaffold-agent.ps1 -Bootstrap
 engine (one engine, two surfaces). Smoke-tested end-to-end green on the real opencode agent.
 Feature set: BDF-exact data model (app reads/writes the agent's own providers/,
-<provider>-models.json, plugins.json, mcp.json, settings.json activeProviders — backup-first),
+<provider>-models.json, plugins.json, mcp.json, settings.json activeProviders â€” backup-first),
 MULTI-AGENT management (Agents card: add any agent's config folder, switch the managed agent
 instantly, already-set-up folders load directly without the wizard), models with thinking
 levels (default/minimal/high/max, provider modal + Models card), plugins card, MCP servers
@@ -593,12 +593,11 @@ kilo verified live (omniroute + tokenrouter, 19 models in kilo.json). Full E2E c
 battery on a real agent config with snapshot backup + hash-verified restore (32/32).
 Committed: 459d407 (docs batch) + b3a0bdb (feat app).
 
-EXTENDED (session 31, 2026-08-08): real-provider support — the app writes the key in both
-agent contracts (apiKey for OpenCode, options.apiKey for Kilo — fixes Kilo's TokenRouter
+EXTENDED (session 31, 2026-08-08): real-provider support â€” the app writes the key in both
+agent contracts (apiKey for OpenCode, options.apiKey for Kilo â€” fixes Kilo's TokenRouter
 401), Add-provider presets for TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter and
 NVIDIA NIM with SDK auto-fill, and the builders mirror the dual key at merge time so
-builder-only users get the same result as app users. 34 app unit tests, kilo harness
-31/31, opencode harness 31/31.
+builder-only users get the same result as app users. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.
 ```
 
 Objective
@@ -607,19 +606,19 @@ A normal person (zero dev knowledge) opens the app, follows the wizard alone,
 and the APP does the BDF's work autonomously:
 
 ```
-Double-click start.bat → browser opens
-↓
-Wizard: discover agent → scan main JSON → found-sections cards
-↓
+Double-click start.bat â†’ browser opens
+â†“
+Wizard: discover agent â†’ scan main JSON â†’ found-sections cards
+â†“
 Generate builder scripts (the app calls the real scaffold-agent.ps1 -Bootstrap engine)
-↓
+â†“
 Add provider (preset or custom, keys stay in the user's providers.json only)
-↓
-Test connection ✓ → Switch to this (one click)
-↓
+â†“
+Test connection âœ“ â†’ Switch to this (one click)
+â†“
 Build my config (runs the generated builder)
-↓
-AI tool points at http://127.0.0.1:9090/v1 once — switching is one click forever
+â†“
+AI tool points at http://127.0.0.1:9090/v1 once â€” switching is one click forever
 ```
 
 Definition of complete
@@ -631,28 +630,28 @@ Definition of complete
   POST /v1/* local OpenAI-compatible proxy to the ACTIVE provider.
 - API keys NEVER returned by GET (masked/omitted); providers.json backed up before every write;
   local-first 127.0.0.1 only; No-Secrets rule.
-- SUCCESS TEST passed: the wizard flow (discover → scan → scaffold on the real opencode agent
-  → build) completed green without any AI agent — build-<agent>.ps1 generated and executed,
+- SUCCESS TEST passed: the wizard flow (discover â†’ scan â†’ scaffold on the real opencode agent
+  â†’ build) completed green without any AI agent â€” build-<agent>.ps1 generated and executed,
   providers switched, chat through the proxy answered.
 
 ---
 
-## Phase 15 — More Coding Agents 🔜
+## Phase 15 â€” More Coding Agents ðŸ”œ
 
 Status
 
 ```
-PLANNED — OpenCode + KiloCode verified today (app + universal scaffold). Other
+PLANNED â€” OpenCode + KiloCode verified today (app + universal scaffold). Other
 open-source coding agents are expected to work with the same universal engine,
-but have NOT been tested yet — we will find out when we try them.
+but have NOT been tested yet â€” we will find out when we try them.
 ```
 
 Objective
 
-The app and the framework should work with more coding agents — not just the
+The app and the framework should work with more coding agents â€” not just the
 ones verified so far. The universal scaffold-agent.ps1 registry already knows
 several agents; the goal is to verify and support each one end-to-end (discover
-→ scan → scaffold → build → manage providers/models/plugins) through the same
+â†’ scan â†’ scaffold â†’ build â†’ manage providers/models/plugins) through the same
 two surfaces: the MD framework and the GUI app.
 
 Definition of complete (when tried)
@@ -667,25 +666,25 @@ Definition of complete (when tried)
 
 | Phase | Status |
 |-------|--------|
-| Phase 1 — Foundation | ✅ Completed |
-| Phase 2 — Builder Improvements | ✅ Completed |
-| Phase 3 — Multiple Profiles | ✅ Completed |
-| Phase 4 — Additional Providers | ✅ Completed |
-| Phase 5 — Validation Framework | ✅ Completed |
-| Phase 6 — Automated Testing | ✅ Completed |
-| Phase 7 — Builder Refactoring | ✅ Completed |
-| Phase 8 — Documentation Expansion | ✅ Completed |
-| Phase 9 — Release Manager V1 | ✅ Completed |
-| Phase 10 — BDF V2.5 Framework Generalization | ✅ Completed |
-| Phase 10.5 — Active-Provider Selector Builder | ✅ Completed |
-| Phase 10.6 — JSON Schema Validation | ✅ Completed |
-| Phase 11 — Claude Code Builder V1 | ✅ Resolved (dropped → KiloCode) |
-| Phase 12 — KiloCode Builder V1 | ✅ Completed |
-| Phase 13 — BDF V3 Universal Builder Generator | 🔄 In Progress |
-| Phase 14 — GUI App (AI Switcher) | ✅ Completed |
-| Phase 15 — More Coding Agents | 🔜 Planned (untested) |
+| Phase 1 â€” Foundation | âœ… Completed |
+| Phase 2 â€” Builder Improvements | âœ… Completed |
+| Phase 3 â€” Multiple Profiles | âœ… Completed |
+| Phase 4 â€” Additional Providers | âœ… Completed |
+| Phase 5 â€” Validation Framework | âœ… Completed |
+| Phase 6 â€” Automated Testing | âœ… Completed |
+| Phase 7 â€” Builder Refactoring | âœ… Completed |
+| Phase 8 â€” Documentation Expansion | âœ… Completed |
+| Phase 9 â€” Release Manager V1 | âœ… Completed |
+| Phase 10 â€” BDF V2.5 Framework Generalization | âœ… Completed |
+| Phase 10.5 â€” Active-Provider Selector Builder | âœ… Completed |
+| Phase 10.6 â€” JSON Schema Validation | âœ… Completed |
+| Phase 11 â€” Claude Code Builder V1 | âœ… Resolved (dropped â†’ KiloCode) |
+| Phase 12 â€” KiloCode Builder V1 | âœ… Completed |
+| Phase 13 â€” BDF V3 Universal Builder Generator | ðŸ”„ In Progress |
+| Phase 14 â€” GUI App (AI Switcher) | âœ… Completed |
+| Phase 15 â€” More Coding Agents | ðŸ”œ Planned (untested) |
 
-**13 of 15 phases complete. Phase 13 (BDF V3) remains IN PROGRESS — not yet released; more development is planned before the official V3 release. Phase 15 (More Coding Agents) is planned but untested.**
+**13 of 15 phases complete. Phase 13 (BDF V3) remains IN PROGRESS â€” not yet released; more development is planned before the official V3 release. Phase 15 (More Coding Agents) is planned but untested.**
 
 ---
 
@@ -699,7 +698,7 @@ The long-term objective is to build a configuration management system that is:
 - Well documented
 - Easy for both humans and AI agents to maintain
 
-The framework's destination is BDF V3 — the first stable public version that generates
+The framework's destination is BDF V3 â€” the first stable public version that generates
 builders for OpenCode, KiloCode, and any same-architecture open-source coding agent from
 a single reusable engineering framework. Future features should extend the existing
 architecture rather than replacing it.

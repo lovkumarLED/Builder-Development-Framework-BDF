@@ -19,20 +19,27 @@ vulnerabilities, no leaked keys/PII, no broken buttons. The user explicitly
 approved testing **on the real kilo config folder** (snapshot + hash-verify
 restore, backup-first) and a **check → fix → check** loop until clean.
 
-## Current baseline (sessions 29-32, verified)
+## Current baseline (sessions 29-33, verified)
 
-- App: docs/app/ — FastAPI + gui.html, 34/34 unit tests, dual-key
+- App: docs/app/ — FastAPI + gui.html, 56/56 unit tests, dual-key
   write_provider (apiKey + options.apiKey), real-provider presets
   (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with
-  SDK auto-fill, SDK selector (15 packages), models/plugins/MCP cards,
-  multi-agent registry, /v1 proxy on 127.0.0.1:9090.
+  SDK auto-fill, reasoning formats per provider (opencode/openai/claude/
+  gemini/none with per-format variant JSON), SDK selector (15 packages),
+  models/plugins/MCP cards, multi-agent registry, /v1 proxy on 127.0.0.1:9090.
 - Builders: kilo K1 + opencode V2.7 — dual-key merge normalization present,
-  kilo harness 31/31, opencode harness 31/31, test-kilo.ps1 synced to K1.
-- Docs: README v2.5 (dual-key contract, presets, user rules), guides v1.1,
-  CHANGELOG 2.5.1, templates synced.
-- Commits: a46efd1 (feat app) + 8e84cb9 (docs). Local main is 2 ahead of
-  origin/main. Repo is PRIVATE (anonymous API 404). NOT yet pushed.
-- No PDF exists inside the repo — if the user has one, get its path first.
+  reasoning formats present (interactive prompt + output filtering), kilo
+  harness 31/31, opencode harness 33/33, legacy 17/17 + 13/13.
+- Docs: README v2.5 (dual-key contract, presets, user rules, reasoning
+  formats), guides v1.1, CHANGELOG 2.5.1 (reasoning formats entry),
+  templates synced (reasoning formats in all builder templates).
+- FSC session 2026-08-09 completed: report in
+  `AI/FULL_SYSTEM_CHECK_REPORT_2026-08-09.md` — all gates PASS; fixes:
+  scaffold-bootstrap harness paths (relative + skip-if-absent), stale
+  exact-name builder/harness copies re-synced, dead config.PRESETS removed,
+  release-doc counts updated.
+- Repo is PRIVATE. Changes from the reasoning-formats + FSC work are NOT yet
+  committed.
 
 ## Out of scope
 

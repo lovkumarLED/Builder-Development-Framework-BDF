@@ -1,4 +1,4 @@
-# Current Release
+﻿# Current Release
 
 > Quick reference for the current release of the OpenCode Configuration Manager.
 
@@ -47,7 +47,7 @@ No
 Testing
 
 ```
-17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7) + 31/31 (Kilo K1) tests passed, exit code 0; 34 app unit tests
+17/17 (V2.1) + 13/13 (V2.5) + 33/33 (V2.7) + 31/31 (Kilo K1) tests passed, exit code 0; 56 app unit tests
 ```
 
 ---
