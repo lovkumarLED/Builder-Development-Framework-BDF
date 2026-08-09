@@ -96,6 +96,13 @@ intended build? Run the existing runbook first:
 6. scaffold-agent.ps1: `-List` (registry), and a sandbox `-Bootstrap` for a
    throwaway agent (temp dir) — generated builder+harness inherit the
    dual-key normalization + K1 fixtures (verify, don't assume).
+7. **FRESH-CLONE GATE (mandatory):** the app must generate working builders
+   with ZERO external scripts. Test: with `BDF_SCRIPTS_DIR` unset and no
+   engine outside the repo, scaffold a temp opencode agent AND a temp kilo
+   agent via `/api/scaffold` → build both → `opencode.json` + `kilo.json`
+   generated. This catches any regression where the app borrows scripts from
+   the author's machine (the self-contained engine in `app/engine/` is the
+   requirement).
 7. Check for **duplicates/staleness**: build-kilo.ps1 == build-kilo-v1.ps1,
    test-kilo.ps1 == test-kilo-v1.ps1, build-opencode.ps1 ==
    build-opencode-v2.7.ps1 (hash-compare); older builders (v2.5/v2.1) are
