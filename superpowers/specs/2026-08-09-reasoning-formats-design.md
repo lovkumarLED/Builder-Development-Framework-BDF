@@ -138,6 +138,36 @@ presets keep one source of truth and let the backend validate.
   low/medium/high/xhigh → saved file matches the reference example; Models card chips
   follow format; save drops `max`.
 
+## Framework (BDF) updates
+
+The app and the framework stay in sync — the same reasoning formats must work through
+the builder pipeline and be documented in the framework docs.
+
+Findings: no functional builder changes are required. `provider.schema.json` only
+constrains `id` + `provider` (object) at the top level, so a `reasoningFormat` field
+inside `provider.<id>` passes validation. `models.schema.json` declares
+`variants: { "type": "object" }` (free-form), so `thinking.budgetTokens` and
+`thinkingConfig.thinkingBudget` shapes already validate. The builder merges provider and
+model entries wholesale (`build-opencode-v2.7.ps1` ~lines 853-871), so variant settings
+pass through untouched.
+
+Work items:
+
+- **Schemas** (`schemas/*.json`): no structural changes. Optionally extend
+  `models.schema.json` `variants` to document the accepted settings keys
+  (`reasoningEffort`, `thinking.budgetTokens`, `thinkingConfig.thinkingBudget`) — keep
+  `additionalProperties` permissive so new formats never fail old builders.
+- **Builder test harness** (`scripts/test-opencode-v2.7.ps1`): add a test with fixtures
+  proving claude-style (`thinking.budgetTokens`) and gemini-style
+  (`thinkingConfig.thinkingBudget`) variant files pass validation and merge into the
+  built config correctly.
+- **Framework docs** (docs repo): update `BUILDER_SPEC.md`, `JSON_SCHEMAS.md`,
+  `FOLDER_STRUCTURE.md`, `ADAPTER.md`, `PROVIDER_DEVELOPMENT_GUIDE.md`,
+  `ARCHITECTURE.md`, `TESTING.md` — document the `reasoningFormat` field on provider
+  files, the preset table (opencode/openai/claude/gemini/none), the per-format variant
+  JSON shapes, and that `<provider>-models.json` may carry any of these shapes.
+- **App docs** (`app/README.md`, `app/rule.md`): same concept, GUI-facing.
+
 ## Files touched
 
 - `app/app/agentstore.py` — formats registry + template-aware read/write models
@@ -146,3 +176,7 @@ presets keep one source of truth and let the backend validate.
 - `app/tests/test_agentstore.py` — new format tests
 - `app/README.md` + `app/rule.md` — document the feature
 - `app/BUGFIXES.md` — log the max-on-GPT-5.x fix (root cause: hardcoded level set)
+- `scripts/test-opencode-v2.7.ps1` — format-aware variant fixtures test (framework)
+- `schemas/models.schema.json` — document accepted variant settings keys (framework)
+- Docs: `BUILDER_SPEC.md`, `JSON_SCHEMAS.md`, `FOLDER_STRUCTURE.md`, `ADAPTER.md`,
+  `PROVIDER_DEVELOPMENT_GUIDE.md`, `ARCHITECTURE.md`, `TESTING.md` (framework docs)
