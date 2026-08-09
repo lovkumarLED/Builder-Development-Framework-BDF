@@ -19,11 +19,17 @@ class ProviderBody(BaseModel):
     baseUrl: str = ""
     apiKey: str = ""
     npm: str = ""
+    reasoningFormat: str = ""
     models: list[ModelItem] | None = None
 
 
 class SwitchBody(BaseModel):
     id: str
+
+
+def _validate_format(reasoning_format):
+    if reasoning_format and reasoning_format not in agentstore.REASONING_FORMATS:
+        raise HTTPException(400, f"Unknown reasoning format '{reasoning_format}'.")
 
 
 def _public(provider, active_ids, models=None):
@@ -34,7 +40,18 @@ def _public(provider, active_ids, models=None):
         "hasKey": bool(provider.get("apiKey")),
         "active": provider["id"] in active_ids,
         "npm": provider.get("npm") or "",
+        "reasoningFormat": provider.get("reasoningFormat") or "opencode",
         "models": models or [],
+    }
+
+
+@router.get("/formats")
+def list_formats():
+    return {
+        "formats": [
+            {"id": key, "label": spec["label"], "levels": list(spec["levels"])}
+            for key, spec in agentstore.REASONING_FORMATS.items()
+        ]
     }
 
 
@@ -44,7 +61,7 @@ def list_providers():
     active_ids = agentstore.get_active_providers(agent_dir)
     providers = []
     for provider in agentstore.list_providers(agent_dir):
-        models = agentstore.read_models(agent_dir, provider["id"])
+        models = agentstore.read_models(agent_dir, provider["id"], format_id=provider["reasoningFormat"])
         providers.append(_public(provider, active_ids, models))
     return {"providers": providers, "activeProvider": active_ids[0] if active_ids else None}
 
@@ -57,17 +74,24 @@ def create_provider(body: ProviderBody):
         raise HTTPException(400, "Give your provider a name first.")
     if not base_url:
         raise HTTPException(400, "The base URL can't be empty.")
+    _validate_format(body.reasoningFormat)
     provider_id = agentstore.slugify(name)
     if not provider_id:
         raise HTTPException(400, "That name can't be used as a provider id — use letters and numbers.")
     agent_dir = agentstore.require_agent_dir()
     if agentstore.read_provider(agent_dir, provider_id):
         raise HTTPException(400, f"A provider named '{name}' already exists on your agent. Use a different name.")
-    provider = agentstore.write_provider(agent_dir, provider_id, name, base_url, body.apiKey.strip(), body.npm.strip())
+    provider = agentstore.write_provider(
+        agent_dir, provider_id, name, base_url, body.apiKey.strip(), body.npm.strip(),
+        reasoning_format=agentstore.resolve_format(body.reasoningFormat),
+    )
     agentstore.activate_provider(agent_dir, provider_id)
     models = []
     if body.models is not None:
-        models = agentstore.write_models(agent_dir, provider_id, [m.model_dump() for m in body.models])
+        models = agentstore.write_models(
+            agent_dir, provider_id, [m.model_dump() for m in body.models],
+            format_id=provider["reasoningFormat"],
+        )
     return _public(provider, agentstore.get_active_providers(agent_dir), models)
 
 
@@ -77,14 +101,20 @@ def update_provider(provider_id: str, body: ProviderBody):
     existing = agentstore.read_provider(agent_dir, provider_id)
     if not existing:
         raise HTTPException(404, "That provider doesn't exist anymore. Refresh the page.")
+    _validate_format(body.reasoningFormat)
     name = body.name.strip() or existing["name"]
     base_url = body.baseUrl.strip() or existing["baseUrl"]
     api_key = body.apiKey.strip() or existing["apiKey"]
     npm = body.npm.strip() or existing["npm"]
-    provider = agentstore.write_provider(agent_dir, provider_id, name, base_url, api_key, npm)
-    models = agentstore.read_models(agent_dir, provider_id)
+    reasoning_format = agentstore.resolve_format(body.reasoningFormat or existing["reasoningFormat"])
+    provider = agentstore.write_provider(
+        agent_dir, provider_id, name, base_url, api_key, npm, reasoning_format=reasoning_format
+    )
+    models = agentstore.read_models(agent_dir, provider_id, format_id=reasoning_format)
     if body.models is not None:
-        models = agentstore.write_models(agent_dir, provider_id, [m.model_dump() for m in body.models])
+        models = agentstore.write_models(
+            agent_dir, provider_id, [m.model_dump() for m in body.models], format_id=reasoning_format
+        )
     return _public(provider, agentstore.get_active_providers(agent_dir), models)
 
 

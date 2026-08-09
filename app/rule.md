@@ -41,10 +41,16 @@ theme:
 
 - The app must let a normal person, alone: discover their coding agent, scan
   it, generate their builder scripts, add providers, test connections, switch
-  the active provider, and build — WITHOUT an AI agent.
+  the active provider, and build �?" WITHOUT an AI agent.
 - The app must never: phone home, require an account, or send anything
   anywhere except the user's own requests to the provider they chose
   (local-first, 127.0.0.1).
+- Reasoning formats: every provider carries a `reasoningFormat`
+  (opencode | openai | claude | gemini | none) that decides the valid thinking
+  levels and the variant JSON the app writes. Presets pre-pick it (CLI Proxy /
+  OpenAI → openai, Google → gemini); users can change it. Levels invalid for
+  the format are never written (e.g. `max` is NOT written for `openai` — GPT-5.x
+  rejects it). The format lives in the provider file, never in the models file.
 
 ## Architecture rules
 
@@ -70,3 +76,6 @@ theme:
 - Read this file BEFORE changing the app.
 - Every user-visible change must be reflected here and in the app README in
   the same change.
+- After fixing a bug or issue, log it in `BUGFIXES.md` in the SAME change —
+  what broke, why it broke, and how it was fixed, following the template at
+  the top of that file. A fix is not done until its entry is written.

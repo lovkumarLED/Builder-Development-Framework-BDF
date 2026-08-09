@@ -196,6 +196,7 @@ def _provider_dict(provider_file):
         "baseUrl": options.get("baseURL", ""),
         "apiKey": inner.get("apiKey", "") or "",
         "npm": inner.get("npm") or NPM_OPENAI_COMPATIBLE,
+        "reasoningFormat": resolve_format(inner.get("reasoningFormat")),
     }
 
 
@@ -214,7 +215,7 @@ def read_provider(agent_dir, provider_id):
     return _provider_dict(provider_file)
 
 
-def write_provider(agent_dir, provider_id, name, base_url, api_key, npm=None):
+def write_provider(agent_dir, provider_id, name, base_url, api_key, npm=None, reasoning_format=None):
     _require_valid_provider_id(provider_id)
     providers_dir = agent_dir / "providers"
     providers_dir.mkdir(parents=True, exist_ok=True)
@@ -224,6 +225,7 @@ def write_provider(agent_dir, provider_id, name, base_url, api_key, npm=None):
     inner = (data.get("provider") or {}).get(provider_id, {})
     inner["name"] = name
     inner["apiKey"] = api_key
+    inner["reasoningFormat"] = resolve_format(reasoning_format or inner.get("reasoningFormat"))
     options = dict(inner.get("options") or {})
     options["baseURL"] = base_url
     options["apiKey"] = api_key
@@ -239,31 +241,74 @@ def write_provider(agent_dir, provider_id, name, base_url, api_key, npm=None):
 
 MODEL_PROFILE = "coding"
 
+REASONING_FORMATS = {
+    "opencode": {
+        "label": "OpenCode",
+        "levels": ["default", "minimal", "high", "max"],
+        "variant": lambda level: {"reasoningEffort": level},
+    },
+    "openai": {
+        "label": "OpenAI / ChatGPT",
+        "levels": ["none", "low", "medium", "high", "xhigh"],
+        "variant": lambda level: {"reasoningEffort": level},
+    },
+    "claude": {
+        "label": "Claude",
+        "levels": ["low", "high", "max"],
+        "variant": lambda level: {
+            "thinking": {"type": "enabled", "budgetTokens": {"low": 8000, "high": 16000, "max": 32000}[level]}
+        },
+    },
+    "gemini": {
+        "label": "Gemini",
+        "levels": ["minimal", "low", "medium", "high"],
+        "variant": lambda level: {
+            "thinkingConfig": {"thinkingBudget": {"minimal": 4096, "low": 8192, "medium": 16384, "high": 32768}[level]}
+        },
+    },
+    "none": {
+        "label": "No reasoning",
+        "levels": [],
+        "variant": None,
+    },
+}
+
+
+def resolve_format(format_id=None):
+    """Return a known format id; anything unknown falls back to opencode."""
+    if isinstance(format_id, str) and format_id in REASONING_FORMATS:
+        return format_id
+    return "opencode"
+
 
 def models_file(agent_dir, provider_id, profile=MODEL_PROFILE):
     _require_valid_provider_id(provider_id)
     return agent_dir / "profiles" / profile / f"{provider_id}-models.json"
 
 
-def read_models(agent_dir, provider_id, profile=MODEL_PROFILE):
+def read_models(agent_dir, provider_id, profile=MODEL_PROFILE, format_id=None):
     data = _read_json(models_file(agent_dir, provider_id, profile), {})
     models = data.get("models") or {}
+    allowed = set(REASONING_FORMATS[resolve_format(format_id)]["levels"])
     result = []
     for model_id, entry in models.items():
         if not isinstance(entry, dict):
             continue
         variants = entry.get("variants") or {}
-        thinking = sorted(v for v in variants.keys() if isinstance(v, str))
+        thinking = sorted(v for v in variants.keys() if isinstance(v, str) and v in allowed)
         result.append({"model": model_id, "name": entry.get("name") or model_id, "thinking": thinking})
     result.sort(key=lambda m: m["model"])
     return result
 
 
-def write_models(agent_dir, provider_id, items, profile=MODEL_PROFILE):
+def write_models(agent_dir, provider_id, items, profile=MODEL_PROFILE, format_id=None):
+    fmt = resolve_format(format_id)
     path = models_file(agent_dir, provider_id, profile)
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = _read_json(path, {})
     _backup(path)
+    spec = REASONING_FORMATS[fmt]
+    allowed = set(spec["levels"])
     models = {}
     for item in items or []:
         model_id = item.get("model")
@@ -273,13 +318,13 @@ def write_models(agent_dir, provider_id, items, profile=MODEL_PROFILE):
         entry["name"] = item.get("name") or model_id
         variants = {}
         for level in item.get("thinking") or []:
-            if level:
-                variants[level] = {"reasoningEffort": level}
+            if level in allowed and spec["variant"] is not None:
+                variants[level] = spec["variant"](level)
         entry["variants"] = variants
         models[model_id] = entry
     existing["models"] = models
     _write_json(path, existing)
-    return read_models(agent_dir, provider_id, profile)
+    return read_models(agent_dir, provider_id, profile, format_id=fmt)
 
 
 def delete_models(agent_dir, provider_id, profile=MODEL_PROFILE):

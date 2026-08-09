@@ -145,6 +145,79 @@ class AgentStoreTests(unittest.TestCase):
         data = json.loads((self.agent_dir / "profiles" / "coding" / "smoke-models.json").read_text(encoding="utf-8"))
         self.assertEqual(data["models"]["zen/mimo"]["variants"]["minimal"], {"reasoningEffort": "minimal"})
 
+    def test_openai_format_writes_gpt_levels(self):
+        agentstore.write_models(self.agent_dir, "smoke", [
+            {"model": "gpt-5.6-luna", "name": "GPT 5.6 Luna", "thinking": ["low", "medium", "high", "xhigh"]},
+        ], format_id="openai")
+        data = json.loads((self.agent_dir / "profiles" / "coding" / "smoke-models.json").read_text(encoding="utf-8"))
+        variants = data["models"]["gpt-5.6-luna"]["variants"]
+        self.assertEqual(variants, {
+            "low": {"reasoningEffort": "low"},
+            "medium": {"reasoningEffort": "medium"},
+            "high": {"reasoningEffort": "high"},
+            "xhigh": {"reasoningEffort": "xhigh"},
+        })
+        self.assertEqual(agentstore.read_models(self.agent_dir, "smoke", format_id="openai")[0]["thinking"], ["high", "low", "medium", "xhigh"])
+
+    def test_openai_format_drops_unsupported_levels(self):
+        agentstore.write_models(self.agent_dir, "smoke", [
+            {"model": "gpt-5.5", "name": "GPT 5.5", "thinking": ["max", "minimal", "high"]},
+        ], format_id="openai")
+        data = json.loads((self.agent_dir / "profiles" / "coding" / "smoke-models.json").read_text(encoding="utf-8"))
+        variants = data["models"]["gpt-5.5"]["variants"]
+        self.assertEqual(variants, {"high": {"reasoningEffort": "high"}})
+        self.assertEqual(agentstore.read_models(self.agent_dir, "smoke", format_id="openai")[0]["thinking"], ["high"])
+
+    def test_claude_format_writes_thinking_budget(self):
+        agentstore.write_models(self.agent_dir, "smoke", [
+            {"model": "claude-sonnet-4", "name": "Claude Sonnet 4", "thinking": ["low", "high", "max"]},
+        ], format_id="claude")
+        data = json.loads((self.agent_dir / "profiles" / "coding" / "smoke-models.json").read_text(encoding="utf-8"))
+        variants = data["models"]["claude-sonnet-4"]["variants"]
+        self.assertEqual(variants["low"], {"thinking": {"type": "enabled", "budgetTokens": 8000}})
+        self.assertEqual(variants["high"], {"thinking": {"type": "enabled", "budgetTokens": 16000}})
+        self.assertEqual(variants["max"], {"thinking": {"type": "enabled", "budgetTokens": 32000}})
+        self.assertEqual(agentstore.read_models(self.agent_dir, "smoke", format_id="claude")[0]["thinking"], ["high", "low", "max"])
+
+    def test_gemini_format_writes_thinking_budget(self):
+        agentstore.write_models(self.agent_dir, "smoke", [
+            {"model": "gemini-3.6-flash", "name": "Gemini 3.6 Flash", "thinking": ["minimal", "low", "medium", "high"]},
+        ], format_id="gemini")
+        data = json.loads((self.agent_dir / "profiles" / "coding" / "smoke-models.json").read_text(encoding="utf-8"))
+        variants = data["models"]["gemini-3.6-flash"]["variants"]
+        self.assertEqual(variants["minimal"], {"thinkingConfig": {"thinkingBudget": 4096}})
+        self.assertEqual(variants["high"], {"thinkingConfig": {"thinkingBudget": 32768}})
+
+    def test_none_format_writes_no_variants(self):
+        agentstore.write_models(self.agent_dir, "smoke", [
+            {"model": "plain", "name": "Plain", "thinking": ["high", "max"]},
+        ], format_id="none")
+        data = json.loads((self.agent_dir / "profiles" / "coding" / "smoke-models.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["models"]["plain"]["variants"], {})
+        self.assertEqual(agentstore.read_models(self.agent_dir, "smoke", format_id="none")[0]["thinking"], [])
+
+    def test_read_models_filters_to_provider_format(self):
+        agentstore.write_models(self.agent_dir, "smoke", [
+            {"model": "gpt-5.5", "name": "GPT 5.5", "thinking": ["max", "high"]},
+        ])
+        thinking = agentstore.read_models(self.agent_dir, "smoke", format_id="openai")[0]["thinking"]
+        self.assertEqual(thinking, ["high"])
+
+    def test_provider_format_roundtrip_and_default(self):
+        provider = agentstore.write_provider(self.agent_dir, "smoke", "Smoke", "http://a/v1", "k", reasoning_format="claude")
+        self.assertEqual(provider["reasoningFormat"], "claude")
+        read = agentstore.read_provider(self.agent_dir, "smoke")
+        self.assertEqual(read["reasoningFormat"], "claude")
+        data = json.loads((self.agent_dir / "providers" / "smoke.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["provider"]["smoke"]["reasoningFormat"], "claude")
+        provider = agentstore.write_provider(self.agent_dir, "plain", "Plain", "http://b/v1", "k")
+        self.assertEqual(provider["reasoningFormat"], "opencode")
+
+    def test_resolve_format_falls_back_to_opencode(self):
+        self.assertEqual(agentstore.resolve_format(None), "opencode")
+        self.assertEqual(agentstore.resolve_format("bogus"), "opencode")
+        self.assertEqual(agentstore.resolve_format("gemini"), "gemini")
+
     def test_models_update_replaces_and_backs_up(self):
         agentstore.write_models(self.agent_dir, "smoke", [{"model": "a", "name": "A", "thinking": ["high"]}])
         agentstore.write_models(self.agent_dir, "smoke", [{"model": "b", "name": "B", "thinking": ["max"]}])
