@@ -231,6 +231,11 @@ The file name follows the pattern `<provider>-models.json` (for example `{{CURRE
 
 Carries the highest model-source precedence.
 
+Each model entry may carry `variants` — named reasoning overlays in the
+provider's reasoning format (`reasoningEffort` for opencode/openai,
+`thinking.budgetTokens` for claude, `thinkingConfig.thinkingBudget` for
+gemini). See `PROVIDER_DEVELOPMENT_GUIDE.md` § Reasoning formats.
+
 ---
 
 ### plugins.json

@@ -967,6 +967,42 @@ No stage may be skipped.
 
 ---
 
+## Reasoning Formats
+
+Model `variants` entries are settings overlays that the builder merges verbatim
+into the generated config — it never interprets their contents. Providers may
+therefore use any reasoning dialect the target agent understands:
+
+- `opencode` / `openai` — `reasoningEffort: "<level>"`
+- `claude` — `thinking: { "type": "enabled", "budgetTokens": <n> }`
+- `gemini` — `thinkingConfig: { "thinkingBudget": <n> }`
+
+Provider files may carry an optional `reasoningFormat` field
+(`opencode` | `openai` | `claude` | `gemini` | `none`, default `opencode`);
+the builder treats it as a validated-but-merged field. The models schema keeps
+`variants` permissive so new shapes never fail older builders.
+
+### Interactive builds ask the developer
+
+When the builder runs interactively (no `-NonInteractive`) and an active
+provider has models but either (a) no `reasoningFormat` declared, or (b)
+variant levels invalid for its declared format, the builder:
+
+1. **Asks** the developer to pick the reasoning format for that provider
+   (numbered menu, Enter keeps the current/default).
+2. **Persists** the choice into `providers/<id>.json` (`reasoningFormat`),
+   backup-first — the same place the app stores it, so GUI and CLI stay in
+   sync. Never under dry-run / diagnostics; never in `-NonInteractive` mode
+   (the app drives format selection itself).
+3. **Filters the merged output**: variant levels invalid for the resolved
+   format are dropped from the generated config with a `[!]` warning per
+   dropped level. Source files are never modified by the filter.
+
+Non-interactive builds use the declared format (or `opencode`) and apply only
+step 3 — invalid levels never reach the generated config.
+
+---
+
 ## Target Artifact Resolution (P2)
 
 The generated artifact name is dynamic and resolved when a profile runs, never fixed in the builder code.

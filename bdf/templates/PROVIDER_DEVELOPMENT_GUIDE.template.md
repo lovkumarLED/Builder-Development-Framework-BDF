@@ -67,6 +67,62 @@ The provider id is the file name. Example: `<id>` → `{{PROVIDER_DIR}}/<id>.jso
 
 Inline or profile-level (`{{CONFIG_SOURCE_DIR}}/<profile>/<id>-models.json`).
 
+## 4. Reasoning formats (optional)
+
+Different providers accept different reasoning settings. The provider file can
+carry an optional `reasoningFormat` field; the builder passes it through, and
+the app uses it to offer the right levels and write the right variant JSON.
+
+| Format | Valid levels | Variant JSON per level |
+|--------|--------------|------------------------|
+| `opencode` (default) | `default`, `minimal`, `high`, `max` | `{ "reasoningEffort": "<level>" }` |
+| `openai` | `none`, `low`, `medium`, `high`, `xhigh` | `{ "reasoningEffort": "<level>" }` |
+| `claude` | `low`, `high`, `max` | `{ "thinking": { "type": "enabled", "budgetTokens": 8000 / 16000 / 32000 } }` |
+| `gemini` | `minimal`, `low`, `medium`, `high` | `{ "thinkingConfig": { "thinkingBudget": 4096 / 8192 / 16384 / 32768 } }` |
+| `none` | — | no variants written |
+
+Claude-style variants (written for a `claude` format provider):
+
+```json
+{
+  "models": {
+    "claude-sonnet-4": {
+      "name": "Claude Sonnet 4",
+      "variants": {
+        "low":  { "thinking": { "type": "enabled", "budgetTokens": 8000 } },
+        "high": { "thinking": { "type": "enabled", "budgetTokens": 16000 } },
+        "max":  { "thinking": { "type": "enabled", "budgetTokens": 32000 } }
+      }
+    }
+  }
+}
+```
+
+Gemini-style variants (written for a `gemini` format provider):
+
+```json
+{
+  "models": {
+    "gemini-3.6-flash": {
+      "name": "Gemini 3.6 Flash",
+      "variants": {
+        "minimal": { "thinkingConfig": { "thinkingBudget": 4096 } },
+        "medium":  { "thinkingConfig": { "thinkingBudget": 16384 } },
+        "high":    { "thinkingConfig": { "thinkingBudget": 32768 } }
+      }
+    }
+  }
+}
+```
+
+An unknown or missing `reasoningFormat` is treated as `opencode`. Levels that
+are not valid for the provider's format are dropped when the app writes the
+models file (e.g. `max` is not valid for OpenAI GPT-5.x — the app refuses to
+write it for `openai` format providers). Interactive builder runs ask the
+developer for the format when it is missing or invalid levels are present,
+persist it to the provider file (backup-first), and filter the generated
+output the same way.
+
 ---
 
 # API Keys — The No-Secrets Rule (ULTIMATE)

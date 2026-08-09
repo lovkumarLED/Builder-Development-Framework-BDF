@@ -94,6 +94,23 @@ The models the project exposes.
 {{SUPPORTED_MODELS}}
 ```
 
+### Reasoning formats
+
+Providers may declare an optional `reasoningFormat` field
+(`opencode` | `openai` | `claude` | `gemini` | `none`, default `opencode`).
+It selects the valid reasoning levels and the variant JSON shape written for
+that provider's models:
+
+- `opencode` / `openai` → `reasoningEffort`
+- `claude` → `thinking.type` + `thinking.budgetTokens`
+- `gemini` → `thinkingConfig.thinkingBudget`
+- `none` → no variants
+
+The builder passes `variants` through verbatim; interactive builds ask the
+developer for the format when it is missing or invalid levels are present,
+then persist it (backup-first) and filter the generated output. See
+`PROVIDER_DEVELOPMENT_GUIDE.md` for full examples.
+
 ---
 
 ## Supported Plugins

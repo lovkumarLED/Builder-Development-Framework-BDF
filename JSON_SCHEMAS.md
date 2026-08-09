@@ -169,6 +169,31 @@ Same shape as `models.json`.
 
 Each model entry has the same shape as a `models.json` entry (for example `name`).
 
+## Model entry shape
+
+| Key | Type | Required | Description |
+|------|------|----------|-------------|
+| name | String | Yes | Display name. |
+| variants | Object | No | Named reasoning overlays (see below). |
+| reasoning | Boolean | No | Whether the model reasons. |
+| temperature | Number | No | Sampling temperature. |
+| limit | Number | No | Token limit. |
+
+`variants` is a map of level → settings object. The settings keys follow the
+provider's reasoning format (the optional `reasoningFormat` field on the
+provider file):
+
+| Reasoning format | Levels | Settings keys |
+|------------------|--------|---------------|
+| `opencode` (default) | `default`, `minimal`, `high`, `max` | `reasoningEffort` |
+| `openai` | `none`, `low`, `medium`, `high`, `xhigh` | `reasoningEffort` |
+| `claude` | `low`, `high`, `max` | `thinking.type`, `thinking.budgetTokens` |
+| `gemini` | `minimal`, `low`, `medium`, `high` | `thinkingConfig.thinkingBudget` |
+| `none` | — | no variants written |
+
+The schema keeps `variants` permissive (`{"type": "object"}`) so new settings
+keys never fail older builders; unknown keys pass through unchanged.
+
 ## Validation Rules
 
 - Model identifiers must be unique (duplicate keys are rejected).

@@ -154,6 +154,7 @@ A provider contains:
 - provider metadata
 - API configuration
 - connection information
+- optional `reasoningFormat` (`opencode` | `openai` | `claude` | `gemini` | `none`) — selects the valid reasoning levels and variant JSON shape for the provider's models
 
 Provider definitions are independent from source profiles.
 

@@ -1,4 +1,4 @@
-# TESTING Template
+﻿# TESTING Template
 
 > Template: verification guide. Becomes `TESTING.md`.
 
@@ -35,11 +35,11 @@ It also runs the release manager against a temp copy of the docs and verifies th
 
 Current automated coverage (all harnesses green = done):
 
-- {{TEST_HARNESS}} — 17 tests (9 builder + 8 Release Docs).
-- V2.5 harness ({{V25_TEST_HARNESS}}) — 13 tests (active-provider selector).
-- V2.7 harness ({{V27_TEST_HARNESS}}) — 31 tests (JSON Schema validation + hardening).
+- {{TEST_HARNESS}} â€” 17 tests (9 builder + 8 Release Docs).
+- V2.5 harness ({{V25_TEST_HARNESS}}) â€” 13 tests (active-provider selector).
+- V2.7 harness ({{V27_TEST_HARNESS}}) â€” 33 tests (JSON Schema validation + hardening + reasoning formats).
 
-Definition of complete: 17/17 + 13/13 + 31/31 PASSED, exit code 0.
+Definition of complete: 17/17 + 13/13 + 33/33 PASSED, exit code 0.
 
 Builder tests (V2.1 harness):
 
@@ -139,17 +139,17 @@ Profile Selection
 
 Before testing begins verify:
 
-□ Configuration files exist.
+â–¡ Configuration files exist.
 
-□ Provider configuration exists.
+â–¡ Provider configuration exists.
 
-□ Builder script exists.
+â–¡ Builder script exists.
 
-□ Backup directory exists.
+â–¡ Backup directory exists.
 
-□ {{APP_NAME}} is installed.
+â–¡ {{APP_NAME}} is installed.
 
-□ Required environment variables are configured.
+â–¡ Required environment variables are configured.
 
 Testing should not begin until every item is complete.
 
@@ -880,10 +880,12 @@ The V2.7 group verifies the schema-validation entry gate and the F1-F7 feature s
 | 7 | Merge diff summary | Diff vs previous backup reported; no prior backup = no diff |
 | 8 | Dynamic target artifact | `target.json` artifact name drives output, backup prefix, provenance, WhatIf |
 | 9 | No literal keys | Generated artifact contains only `{env:VAR}` apiKey placeholders |
+| 10 | Reasoning-format variants merge | OpenAI (`reasoningEffort`), Claude (`thinking.budgetTokens`) and Gemini (`thinkingConfig.thinkingBudget`) variant shapes pass schema validation and merge into the generated config; provider `reasoningFormat` field accepted |
+| 11 | Reasoning-format enforcement | Variant levels invalid for the provider's declared format are dropped from the generated output with a warning (e.g. `max` on an `openai` provider) |
 
 # Release Docs Test Group (Tests 10-17)
 
-The Release Docs group verifies the release pipeline (registry → release manager → generated documentation).
+The Release Docs group verifies the release pipeline (registry â†’ release manager â†’ generated documentation).
 
 All tests except test 17 run against an isolated temp copy of the docs.
 
@@ -898,7 +900,7 @@ All tests except test 17 run against an isolated temp copy of the docs.
 | 16 | Missing markers abort safely | Removing a marker makes the manager fail with exit non-zero and leaves CHANGELOG untouched |
 | 17 | Real docs consistent (read-only) | Real `release_registry.json`, `CHANGELOG.md`, and `CURRENT_RELEASE.md` are consistent |
 
-Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only — it never writes or modifies the real documentation.
+Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only â€” it never writes or modifies the real documentation.
 
 Run the harness with:
 
@@ -908,7 +910,7 @@ powershell -File {{SCRIPTS_DIR}}/{{V25_TEST_HARNESS}}
 powershell -File {{SCRIPTS_DIR}}/{{V27_TEST_HARNESS}}
 ```
 
-Expected: 17/17 + 13/13 + 31/31 PASSED, exit 0.
+Expected: 17/17 + 13/13 + 33/33 PASSED, exit 0.
 
 ## JSON Schema (V2.7) test group
 
@@ -938,19 +940,19 @@ Perform the following steps in order.
 
 A successful test session satisfies all of the following.
 
-✓ Project structure is correct.
+âœ“ Project structure is correct.
 
-✓ Configuration files are valid.
+âœ“ Configuration files are valid.
 
-✓ Builder executes successfully.
+âœ“ Builder executes successfully.
 
-✓ Backup is created.
+âœ“ Backup is created.
 
-✓ Generated configuration is valid.
+âœ“ Generated configuration is valid.
 
-✓ Application starts successfully.
+âœ“ Application starts successfully.
 
-✓ Configured models are available.
+âœ“ Configured models are available.
 
 ---
 
@@ -973,21 +975,21 @@ Any failure should be investigated before continuing development.
 
 Before considering a build complete:
 
-□ Folder structure verified.
+â–¡ Folder structure verified.
 
-□ Configuration validated.
+â–¡ Configuration validated.
 
-□ Builder executed successfully.
+â–¡ Builder executed successfully.
 
-□ Backup created.
+â–¡ Backup created.
 
-□ Generated configuration verified.
+â–¡ Generated configuration verified.
 
-□ Application launched.
+â–¡ Application launched.
 
-□ Models available.
+â–¡ Models available.
 
-□ No unexpected errors observed.
+â–¡ No unexpected errors observed.
 
 ---
 

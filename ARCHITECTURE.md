@@ -80,7 +80,9 @@ The following diagram illustrates the overall system structure.
         |                                            |
         | providers/                                 |
         |                                            |
-        | └── omniroute.json                         |
+        | └── omniroute.json (may carry              |
+        |     reasoningFormat: opencode | openai |   |
+        |     claude | gemini | none)                |
         |                                            |
         +--------------------------------------------+
 

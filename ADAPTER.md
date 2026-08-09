@@ -126,6 +126,24 @@ inline provider models
 profiles/<profile>/models.json
 ```
 
+### Reasoning formats
+
+Providers may declare an optional `reasoningFormat` field
+(`opencode` | `openai` | `claude` | `gemini` | `none`, default `opencode`).
+It selects the valid reasoning levels and the variant JSON shape the app
+writes for that provider's models:
+
+- `opencode` / `openai` → `reasoningEffort`
+- `claude` → `thinking.type` + `thinking.budgetTokens`
+- `gemini` → `thinkingConfig.thinkingBudget`
+- `none` → no variants
+
+The builder passes `variants` through verbatim; the field never affects the
+build pipeline. Interactive builder runs ask the developer for the format when
+it is missing or invalid levels are present, persist it to the provider file
+(backup-first), and filter invalid levels from the generated output. See
+`PROVIDER_DEVELOPMENT_GUIDE.md` for full examples.
+
 ---
 
 ## Supported Plugins

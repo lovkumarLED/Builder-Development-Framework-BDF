@@ -1,4 +1,4 @@
-# TESTING
+﻿# TESTING
 
 > Verification guide for the OpenCode Configuration Manager.
 
@@ -74,7 +74,7 @@ powershell -File scripts/test-opencode-v2.ps1
 
 The harness exits non-zero when any test fails.
 
-The full suite is ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7).
+The full suite is ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 33/33 (V2.7).
 
 ---
 
@@ -159,19 +159,19 @@ Profile Selection
 
 Before testing begins verify:
 
-□ JSON files exist.
+â–¡ JSON files exist.
 
-□ Provider configuration exists.
+â–¡ Provider configuration exists.
 
-□ Builder script exists.
+â–¡ Builder script exists.
 
-□ Backup directory exists.
+â–¡ Backup directory exists.
 
-□ OpenCode is installed.
+â–¡ OpenCode is installed.
 
-□ OmniRoute is running.
+â–¡ OmniRoute is running.
 
-□ Required environment variables are configured.
+â–¡ Required environment variables are configured.
 
 Testing should not begin until every item is complete.
 
@@ -891,7 +891,7 @@ Different outputs indicate a regression or non-deterministic behavior.
 
 # Release Docs Test Group (Tests 10-17)
 
-The Release Docs group verifies the release pipeline (registry → release manager → generated documentation).
+The Release Docs group verifies the release pipeline (registry â†’ release manager â†’ generated documentation).
 
 All tests except test 17 run against an isolated temp copy of the docs.
 
@@ -901,12 +901,12 @@ All tests except test 17 run against an isolated temp copy of the docs.
 | 11 | Release manager generates all outputs | Exit 0, CURRENT_RELEASE.md created, markers intact, every registry version present in CHANGELOG |
 | 12 | Release manager deterministic | Two runs produce identical CHANGELOG and CURRENT_RELEASE.md |
 | 13 | CURRENT_RELEASE matches registry | Quick reference contains the Current entry's builder version, project version, date, and testing summary |
-| 14 | Registry and CHANGELOG consistent | Every registry entry present in CHANGELOG with its summary; legacy entries (2.1.0 → 1.0.0) preserved; exactly one Current in the generated section |
+| 14 | Registry and CHANGELOG consistent | Every registry entry present in CHANGELOG with its summary; legacy entries (2.1.0 â†’ 1.0.0) preserved; exactly one Current in the generated section |
 | 15 | VERSION.md rows updated | Last Updated row matches the Current release date |
 | 16 | Missing markers abort safely | Removing a marker makes the manager fail with exit non-zero and leaves CHANGELOG untouched |
 | 17 | Real docs consistent (read-only) | Real `release_registry.json`, `CHANGELOG.md`, and `CURRENT_RELEASE.md` are consistent |
 
-Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only — it never writes or modifies the real documentation.
+Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only â€” it never writes or modifies the real documentation.
 
 Run the harness with:
 
@@ -948,7 +948,7 @@ powershell -File scripts/test-opencode-v2.5.ps1
 
 Expected: 13/13 PASSED, exit 0.
 
-The definition of complete is ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7).
+The definition of complete is ALL THREE harnesses green: 17/17 (V2.1) + 13/13 (V2.5) + 33/33 (V2.7).
 
 ---
 
@@ -965,6 +965,7 @@ The V2.7 group verifies the JSON Schema builder (`scripts/build-opencode-v2.7.ps
 | Backup retention | `-KeepBackups` honored |
 | Provenance | Sidecar fields and SHA correct |
 | Diff summary | Added/Removed lines; identical input silent |
+| Reasoning formats | OpenAI (`reasoningEffort`), Claude (`thinking.budgetTokens`) and Gemini (`thinkingConfig.thinkingBudget`) variant shapes pass schema validation and merge into the generated config; provider `reasoningFormat` field accepted |
 
 Run the V2.7 harness with:
 
@@ -972,7 +973,7 @@ Run the V2.7 harness with:
 powershell -File scripts/test-opencode-v2.7.ps1
 ```
 
-Expected: 31/31 PASSED, exit 0.
+Expected: 33/33 PASSED, exit 0.
 
 ---
 
@@ -995,19 +996,19 @@ Perform the following steps in order.
 
 A successful test session satisfies all of the following.
 
-✓ Project structure is correct.
+âœ“ Project structure is correct.
 
-✓ Configuration files are valid.
+âœ“ Configuration files are valid.
 
-✓ Builder executes successfully.
+âœ“ Builder executes successfully.
 
-✓ Backup is created.
+âœ“ Backup is created.
 
-✓ Generated configuration is valid.
+âœ“ Generated configuration is valid.
 
-✓ OpenCode starts successfully.
+âœ“ OpenCode starts successfully.
 
-✓ Configured models are available.
+âœ“ Configured models are available.
 
 ---
 
@@ -1030,21 +1031,21 @@ Any failure should be investigated before continuing development.
 
 Before considering a build complete:
 
-□ Folder structure verified.
+â–¡ Folder structure verified.
 
-□ Configuration validated.
+â–¡ Configuration validated.
 
-□ Builder executed successfully.
+â–¡ Builder executed successfully.
 
-□ Backup created.
+â–¡ Backup created.
 
-□ Generated configuration verified.
+â–¡ Generated configuration verified.
 
-□ OpenCode launched.
+â–¡ OpenCode launched.
 
-□ Models available.
+â–¡ Models available.
 
-□ No unexpected errors observed.
+â–¡ No unexpected errors observed.
 
 ---
 
