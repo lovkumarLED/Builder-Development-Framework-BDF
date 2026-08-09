@@ -222,7 +222,7 @@ User clicks "Test" on a provider card
 | `discovery.py` | `/api/status`, `/api/discover`, `/api/scan` — find agents, read their main JSON read-only |
 | `agentstore.py` | **the heart**: reads/writes the agent's real BDF files (providers, models, plugins, mcp, settings), backups, builder discovery, agent registry logic |
 | `providers.py` | `/api/providers` CRUD + `/api/switch` + models writing |
-| `engine.py` | `/api/scaffold` (runs `scaffold-agent.ps1 -Bootstrap`) + `/api/build` (runs the agent's real builder) |
+| `engine.py` | `/api/scaffold` (runs the **bundled** `app/engine/scaffold-agent.ps1 -Bootstrap` - self-contained, nothing lives outside the repo) + `/api/build` (runs the agent's generated builder) |
 | `testing.py` | `/api/test` — connection tester (GET /v1/models) |
 | `plugins.py` | `/api/plugins` — profile plugin list |
 | `mcp.py` | `/api/mcp` — profile MCP servers |
