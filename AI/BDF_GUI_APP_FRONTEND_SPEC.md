@@ -8,7 +8,7 @@
 
 ## What you are building
 
-A **simple, clean, dark-themed web GUI** ("AI Switcher") that lets a normal,
+A **simple, clean, dark-themed web GUI** ("Switcher") that lets a normal,
 non-developer person:
 
 1. Run a first-time **Setup Wizard** (find their coding agent → scan → generate builder).

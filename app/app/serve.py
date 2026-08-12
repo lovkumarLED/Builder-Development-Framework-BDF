@@ -15,7 +15,7 @@ PLACEHOLDER = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Switcher</title>
+<title>Switcher</title>
 <style>
   body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:#0d1117;color:#e6edf3;display:flex;align-items:center;justify-content:center;min-height:100vh}
   .card{background:#161b22;border:1px solid #30363d;border-radius:16px;padding:40px 48px;max-width:520px;text-align:center}
@@ -29,7 +29,7 @@ PLACEHOLDER = """<!doctype html>
 </head>
 <body>
 <div class="card">
-  <h1>AI Switcher</h1>
+  <h1>Switcher</h1>
   <p>The backend is running on <code>127.0.0.1:9090</code>.<br>
   The full interface (<code>gui.html</code>) is not here yet —<br>
   drop it into the <code>docs\\app</code> folder and refresh this page.</p>

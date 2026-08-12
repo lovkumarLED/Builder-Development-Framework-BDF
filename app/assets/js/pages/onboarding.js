@@ -94,7 +94,7 @@ function icon(name) {
 }
 
 function brandMarkup() {
-  return '<div class="onboarding-brand"><img src="/assets/bdf-counterphase-logo.svg" alt=""><strong>AI Switcher</strong></div>';
+  return '<div class="onboarding-brand"><img src="/assets/bdf-counterphase-logo.svg" alt=""><strong>Switcher</strong></div>';
 }
 
 function sidebarMarkup(screen) {

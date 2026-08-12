@@ -33,15 +33,14 @@
 #   6. NEVER overwrite mcp.json / plugins.json once they exist - the user
 #      owns those files after creation. The framework writes them only when
 #      they are missing (seeded from the scanned main config).
-#   7. AUTO-IMPORT (V3.1): when the scanned main .json / .jsonc carries
+#   7. AUTO-IMPORT (V3.1): when the scanned main .json carries
 #      providers, the framework creates providers/<id>.json (dual-key:
 #      apiKey + options.apiKey) and profiles/coding/<id>-models.json for the
 #      first time, so the builder has every provider in one go. Existing
 #      files are never overwritten.
-#   8. The companion .jsonc is always merged (read-only), imported into the
-#      modular sources, then emptied (content lives in the profiles now) -
-#      so it can never shadow or contradict the built config. With -AutoBuild
-#      the generated builder runs immediately with all providers active.
+#   8. HARD RULE: the framework ONLY scans the main .json. It NEVER scans,
+#      merges, reads, or modifies any .jsonc file - ever. A .jsonc is never
+#      imported and never emptied. Providers/models live in .json only.
 #   9. Everything is generated from the agent's OWN main config. No work is
 #      done BEFORE scanning. Errors are always user-reportable + fixable.
 # ============================================================
@@ -66,7 +65,7 @@ trap {
     Write-Host "    Diagnosis (V3 rule): check that"
     Write-Host "      1. the config path is correct and contains a .json main file,"
     Write-Host "      2. the agent you named is in `AgentRegistry` (or pass -ConfigRoot),"
-    Write-Host "      3. you aren't pointing at a .jsonc-only folder (framework needs consent)."
+    Write-Host "      3. you aren't pointing at a folder without a .json main file (.jsonc is never scanned)."
     Write-Host "    Re-run after fixing; the generated builder also supports -Doctor."
     Write-Host ""
     Write-Host "[x] Framework did NOT complete. Fix the reported error and rerun." -ForegroundColor Red
@@ -88,7 +87,7 @@ function Show-Credits {
 # ------------------------------------------------------------
 $AgentRegistry = @(
     @{ Name = "opencode";   Home = ".config\opencode"; Main = @("opencode.json");       PlugKeys = @("plugin");       Schema = "https://opencode.ai/config.schema.json" }
-    @{ Name = "kilo";       Home = ".config\kilo";     Main = @("kilo.json", "kilo.jsonc"); PlugKeys = @("plugin", "skills.urls"); Schema = "https://app.kilo.ai/config.json" }
+    @{ Name = "kilo";       Home = ".config\kilo";     Main = @("kilo.json");       PlugKeys = @("plugin", "skills.urls"); Schema = "https://app.kilo.ai/config.json" }
     @{ Name = "claudecode"; Home = ".claude";          Main = @(".claude.json", "settings.json"); PlugKeys = @("plugins"); Schema = "" }  # discovery only - NOT a scaffold target (dropped 2026-08-08)
     @{ Name = "aider";      Home = ".aider";           Main = @(".aider.conf.json");    PlugKeys = @("plugins"); Schema = "" }
     @{ Name = "goose";      Home = ".config\goose";    Main = @("config.json");         PlugKeys = @("plugins"); Schema = "" }
@@ -196,22 +195,12 @@ if ($MainFiles.Count -eq 0) {
 }
 $MainFiles = @($MainFiles | Select-Object -Unique)
 
-# ---- non-.json? merge companion .jsonc files when a .json main exists ----
-# V3 auto-import: kilo.jsonc (and similar) can carry providers/models/mcp/
-# plugins. When a main .json was found, its .jsonc siblings are ALWAYS merged
-# in (read-only), imported into the modular sources, then emptied - so no
-# provider is ever lost and the .jsonc can never shadow the built config.
-$NonJson = @(Get-ChildItem $ConfigRoot -File -Filter *.jsonc -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -notmatch "^(package|package-lock)" } |
-    Select-Object -ExpandProperty FullName)
-if ($NonJson.Count -gt 0 -and $MainFiles.Count -gt 0) {
-    foreach ($Nj in $NonJson) {
-        if ($MainFiles -notcontains $Nj) { $MainFiles += $Nj }
-    }
-    Write-Host "[i] Merging companion .jsonc config(s) for import: $([System.IO.Path]::GetFileName($NonJson) -join ', ')"
-}
+# ---- HARD RULE: .jsonc is NEVER scanned, merged, imported, or emptied ----
+# The framework scans ONLY the main .json file(s) above. A .jsonc sitting next
+# to them is invisible to the scaffold: it is never read, never imported, and
+# never modified. Providers/models live in .json only.
 if ($MainFiles.Count -eq 0) {
-    throw "No main .json config found in '$ConfigRoot'. The framework never scans .jsonc on its own."
+    throw "No main .json config found in '$ConfigRoot'. .jsonc files are never scanned - add a .json main config."
 }
 
 Write-Host ""
@@ -225,7 +214,6 @@ $MergedMcp       = [ordered]@{}
 $MergedPlugins   = [System.Collections.Generic.List[string]]::new()
 $MergedProviders = [ordered]@{}   # provider id -> full provider object (incl. models)
 $ProviderSeen    = [System.Collections.Generic.List[string]]::new()
-$JsoncFiles      = @()
 
 foreach ($TF in $MainFiles) {
     Write-Host "[*] Scanning main config: $TF"
@@ -246,8 +234,6 @@ foreach ($TF in $MainFiles) {
             $MergedProviders[$P.Name] = $P.Value
         }
     }
-    # track jsonc files for post-import emptying
-    if ($TF -like "*.jsonc") { $JsoncFiles += $TF }
     # settings schema (use the config's own $schema when present)
     if ($SchemaUrl -eq "" -and $Main.schema)       { $SchemaUrl = [string]$Main.schema }
     if ($SchemaUrl -eq "" -and $Main.'$schema')    { $SchemaUrl = [string]$Main.'$schema' }
@@ -354,7 +340,7 @@ $ProvidersRoot = Join-Path $ConfigRoot "providers"
 if (-not (Test-Path $ProvidersRoot)) { New-Item -ItemType Directory -Path $ProvidersRoot -Force | Out-Null; Write-Host "[ ] providers/ folder created (files are user-owned)" }
 
 # ---- 4b. AUTO-IMPORT: migrate providers/models from the scanned main configs ----
-# When providers exist in the main .json / .jsonc, create the modular source
+# When providers exist in the main .json, create the modular source
 # files so the builder has everything in one go:
 #   providers/<id>.json                 (provider config)
 #   profiles/coding/<id>-models.json    (provider models)
@@ -406,17 +392,8 @@ foreach ($ProviderId in @($MergedProviders.Keys)) {
     }
 }
 
-# ---- 4c. EMPTY the .jsonc after a successful import (content is now in profiles) ----
-# The file stays (some tools expect it), but its content is fully migrated to
-# the modular sources, so it can never shadow or contradict the built config.
-foreach ($Jf in $JsoncFiles) {
-    $Base = [System.IO.Path]::GetFileNameWithoutExtension($Jf)
-    Backup-ProfileFile $Jf $Base
-    $Empty = @{}
-    if ($SchemaUrl) { $Empty['$schema'] = $SchemaUrl }
-    [System.IO.File]::WriteAllText($Jf, (ConvertTo-Json $Empty -Depth 5), (New-Object System.Text.UTF8Encoding($false)))
-    Write-Host "  [~] emptied $([System.IO.Path]::GetFileName($Jf)) - content migrated to profiles (backup kept)"
-}
+# ---- 4c. (removed) .jsonc files are NEVER emptied, modified, or touched ----
+# The scaffold never scans .jsonc; there is nothing to migrate or empty.
 
 if ($ImportCreated -gt 0) {
     Write-Host "[+] Auto-import complete: $ImportCreated modular file(s) created from the scanned main config(s)."

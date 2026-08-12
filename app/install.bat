@@ -1,14 +1,14 @@
 @echo off
-title AI Switcher - One-click Installer
+title Switcher - One-click Installer
 cd /d "%~dp0"
 
 echo.
 echo ============================================
-echo    AI Switcher - one-time installer
+echo    Switcher - one-time installer
 echo ============================================
 echo.
 echo This creates the app's own Python environment, installs
-echo its packages, and puts an "AI Switcher" shortcut on your
+echo its packages, and puts an "Switcher" shortcut on your
 echo desktop. You only need to run this once.
 echo.
 
@@ -64,14 +64,14 @@ if not "%CUR_HASH%"=="%OLD_HASH%" (
 echo [2/2] Creating a desktop shortcut...
 set "SHORTCUT_DIR=%USERPROFILE%\Desktop"
 if not "%~1"=="" set "SHORTCUT_DIR=%~1"
-powershell -NoProfile -Command "$ws = New-Object -ComObject WScript.Shell; $sc = $ws.CreateShortcut((Join-Path '%SHORTCUT_DIR%' 'AI Switcher.lnk')); $sc.TargetPath = '%~dp0start.bat'; $sc.WorkingDirectory = '%~dp0'; $sc.Description = 'AI Switcher - manage your AI agents, providers and configs'; $sc.Save()" >nul 2>nul
+powershell -NoProfile -Command "$ws = New-Object -ComObject WScript.Shell; $sc = $ws.CreateShortcut((Join-Path '%SHORTCUT_DIR%' 'Switcher.lnk')); $sc.TargetPath = '%~dp0start.bat'; $sc.WorkingDirectory = '%~dp0'; $sc.Description = 'Switcher - manage your AI agents, providers and configs'; $sc.Save()" >nul 2>nul
 if errorlevel 1 (
     echo       Could not create the shortcut - you can still run start.bat manually.
 ) else (
-    echo       Shortcut created: "AI Switcher" on your desktop.
+    echo       Shortcut created: "Switcher" on your desktop.
 )
 
 echo.
-echo Done! Double-click "AI Switcher" on your desktop to run the app.
+echo Done! Double-click "Switcher" on your desktop to run the app.
 echo.
 pause

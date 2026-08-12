@@ -5,7 +5,7 @@ import { integrationWorkspaceMarkup } from "./integration-workspace.js";
 function openPluginDialog(trigger, onSaved) {
   const { dialog, close } = openDialog({
     title: "Add plugin identifier", trigger,
-    content: `<form id="pluginForm"><div class="field"><label for="pluginId">Plugin ID</label><input id="pluginId" required placeholder="package@git+https://github.com/owner/repo.git"><p class="field-note">AI Switcher stores this identifier. It does not install, run, or monitor the plugin.</p><p id="pluginMessage" class="field-error" role="alert"></p></div></form>`,
+    content: `<form id="pluginForm"><div class="field"><label for="pluginId">Plugin ID</label><input id="pluginId" required placeholder="package@git+https://github.com/owner/repo.git"><p class="field-note">Switcher stores this identifier. It does not install, run, or monitor the plugin.</p><p id="pluginMessage" class="field-error" role="alert"></p></div></form>`,
     actions: `<button class="button button--quiet" type="button" data-dialog-close>Cancel</button><button class="button button--primary" type="submit" form="pluginForm">Add identifier</button>`,
   });
   dialog.querySelector("#pluginForm").addEventListener("submit", async event => {

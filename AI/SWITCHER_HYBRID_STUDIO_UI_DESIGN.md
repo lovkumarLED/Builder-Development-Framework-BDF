@@ -1,12 +1,12 @@
-# AI Switcher Hybrid Studio UI Design
+# Switcher Hybrid Studio UI Design
 
 **Date:** 2026-08-10  
 **Status:** Approved visual direction; written specification awaiting review  
-**Scope:** AI Switcher GUI, interactions, responsive behavior, and privacy-safe request analytics
+**Scope:** Switcher GUI, interactions, responsive behavior, and privacy-safe request analytics
 
 ## 1. Purpose
 
-This specification translates the approved Hybrid Studio reference boards into the existing AI Switcher application without replacing the BDF architecture.
+This specification translates the approved Hybrid Studio reference boards into the existing Switcher application without replacing the BDF architecture.
 
 The application remains a local-first GUI over the existing BDF engine. It must continue to discover and manage supported coding agents, edit their source configuration through the existing backup-first APIs, run the bundled scaffold/builders, and expose the local OpenAI-compatible proxy at `127.0.0.1:9090`.
 
@@ -16,7 +16,7 @@ The visual goal is a dark, immersive first-run experience that transitions into 
 
 ### 2.1 Brand
 
-- Product name remains **AI Switcher**.
+- Product name remains **Switcher**.
 - The approved BDF Counterphase mark replaces the flame/shield artwork.
 - The mark contains no letters or words.
 - The master mark consists of two rounded opposing paths:
@@ -150,7 +150,7 @@ Integrations is a configuration hub, not a marketplace.
 - **Plugins:** list plugin IDs; add and remove; no health or installed badge.
 - **MCP servers:** list name, declared type, and `Configured`; add and remove.
 - **AI provider connection:** show primary provider, explicit `Test connection`, and link to Providers.
-- **Use AI Switcher with another tool:** show the copyable local endpoint `http://127.0.0.1:9090/v1` and `Local only` status.
+- **Use Switcher with another tool:** show the copyable local endpoint `http://127.0.0.1:9090/v1` and `Local only` status.
 - A build-required notice explains when configuration changes need a builder run.
 
 MCP creation is guided by default. Common local/remote fields are presented as structured inputs. An explicitly labelled `Expert JSON` disclosure exposes the existing JSON configuration editor for advanced cases. JSON is validated before save. There is no orphaned `Advanced` footer link.

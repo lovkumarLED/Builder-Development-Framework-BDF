@@ -2,7 +2,7 @@
 
 Date: 2026-08-09
 Status: Approved
-App: AI Switcher (BDF app) — `docs/app/`
+App: Switcher (BDF app) — `docs/app/`
 
 ## Problem
 

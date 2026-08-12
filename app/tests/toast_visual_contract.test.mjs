@@ -9,7 +9,7 @@ const css = readFileSync(new URL("../assets/css/components.css", import.meta.url
 test("toast types have clear user-facing presentation", () => {
   assert.deepEqual(toastPresentation("success"), { title: "Change saved", symbol: "check" });
   assert.deepEqual(toastPresentation("error"), { title: "Action needed", symbol: "alert" });
-  assert.deepEqual(toastPresentation("info"), { title: "AI Switcher", symbol: "info" });
+  assert.deepEqual(toastPresentation("info"), { title: "Switcher", symbol: "info" });
 });
 
 test("toast cards expose a dismiss control and timed progress", () => {

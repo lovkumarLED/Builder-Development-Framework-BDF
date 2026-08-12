@@ -12,7 +12,7 @@ test("integrations uses the approved reference composition", () => {
   for (const text of [
     "Managing:", "Changes are backed up", "Plugins", "Add plugin",
     "MCP servers", "Add MCP server", "AI provider connection",
-    "Use AI Switcher with another tool", "Build required", "Build my config",
+    "Use Switcher with another tool", "Build required", "Build my config",
   ]) assert.match(view, new RegExp(text));
   assert.match(view, /integration-workspace/);
   assert.match(css, /grid-template-columns:\s*minmax\(0,\s*1\.58fr\)\s+minmax\(300px,\s*\.9fr\)/);

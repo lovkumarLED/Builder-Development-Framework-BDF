@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="app/assets/bdf-counterphase-logo.svg" width="160" alt="AI Switcher logo">
+  <img src="app/assets/bdf-counterphase-logo.svg" width="160" alt="Switcher logo">
 </p>
 
-# 🔥 Builder Development Framework (BDF) + AI Switcher App
+# 🔥 Builder Development Framework (BDF) + Switcher App
 
 > **Learn the engineering process once. Reuse it forever.**
 >
@@ -42,7 +42,7 @@ So I built one.
 
 - **The BDF builders** (`build-kilo-v1.ps1`, `build-opencode-v2.7.ps1`): they read your `providers/` and `profiles/`, validate everything against JSON schemas, back up before they touch anything, merge, and generate the final config - with a dry-run (`-WhatIf`), a doctor (`-Doctor`), and a provenance sidecar so you always know what happened and why.
 
-- **The AI Switcher app**: a GUI on top of that same engine. The wizard discovers your agents, scans their
+- **The Switcher app**: a GUI on top of that same engine. The wizard discovers your agents, scans their
   configs, and generates their builders. One dashboard shows your agents, providers, models, plugins, and MCP
   servers. The Add-provider form carries presets - my local proxies (OmniRoute, LiteLLM), TokenRouter,
   OpenAI, Google Gemini, OpenRouter, NVIDIA NIM - that auto-fill the URL, the SDK, the name, and the
@@ -73,7 +73,7 @@ You're welcome. 😂
 
 Three ways to get it, depending on what you want:
 
-### 1. Everything - the BDF framework + the AI Switcher app
+### 1. Everything - the BDF framework + the Switcher app
 
 ```powershell
 git clone https://github.com/lovkumarLED/Builder-Development-Framework-BDF.git
@@ -108,7 +108,7 @@ git sparse-checkout set bdf
 1. Install **Python** on Windows (tick *"Add python.exe to PATH"*).
 2. Double-click **`app\install.bat`** once. It creates the app's own
    Python environment (`env\`), installs its packages (one-time, needs
-   internet), and puts an **"AI Switcher"** shortcut on your desktop.
+   internet), and puts an **"Switcher"** shortcut on your desktop.
 3. From now on, double-click the desktop shortcut (or `app\start.bat`) - your
    browser opens **`http://127.0.0.1:9090`**. Follow the wizard.
 4. Close the window = the app stops. It is not a background service.
@@ -255,7 +255,7 @@ backup retention → provenance sidecar → merge-diff summary
 
 ---
 
-## 🤖 How the AI Switcher app works
+## 🤖 How the Switcher app works
 ### See it in action
 
 The whole flow, from first launch to build - all local, nothing leaves 127.0.0.1:
@@ -498,7 +498,7 @@ toasts, and the ember particles in the background.
 
 | File | Purpose |
 |------|---------|
-| `app/assets/bdf-counterphase-logo.svg` | the AI Switcher brand logo (app favicon + README header) |
+| `app/assets/bdf-counterphase-logo.svg` | the Switcher brand logo (app favicon + README header) |
 
 To add images: put them in `app/assets/` and reference them with relative
 paths (`src="assets/my-image.png"`) — the server serves `/assets` statically.
@@ -524,7 +524,7 @@ automatically (SHA256 hash marker detects the change).
 
 ```
 docs/
-├── app/                    ← the AI Switcher app (self-contained)
+├── app/                    ← the Switcher app (self-contained)
 │   ├── app/                ← Python package (see module table above)
 │   ├── tests/              ← 48 unit tests (unittest, stdlib-only)
 │   ├── assets/             ← logo + favicon
@@ -599,7 +599,7 @@ same-architecture open-source coding agent. Phase 13 (BDF V3) is in progress.
 | Phase 11 — Claude Code Builder V1 | ✅ resolved (dropped) |
 | Phase 12 — KiloCode Builder V1 | ✅ |
 | Phase 13 — BDF V3 Universal Builder Generator | 🔄 in progress |
-| Phase 14 — GUI App (AI Switcher) | ✅ |
+| Phase 14 — GUI App (Switcher) | ✅ |
 | Phase 15 — More Coding Agents | 🔜 planned (untested) |
 
 **Phase 15 note:** OpenCode + KiloCode are verified today. The app and the
@@ -661,4 +661,4 @@ See the [LICENSE](LICENSE) file for the full text.
 
 ### Brand protection
 
-The name **"Builder Development Framework"**, **"BDF"**, **"AI Switcher"**, the logo artwork, and the demo images are **not** part of the MIT grant. You may freely use, modify, and build on the code, but you may not re-publish or sell the project as your own creation, and you may not reuse the name, logo, or brand assets without permission. You are expected to keep the original copyright notice (as the MIT license requires) so the real author is always identifiable.
+The name **"Builder Development Framework"**, **"BDF"**, **"Switcher"**, the logo artwork, and the demo images are **not** part of the MIT grant. You may freely use, modify, and build on the code, but you may not re-publish or sell the project as your own creation, and you may not reuse the name, logo, or brand assets without permission. You are expected to keep the original copyright notice (as the MIT license requires) so the real author is always identifiable.

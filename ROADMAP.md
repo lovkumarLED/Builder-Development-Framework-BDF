@@ -573,7 +573,7 @@ V3 is the first stable public milestone — not the end of development.
 
 ---
 
-## Phase 14 — GUI App: "AI Switcher" for Normal Users ✅
+## Phase 14 — GUI App: "Switcher" for Normal Users ✅
 
 Status
 
@@ -681,7 +681,7 @@ Definition of complete (when tried)
 | Phase 11 — Claude Code Builder V1 | ✅ Resolved (dropped → KiloCode) |
 | Phase 12 — KiloCode Builder V1 | ✅ Completed |
 | Phase 13 — BDF V3 Universal Builder Generator | 🔄 In Progress |
-| Phase 14 — GUI App (AI Switcher) | ✅ Completed |
+| Phase 14 — GUI App (Switcher) | ✅ Completed |
 | Phase 15 — More Coding Agents | 🔜 Planned (untested) |
 
 **13 of 15 phases complete. Phase 13 (BDF V3) remains IN PROGRESS — not yet released; more development is planned before the official V3 release. Phase 15 (More Coding Agents) is planned but untested.**

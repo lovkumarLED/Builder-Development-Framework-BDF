@@ -1,6 +1,6 @@
-# APP FULL CHECK — AI Switcher (docs/app) complete test runbook
+# APP FULL CHECK — Switcher (docs/app) complete test runbook
 
-> Rule: a THOROUGH end-to-end check of the A app (AI Switcher) — every page,
+> Rule: a THOROUGH end-to-end check of the A app (Switcher) — every page,
 > every button, every dialog, every card, every error path, every graph.
 > Two full passes: (1) **FIRST-STARTUP TEST** on a wiped kilo config
 > (pre-seeded models in the Jason), then (2) **NORMAL TEST** on the restored

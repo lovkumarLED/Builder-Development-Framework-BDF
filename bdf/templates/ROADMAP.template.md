@@ -402,7 +402,7 @@ BDF V3 is the destination: a builder-generator framework where a generic framewo
 
 ---
 
-## Phase 14 - GUI App: "AI Switcher" for Normal Users
+## Phase 14 - GUI App: "Switcher" for Normal Users
 
 Status
 

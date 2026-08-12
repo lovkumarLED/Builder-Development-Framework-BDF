@@ -1,6 +1,6 @@
 """Startup banner for the app console: BDF ASCII art in the logo's fire colors.
 
-The banner mirrors the brand identity of the AI Switcher UI:
+The banner mirrors the brand identity of the Switcher UI:
 - "BDF" sweeps a coral->plum gradient (matching bdf-counterphase-logo.svg)
 - "AI SWITCHER" uses the coral accent
 - A soft animated shimmer pulses across the tagline (disabled when piped,

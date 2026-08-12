@@ -1,4 +1,4 @@
-"""Paths, constants, and the agent registry for the AI Switcher app."""
+"""Paths, constants, and the agent registry for the Switcher app."""
 
 import os
 from pathlib import Path
@@ -24,7 +24,7 @@ PORT = 9090
 
 AGENT_REGISTRY = [
     {"name": "opencode", "home": ".config\\opencode", "main": ["opencode.json"], "plugkeys": ["plugin"]},
-    {"name": "kilo", "home": ".config\\kilo", "main": ["kilo.json", "kilo.jsonc"], "plugkeys": ["plugin", "skills.urls"]},
+    {"name": "kilo", "home": ".config\\kilo", "main": ["kilo.json"], "plugkeys": ["plugin", "skills.urls"]},
     {"name": "claudecode", "home": ".claude", "main": [".claude.json", "settings.json"], "plugkeys": ["plugins"]},
     {"name": "aider", "home": ".aider", "main": [".aider.conf.json"], "plugkeys": ["plugins"]},
     {"name": "goose", "home": ".config\\goose", "main": ["config.json"], "plugkeys": ["plugins"]},

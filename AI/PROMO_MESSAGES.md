@@ -51,7 +51,7 @@ I built something, and I want to share it.
 
 I'm an intermediate Python developer learning Machine Learning the free way — free models, free APIs, free agents. The problem? Too many API keys, too many providers, and config files that kept growing.
 
-So I built BDF — the Builder Development Framework — plus an "AI Switcher" app on top of it.
+So I built BDF — the Builder Development Framework — plus an "Switcher" app on top of it.
 
 What it does: one system to manage your coding agents (OpenCode, KiloCode and more), providers, models, plugins and MCP servers. The framework generates your agent's config from clean modular files. The app does it all with a click — no JSON, no PowerShell, no terminal.
 
@@ -86,7 +86,7 @@ Recommended subreddits (pick per audience):
 
 ### Full version
 
-**Title:** I built an open-source "AI Switcher" — one dashboard to manage your coding agents, API keys, providers, models, MCPs and plugins. All local, all free.
+**Title:** I built an open-source "Switcher" — one dashboard to manage your coding agents, API keys, providers, models, MCPs and plugins. All local, all free.
 
 **Body:**
 
@@ -95,7 +95,7 @@ Hey everyone. I'm a self-taught dev learning ML on free models, and my setup got
 Two parts, one engine:
 
 - **BDF builders** — generate your coding agent's config (OpenCode, KiloCode and more) from clean modular files: providers, profiles, models, plugins, MCP. Schema-validated, backup-first, provenance stamped, with a dry-run and a doctor mode.
-- **AI Switcher app** — a GUI on top of the same engine. Wizard discovers your agent → scans → generates your builders. One dashboard to add providers (presets for OmniRoute, LiteLLM, TokenRouter, OpenAI, Gemini, OpenRouter, NVIDIA NIM), test connections, switch the active provider, manage models/plugins/MCP, and build with one click.
+- **Switcher app** — a GUI on top of the same engine. Wizard discovers your agent → scans → generates your builders. One dashboard to add providers (presets for OmniRoute, LiteLLM, TokenRouter, OpenAI, Gemini, OpenRouter, NVIDIA NIM), test connections, switch the active provider, manage models/plugins/MCP, and build with one click.
 
 The details that matter to me:
 
@@ -110,7 +110,7 @@ https://github.com/lovkumarLED/Builder-Development-Framework-BDF
 
 ### Short "edit" version (quick post or comment)
 
-I built an open-source AI Switcher — a GUI + builders to manage your coding agents, API keys, providers, models, MCPs and plugins. All local, free, no account. Presets for the big providers, dual-key files that work in any agent, keys never leave your machine. Built it for myself while learning ML on free models. Link below — contributions welcome!
+I built an open-source Switcher — a GUI + builders to manage your coding agents, API keys, providers, models, MCPs and plugins. All local, free, no account. Presets for the big providers, dual-key files that work in any agent, keys never leave your machine. Built it for myself while learning ML on free models. Link below — contributions welcome!
 
 ---
 
@@ -134,7 +134,7 @@ https://github.com/lovkumarLED/Builder-Development-Framework-BDF
 
 ### Variant B — main tweet (one hashtag only)
 
-Built an "AI Switcher" — one dashboard for your coding agents, providers, models, MCPs and plugins. No cloud. No account. Free.
+Built an "Switcher" — one dashboard for your coding agents, providers, models, MCPs and plugins. No cloud. No account. Free.
 Built by me + coding agents, days of debugging, lots of coffee. ☕
 What does YOUR agent config look like? Mine was chaos. #buildinpublic
 

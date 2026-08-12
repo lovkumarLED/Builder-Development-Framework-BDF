@@ -1,4 +1,4 @@
-# AI Switcher
+# Switcher
 
 A local Windows control room for people who already understand coding agents,
 models, and API keys. It lets you **switch between AI servers (providers)**,
@@ -31,7 +31,7 @@ point `BDF_SCRIPTS_DIR` at their own copy of the engine.)
 
 1. Open the `app` folder.
 2. Double-click **`install.bat`** once - it creates the environment, installs
-   the packages, and adds an **"AI Switcher"** shortcut to your desktop.
+   the packages, and adds an **"Switcher"** shortcut to your desktop.
 3. From now on, double-click the desktop shortcut (or `start.bat`).
 4. Your browser opens the app automatically.
 
@@ -217,6 +217,11 @@ To add one:
   away (the app reads the built `.json`).
   We will update the app in the future to generate **both** `opencode.json`
   and `opencode.jsonc` — but not right now.
+- **The app only scans the `.json` main config. It never scans, reads, or
+  modifies any `.jsonc` — ever.** If you add providers or models to your
+  `.jsonc`, the app will not see them and they will not run.
+  > **If you have a model added to your `.jsonc`, remove it and add it
+  > through the app instead. Otherwise, it will not run.**
 
 > When you save a provider, the app **writes it into your agent's own
 > `providers/` folder** (e.g. `providers\omniroute.json`) — the same place your

@@ -156,7 +156,7 @@ def verify_setup(body: VerifyBody):
 
     # generated main JSON: does it exist and carry the providers?
     main_files = list(directory.glob("*.json"))
-    main_files = [f for f in main_files if f.name not in ("package.json", "package-lock.json", "kilo.jsonc")]
+    main_files = [f for f in main_files if f.name not in ("package.json", "package-lock.json")]
     main_json_ok = False
     main_json_path = ""
     if main_files:

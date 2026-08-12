@@ -56,7 +56,7 @@ Full-system health check + security hardening + per-model reasoning
 | Version | Status | Description |
 |----------|--------|-------------|
 | 2.5.2 | Current | Full-system health check + security hardening + per-model reasoning formats + profile switcher. Security fixes: SSRF-via-redirect in /api/test, proxy userinfo-injection path regex, profile-switch path traversal, scaffold agent-name validation, storage.py lock deadlock. Builders preserve per-model reasoning formats. Settings gains a per-model reasoning panel, delete-model button, and active-profile switcher. Model adds overwrite by ID. 79 app unit tests, 75 frontend contract tests, kilo 31/31 + opencode 31/31 harnesses green. |
-| 2.5.1 | Previous | Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. 56 app unit tests, kilo harness 31/31, opencode harness 33/33. |
+| 2.5.1 | Previous | Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. 56 app unit tests, kilo harness 31/31, opencode harness 33/33. |
 | 2.5.0 | Previous | Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.schema.json before builder validation (F1), pre-flight dependency check (F2), -WhatIf dry run (F3), backup retention (F4), provenance sidecar (F5), -Doctor diagnostics (F6), merge diff summary (F7), 9-stage pipeline. P2 dynamic target artifact (profiles/<profile>/target.json) + P1 env-key policy. |
 | 2.4.0 | Previous | Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level <provider>-models.json with highest precedence. |
 | 2.3.0 | Previous | BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets. |
@@ -189,7 +189,7 @@ docs/
 | `docs/AI/` | AI task documents (including build-continuation rule) |
 | `docs/planning/` | Long-term planning and vision (road to V3) |
 | `docs/bdf/` | Reusable Builder Development Framework |
-| `docs/app/` | The self-contained "AI Switcher" GUI app (backend + frontend + launcher) |
+| `docs/app/` | The self-contained "Switcher" GUI app (backend + frontend + launcher) |
 | `docs/app/app/` | The app's Python backend package (modular: config/storage/discovery/providers/engine/testing/proxy/serve) |
 
 ---
@@ -715,7 +715,7 @@ Current framework version:
 
 ## Implemented
 
-- GUI App 'AI Switcher' (docs/app/) COMPLETE - the BDF made autonomous (session 29, 2026-08-08): FastAPI backend + gui.html + start.bat + local /v1 proxy on 127.0.0.1:9090; calls the real scaffold-agent.ps1 engine and the generated builders. BDF-exact data model: the app reads/writes the agent's own providers/, <provider>-models.json, plugins.json, mcp.json and settings.json activeProviders (a LIST - every listed provider merges into the build), all backup-first. MULTI-AGENT management: Agents card registers any agent config folder, switches the managed agent instantly, loads already-set-up folders directly (no wizard forced). Features: models with per-provider reasoning formats (opencode/openai/claude/gemini/none - correct variant JSON per format) in the provider modal + Models card, plugins card, MCP servers card, SDK type selector (15 npm packages, registry-verified), active hero showing every active provider side-by-side, flame startup banner with local addresses, self-contained Python env (env/ auto-bootstrapped), rule.md live theme + agent rulebook. Verified live on opencode and kilo (kilo.json: omniroute 18 models + tokenrouter 1 model, 19 merged); full E2E click-through battery with snapshot backup + hash-verified restore (32/32). Committed 459d407 + b3a0bdb.
+- GUI App 'Switcher' (docs/app/) COMPLETE - the BDF made autonomous (session 29, 2026-08-08): FastAPI backend + gui.html + start.bat + local /v1 proxy on 127.0.0.1:9090; calls the real scaffold-agent.ps1 engine and the generated builders. BDF-exact data model: the app reads/writes the agent's own providers/, <provider>-models.json, plugins.json, mcp.json and settings.json activeProviders (a LIST - every listed provider merges into the build), all backup-first. MULTI-AGENT management: Agents card registers any agent config folder, switches the managed agent instantly, loads already-set-up folders directly (no wizard forced). Features: models with per-provider reasoning formats (opencode/openai/claude/gemini/none - correct variant JSON per format) in the provider modal + Models card, plugins card, MCP servers card, SDK type selector (15 npm packages, registry-verified), active hero showing every active provider side-by-side, flame startup banner with local addresses, self-contained Python env (env/ auto-bootstrapped), rule.md live theme + agent rulebook. Verified live on opencode and kilo (kilo.json: omniroute 18 models + tokenrouter 1 model, 19 merged); full E2E click-through battery with snapshot backup + hash-verified restore (32/32). Committed 459d407 + b3a0bdb.
 - Real-provider fix + presets (session 31, 2026-08-08): the app writes the key in BOTH agent contracts (provider.<id>.apiKey for OpenCode + provider.<id>.options.apiKey for Kilo) — fixes Kilo's TokenRouter 401; the builders mirror the dual key at merge time (builder-only parity); Add-provider presets for TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter, NVIDIA NIM with SDK auto-fill; 56 app unit tests, kilo harness 31/31, opencode harness 33/33.
 - Modular configuration architecture
 - OmniRoute provider integration
@@ -770,7 +770,7 @@ These limitations simplify development and provide a stable foundation for futur
 
 ## Immediate
 
-- Committed: 459d407 (docs batch, sessions 28b-28f) + b3a0bdb (AI Switcher app, session 29) + session 31 commit (real-provider fix + presets + builder parity + docs).
+- Committed: 459d407 (docs batch, sessions 28b-28f) + b3a0bdb (Switcher app, session 29) + session 31 commit (real-provider fix + presets + builder parity + docs).
 - Pending: user acceptance of Kilo chat with TokenRouter (done — works), then commit; future app update to generate BOTH opencode.json and opencode.jsonc (planned, not yet).
 
 ## Roadmap Phases

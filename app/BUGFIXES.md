@@ -105,7 +105,7 @@ Copy this block into Entries when a fix lands:
 - **Symptom:** Launching the app with an already-set-up agent skipped the Welcome screen and went straight to the dashboard.
 - **Root cause:** `main.js` boot() called `showWorkspace()` whenever `status.ready` was true.
 - **Fix:** Boot always shows the Welcome page; status is fetched only for context. Navigation to the dashboard happens exclusively through the wizard ("Open dashboard").
-- **Verified:** Fresh load lands on `http://127.0.0.1:9090/` showing "Welcome to AI Switcher" with the app shell hidden; no auto-navigation to `?view=overview`.
+- **Verified:** Fresh load lands on `http://127.0.0.1:9090/` showing "Welcome to Switcher" with the app shell hidden; no auto-navigation to `?view=overview`.
 
 ### 2026-08-10 — Agent selection allowed multiple choices and Continue with none
 

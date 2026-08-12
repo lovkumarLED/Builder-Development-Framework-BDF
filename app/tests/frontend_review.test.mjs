@@ -58,11 +58,11 @@ test("onboarding page direction is forward or backward", () => {
 test("onboarding screens preserve the approved visible copy and controls", () => {
   const agent = onboardingScreenMarkup("agent");
   assert.match(agent, /Connect your agent/);
-  assert.match(agent, /OpenCode/);
-  assert.match(agent, /KiloCode/);
-  assert.match(agent, /ClaudeCode/);
-  assert.doesNotMatch(agent, /Codex/);
+  assert.match(agent, /Looking for your agents…/);
   assert.match(agent, /Choose a folder manually/);
+  assert.match(agent, /manualAgentPath/);
+  assert.match(agent, /Use this folder/);
+  assert.match(agent, /Continue/);
 
   const review = onboardingScreenMarkup("review");
   assert.match(review, /Review your workspace/);

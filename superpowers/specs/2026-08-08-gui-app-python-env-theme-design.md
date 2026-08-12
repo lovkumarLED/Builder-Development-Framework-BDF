@@ -2,7 +2,7 @@
 
 Date: 2026-08-08
 Status: Approved by user (2026-08-08)
-Applies to: `docs/app/` (AI Switcher app)
+Applies to: `docs/app/` (Switcher app)
 
 ---
 

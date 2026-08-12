@@ -1,4 +1,4 @@
-"""AI Switcher — entry point. Serves the GUI and starts the local server."""
+"""Switcher — entry point. Serves the GUI and starts the local server."""
 
 import threading
 import webbrowser
@@ -23,7 +23,7 @@ from app.proxy import router as proxy_router
 from app.serve import router as serve_router
 from app.testing import router as testing_router
 
-app = FastAPI(title="AI Switcher", version=APP_VERSION)
+app = FastAPI(title="Switcher", version=APP_VERSION)
 
 
 class NoCacheStaticFiles(StaticFiles):

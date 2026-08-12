@@ -1,5 +1,5 @@
 @echo off
-title AI Switcher
+title Switcher
 cd /d "%~dp0"
 
 set "VENV_PY=env\Scripts\python.exe"
@@ -49,7 +49,7 @@ if not "%CUR_HASH%"=="%OLD_HASH%" (
 )
 
 echo.
-echo Starting AI Switcher... your browser will open in a moment.
+echo Starting Switcher... your browser will open in a moment.
 echo Close this window to stop the app.
 echo.
 "%VENV_PY%" server.py

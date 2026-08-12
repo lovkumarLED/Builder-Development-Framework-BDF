@@ -21,7 +21,7 @@ theme:
     font: "Inter Tight, Segoe UI Variable, Segoe UI, sans-serif"
 ---
 
-# AI Switcher — App Rules
+# Switcher — App Rules
 
 > This file has two jobs:
 > 1. The YAML front-matter above is the app's **theme** — the app reads it at
@@ -99,6 +99,9 @@ theme:
 - The builders generate `opencode.json` (OpenCode) / `kilo.json` (Kilo). Never
   create a `.jsonc` next to the built config — it shadows it and the built
   config silently disappears from the agent's model list.
+- HARD RULE: the app scans ONLY the main `.json` config. It NEVER scans,
+  reads, merges, imports, or modifies any `.jsonc` file. Providers/models
+  added to a `.jsonc` will not run — the app only reads `.json`.
 
 ## Rules for AI agents
 

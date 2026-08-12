@@ -101,7 +101,7 @@ function bindShell() {
     root.setAttribute("data-theme", dark ? "dark" : "light");
     try { localStorage.setItem("ai-switcher-theme", dark ? "dark" : "light"); } catch { /* private mode */ }
   });
-  document.querySelector('.sidebar-tool[aria-label="About AI Switcher"]').addEventListener("click", event => openAboutDialog(event.currentTarget));
+  document.querySelector('.sidebar-tool[aria-label="About Switcher"]').addEventListener("click", event => openAboutDialog(event.currentTarget));
   try {
     if (localStorage.getItem("ai-switcher-theme") === "dark") document.documentElement.setAttribute("data-theme", "dark");
   } catch { /* private mode */ }
@@ -128,7 +128,7 @@ async function boot() {
     const status = await api.status();
     store.set({ status });
   } catch (error) {
-    notify("The local backend is not responding. Keep the AI Switcher window open and retry.", "error");
+    notify("The local backend is not responding. Keep the Switcher window open and retry.", "error");
   }
   initStartup(startupView, showWorkspace);
 }

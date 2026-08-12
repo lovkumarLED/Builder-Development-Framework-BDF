@@ -22,7 +22,7 @@ export function openDialog({ title, content, actions = "", wide = false, trigger
   lastTrigger = trigger;
   closeCallback = onClose || null;
   const layer = document.querySelector("#dialogLayer");
-  layer.innerHTML = `<div class="dialog-backdrop"><section class="dialog${wide ? " dialog--wide" : ""}" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><header class="dialog__head"><div><p class="eyebrow">AI Switcher</p><h2 id="dialogTitle"></h2></div><button class="icon-button dialog__close" type="button" data-dialog-close aria-label="Close dialog">×</button></header><div class="dialog__body"></div>${actions ? `<footer class="dialog__actions">${actions}</footer>` : ""}</section></div>`;
+  layer.innerHTML = `<div class="dialog-backdrop"><section class="dialog${wide ? " dialog--wide" : ""}" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><header class="dialog__head"><div><p class="eyebrow">Switcher</p><h2 id="dialogTitle"></h2></div><button class="icon-button dialog__close" type="button" data-dialog-close aria-label="Close dialog">×</button></header><div class="dialog__body"></div>${actions ? `<footer class="dialog__actions">${actions}</footer>` : ""}</section></div>`;
   const dialog = layer.querySelector(".dialog");
   dialog.querySelector("#dialogTitle").textContent = title || "Dialog";
   const body = dialog.querySelector(".dialog__body");
@@ -59,7 +59,7 @@ export function confirmAction({ title, message, confirmLabel = "Continue", dange
 export function toastPresentation(type = "info") {
   if (type === "success") return { title: "Change saved", symbol: "check" };
   if (type === "error") return { title: "Action needed", symbol: "alert" };
-  return { title: "AI Switcher", symbol: "info" };
+  return { title: "Switcher", symbol: "info" };
 }
 
 const toastSymbols = {

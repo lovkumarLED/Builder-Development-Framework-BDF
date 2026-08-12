@@ -383,7 +383,7 @@ Only a new adapter is needed.
 
 ---
 
-# Second Surface: the AI Switcher App
+# Second Surface: the Switcher App
 
 Since session 29 (2026-08-08) this project has TWO surfaces powered by the SAME
 engine (`scripts/scaffold-agent.ps1` + the generated builders):
@@ -391,7 +391,7 @@ engine (`scripts/scaffold-agent.ps1` + the generated builders):
 | Surface | Audience | How it drives the engine |
 |---------|----------|--------------------------|
 | MD framework + AI agents | developers | reads `docs/bdf/*.md`, runs the scaffold/builders |
-| **AI Switcher app** (`docs/app/`) | normal people | calls `scaffold-agent.ps1 -Bootstrap` and `build-<agent>.ps1` from the GUI; writes the agent's own provider/model/plugin files (backup-first) |
+| **Switcher app** (`docs/app/`) | normal people | calls `scaffold-agent.ps1 -Bootstrap` and `build-<agent>.ps1` from the GUI; writes the agent's own provider/model/plugin files (backup-first) |
 
 The app is NOT a separate framework - it is a frontend for this one. Any new
 adapter/agent support the framework gains is available to the app automatically

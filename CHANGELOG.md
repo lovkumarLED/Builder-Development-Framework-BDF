@@ -1,4 +1,4 @@
-﻿# CHANGELOG
+# CHANGELOG
 
 > Chronological history of the OpenCode Configuration Manager.
 
@@ -66,7 +66,7 @@ Current
 
 ## Summary
 
-Full-system health check + security hardening + per-model reasoning formats + profile switcher. The AI Switcher app was tested end-to-end on a temp clone agent (onboarding, overview, providers wizard, activity tracking with 49 real proxy calls, integrations, settings, builders). Security review found and fixed 6 issues: SSRF-via-redirect in /api/test, SSRF userinfo injection in the proxy path, profile-switch path traversal, unvalidated agent name reaching the scaffold script, a storage.py lock deadlock, and a wrong agent-label display. Builders now preserve per-model reasoning formats (the reasoning-format filter accepts levels valid in ANY format, so gemini models keep thinkingConfig inside an opencode provider). The app supports per-model reasoning format on save, model overwrite-by-ID, model deletion, and an active-profile switcher persisted in state.json. 79 app unit tests, 75 frontend contract tests, kilo + opencode harnesses all green.
+Full-system health check + security hardening + per-model reasoning formats + profile switcher. The Switcher app was tested end-to-end on a temp clone agent (onboarding, overview, providers wizard, activity tracking with 49 real proxy calls, integrations, settings, builders). Security review found and fixed 6 issues: SSRF-via-redirect in /api/test, SSRF userinfo injection in the proxy path, profile-switch path traversal, unvalidated agent name reaching the scaffold script, a storage.py lock deadlock, and a wrong agent-label display. Builders now preserve per-model reasoning formats (the reasoning-format filter accepts levels valid in ANY format, so gemini models keep thinkingConfig inside an opencode provider). The app supports per-model reasoning format on save, model overwrite-by-ID, model deletion, and an active-profile switcher persisted in state.json. 79 app unit tests, 75 frontend contract tests, kilo + opencode harnesses all green.
 
 ## Highlights
 
@@ -144,7 +144,7 @@ Previous
 
 ## Summary
 
-Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. Reasoning formats: per-provider reasoning levels (opencode / openai / claude / gemini / none) with correct variant JSON per format (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); interactive builder runs ask the developer, persist the choice backup-first, and filter invalid levels from the generated config. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.
+Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. Reasoning formats: per-provider reasoning levels (opencode / openai / claude / gemini / none) with correct variant JSON per format (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); interactive builder runs ask the developer, persist the choice backup-first, and filter invalid levels from the generated config. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.
 
 ## Highlights
 
