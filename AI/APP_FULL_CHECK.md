@@ -290,6 +290,17 @@ scan kilo + jason and create kilo's folders by itself.
 
 # Phase 11 — NORMAL TEST — Build pipeline
 
+- [ ] 11.0 **Content parity (MANDATORY — catches silent data loss)**: after each
+      build, diff the SOURCE files against the GENERATED JSON:
+  - [ ] Every provider in `providers\` exists in the generated `opencode.json` / `kilo.json`.
+  - [ ] Every model in `profiles\coding\<provider>-models.json` exists in the
+        generated output, with the SAME variant names AND identical variant
+        content (compare `ConvertTo-Json -Compress` per variant, not just names).
+  - [ ] Zero "dropped" warnings in the build output (grep the log for `dropped`).
+  - [ ] Missing/differing items = FAIL → fix the builder, never accept it.
+  - [ ] This phase exists because the 2026-08-12 full check only verified the
+        build RAN and missed that the reasoning-format filter stripped
+        low/medium/xhigh variants from cli-proxy models.
 - [ ] 11.1 Overview `Build my config` → terminal-style output: green done lines, amber warnings, red problems; Run re-enables on failure.
 - [ ] 11.2 Build backs up old config first (`backup\`).
 - [ ] 11.3 Build is idempotent: second build = "No changes detected".

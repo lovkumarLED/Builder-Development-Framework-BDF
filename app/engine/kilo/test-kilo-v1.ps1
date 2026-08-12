@@ -1557,6 +1557,64 @@ function Test-DualKeyOptionsMirrored {
 }
 
 # ------------------------------------------------------------
+# Output parity: every source variant survives the merge
+# ------------------------------------------------------------
+
+function Test-SourceVariantParity {
+
+    # A provider with a non-opencode level set (high/low/medium/xhigh) must
+    # carry EVERY source variant in the generated kilo.json - the build must
+    # never silently drop model data. Guards the any-format filter.
+
+    $Root = New-V25Root
+
+    try {
+
+        Write-Schemas $Root
+        Write-ProfileSettings $Root -Active @("gpt")
+
+        Write-JsonObject $Root "providers\gpt.json" @{
+            id       = "gpt"
+            provider = @{
+                gpt = @{
+                    name            = "GPT"
+                    reasoningFormat = "opencode"
+                    npm             = "@ai-sdk/openai-compatible"
+                }
+            }
+        }
+
+        Write-ProfileProviderModels $Root "default" "gpt" @{
+            "gpt-5.5" = @{
+                name     = "GPT 5.5"
+                variants = @{
+                    high   = @{ reasoningEffort = "high" }
+                    low    = @{ reasoningEffort = "low" }
+                    medium = @{ reasoningEffort = "medium" }
+                    xhigh  = @{ reasoningEffort = "xhigh" }
+                }
+            }
+        }
+
+        $Run = Invoke-Builder $Root -NonInteractive
+
+        Assert-True ($Run.ExitCode -eq 0) "Builder must succeed. Exit: $($Run.ExitCode): $($Run.Output)"
+        Assert-True (-not $Run.Output.Contains("dropped")) "No source variant may be dropped. Output: $($Run.Output)"
+
+        $Variants = (Read-Generated $Root).provider.gpt.models."gpt-5.5".variants
+
+        foreach ($Level in @("high", "low", "medium", "xhigh")) {
+
+            Assert-True ($Variants.PSObject.Properties.Name -contains $Level) "variant '$Level' must survive the merge."
+        }
+    }
+    finally {
+
+        Remove-TestRoot $Root
+    }
+}
+
+# ------------------------------------------------------------
 # Run tests
 # ------------------------------------------------------------
 
@@ -1599,6 +1657,7 @@ Run-Test "Builder spec covers V2.7"             { Test-BuilderSpecCoversV27 }
 Run-Test "Dynamic target artifact"              { Test-DynamicTargetArtifact }
 Run-Test "No literal keys in output"            { Test-NoLiteralKeysInOutput }
 Run-Test "Dual-key options mirror"              { Test-DualKeyOptionsMirrored }
+Run-Test "Output parity: source variants survive" { Test-SourceVariantParity }
 
 $Stopwatch.Stop()
 
