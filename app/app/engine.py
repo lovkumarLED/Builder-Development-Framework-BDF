@@ -78,8 +78,9 @@ def scaffold(body: ScaffoldBody):
             str(directory),
             "-NonInteractive",
             "-Bootstrap",
+            "-AutoBuild",
         ],
-        180,
+        300,
     )
     agentstore.upsert_agent(body.agent, str(directory))
     if code == 0:

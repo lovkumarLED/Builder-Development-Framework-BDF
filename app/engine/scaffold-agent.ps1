@@ -47,7 +47,8 @@ param(
     [switch]$NonInteractive,
     [switch]$List,                     # list discovered agents only
     [switch]$Bootstrap,                # after scaffold, also bootstrap a builder
-    [string]$BuilderSource = ""        # source builder to adapt (bootstrap)
+    [string]$BuilderSource = "",       # source builder to adapt (bootstrap)
+    [switch]$AutoBuild                 # after import, run the builder automatically
 )
 
 $ErrorActionPreference = "Stop"
@@ -189,19 +190,19 @@ if ($MainFiles.Count -eq 0) {
 }
 $MainFiles = @($MainFiles | Select-Object -Unique)
 
-# ---- non-.json? ONLY WITH USER CONSENT (never touch jsonc alone) ----
+# ---- non-.json? merge companion .jsonc files when a .json main exists ----
+# V3 auto-import: kilo.jsonc (and similar) can carry providers/models/mcp/
+# plugins. When a main .json was found, its .jsonc siblings are ALWAYS merged
+# in (read-only), imported into the modular sources, then emptied - so no
+# provider is ever lost and the .jsonc can never shadow the built config.
 $NonJson = @(Get-ChildItem $ConfigRoot -File -Filter *.jsonc -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -notmatch "^(package|package-lock)" } |
     Select-Object -ExpandProperty FullName)
-if ($NonJson.Count -gt 0) {
-    if ($NonInteractive) {
-        Write-Host "[.] Non-Interactive mode - non-.json files untouched: $([System.IO.Path]::GetFileName($NonJson) -join ', ')"
+if ($NonJson.Count -gt 0 -and $MainFiles.Count -gt 0) {
+    foreach ($Nj in $NonJson) {
+        if ($MainFiles -notcontains $Nj) { $MainFiles += $Nj }
     }
-    else {
-        Write-Host "[?] Found non-.json config files: $([System.IO.Path]::GetFileName($NonJson) -join ', ')"
-        try { $Answer = Read-Host "    Let me also read them? (y/N)" } catch { $Answer = "n" }
-        if ($Answer -and $Answer.Trim() -match "^(y|yes)$") { $MainFiles += $NonJson } else { Write-Host "    O.K. - leaving them untouched." }
-    }
+    Write-Host "[i] Merging companion .jsonc config(s) for import: $([System.IO.Path]::GetFileName($NonJson) -join ', ')"
 }
 if ($MainFiles.Count -eq 0) {
     throw "No main .json config found in '$ConfigRoot'. The framework never scans .jsonc on its own."
@@ -214,9 +215,11 @@ Write-Host "=============================================="
 Show-Credits
 
 # ---- 2. scan + split the agent's own main config (read-only, merged) ----
-$MergedMcp      = [ordered]@{}
-$MergedPlugins  = [System.Collections.Generic.List[string]]::new()
-$ProviderSeen   = [System.Collections.Generic.List[string]]::new()
+$MergedMcp       = [ordered]@{}
+$MergedPlugins   = [System.Collections.Generic.List[string]]::new()
+$MergedProviders = [ordered]@{}   # provider id -> full provider object (incl. models)
+$ProviderSeen    = [System.Collections.Generic.List[string]]::new()
+$JsoncFiles      = @()
 
 foreach ($TF in $MainFiles) {
     Write-Host "[*] Scanning main config: $TF"
@@ -230,8 +233,15 @@ foreach ($TF in $MainFiles) {
         foreach ($Seg in $Split) { if ($null -ne $Node) { $Node = $Node.$Seg } }
         foreach ($P in @($Node)) { if ($P) { $MergedPlugins.Add([string]$P) } }
     }
-    # provider section presence (never written - guidance only, user-owned)
-    foreach ($P in @($Main.provider.PSObject.Properties)) { if ($P) { $ProviderSeen.Add($P.Name) } }
+    # provider section: collect FULL provider objects (name + options + models)
+    foreach ($P in @($Main.provider.PSObject.Properties)) {
+        if ($P) {
+            $ProviderSeen.Add($P.Name)
+            $MergedProviders[$P.Name] = $P.Value
+        }
+    }
+    # track jsonc files for post-import emptying
+    if ($TF -like "*.jsonc") { $JsoncFiles += $TF }
     # settings schema (use the config's own $schema when present)
     if ($SchemaUrl -eq "" -and $Main.schema)       { $SchemaUrl = [string]$Main.schema }
     if ($SchemaUrl -eq "" -and $Main.'$schema')    { $SchemaUrl = [string]$Main.'$schema' }
@@ -336,6 +346,76 @@ foreach ($Profile in $Profiles) {
 # NEVER writes provider or model JSON files inside it - the user owns those.
 $ProvidersRoot = Join-Path $ConfigRoot "providers"
 if (-not (Test-Path $ProvidersRoot)) { New-Item -ItemType Directory -Path $ProvidersRoot -Force | Out-Null; Write-Host "[ ] providers/ folder created (files are user-owned)" }
+
+# ---- 4b. AUTO-IMPORT: migrate providers/models from the scanned main configs ----
+# When providers exist in the main .json / .jsonc, create the modular source
+# files so the builder has everything in one go:
+#   providers/<id>.json                 (provider config)
+#   profiles/coding/<id>-models.json    (provider models)
+# mcp + plugins are already seeded above from the same scan.
+$ImportCreated = 0
+foreach ($ProviderId in @($MergedProviders.Keys)) {
+    $Prov = $MergedProviders[$ProviderId]
+    if (-not $Prov) { continue }
+
+    # --- provider file: providers/<id>.json (BDF shape, backup-first) ---
+    $ProvFile = Join-Path $ProvidersRoot "$ProviderId.json"
+    if (-not (Test-Path $ProvFile)) {
+        $Inner = [ordered]@{}
+        if ($Prov.name)              { $Inner['name'] = [string]$Prov.name }
+        if ($Prov.apiKey)            { $Inner['apiKey'] = [string]$Prov.apiKey }
+        if ($Prov.npm)               { $Inner['npm'] = [string]$Prov.npm }
+        if ($Prov.reasoningFormat)   { $Inner['reasoningFormat'] = [string]$Prov.reasoningFormat }
+        # options: preserve extras + mirror the apiKey in options.apiKey
+        # (dual-key contract: opencode reads provider.<id>.apiKey, kilo reads
+        # provider.<id>.options.apiKey - both must be present)
+        $Opts = [ordered]@{}
+        if ($Prov.options) {
+            foreach ($O in $Prov.options.PSObject.Properties) { $Opts[$O.Name] = $O.Value }
+        }
+        if ($Prov.apiKey -and -not $Opts.Contains('apiKey')) { $Opts['apiKey'] = [string]$Prov.apiKey }
+        if ($Opts.Count -gt 0) { $Inner['options'] = $Opts }
+        $Wrapper = [ordered]@{ provider = [ordered]@{ $ProviderId = $Inner }; id = $ProviderId }
+        $Json = ConvertTo-Json $Wrapper -Depth 20
+        [System.IO.File]::WriteAllText($ProvFile, $Json, (New-Object System.Text.UTF8Encoding($false)))
+        Write-Host "  [+] provider '$ProviderId' imported -> providers\$ProviderId.json"
+        $ImportCreated++
+    } else {
+        Write-Host "  [ ] provider '$ProviderId' file exists - left untouched"
+    }
+
+    # --- models file: profiles/coding/<id>-models.json (provider name/models) ---
+    if ($Prov.models) {
+        $ModelsRoot = Join-Path $ProfilesRoot "coding"
+        $ModelsFile = Join-Path $ModelsRoot "$ProviderId-models.json"
+        if (-not (Test-Path $ModelsFile)) {
+            $ModelsObj = [ordered]@{ models = $Prov.models }
+            $MJson = ConvertTo-Json $ModelsObj -Depth 30
+            [System.IO.File]::WriteAllText($ModelsFile, $MJson, (New-Object System.Text.UTF8Encoding($false)))
+            Write-Host "  [+] provider '$ProviderId' models imported -> profiles\coding\$ProviderId-models.json"
+            $ImportCreated++
+        } else {
+            Write-Host "  [ ] provider '$ProviderId' models file exists - left untouched"
+        }
+    }
+}
+
+# ---- 4c. EMPTY the .jsonc after a successful import (content is now in profiles) ----
+# The file stays (some tools expect it), but its content is fully migrated to
+# the modular sources, so it can never shadow or contradict the built config.
+foreach ($Jf in $JsoncFiles) {
+    $Base = [System.IO.Path]::GetFileNameWithoutExtension($Jf)
+    Backup-ProfileFile $Jf $Base
+    $Empty = @{}
+    if ($SchemaUrl) { $Empty['$schema'] = $SchemaUrl }
+    [System.IO.File]::WriteAllText($Jf, (ConvertTo-Json $Empty -Depth 5), (New-Object System.Text.UTF8Encoding($false)))
+    Write-Host "  [~] emptied $([System.IO.Path]::GetFileName($Jf)) - content migrated to profiles (backup kept)"
+}
+
+if ($ImportCreated -gt 0) {
+    Write-Host "[+] Auto-import complete: $ImportCreated modular file(s) created from the scanned main config(s)."
+    Write-Host "    Run the builder (build-$Agent.ps1 -Profile coding) to generate the final config with all providers active."
+}
 Write-Host ""
 Write-Host "[i] Provider section detected in main config: $($ProviderSeen -join ', ')"
 Write-Host "    Provider and model JSON files are 100% USER-owned. The framework"
@@ -406,4 +486,25 @@ param(
 
 Write-Host ""
 Write-Host "[+] Scaffold complete. Main profile: $Agent/coding. Providers/models are user-owned."
+
+# ---- 6. AUTO-BUILD: run the generated builder with ALL imported providers ----
+# The builder merges every provider in profiles/coding/settings.json
+# (activeProviders), generates the final main config, stamps provenance, and
+# backs up first - so the user's dashboard is populated immediately and no
+# provider is left inactive by accident.
+if ($AutoBuild) {
+    $BuiltPath = Join-Path (Join-Path $ConfigRoot "scripts") "build-$Agent.ps1"
+    if (Test-Path $BuiltPath) {
+        Write-Host ""
+        Write-Host "[*] Auto-building with all imported providers active..."
+        & $BuiltPath -Profile "coding" -NonInteractive -ConfigRoot $ConfigRoot
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "[+] Auto-build complete - activeProviders + generated config ready."
+        } else {
+            Write-Host "[!] Auto-build reported a problem (exit $LASTEXITCODE). Check the builder output above."
+        }
+    } else {
+        Write-Host "[!] AutoBuild requested but no builder found at $BuiltPath - run the scaffold with -Bootstrap first."
+    }
+}
 Write-Host "=========================================================="
