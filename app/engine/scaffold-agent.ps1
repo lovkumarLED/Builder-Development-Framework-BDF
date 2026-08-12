@@ -199,6 +199,12 @@ $MainFiles = @($MainFiles | Select-Object -Unique)
 # The framework scans ONLY the main .json file(s) above. A .jsonc sitting next
 # to them is invisible to the scaffold: it is never read, never imported, and
 # never modified. Providers/models live in .json only.
+$MainFiles = @($MainFiles | Where-Object { $_ -notlike "*.jsonc" })
+$JsoncPresent = @(Get-ChildItem $ConfigRoot -File -Filter *.jsonc -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -notmatch "^(package|package-lock)" })
+if ($JsoncPresent.Count -gt 0) {
+    Write-Host "[i] .jsonc file(s) present but NEVER scanned: $([System.IO.Path]::GetFileName($JsoncPresent) -join ', ')"
+}
 if ($MainFiles.Count -eq 0) {
     throw "No main .json config found in '$ConfigRoot'. .jsonc files are never scanned - add a .json main config."
 }
