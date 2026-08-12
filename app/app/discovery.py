@@ -96,7 +96,7 @@ def scan(body: ScanBody):
     mcps, plugins = [], []
     if main_file:
         try:
-            data = json.loads(main_file.read_text(encoding="utf-8"))
+            data = json.loads(main_file.read_text(encoding="utf-8-sig"))
         except (ValueError, OSError):
             data = {}
         if isinstance(data, dict):

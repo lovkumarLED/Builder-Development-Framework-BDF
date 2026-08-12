@@ -10,7 +10,7 @@ _lock = threading.Lock()
 
 def _read(path, default):
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
         return data if isinstance(data, dict) else default
     except (OSError, ValueError):
         return default
