@@ -138,7 +138,8 @@ def _blast_animation(art_top, art_bottom, art_right):
     The burst radiates outward from the art's center (like the welcome-page
     logo click), but every particle is clamped to the empty space AROUND the
     art rectangle so the banner text is never touched or erased. All written
-    cells are cleared afterwards and the cursor is parked back below the art.
+    cells are cleared afterwards. The cursor position is saved before the
+    burst and restored after it, so log output keeps flowing where it was.
     Best-effort, never throws.
     """
     try:
@@ -151,7 +152,7 @@ def _blast_animation(art_top, art_bottom, art_right):
     center_col = max(2, art_right // 2)
     written = set()
     try:
-        sys.stdout.write("\x1b[?25l")
+        sys.stdout.write("\x1b7\x1b[?25l")  # save cursor, hide it
         for step in range(10):
             radius = 4 + step * 1.6
             cells = []
@@ -183,11 +184,70 @@ def _blast_animation(art_top, art_bottom, art_right):
         try:
             for row, col in written:
                 sys.stdout.write(f"\x1b[{row};{col}H ")
-            sys.stdout.write(f"\x1b[{art_bottom + 1};1H")
-            sys.stdout.write("\x1b[?25h")
+            sys.stdout.write("\x1b[?25h\x1b8")  # show cursor, restore position
             sys.stdout.flush()
         except Exception:
             pass
+
+
+def _listen_for_banner_clicks(art_top, art_bottom, art_right):
+    """Windows console: clicking anywhere on the banner replays the blast.
+
+    Enables mouse input on the console and watches for left-button presses
+    inside the banner area. Each click fires the burst + boom sound again,
+    exactly like clicking the logo on the welcome page. Ctrl+C and typing
+    keep working (processed input stays enabled, other records are ignored).
+    Best-effort, never throws.
+    """
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        from ctypes import wintypes
+        kernel32 = ctypes.windll.kernel32
+        in_handle = kernel32.GetStdHandle(-10)  # STD_INPUT_HANDLE
+
+        class MOUSE_EVENT_RECORD(ctypes.Structure):
+            _fields_ = [
+                ("dwMousePosition", wintypes.COORD),
+                ("dwButtonState", wintypes.DWORD),
+                ("dwControlKeyState", wintypes.DWORD),
+                ("dwEventFlags", wintypes.DWORD),
+            ]
+
+        class INPUT_RECORD(ctypes.Structure):
+            _fields_ = [
+                ("EventType", wintypes.WORD),
+                ("_padding", wintypes.WORD),
+                ("MouseEvent", MOUSE_EVENT_RECORD),
+            ]
+
+        mode = wintypes.DWORD()
+        kernel32.GetConsoleMode(in_handle, ctypes.byref(mode))
+        kernel32.SetConsoleMode(in_handle, mode.value | 0x0080 | 0x0010)  # EXTENDED_FLAGS | MOUSE_INPUT
+
+        last_blast = 0.0
+        while True:
+            rec = INPUT_RECORD()
+            count = wintypes.DWORD()
+            if not kernel32.ReadConsoleInputW(in_handle, ctypes.byref(rec), 1, ctypes.byref(count)):
+                time.sleep(0.05)
+                continue
+            if rec.EventType != 0x0002:  # MOUSE_EVENT
+                continue
+            mouse = rec.MouseEvent
+            if mouse.dwEventFlags != 0 or not (mouse.dwButtonState & 0x0001):
+                continue  # only plain left-button presses
+            x, y = mouse.dwMousePosition.X, mouse.dwMousePosition.Y
+            if art_top - 1 <= y <= art_bottom + 1 and 1 <= x <= art_right + 6:
+                now = time.monotonic()
+                if now - last_blast < 0.4:
+                    continue
+                last_blast = now
+                threading.Thread(target=_play_blast_sound, daemon=True).start()
+                _blast_animation(art_top, art_bottom, art_right)
+    except Exception:
+        pass
 
 
 def print_banner():
@@ -214,13 +274,15 @@ def print_banner():
 
     print("\n" + "\n".join(lines))
     # Welcome-page-style blast: ripples + particles radiate in the margin
-    # AROUND the art (never over it), with a boom sound.
+    # AROUND the art (never over it), with a boom sound. Clicking the banner
+    # afterwards replays the burst, exactly like the welcome-page logo.
     art_height = len(lines)
     art_top = 2
     art_bottom = art_top + art_height - 1
     art_right = max(len(line) for line in lines)
     threading.Thread(target=_play_blast_sound, daemon=True).start()
     _blast_animation(art_top, art_bottom, art_right)
+    threading.Thread(target=_listen_for_banner_clicks, args=(art_top, art_bottom, art_right), daemon=True).start()
     print()
 
     # Animated: sweep a coral->plum glow across the tagline.

@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import tempfile
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -185,13 +186,30 @@ def _write_json(path, data):
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as handle:
             handle.write(json.dumps(data, indent=2, ensure_ascii=False))
-        os.replace(tmp_name, path)
+        _replace_retry(tmp_name, path)
     except BaseException:
         try:
             os.unlink(tmp_name)
         except OSError:
             pass
         raise
+
+
+def _replace_retry(tmp_name, path, attempts=6):
+    """Rename tmp onto the target with backoff.
+
+    On Windows the destination can be transiently locked while another
+    concurrent writer renames onto it (or the AV scans it), surfacing as
+    PermissionError 13 'Access is denied'. Retry briefly before giving up.
+    """
+    for attempt in range(attempts):
+        try:
+            os.replace(tmp_name, path)
+            return
+        except OSError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(0.02 * (attempt + 1))
 
 
 def _provider_dict(provider_file):
