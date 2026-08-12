@@ -1,4 +1,4 @@
-﻿# TESTING Template
+# TESTING Template
 
 > Template: verification guide. Becomes `TESTING.md`.
 
@@ -35,9 +35,9 @@ It also runs the release manager against a temp copy of the docs and verifies th
 
 Current automated coverage (all harnesses green = done):
 
-- {{TEST_HARNESS}} â€” 17 tests (9 builder + 8 Release Docs).
-- V2.5 harness ({{V25_TEST_HARNESS}}) â€” 13 tests (active-provider selector).
-- V2.7 harness ({{V27_TEST_HARNESS}}) â€” 33 tests (JSON Schema validation + hardening + reasoning formats).
+- {{TEST_HARNESS}} — 17 tests (9 builder + 8 Release Docs).
+- V2.5 harness ({{V25_TEST_HARNESS}}) — 13 tests (active-provider selector).
+- V2.7 harness ({{V27_TEST_HARNESS}}) — 33 tests (JSON Schema validation + hardening + reasoning formats).
 
 Definition of complete: 17/17 + 13/13 + 33/33 PASSED, exit code 0.
 
@@ -139,17 +139,17 @@ Profile Selection
 
 Before testing begins verify:
 
-â–¡ Configuration files exist.
+□ Configuration files exist.
 
-â–¡ Provider configuration exists.
+□ Provider configuration exists.
 
-â–¡ Builder script exists.
+□ Builder script exists.
 
-â–¡ Backup directory exists.
+□ Backup directory exists.
 
-â–¡ {{APP_NAME}} is installed.
+□ {{APP_NAME}} is installed.
 
-â–¡ Required environment variables are configured.
+□ Required environment variables are configured.
 
 Testing should not begin until every item is complete.
 
@@ -885,7 +885,7 @@ The V2.7 group verifies the schema-validation entry gate and the F1-F7 feature s
 
 # Release Docs Test Group (Tests 10-17)
 
-The Release Docs group verifies the release pipeline (registry â†’ release manager â†’ generated documentation).
+The Release Docs group verifies the release pipeline (registry → release manager → generated documentation).
 
 All tests except test 17 run against an isolated temp copy of the docs.
 
@@ -900,7 +900,7 @@ All tests except test 17 run against an isolated temp copy of the docs.
 | 16 | Missing markers abort safely | Removing a marker makes the manager fail with exit non-zero and leaves CHANGELOG untouched |
 | 17 | Real docs consistent (read-only) | Real `release_registry.json`, `CHANGELOG.md`, and `CURRENT_RELEASE.md` are consistent |
 
-Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only â€” it never writes or modifies the real documentation.
+Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only — it never writes or modifies the real documentation.
 
 Run the harness with:
 
@@ -940,19 +940,19 @@ Perform the following steps in order.
 
 A successful test session satisfies all of the following.
 
-âœ“ Project structure is correct.
+✓ Project structure is correct.
 
-âœ“ Configuration files are valid.
+✓ Configuration files are valid.
 
-âœ“ Builder executes successfully.
+✓ Builder executes successfully.
 
-âœ“ Backup is created.
+✓ Backup is created.
 
-âœ“ Generated configuration is valid.
+✓ Generated configuration is valid.
 
-âœ“ Application starts successfully.
+✓ Application starts successfully.
 
-âœ“ Configured models are available.
+✓ Configured models are available.
 
 ---
 
@@ -975,21 +975,21 @@ Any failure should be investigated before continuing development.
 
 Before considering a build complete:
 
-â–¡ Folder structure verified.
+□ Folder structure verified.
 
-â–¡ Configuration validated.
+□ Configuration validated.
 
-â–¡ Builder executed successfully.
+□ Builder executed successfully.
 
-â–¡ Backup created.
+□ Backup created.
 
-â–¡ Generated configuration verified.
+□ Generated configuration verified.
 
-â–¡ Application launched.
+□ Application launched.
 
-â–¡ Models available.
+□ Models available.
 
-â–¡ No unexpected errors observed.
+□ No unexpected errors observed.
 
 ---
 

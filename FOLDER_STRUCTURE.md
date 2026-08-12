@@ -1,4 +1,4 @@
-﻿# Folder Structure
+# Folder Structure
 
 > Directory and file organization of the OpenCode Configuration Manager.
 
@@ -18,7 +18,7 @@ The builder relies on this structure when generating the final configuration.
 
 ```
 .config/
-â””â”€â”€ opencode/
+└── opencode/
 ```
 
 The `opencode` directory is the root of the entire project.
@@ -32,20 +32,20 @@ Everything required by the configuration manager exists inside this directory.
 ```
 opencode/
 
-â”œâ”€â”€ agent/
-â”œâ”€â”€ backup/
-â”œâ”€â”€ docs/
-â”œâ”€â”€ node_modules/
-â”œâ”€â”€ profiles/
-â”œâ”€â”€ providers/
-â”œâ”€â”€ schemas/
-â”œâ”€â”€ scripts/
-â”œâ”€â”€ skills/
-â”œâ”€â”€ .gitignore
-â”œâ”€â”€ opencode.json
-â”œâ”€â”€ opencode.provenance.json
-â”œâ”€â”€ package-lock.json
-â””â”€â”€ package.json
+├── agent/
+├── backup/
+├── docs/
+├── node_modules/
+├── profiles/
+├── providers/
+├── schemas/
+├── scripts/
+├── skills/
+├── .gitignore
+├── opencode.json
+├── opencode.provenance.json
+├── package-lock.json
+└── package.json
 ```
 
 Each directory has a dedicated responsibility.
@@ -235,7 +235,7 @@ Includes the build-continuation rule:
 AI/CONTINUE_PROJECT_BUILD.md
 ```
 
-- **`app/`** â€” the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `install.bat` (one-time installer: env + packages + desktop shortcut), `requirements.txt` (fastapi + uvicorn), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js â€” no CDN), `tests/` (56 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage). **`engine/`** ships the full BDF engine inside the repo (scaffold-agent.ps1 generator, build/test-opencode-v2.7.ps1, kilo/ K1 adapter + harness, schemas/) so a downloaded copy generates working builders for any agent with zero external dependencies. Add-provider presets cover proxies (OmniRoute, LiteLLM, CLI Proxy) AND real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill; the app writes the key in both agent contracts (`apiKey` + `options.apiKey`).
+- **`app/`** — the self-contained "AI Switcher" GUI app: `server.py` (FastAPI backend + local proxy), `app/` (Python package: config, storage, agents, discovery, providers, agentstore, engine, testing, plugins, mcp, proxy, serve, rules, banner), `gui.html` (frontend), `start.bat` (double-click launcher), `install.bat` (one-time installer: env + packages + desktop shortcut), `requirements.txt` (fastapi + uvicorn), `env/` (private venv, auto-created), `assets/` (logo + favicon), `lib/` (local Anime.js — no CDN), `tests/` (56 unit tests), `rule.md` (theme + agent rulebook), `README.md` (plain-language usage). **`engine/`** ships the full BDF engine inside the repo (scaffold-agent.ps1 generator, build/test-opencode-v2.7.ps1, kilo/ K1 adapter + harness, schemas/) so a downloaded copy generates working builders for any agent with zero external dependencies. Add-provider presets cover proxies (OmniRoute, LiteLLM, CLI Proxy) AND real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill; the app writes the key in both agent contracts (`apiKey` + `options.apiKey`).
 
 ## PROJECT_STATE.md
 
@@ -317,7 +317,7 @@ minimal/
 
 The `default` profile is the primary profile of this project (settings, plugins, mcp, per-provider models). It currently exposes `omniroute` via `omniroute-models.json`. No provider files carry literal keys (P1 env-key policy; `{env:VAR}` placeholders only).
 
-`coding/` is a fully developed secondary profile (settings, `<provider>-models.json`, plugins, mcp). `experimental/` and `minimal/` carry `settings.json`, `mcp.json`, and `plugins.json` (three files each); they contribute their provider selection to the build. `target.json` is optional (P2) â€” absent profiles fall back to `opencode.json`.
+`coding/` is a fully developed secondary profile (settings, `<provider>-models.json`, plugins, mcp). `experimental/` and `minimal/` carry `settings.json`, `mcp.json`, and `plugins.json` (three files each); they contribute their provider selection to the build. `target.json` is optional (P2) — absent profiles fall back to `opencode.json`.
 
 ## V3 scaffold profile shape (any agent)
 
@@ -335,14 +335,14 @@ plugins.json
 
 - `coding` is ALWAYS the main profile; its `mcp.json`/`plugins.json` are seeded
   from the agent's own main config (once, if missing).
-- `experimental/` and `minimal/` get EMPTY `mcp.json`/`plugins.json` â€” the
+- `experimental/` and `minimal/` get EMPTY `mcp.json`/`plugins.json` — the
   framework never fills them; the user does.
-- `mcp.json`/`plugins.json` are USER-OWNED after creation â€” the framework never
+- `mcp.json`/`plugins.json` are USER-OWNED after creation — the framework never
   overwrites them on later runs.
 - `settings.json` is the only file the framework writes freely
   (`$schema` + `activeProviders`).
 - The framework creates the `providers/` folder (like the profile folders) but
-  NEVER writes provider or model files inside it â€” those are 100% user-owned.
+  NEVER writes provider or model files inside it — those are 100% user-owned.
 
 ---
 
@@ -388,10 +388,10 @@ The file name follows the pattern `<provider>-models.json` (for example `omnirou
 
 Carries the highest model-source precedence.
 
-Each model entry may carry `variants` â€” named reasoning overlays in the
+Each model entry may carry `variants` — named reasoning overlays in the
 provider's reasoning format (`reasoningEffort` for opencode/openai,
 `thinking.budgetTokens` for claude, `thinkingConfig.thinkingBudget` for
-gemini). See `PROVIDER_DEVELOPMENT_GUIDE.md` Â§ Reasoning formats.
+gemini). See `PROVIDER_DEVELOPMENT_GUIDE.md` § Reasoning formats.
 
 ---
 
@@ -532,13 +532,13 @@ README.md
 
 The seven schema files are the machine-readable definitions behind `JSON_SCHEMAS.md`:
 
-- `schema.json` â€” root shape of the generated `opencode.json` (documentation only; not validated by the builder pipeline).
-- `settings.schema.json` â€” validates `profiles/<profile>/settings.json`.
-- `provider.schema.json` â€” validates `providers/<id>.json`.
-- `models.schema.json` â€” covers both `models.json` and `<provider>-models.json` (profile-level per-provider model files).
-- `plugins.schema.json` â€” validates `profiles/<profile>/plugins.json`.
-- `mcp.schema.json` â€” validates `profiles/<profile>/mcp.json`.
-- `targets.schema.json` â€” validates `profiles/<profile>/target.json` (target artifact, P2).
+- `schema.json` — root shape of the generated `opencode.json` (documentation only; not validated by the builder pipeline).
+- `settings.schema.json` — validates `profiles/<profile>/settings.json`.
+- `provider.schema.json` — validates `providers/<id>.json`.
+- `models.schema.json` — covers both `models.json` and `<provider>-models.json` (profile-level per-provider model files).
+- `plugins.schema.json` — validates `profiles/<profile>/plugins.json`.
+- `mcp.schema.json` — validates `profiles/<profile>/mcp.json`.
+- `targets.schema.json` — validates `profiles/<profile>/target.json` (target artifact, P2).
 
 `README.md` describes the validation flow and the artifact list.
 
@@ -615,7 +615,7 @@ build-opencode.ps1
 ```
 
 The universal scaffold seeds the profile structure for ANY open-source coding
-agent. SYSTEM-RUN ONLY â€” the user never runs it directly.
+agent. SYSTEM-RUN ONLY — the user never runs it directly.
 
 ```
 scaffold-agent.ps1
@@ -635,7 +635,7 @@ The user only ever runs the BUILDERS directly:
 - `build-opencode-v2.7.ps1` (OpenCode)
 - `build-kilo-v1.ps1` (KiloCode, in `~/.config/kilo/scripts/`)
 
-Everything else â€” test harnesses, the release manager, and the scaffolds â€” is
+Everything else — test harnesses, the release manager, and the scaffolds — is
 system/AI-run machinery. The scaffolds run once per agent (to create the profile
 folders and seed `mcp.json`/`plugins.json` from the agent's own main JSON); after
 that the user edits profiles/providers and runs only the builder.
@@ -914,23 +914,23 @@ Not required.
 ```
 profiles/
 
-â†“
+↓
 
 providers/
 
-â†“
+↓
 
 builder
 
-â†“
+↓
 
 backup
 
-â†“
+↓
 
 opencode.json
 
-â†“
+↓
 
 OpenCode
 ```

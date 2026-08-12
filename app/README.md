@@ -1,4 +1,4 @@
-﻿# AI Switcher
+# AI Switcher
 
 A local Windows control room for people who already understand coding agents,
 models, and API keys. It lets you **switch between AI servers (providers)**,
@@ -14,7 +14,7 @@ whichever provider you pick. Switching providers = one click in the app.
 ## What you need
 
 - **Windows** (10 or 11)
-- **Python** �?" install it from <https://www.python.org/downloads/>
+- **Python** — install it from <https://www.python.org/downloads/>
   (during installation, tick **"Add python.exe to PATH"**)
 
 That's it. No other setup, no terminal commands. The app is **self-contained**:
@@ -22,7 +22,7 @@ its full engine (the builder generator, the OpenCode builder + tester, the
 Kilo adapter + tester, and the JSON schemas) ships inside the repo under
 `app\engine\`. Download the repo, run the app, pick your coding agent (OpenCode
 or Kilo), and the app creates the agent's profiles, schemas, builders, testers,
-and scaffolds **by itself** �?" nothing lives outside the repo. (Power users can
+and scaffolds **by itself** — nothing lives outside the repo. (Power users can
 point `BDF_SCRIPTS_DIR` at their own copy of the engine.)
 
 ---
@@ -62,11 +62,11 @@ Python environment in an `env` folder next to the app, then installs the
 packages it needs from `requirements.txt`. That is a one-time thing (needs
 internet).
 
-- The second launch onward is instant â€” no re-installing.
+- The second launch onward is instant — no re-installing.
 - If `requirements.txt` changes (when new features are added), the app
   re-installs automatically the next time you start it.
 - The `env` folder is private to this computer. Copy the app folder to
-  another PC and it simply creates a fresh `env` there on first launch â€”
+  another PC and it simply creates a fresh `env` there on first launch —
   your providers, settings, and rule.md stay untouched.
 - Deleting `env` is safe: it is recreated on the next launch.
 
@@ -140,15 +140,15 @@ custom provider gets its own generated logo (a colored tile with its initials)
 
 The **Agents card** sits at the top of the home screen:
 
-- It shows every agent the app knows about â€” name, config folder, and who's
+- It shows every agent the app knows about — name, config folder, and who's
   **Active** (the one being managed right now).
 - **Add agent**: type a name + the config folder (e.g.
-  `C:\Users\YourName\.config\opencode`) â†’ the app can manage it too. You can
+  `C:\Users\YourName\.config\opencode`) → the app can manage it too. You can
   have kilo AND opencode (and more) registered at once.
-- **Switch to this**: the whole app â€” providers, models, plugins, MCP, build â€”
+- **Switch to this**: the whole app — providers, models, plugins, MCP, build —
   instantly starts managing the chosen agent. Nothing is mixed up between
   agents; each one keeps its own config.
-- âœ• removes an agent from the list (never deletes its files).
+- ✕ removes an agent from the list (never deletes its files).
 
 After the first-time wizard, your agent is registered automatically.
 
@@ -175,32 +175,32 @@ To add one:
 
 1. Click **"Add provider"**.
 2. Pick a preset (or Custom). The preset fills in the address **and** the SDK
-   type for you â€” change either one if you like. (For **Modal**, paste your own
-   endpoint URL â€” every Modal account has its own, e.g.
-   `https://you--your-app.us-west.modal.direct/v1` â€” and use your proxy token
-   `wk-â€¦ws-â€¦` as the API key.)
+   type for you — change either one if you like. (For **Modal**, paste your own
+   endpoint URL — every Modal account has its own, e.g.
+   `https://you--your-app.us-west.modal.direct/v1` — and use your proxy token
+   `wk-…ws-…` as the API key.)
 3. Give it a **name** (anything, e.g. "TokenRouter").
 4. Check the address.
-5. Pick the **SDK type** â€” how your server talks. "OpenAI-compatible (most
+5. Pick the **SDK type** — how your server talks. "OpenAI-compatible (most
    servers)" fits OmniRoute, LiteLLM, CLI proxies, TokenRouter, Modal,
    NVIDIA NIM, and almost any local gateway. Choose OpenAI, OpenRouter, Claude
-   (Anthropic), Gemini (Google), DeepSeek, Groq, and others for those APIs â€”
-   or "Otherâ€¦" to type any exact package name.
-6. Paste the **API key** (if it needs one) â€” the little eye ðŸ‘ hides/shows it.
-7. Pick the **Reasoning format** â€” which thinking levels your provider accepts
+   (Anthropic), Gemini (Google), DeepSeek, Groq, and others for those APIs —
+   or "Other…" to type any exact package name.
+6. Paste the **API key** (if it needs one) — the little eye 👁 hides/shows it.
+7. Pick the **Reasoning format** — which thinking levels your provider accepts
    (OpenCode: default/minimal/high/max, OpenAI/ChatGPT: none/low/medium/high/xhigh,
    Claude: low/high/max, Gemini: minimal/low/medium/high, or No reasoning).
-   Presets pick it for you automatically (CLI Proxy / OpenAI â†’ OpenAI, Google â†’ Gemini);
+   Presets pick it for you automatically (CLI Proxy / OpenAI → OpenAI, Google → Gemini);
    change it anytime.
-8. (Optional) Add its **models** â€” each with the thinking levels of the chosen format.
-9. Click **"Test connection"** â€” green âœ“ means it works.
-10. Click **Save** â€” the provider is added but remains inactive. Use the
+8. (Optional) Add its **models** — each with the thinking levels of the chosen format.
+9. Click **"Test connection"** — green ✓ means it works.
+10. Click **Save** — the provider is added but remains inactive. Use the
     separate **Switch provider** action when you intentionally want to route
     traffic through it.
 
-> **Real providers (TokenRouter, Modal, OpenAI, Google, OpenRouter, NVIDIA â€¦)
+> **Real providers (TokenRouter, Modal, OpenAI, Google, OpenRouter, NVIDIA …)
 > work just like proxies**: add one, save, rebuild, and it appears in your
-> agent (Kilo/OpenCode) ready to chat â€” the app writes your key in both
+> agent (Kilo/OpenCode) ready to chat — the app writes your key in both
 > places your agent reads it. Remember to **restart your agent** after a
 > rebuild so it picks up the new config.
 
@@ -209,52 +209,52 @@ To add one:
 ## Rules: what NOT to do
 
 - **Don't hand-edit your agent's main config** (`opencode.json`, `kilo.json`).
-  It's *generated* â€” the app and the builder own it. Change a provider or
+  It's *generated* — the app and the builder own it. Change a provider or
   model in the app and click **Build my config** instead.
 - **Never create `opencode.jsonc` next to `opencode.json`.** OpenCode reads
   the `.jsonc` *instead of* the `.json` when both exist, so your built config
   silently disappears from `/models`. If a `opencode.jsonc` shows up, move it
   away (the app reads the built `.json`).
   We will update the app in the future to generate **both** `opencode.json`
-  and `opencode.jsonc` â€” but not right now.
+  and `opencode.jsonc` — but not right now.
 
 > When you save a provider, the app **writes it into your agent's own
-> `providers/` folder** (e.g. `providers\omniroute.json`) â€” the same place your
+> `providers/` folder** (e.g. `providers\omniroute.json`) — the same place your
 > agent's builder reads from. Your keys are only ever stored in your own
 > provider files. They never leave your computer, and the app never shows them
 > back to you (you can only add a new one, never read the old one).
 >
-> **Your key is written where your agent reads it** â€” the app saves it in
+> **Your key is written where your agent reads it** — the app saves it in
 > **both** places: top-level `apiKey` (what OpenCode reads) **and**
 > `options.apiKey` (what Kilo and other agents read). One save, every agent
 > works.
 >
 > Existing provider files (created by you earlier, or by the app) show up
-> automatically â€” the app never overwrites anything without making a backup
+> automatically — the app never overwrites anything without making a backup
 > first (`backup\` folder in your agent's config).
 >
 > **Models:** add each model name with the thinking levels of its provider's
 > reasoning format (OpenCode: default/minimal/high/max; OpenAI/ChatGPT:
-> none/low/medium/high/xhigh â€” no `max`, GPT-5.x doesn't support it; Claude:
-> low/high/max; Gemini: minimal/low/medium/high) right in the provider screen â€”
+> none/low/medium/high/xhigh — no `max`, GPT-5.x doesn't support it; Claude:
+> low/high/max; Gemini: minimal/low/medium/high) right in the provider screen —
 > the app writes your `profiles\coding\<provider>-models.json` for you with the
 > correct JSON shape per format (`reasoningEffort`, `thinking.budgetTokens`, or
 > `thinkingConfig.thinkingBudget`), exactly like the builder expects. No
 > hand-editing JSON.
 >
-> **Plugins:** the app has a Plugins card on the home screen â€” type a plugin
+> **Plugins:** the app has a Plugins card on the home screen — type a plugin
 > id and click Add; the app writes your `profiles\coding\plugins.json`.
 > Remove is one click (backup kept first).
 >
-> **MCP servers:** an MCP card next to Plugins â€” your agent's MCP servers with
+> **MCP servers:** an MCP card next to Plugins — your agent's MCP servers with
 > their type, each removable in one click. Add a new one with a name + its
-> config (JSON â€” e.g. `{"type": "local", "command": ["npx", "-y", "@example/mcp"]}`),
+> config (JSON — e.g. `{"type": "local", "command": ["npx", "-y", "@example/mcp"]}`),
 > validated before it's written to `profiles\coding\mcp.json` (backup-first).
 >
-> **Models card:** the home screen also has a Models card â€” pick a provider
+> **Models card:** the home screen also has a Models card — pick a provider
 > and its models load as rows (model id, display name, thinking chips for the provider's reasoning format: OpenAI none/low/medium/high/xhigh, Claude low/high/max, Gemini minimal/low/medium/high, OpenCode default/minimal/high/max).
 > Remove a dead model, add a new one (e.g. when a provider swaps models),
-> click **Save models** â€” the app writes
+> click **Save models** — the app writes
 > `profiles\coding\<provider>-models.json` for you, backup-first. No JSON
 > editing ever.
 
@@ -263,11 +263,11 @@ To add one:
 ## Switching providers
 
 On the home screen you see all your providers as cards, and the big glowing
-hero shows **every active provider** â€” all of them ðŸ”¥ Active, side by side.
+hero shows **every active provider** — all of them 🔥 Active, side by side.
 
-- The **first** one in the list is the primary â€” the one your tool talks to
+- The **first** one in the list is the primary — the one your tool talks to
   through `127.0.0.1:9090` (the note under the hero says so).
-- Click **"Switch to this"** on any other card â€” it moves to the front and
+- Click **"Switch to this"** on any other card — it moves to the front and
   becomes the primary; **every active provider is still merged into the build**.
 - **Test** re-checks a provider's connection (green = working, red = not
   reachable, gray = never tested).
@@ -280,10 +280,10 @@ Your AI agent works best with a *built* configuration (profiles + providers
 merged into its main config file).
 
 - **"Generate my builder"** (in the wizard) creates your personal builder
-  scripts â€” exactly like the professional tool would, but done by the app.
+  scripts — exactly like the professional tool would, but done by the app.
 - **"Build my config"** (home screen) runs the build for you. You see a
   terminal-style panel with colored lines while it works.
-  - Green lines = done âœ“
+  - Green lines = done ✓
   - Amber lines = warnings
   - Red lines = problems (the Run button re-enables so you can retry)
 
@@ -300,7 +300,7 @@ talk through this app. Point your tool at:
 http://127.0.0.1:9090/v1
 ```
 
-and it will reach whichever provider is active â€” switching is still one click
+and it will reach whichever provider is active — switching is still one click
 in the app.
 
 ---
@@ -312,20 +312,20 @@ Everything stays inside the `app` folder (or next to your agent):
 | File | What it is |
 |------|------------|
 | `state.json` | which agent is set up, where it lives |
-| `<agent>\providers\` | your providers â€” the app writes them here (backup-first), exactly where your agent's builder reads them |
-| `<agent>\profiles\coding\<provider>-models.json` | your models (with thinking levels) â€” the app writes them when you add models |
-| `<agent>\profiles\coding\plugins.json` | your plugins â€” the app writes them from the Plugins card |
-| `<agent>\profiles\coding\mcp.json` | your MCP servers â€” the app writes them from the MCP card |
-| `<agent>\profiles\coding\settings.json` | which provider is active (`activeProviders`) â€” the app updates it when you switch |
+| `<agent>\providers\` | your providers — the app writes them here (backup-first), exactly where your agent's builder reads them |
+| `<agent>\profiles\coding\<provider>-models.json` | your models (with thinking levels) — the app writes them when you add models |
+| `<agent>\profiles\coding\plugins.json` | your plugins — the app writes them from the Plugins card |
+| `<agent>\profiles\coding\mcp.json` | your MCP servers — the app writes them from the MCP card |
+| `<agent>\profiles\coding\settings.json` | which provider is active (`activeProviders`) — the app updates it when you switch |
 | `<agent>\backup\` | automatic backups of everything the app changes |
 | `profiles\` | your agent's profiles (`coding`, `experimental`, `minimal`) |
 | `<agent>\scripts\build-<agent>.ps1` etc. | your generated builder scripts (created by the app's bundled engine in `app\engine\`) |
-| `env\` | the app's private Python environment (created on first run â€” safe to delete, recreated next launch) |
+| `env\` | the app's private Python environment (created on first run — safe to delete, recreated next launch) |
 | `preferences.json` | app-only local preferences: Activity retention and motion preference; request-content redaction stays on |
 | `activity.jsonl` | bounded local proxy metadata for the Activity page; not agent configuration and not sent anywhere |
 | `rule.md` | the app's look (theme colors) + the rulebook for AI agents |
 
-To move the app, copy the whole folder. Your providers live with your agent â€”
+To move the app, copy the whole folder. Your providers live with your agent —
 copy your agent's config folder too (or re-add your providers in the app).
 
 ---
@@ -336,7 +336,7 @@ Hybrid Studio has a dark cinematic startup and a warm operational workspace.
 The Counterphase symbol is the letter-free product mark: its pointer response
 and click burst are bounded, keyboard reachable, and disabled when reduced
 motion is requested. Operational pages use the same small purposeful motion
-for navigation, cards, and dialogs â€” never perpetual decorative effects.
+for navigation, cards, and dialogs — never perpetual decorative effects.
 
 The app bundles OFL-licensed **Inter Tight** locally in
 `assets\fonts\InterTight-Variable.woff2`; it never fetches fonts, scripts, or
@@ -347,15 +347,15 @@ focus, keyboard dialogs, and a readable forced-colors mode.
 
 The editable theme tokens remain in `rule.md` (next to this README).
 
-- The top part of `rule.md` is the **theme** â€” colors and corner rounding.
+- The top part of `rule.md` is the **theme** — colors and corner rounding.
   Edit a color (e.g. change `accent` to a color you like), save the file, and
   refresh the browser. The app applies it immediately.
-- The bottom part of `rule.md` is the **rulebook** â€” the design and feature
+- The bottom part of `rule.md` is the **rulebook** — the design and feature
   rules the app follows. AI agents working on this app read it before making
   changes, and every change keeps it in sync.
 
 If you mess up `rule.md` (bad color, broken file), the app just keeps its
-built-in look and shows a warning in the black window â€” nothing breaks.
+built-in look and shows a warning in the black window — nothing breaks.
 
 ---
 
@@ -364,16 +364,16 @@ built-in look and shows a warning in the black window â€” nothing breaks.
 | Problem | Fix |
 |---------|-----|
 | Double-clicking `start.bat` does nothing | Python is not installed, or "Add python.exe to PATH" wasn't ticked. Install/reinstall Python. |
-| "The server is running but the browser says it can't connect" | Check the small black window â€” it should say "Application startup complete". If it shows an error (e.g. port already in use), close other apps and retry. |
+| "The server is running but the browser says it can't connect" | Check the small black window — it should say "Application startup complete". If it shows an error (e.g. port already in use), close other apps and retry. |
 | A provider shows red on Test | That server isn't running right now. Start it, or check the address. |
-| Your agent says "401 / no token / missing key" after adding a provider | Rebuild your config, then **restart the agent** â€” it keeps the old config in memory. The app writes your key in both places your agent reads it. |
+| Your agent says "401 / no token / missing key" after adding a provider | Rebuild your config, then **restart the agent** — it keeps the old config in memory. The app writes your key in both places your agent reads it. |
 | "No active provider" when chatting | Add a provider, then click "Switch to this" on it. |
 
 ---
 
 ## Privacy and Activity
 
-- The app runs **only on your computer** (`127.0.0.1`) â€” nothing is sent
+- The app runs **only on your computer** (`127.0.0.1`) — nothing is sent
   anywhere except your own requests to the provider you chose.
 - No account, no phone-home, and no remote telemetry.
 - Keys never appear in the app's own files, logs, or on screen (only inside

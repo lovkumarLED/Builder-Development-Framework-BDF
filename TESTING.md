@@ -1,4 +1,4 @@
-﻿# TESTING
+# TESTING
 
 > Verification guide for the OpenCode Configuration Manager.
 
@@ -159,19 +159,19 @@ Profile Selection
 
 Before testing begins verify:
 
-â–¡ JSON files exist.
+□ JSON files exist.
 
-â–¡ Provider configuration exists.
+□ Provider configuration exists.
 
-â–¡ Builder script exists.
+□ Builder script exists.
 
-â–¡ Backup directory exists.
+□ Backup directory exists.
 
-â–¡ OpenCode is installed.
+□ OpenCode is installed.
 
-â–¡ OmniRoute is running.
+□ OmniRoute is running.
 
-â–¡ Required environment variables are configured.
+□ Required environment variables are configured.
 
 Testing should not begin until every item is complete.
 
@@ -891,7 +891,7 @@ Different outputs indicate a regression or non-deterministic behavior.
 
 # Release Docs Test Group (Tests 10-17)
 
-The Release Docs group verifies the release pipeline (registry â†’ release manager â†’ generated documentation).
+The Release Docs group verifies the release pipeline (registry → release manager → generated documentation).
 
 All tests except test 17 run against an isolated temp copy of the docs.
 
@@ -901,12 +901,12 @@ All tests except test 17 run against an isolated temp copy of the docs.
 | 11 | Release manager generates all outputs | Exit 0, CURRENT_RELEASE.md created, markers intact, every registry version present in CHANGELOG |
 | 12 | Release manager deterministic | Two runs produce identical CHANGELOG and CURRENT_RELEASE.md |
 | 13 | CURRENT_RELEASE matches registry | Quick reference contains the Current entry's builder version, project version, date, and testing summary |
-| 14 | Registry and CHANGELOG consistent | Every registry entry present in CHANGELOG with its summary; legacy entries (2.1.0 â†’ 1.0.0) preserved; exactly one Current in the generated section |
+| 14 | Registry and CHANGELOG consistent | Every registry entry present in CHANGELOG with its summary; legacy entries (2.1.0 → 1.0.0) preserved; exactly one Current in the generated section |
 | 15 | VERSION.md rows updated | Last Updated row matches the Current release date |
 | 16 | Missing markers abort safely | Removing a marker makes the manager fail with exit non-zero and leaves CHANGELOG untouched |
 | 17 | Real docs consistent (read-only) | Real `release_registry.json`, `CHANGELOG.md`, and `CURRENT_RELEASE.md` are consistent |
 
-Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only â€” it never writes or modifies the real documentation.
+Test 17 is the only test in the harness that reads the real docs, and it is strictly read-only — it never writes or modifies the real documentation.
 
 Run the harness with:
 
@@ -996,19 +996,19 @@ Perform the following steps in order.
 
 A successful test session satisfies all of the following.
 
-âœ“ Project structure is correct.
+✓ Project structure is correct.
 
-âœ“ Configuration files are valid.
+✓ Configuration files are valid.
 
-âœ“ Builder executes successfully.
+✓ Builder executes successfully.
 
-âœ“ Backup is created.
+✓ Backup is created.
 
-âœ“ Generated configuration is valid.
+✓ Generated configuration is valid.
 
-âœ“ OpenCode starts successfully.
+✓ OpenCode starts successfully.
 
-âœ“ Configured models are available.
+✓ Configured models are available.
 
 ---
 
@@ -1031,21 +1031,21 @@ Any failure should be investigated before continuing development.
 
 Before considering a build complete:
 
-â–¡ Folder structure verified.
+□ Folder structure verified.
 
-â–¡ Configuration validated.
+□ Configuration validated.
 
-â–¡ Builder executed successfully.
+□ Builder executed successfully.
 
-â–¡ Backup created.
+□ Backup created.
 
-â–¡ Generated configuration verified.
+□ Generated configuration verified.
 
-â–¡ OpenCode launched.
+□ OpenCode launched.
 
-â–¡ Models available.
+□ Models available.
 
-â–¡ No unexpected errors observed.
+□ No unexpected errors observed.
 
 ---
 
