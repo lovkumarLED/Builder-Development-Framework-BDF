@@ -217,11 +217,15 @@ To add one:
   away (the app reads the built `.json`).
   We will update the app in the future to generate **both** `opencode.json`
   and `opencode.jsonc` — but not right now.
-- **The app only scans the `.json` main config. It never scans, reads, or
-  modifies any `.jsonc` — ever.** If you add providers or models to your
-  `.jsonc`, the app will not see them and they will not run.
-  > **If you have a model added to your `.jsonc`, remove it and add it
-  > through the app instead. Otherwise, it will not run.**
+- **The app works with `.json` only — it never scans, reads, or modifies any
+  `.jsonc` — ever.** Providers or models that live in a `.jsonc` are invisible
+  to the app and will not run.
+  > **If you have a provider in your `.jsonc` and you want to use it in the
+  > app: remove the provider (and its API key) from the `.jsonc`, then add it
+  > through the app instead (Providers → Add provider). Do that and the
+  > provider works with the app — because the app can only work with `.json`,
+  > never `.jsonc`.** The same applies to models: remove them from the
+  > `.jsonc` and add them through the app, otherwise they will not run.
 
 > When you save a provider, the app **writes it into your agent's own
 > `providers/` folder** (e.g. `providers\omniroute.json`) — the same place your

@@ -18,6 +18,47 @@ Copy this block into Entries when a fix lands:
 
 ## Entries
 
+### 2026-08-12 — Terminal banner blast painted over the banner and scrambled the console
+
+- **Symptom:** On server start the BDF SWITCHER banner burst ran, but particles
+  landed ON TOP of the banner text (erasing the 5th BDF line and the whole
+  SWITCHER block), the cursor was left mid-screen, and the tagline / addresses /
+  uvicorn INFO logs printed interleaved with leftover particles — "a horror" per
+  the owner.
+- **Root cause:** `banner.py` `_blast_animation` used the art's center as the
+  burst origin with a radius large enough to reach the art rectangle itself, and
+  never restored the cursor after the absolute-position ANSI writes. The clear
+  pass then erased art cells it had overlapped.
+- **Fix:** Particles are now clamped to the empty margin AROUND the art
+  rectangle (row < art_top or row > art_bottom or col > art_right) so the banner
+  is never touched; the cursor is saved (`ESC 7`) before the burst and restored
+  (`ESC 8`) after, so log output keeps flowing from where it was. Verified in a
+  simulated TTY run: 0 of the ANSI writes land inside the art rect, art + tagline
+  intact.
+- **Verified:** Fake-TTY harness asserts BDF + SWITCHER block lines intact,
+  cursor save/restore present, zero writes inside the art rectangle; fresh
+  server start shows a clean banner followed by clean INFO logs.
+
+### 2026-08-12 — Concurrent config writes flaked with PermissionError 13 'Access is denied'
+
+- **Symptom:** The regression test for concurrent `_write_json` calls
+  (`test_concurrent_write_json_no_tmp_collision`) intermittently failed with
+  `PermissionError(13, 'Access is denied')`; rapid double-activate of two
+  providers could 500 on the second request. A follow-up retry attempt itself
+  crashed every run with `NameError: name 'time' is not defined`.
+- **Root cause:** Two layers: (1) `_write_json` originally used a FIXED
+  `.tmp` filename, so two concurrent writers collided on the same temp file
+  (fixed with `tempfile.mkstemp`); (2) even with unique temp files, the final
+  `os.replace(tmp, target)` on Windows races — the destination is transiently
+  locked while the other thread renames onto it (or the AV scans it), surfacing
+  as PermissionError 13. The retry helper I added referenced `time.sleep`
+  without importing `time`.
+- **Fix:** `_replace_retry(tmp_name, path)` retries `os.replace` up to 6 times
+  with 20-120ms backoff before giving up; added `import time` to
+  `app/app/agentstore.py`.
+- **Verified:** Suite run 10 times in a row — 10/10 green (was failing ~3/10
+  before the rename retry, 10/10 failing with the NameError).
+
 ### 2026-08-12 — Builder stripped model reasoning variants from the generated config
 
 - **Symptom:** Built `opencode.json` / `kilo.json` carried fewer model variants than
