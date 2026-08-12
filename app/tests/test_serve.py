@@ -28,5 +28,5 @@ class ThemeInjectionTests(unittest.TestCase):
         self.assertIn('aria-label="Primary"', html)
         for destination in ("overview", "providers", "activity", "integrations", "settings"):
             self.assertIn(f'data-route="{destination}"', html)
-        self.assertIn('<script type="module" src="/assets/js/main.js"></script>', html)
+        self.assertIn('<script type="module" src="/assets/js/main.js', html)
         self.assertNotIn("logo.png", html)

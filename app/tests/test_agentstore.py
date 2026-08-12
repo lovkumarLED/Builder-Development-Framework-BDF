@@ -1,5 +1,6 @@
 import json
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 
@@ -326,3 +327,25 @@ class AgentStoreTests(unittest.TestCase):
         self.assertFalse(agentstore.remove_mcp(self.agent_dir, "context7"))
         self.assertEqual(list(agentstore.read_mcp(self.agent_dir).keys()), ["files"])
         self.assertGreaterEqual(len(list((self.agent_dir / "backup").glob("mcp_*.json"))), 1)
+
+    def test_concurrent_write_json_no_tmp_collision(self):
+        target = self.agent_dir / "settings.json"
+        errors = []
+        barrier = threading.Barrier(2)
+
+        def writer(value):
+            try:
+                barrier.wait(timeout=5)
+                agentstore._write_json(target, {"activeProviders": [value]})
+            except BaseException as error:  # noqa: BLE001 - surfaced below
+                errors.append(error)
+
+        threads = [threading.Thread(target=writer, args=(name,)) for name in ("tokenrouter", "omniroute")]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=10)
+        self.assertEqual(errors, [], f"concurrent writes must not collide: {errors}")
+        self.assertEqual(len(list(self.agent_dir.glob("*.tmp"))), 0, "no tmp files may remain")
+        data = agentstore._read_json(target)
+        self.assertTrue(data["activeProviders"][0] in ("tokenrouter", "omniroute"))

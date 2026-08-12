@@ -1,8 +1,10 @@
 """Agent-config store: reads/writes the agent's BDF provider files and active providers."""
 
 import json
+import os
 import re
 import shutil
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -179,9 +181,17 @@ def _read_json(path, default=None):
 
 
 def _write_json(path, data):
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-    tmp.replace(path)
+    fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(json.dumps(data, indent=2, ensure_ascii=False))
+        os.replace(tmp_name, path)
+    except BaseException:
+        try:
+            os.unlink(tmp_name)
+        except OSError:
+            pass
+        raise
 
 
 def _provider_dict(provider_file):

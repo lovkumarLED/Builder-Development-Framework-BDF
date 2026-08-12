@@ -60,14 +60,15 @@ function openBuildDialog(trigger) {
   const { dialog } = openDialog({ title: "Run builder", trigger, content: `<p>The active agent's real builder will merge source files, back up the existing generated configuration, and show its complete output here.</p><pre id="buildOutput" class="terminal" aria-live="polite">Ready.</pre>`, actions: `<button class="button button--quiet" type="button" data-dialog-close>Close</button><button id="runBuild" class="button button--primary" type="button">Run build</button>`, wide: true });
   dialog.querySelector("#runBuild").addEventListener("click", async event => {
     const output = dialog.querySelector("#buildOutput");
-    event.currentTarget.disabled = true;
+    const button = event.currentTarget;
+    button.disabled = true;
     output.textContent = "Starting builder…";
     try {
       const result = await api.build("coding");
       output.textContent = result.output || (result.ok ? "Build complete." : "Build did not complete.");
       notify(result.ok ? "Build complete." : "Build reported a problem.", result.ok ? "success" : "error");
     } catch (error) { output.textContent = error.message; notify(error.message, "error"); }
-    finally { event.currentTarget.disabled = false; }
+    finally { button.disabled = false; }
   });
 }
 
