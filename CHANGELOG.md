@@ -1,4 +1,4 @@
-# CHANGELOG
+﻿# CHANGELOG
 
 > Chronological history of the OpenCode Configuration Manager.
 
@@ -90,6 +90,7 @@ Full-system health check + security hardening + per-model reasoning formats + pr
 - Reasoning level shapes are regenerated per chosen format (no leftover thinkingConfig on opencode models)
 
 ## Bug Fixes
+- Provider endpoint (base URL) missing on Overview relay cards: UTF-8 BOM in provider files made JSON reads fail (empty baseUrl); all app JSON reads hardened to utf-8-sig, endpoints restored on kilo + opencode tokenrouter double-slash fixed
 
 - SSRF-via-redirect in /api/test (Authorization header could be re-pointed at an attacker host)
 - Proxy URL userinfo injection (base_url + '/models@evil.com' could reach an arbitrary host)
@@ -148,7 +149,7 @@ Real-provider compatibility: the app and the builders now write the API key in b
 ## Highlights
 
 - Dual key placement in app/app/agentstore.py write_provider (top-level apiKey + options.apiKey), options preserved on write
-- Builder merge-stage dual-key normalization (K1 + V2.7 builders) ΓÇö fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)
+- Builder merge-stage dual-key normalization (K1 + V2.7 builders) Î“Ã‡Ã¶ fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)
 - Real-provider presets in the Add-provider form (URL + SDK auto-filled), presets kept in sync in app/app/config.py
 - Kilo harness fixtures updated to per-provider models (the global models.json lookup was removed earlier; the fixtures still used it)
 - Stale exact-name harness copy (test-kilo.ps1) replaced with the real K1 harness (backed up)
@@ -169,7 +170,7 @@ Real-provider compatibility: the app and the builders now write the API key in b
 
 - Kilo 401 "Token not provided": key now lands in options.apiKey for runtime reading
 - OpenCode /models not showing a provider: a stray opencode.jsonc (with disabled_providers) was shadowing the built opencode.json
-- Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change ΓÇö fixtures now use per-provider models
+- Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change Î“Ã‡Ã¶ fixtures now use per-provider models
 - PS 5.1: Add-Member required when creating a missing options object on parsed JSON
 
 ## Breaking Changes
@@ -533,13 +534,13 @@ Documentation architecture: adopted the Builder Development Framework (BDF) upgr
 
 ## Added
 
-- `bdf/BLUEPRINT_ENGINE.md` — the intelligence layer and change pipeline.
-- `bdf/PROJECT_ADAPTER.md` — the project adapter concept.
-- `bdf/BUILDER_EVOLUTION.md` — predictable builder evolution workflow.
-- `bdf/FRAMEWORK_LIFECYCLE.md` — master lifecycle reference.
-- `bdf/AI_WORKFLOW.md` — the master AI agent workflow.
-- `bdf/templates/ADAPTER.template.md` — project adapter template.
-- `ADAPTER.md` — the OpenCode project adapter (first implementation).
+- `bdf/BLUEPRINT_ENGINE.md` â€” the intelligence layer and change pipeline.
+- `bdf/PROJECT_ADAPTER.md` â€” the project adapter concept.
+- `bdf/BUILDER_EVOLUTION.md` â€” predictable builder evolution workflow.
+- `bdf/FRAMEWORK_LIFECYCLE.md` â€” master lifecycle reference.
+- `bdf/AI_WORKFLOW.md` â€” the master AI agent workflow.
+- `bdf/templates/ADAPTER.template.md` â€” project adapter template.
+- `ADAPTER.md` â€” the OpenCode project adapter (first implementation).
 
 ---
 

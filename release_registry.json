@@ -1,311 +1,312 @@
 {
-    "releases":  [
-                     {
-                         "version":  "2.5.2",
-                         "builderVersion":  "V2.7",
-                         "date":  "2026-08-12",
-                         "status":  "Current",
-                         "summary":  "Full-system health check + security hardening + per-model reasoning formats + profile switcher. The AI Switcher app was tested end-to-end on a temp clone agent (onboarding, overview, providers wizard, activity tracking with 49 real proxy calls, integrations, settings, builders). Security review found and fixed 6 issues: SSRF-via-redirect in /api/test, SSRF userinfo injection in the proxy path, profile-switch path traversal, unvalidated agent name reaching the scaffold script, a storage.py lock deadlock, and a wrong agent-label display. Builders now preserve per-model reasoning formats (the reasoning-format filter accepts levels valid in ANY format, so gemini models keep thinkingConfig inside an opencode provider). The app supports per-model reasoning format on save, model overwrite-by-ID, model deletion, and an active-profile switcher persisted in state.json. 79 app unit tests, 75 frontend contract tests, kilo + opencode harnesses all green. The project is now MIT licensed (LICENSE file + README section).",
-                         "highlights":  [
-                                            "Security: /api/test now blocks redirects and non-http(s) schemes; proxy path regex blocks userinfo/percent/space injection; /api/profiles/switch only accepts listed profiles; scaffold validates the agent name before running the PS1; storage.py set_state made atomic under one lock (fixed a deadlock that hung the app)",
-                                            "Builders: Apply-ReasoningFormatFilter now drops only levels invalid in EVERY format, so per-model formats survive the merge (gemini models keep thinkingConfig budgets inside an opencode provider)",
-                                            "App: Settings has a per-model reasoning panel (change format + levels without re-adding the model), Add-models sends per-row reasoning format, model IDs overwrite in place, Delete-model endpoint (POST with body, slash-safe), active-profile switcher (GET/POST /api/profiles)",
-                                            "Profile JSONs confirmed as the single source of truth: providers -\u003e providers/, models -\u003e profiles/\u003cprofile\u003e/\u003cprovider\u003e-models.json, MCP/plugins -\u003e profile JSONs; the agent main JSON is generated output only",
-                                            "Temp clone agent testing verified every page/button with zero console errors; real kilo config untouched and restored byte-identical",
-                                            "Repo cleanup: removed junk folders (AI/image, .tmp_sidebar_video, .playwright-mcp, app/.playwright-cli, app/output, nested docs/superpowers) and 10 stale CONTINUE_* session handoffs; build-kilo.ps1 synced to the v1 builder",
-                                            "MIT License added - the project is officially open source under permissive terms with attribution required"
-                                        ],
-                         "newFeatures":  [
-                                             "Per-model reasoning format editing in Settings (change format + reasoning choices for the selected model, save overwrites in place)",
-                                             "Delete model button in Settings",
-                                             "Active profile switcher (coding/experimental/minimal for kilo; + default for opencode) persisted in state.json"
-                                         ],
-                         "improvements":  [
-                                              "Model adds overwrite by model ID (no more \u0027already configured\u0027 rejection)",
-                                              "Provider page shows the real agent name for custom agents",
-                                              "Reasoning level shapes are regenerated per chosen format (no leftover thinkingConfig on opencode models)"
-                                          ],
-                         "bugFixes":  [
-                                          "SSRF-via-redirect in /api/test (Authorization header could be re-pointed at an attacker host)",
-                                          "Proxy URL userinfo injection (base_url + \u0027/models@evil.com\u0027 could reach an arbitrary host)",
-                                          "Profile switch accepted arbitrary directories (path traversal into any folder on disk)",
-                                          "Scaffold ran the PowerShell script before validating the agent name",
-                                          "storage.py deadlock (double-acquire of a non-reentrant lock) hung every test run",
-                                          "build-kilo.ps1 stale copy did not match build-kilo-v1.ps1"
-                                      ],
-                         "breakingChanges":  "None",
-                         "migrationRequired":  "No",
-                         "testingSummary":  "kilo harness 31/31, opencode harness 31/31, -WhatIf dry-run green, 79 app unit tests, 75 frontend contract tests (1 pre-existing onboarding-discovery fail + 1 gui.html cache-param fail, unrelated)",
-                         "knownIssues":  "The onboarding gate always shows on a fresh page load (no \u0027already set up\u0027 skip). Pre-existing frontend test failures: onboarding agent screen needs live discovery (node-only test), gui.html main.js has cache-busting ?v= params that the test_serve assertion doesn\u0027t expect.",
-                         "docsUpdated":  [
-                                             "README.md",
-                                             "app/README.md",
-                                             "app/rule.md",
-                                             "PROVIDER_DEVELOPMENT_GUIDE.md",
-                                             "CHANGELOG.md",
-                                             "PROJECT_STATE.md",
-                                             "CURRENT_RELEASE.md",
-                                             "release_registry.json",
-                                             "ROADMAP.md",
-                                             "bdf/VERSION.md",
-                                             "_agent/JOURNEY_TO_V3.md",
-                                             "_agent/SESSION_LOG.md",
-                                             "LICENSE"
-                                         ]
-                     },
-                     {
-                         "version":  "2.5.1",
-                         "builderVersion":  "V2.7",
-                         "date":  "2026-08-08",
-                         "status":  "Previous",
-                         "summary":  "Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.\u003cid\u003e.apiKey for OpenCode, provider.\u003cid\u003e.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. Reasoning formats: per-provider reasoning levels (opencode / openai / claude / gemini / none) with correct variant JSON per format (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); interactive builder runs ask the developer, persist the choice backup-first, and filter invalid levels from the generated config. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.",
-                         "highlights":  [
-                                            "Dual key placement in app/app/agentstore.py write_provider (top-level apiKey + options.apiKey), options preserved on write",
-                                            "Builder merge-stage dual-key normalization (K1 + V2.7 builders) ΓÇö fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)",
-                                            "Real-provider presets in the Add-provider form (URL + SDK auto-filled), presets kept in sync in app/app/config.py",
-                                            "Kilo harness fixtures updated to per-provider models (the global models.json lookup was removed earlier; the fixtures still used it)",
-                                            "Stale exact-name harness copy (test-kilo.ps1) replaced with the real K1 harness (backed up)",
-                                            "User rules documented: never hand-edit the generated main config, never create opencode.jsonc next to opencode.json (it shadows the built config); generating both formats planned for a future update"
-                                        ],
-                         "newFeatures":  [
-                                             "Add-provider presets: TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter, NVIDIA NIM (SDK auto-fill on preset pick)",
-                                             "Builder dual-key normalization with a \"Dual-key: options.apiKey mirrored\" build-log line",
-                                             "Reasoning formats per provider (opencode/openai/claude/gemini/none) with per-format variant JSON (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); GET /api/formats; Reasoning format dropdown in provider modal + Models card; interactive builder prompt for developers (persist backup-first + filter invalid levels from output)"
-                                         ],
-                         "improvements":  [
-                                              "OpenCode and Kilo both work from one provider file (no more \"works in OpenCode, 401 in Kilo\")",
-                                              "Builder-only workflow produces identical output to the app workflow"
-                                          ],
-                         "bugFixes":  [
-                                          "Kilo 401 \"Token not provided\": key now lands in options.apiKey for runtime reading",
-                                          "OpenCode /models not showing a provider: a stray opencode.jsonc (with disabled_providers) was shadowing the built opencode.json",
-                                          "Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change ΓÇö fixtures now use per-provider models",
-                                          "PS 5.1: Add-Member required when creating a missing options object on parsed JSON"
-                                      ],
-                         "breakingChanges":  "None",
-                         "migrationRequired":  "No",
-                         "testingSummary":  "17/17 (V2.1) + 13/13 (V2.5) + 33/33 (V2.7) + 31/31 (Kilo K1) tests passed, exit code 0; 56 app unit tests",
-                         "knownIssues":  "None",
-                         "docsUpdated":  [
-                                             "README.md",
-                                             "app/README.md",
-                                             "app/rule.md",
-                                             "PROVIDER_DEVELOPMENT_GUIDE.md",
-                                             "CHANGELOG.md",
-                                             "PROJECT_STATE.md",
-                                             "CURRENT_RELEASE.md",
-                                             "release_registry.json",
-                                             "ROADMAP.md",
-                                             "bdf/VERSION.md",
-                                             "_agent/JOURNEY_TO_V3.md"
-                                         ]
-                     },
-                     {
-                         "version":  "2.5.0",
-                         "builderVersion":  "V2.7",
-                         "date":  "2026-08-06",
-                         "status":  "Previous",
-                         "summary":  "Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.schema.json before builder validation (F1), pre-flight dependency check (F2), -WhatIf dry run (F3), backup retention (F4), provenance sidecar (F5), -Doctor diagnostics (F6), merge diff summary (F7), 9-stage pipeline. P2 dynamic target artifact (profiles/\u003cprofile\u003e/target.json) + P1 env-key policy.",
-                         "highlights":  [
-                                            "F1 JSON Schema validation (seven live schemas under schemas/)",
-                                            "F2 pre-flight dependency check catches missing provider files before any merge",
-                                            "F3 -WhatIf dry run (validate + merge, write nothing)",
-                                            "F4 backup retention via -KeepBackups (default 10), artifact-prefix aware",
-                                            "F5 provenance sidecar opencode.provenance.json",
-                                            "F6 -Doctor read-only diagnostics (exit 0 clean / 1 issues)",
-                                            "F7 merge diff summary vs previous backup",
-                                            "P2 dynamic target artifact: optional profiles/\u003cprofile\u003e/target.json -\u003e {artifact} drives output, backup prefix, provenance, WhatIf; default opencode.json",
-                                            "P1 env-key policy: builder never carries/restores/invents API keys; providers carry {env:VAR} placeholders only",
-                                            "31-test V2.7 harness in addition to 17/17 (V2.1) + 13/13 (V2.5)"
-                                        ],
-                         "newFeatures":  [
-                                             "scripts/build-opencode-v2.7.ps1",
-                                             "scripts/test-opencode-v2.7.ps1 (31 tests)",
-                                             "schemas/schema.json, settings.schema.json, provider.schema.json, models.schema.json, plugins.schema.json, mcp.schema.json, targets.schema.json",
-                                             "-SchemaDir, -WhatIf, -KeepBackups, -Doctor, -ProvenancePath CLI flags",
-                                             "profiles/\u003cprofile\u003e/target.json (P2 dynamic artifact)"
-                                         ],
-                         "improvements":  [
-                                              "Schema validation powers an entry gate before any merge",
-                                              "Backups pruned to the newest N per prefix",
-                                              "Provenance stamping without touching opencode.json",
-                                              "Real-world build reproducibility (identical output + silent diff on rerun)"
-                                          ],
-                         "bugFixes":  [
-                                          "F7 diff summary correctly enumerates IDictionary backup properties (OrderedDictionary)",
-                                          "Doctor no longer faults on missing settings file path",
-                                          "Empty active-provider lists no longer produce a phantom \u0027\u0027 provider reference"
-                                      ],
-                         "breakingChanges":  "None",
-                         "migrationRequired":  "No",
-                         "testingSummary":  "17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7) tests passed, exit code 0",
-                         "knownIssues":  "None",
-                         "docsUpdated":  [
-                                             "BUILDER_SPEC.md",
-                                             "JSON_SCHEMAS.md",
-                                             "TESTING.md",
-                                             "ARCHITECTURE.md",
-                                             "FOLDER_STRUCTURE.md",
-                                             "ADAPTER.md",
-                                             "README.md",
-                                             "bdf/TESTING.md",
-                                             "bdf/VERSION.md",
-                                             "schemas/README.md",
-                                             "release_registry.json"
-                                         ]
-                     },
-                     {
-                         "version":  "2.4.0",
-                         "builderVersion":  "V2.5",
-                         "date":  "2026-08-05",
-                         "status":  "Previous",
-                         "summary":  "Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level \u003cprovider\u003e-models.json with highest precedence.",
-                         "highlights":  [
-                                            "All-provider discovery (providers/*.json)",
-                                            "Interactive active-provider selection persisted to profile settings.json",
-                                            "Profile-level per-provider model files (\u003cprovider\u003e-models.json)",
-                                            "-Provider / -NonInteractive CLI switches",
-                                            "Active providers without a models source are dropped (with a warning) instead of failing the build",
-                                            "13-test V2.5 harness + builder-regeneration guarantee in docs"
-                                        ],
-                         "newFeatures":  [
-                                             "scripts/build-opencode-v2.5.ps1",
-                                             "scripts/test-opencode-v2.5.ps1",
-                                             "profiles/\u003cprofile\u003e/\u003cprovider\u003e-models.json"
-                                         ],
-                         "improvements":  [
-                                              "Model precedence: profile \u003cprovider\u003e-models.json \u003e providers/\u003cp\u003e/models.json \u003e inline \u003e global",
-                                              "settings.json backed up before activeProviders write"
-                                          ],
-                         "bugFixes":  [
-                                          "settings.json no longer rewritten when the active-provider list is unchanged (no-op runs keep the file byte-identical)"
-                                      ],
-                         "breakingChanges":  "None",
-                         "migrationRequired":  "No",
-                         "testingSummary":  "17/17 (V2.1) + 13/13 (V2.5) tests passed, exit code 0",
-                         "knownIssues":  "None",
-                         "docsUpdated":  [
-                                             "BUILDER_SPEC.md",
-                                             "JSON_SCHEMAS.md",
-                                             "FOLDER_STRUCTURE.md",
-                                             "ADAPTER.md",
-                                             "ARCHITECTURE.md",
-                                             "TESTING.md",
-                                             "README.md",
-                                             "PROJECT_STATE.md",
-                                             "CHANGELOG.md",
-                                             "CURRENT_RELEASE.md",
-                                             "bdf/VERSION.md",
-                                             "_agent/JOURNEY_TO_V3.md"
-                                         ]
-                     },
-                     {
-                         "version":  "2.3.0",
-                         "builderVersion":  "V2.3",
-                         "date":  "2026-08-04",
-                         "status":  "Previous",
-                         "summary":  "BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets.",
-                         "highlights":  [
-                                            "Framework generalization (first step to BDF V3)",
-                                            "Single source of truth for adapter fields",
-                                            "Testable adapter validation checklist",
-                                            "Impact Analysis record for the Blueprint Engine",
-                                            "Generic release process documented (RELEASE_MANAGER.md)",
-                                            "Generic test-harness pattern documented (TESTING.md)"
-                                        ],
-                         "newFeatures":  [
-                                             "bdf/NEW_PROJECT_GUIDE.md - the onboarding process for starting a new project with the framework",
-                                             "bdf/RELEASE_MANAGER.md - the generic release process document (registry, generator, generated documents)",
-                                             "bdf/TESTING.md - the generic test-harness pattern document",
-                                             "Adapter field table now lives only in templates/ADAPTER.template.md (single source of truth)",
-                                             "Adapter validation checklist (executable yes/no criteria) in PROJECT_ADAPTER.md",
-                                             "Impact Analysis record required output of the Blueprint Engine Impact Analysis stage"
-                                         ],
-                         "improvements":  [
-                                              "Framework boundaries audited: OpenCode-specific file names removed from bdf/ (Layer 1 no longer depends on Layer 2)",
-                                              "templates/README.md: placeholder audit ({{PLACEHOLDER_NAME}} row added), cross-reference matrix, provider placeholders confirmed generic, template sync rule stated",
-                                              "FRAMEWORK.md and bdf/README.md register the three new framework documents",
-                                              "Reference ADAPTER.md passes the new adapter validation checklist",
-                                              "docs/TESTING.md aligned with bdf/TESTING.md (test groups + definition of complete)"
-                                          ],
-                         "bugFixes":  [
-                                          "Removed OpenCode-specific file names from bdf/MIGRATION.md and bdf/PROJECT_ADAPTER.md examples",
-                                          "Generalized a Layer 2 description in bdf/MIGRATION.md from OpenCode-specific to project-specific"
-                                      ],
-                         "breakingChanges":  "None",
-                         "migrationRequired":  "No",
-                         "testingSummary":  "17/17 tests passed, exit code 0",
-                         "knownIssues":  "None",
-                         "docsUpdated":  [
-                                             "bdf/NEW_PROJECT_GUIDE.md (new)",
-                                             "bdf/RELEASE_MANAGER.md (new)",
-                                             "bdf/TESTING.md (new)",
-                                             "bdf/FRAMEWORK.md",
-                                             "bdf/PROJECT_ADAPTER.md",
-                                             "bdf/AI_WORKFLOW.md",
-                                             "bdf/PROJECT_GENERATOR.md",
-                                             "bdf/BLUEPRINT_ENGINE.md",
-                                             "bdf/MIGRATION.md",
-                                             "bdf/README.md",
-                                             "bdf/VERSION.md",
-                                             "bdf/templates/README.md",
-                                             "bdf/templates/ADAPTER.template.md",
-                                             "ADAPTER.md",
-                                             "PROJECT_STATE.md",
-                                             "ROADMAP.md",
-                                             "TESTING.md",
-                                             "CHANGELOG.md",
-                                             "CURRENT_RELEASE.md",
-                                             "_agent/JOURNEY_TO_V3.md"
-                                         ]
-                     },
-                     {
-                         "version":  "2.2.0",
-                         "builderVersion":  "V2.1",
-                         "date":  "2026-08-04",
-                         "status":  "Previous",
-                         "summary":  "Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing.",
-                         "highlights":  [
-                                            "Provider-specific models",
-                                            "Modular merge pipeline",
-                                            "Extended validation",
-                                            "Pre-write output verification",
-                                            "Automated test harness"
-                                        ],
-                         "newFeatures":  [
-                                             "scripts/test-opencode-v2.ps1 - automated test harness (17 tests: 9 builder + 8 Release Docs)",
-                                             "Provider-specific models: providers/\u003cprovider\u003e/models.json takes precedence over inline provider models and global models.json",
-                                             "-ConfigRoot parameter on the builder for isolated test builds",
-                                             "Output verification stage (JSON round-trip, providers, models, plugins, MCP) before writing"
-                                         ],
-                         "improvements":  [
-                                              "Validation extended: duplicate provider/model/plugin/MCP identifiers, duplicate model names, malformed provider and profile definitions, missing required fields, invalid configuration structure",
-                                              "Duplicate-key detection scans raw JSON text (PowerShell 5.1 ConvertFrom-Json silently drops duplicates)",
-                                              "Merge logic split into independent stages: settings, providers, models, plugins, MCP, final",
-                                              "Concise count-based logging (e.g. Provider \u0027omniroute\u0027: 58 model(s))"
-                                          ],
-                         "bugFixes":  [
-                                          "Fixed $Section: here-string parse errors",
-                                          "Fixed unreliable PSObject.Properties.Count checks (wrapped with @())",
-                                          "Fixed plugin single-element array unrolling in output (return ,$Plugins.plugin)",
-                                          "Removed 2 corrupted backups created during intermediate buggy runs"
-                                      ],
-                         "breakingChanges":  "None",
-                         "migrationRequired":  "No",
-                         "testingSummary":  "17/17 tests passed, exit code 0",
-                         "knownIssues":  "None",
-                         "docsUpdated":  [
-                                             "BUILDER_SPEC.md",
-                                             "CHANGELOG.md",
-                                             "PROJECT_STATE.md",
-                                             "TESTING.md",
-                                             "ROADMAP.md",
-                                             "FOLDER_STRUCTURE.md",
-                                             "ARCHITECTURE.md",
-                                             "ADAPTER.md",
-                                             "README.md",
-                                             "bdf/VERSION.md"
-                                         ]
-                     }
-                 ]
+  "releases": [
+    {
+      "version": "2.5.2",
+      "builderVersion": "V2.7",
+      "date": "2026-08-12",
+      "status": "Current",
+      "summary": "Full-system health check + security hardening + per-model reasoning formats + profile switcher. The AI Switcher app was tested end-to-end on a temp clone agent (onboarding, overview, providers wizard, activity tracking with 49 real proxy calls, integrations, settings, builders). Security review found and fixed 6 issues: SSRF-via-redirect in /api/test, SSRF userinfo injection in the proxy path, profile-switch path traversal, unvalidated agent name reaching the scaffold script, a storage.py lock deadlock, and a wrong agent-label display. Builders now preserve per-model reasoning formats (the reasoning-format filter accepts levels valid in ANY format, so gemini models keep thinkingConfig inside an opencode provider). The app supports per-model reasoning format on save, model overwrite-by-ID, model deletion, and an active-profile switcher persisted in state.json. 79 app unit tests, 75 frontend contract tests, kilo + opencode harnesses all green. The project is now MIT licensed (LICENSE file + README section).",
+      "highlights": [
+        "Security: /api/test now blocks redirects and non-http(s) schemes; proxy path regex blocks userinfo/percent/space injection; /api/profiles/switch only accepts listed profiles; scaffold validates the agent name before running the PS1; storage.py set_state made atomic under one lock (fixed a deadlock that hung the app)",
+        "Builders: Apply-ReasoningFormatFilter now drops only levels invalid in EVERY format, so per-model formats survive the merge (gemini models keep thinkingConfig budgets inside an opencode provider)",
+        "App: Settings has a per-model reasoning panel (change format + levels without re-adding the model), Add-models sends per-row reasoning format, model IDs overwrite in place, Delete-model endpoint (POST with body, slash-safe), active-profile switcher (GET/POST /api/profiles)",
+        "Profile JSONs confirmed as the single source of truth: providers -> providers/, models -> profiles/<profile>/<provider>-models.json, MCP/plugins -> profile JSONs; the agent main JSON is generated output only",
+        "Temp clone agent testing verified every page/button with zero console errors; real kilo config untouched and restored byte-identical",
+        "Repo cleanup: removed junk folders (AI/image, .tmp_sidebar_video, .playwright-mcp, app/.playwright-cli, app/output, nested docs/superpowers) and 10 stale CONTINUE_* session handoffs; build-kilo.ps1 synced to the v1 builder",
+        "MIT License added - the project is officially open source under permissive terms with attribution required"
+      ],
+      "newFeatures": [
+        "Per-model reasoning format editing in Settings (change format + reasoning choices for the selected model, save overwrites in place)",
+        "Delete model button in Settings",
+        "Active profile switcher (coding/experimental/minimal for kilo; + default for opencode) persisted in state.json"
+      ],
+      "improvements": [
+        "Model adds overwrite by model ID (no more 'already configured' rejection)",
+        "Provider page shows the real agent name for custom agents",
+        "Reasoning level shapes are regenerated per chosen format (no leftover thinkingConfig on opencode models)"
+      ],
+      "bugFixes": [
+        "SSRF-via-redirect in /api/test (Authorization header could be re-pointed at an attacker host)",
+        "Proxy URL userinfo injection (base_url + '/models@evil.com' could reach an arbitrary host)",
+        "Profile switch accepted arbitrary directories (path traversal into any folder on disk)",
+        "Scaffold ran the PowerShell script before validating the agent name",
+        "storage.py deadlock (double-acquire of a non-reentrant lock) hung every test run",
+        "build-kilo.ps1 stale copy did not match build-kilo-v1.ps1",
+        "Provider endpoint (base URL) missing on Overview relay cards: UTF-8 BOM in provider files made JSON reads fail (empty baseUrl); all app JSON reads hardened to utf-8-sig, endpoints restored on kilo + opencode tokenrouter double-slash fixed"
+      ],
+      "breakingChanges": "None",
+      "migrationRequired": "No",
+      "testingSummary": "kilo harness 31/31, opencode harness 31/31, -WhatIf dry-run green, 79 app unit tests, 75 frontend contract tests (1 pre-existing onboarding-discovery fail + 1 gui.html cache-param fail, unrelated)",
+      "knownIssues": "The onboarding gate always shows on a fresh page load (no 'already set up' skip). Pre-existing frontend test failures: onboarding agent screen needs live discovery (node-only test), gui.html main.js has cache-busting ?v= params that the test_serve assertion doesn't expect.",
+      "docsUpdated": [
+        "README.md",
+        "app/README.md",
+        "app/rule.md",
+        "PROVIDER_DEVELOPMENT_GUIDE.md",
+        "CHANGELOG.md",
+        "PROJECT_STATE.md",
+        "CURRENT_RELEASE.md",
+        "release_registry.json",
+        "ROADMAP.md",
+        "bdf/VERSION.md",
+        "_agent/JOURNEY_TO_V3.md",
+        "_agent/SESSION_LOG.md",
+        "LICENSE"
+      ]
+    },
+    {
+      "version": "2.5.1",
+      "builderVersion": "V2.7",
+      "date": "2026-08-08",
+      "status": "Previous",
+      "summary": "Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. Reasoning formats: per-provider reasoning levels (opencode / openai / claude / gemini / none) with correct variant JSON per format (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); interactive builder runs ask the developer, persist the choice backup-first, and filter invalid levels from the generated config. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.",
+      "highlights": [
+        "Dual key placement in app/app/agentstore.py write_provider (top-level apiKey + options.apiKey), options preserved on write",
+        "Builder merge-stage dual-key normalization (K1 + V2.7 builders) ΓÇö fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)",
+        "Real-provider presets in the Add-provider form (URL + SDK auto-filled), presets kept in sync in app/app/config.py",
+        "Kilo harness fixtures updated to per-provider models (the global models.json lookup was removed earlier; the fixtures still used it)",
+        "Stale exact-name harness copy (test-kilo.ps1) replaced with the real K1 harness (backed up)",
+        "User rules documented: never hand-edit the generated main config, never create opencode.jsonc next to opencode.json (it shadows the built config); generating both formats planned for a future update"
+      ],
+      "newFeatures": [
+        "Add-provider presets: TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter, NVIDIA NIM (SDK auto-fill on preset pick)",
+        "Builder dual-key normalization with a \"Dual-key: options.apiKey mirrored\" build-log line",
+        "Reasoning formats per provider (opencode/openai/claude/gemini/none) with per-format variant JSON (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); GET /api/formats; Reasoning format dropdown in provider modal + Models card; interactive builder prompt for developers (persist backup-first + filter invalid levels from output)"
+      ],
+      "improvements": [
+        "OpenCode and Kilo both work from one provider file (no more \"works in OpenCode, 401 in Kilo\")",
+        "Builder-only workflow produces identical output to the app workflow"
+      ],
+      "bugFixes": [
+        "Kilo 401 \"Token not provided\": key now lands in options.apiKey for runtime reading",
+        "OpenCode /models not showing a provider: a stray opencode.jsonc (with disabled_providers) was shadowing the built opencode.json",
+        "Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change ΓÇö fixtures now use per-provider models",
+        "PS 5.1: Add-Member required when creating a missing options object on parsed JSON"
+      ],
+      "breakingChanges": "None",
+      "migrationRequired": "No",
+      "testingSummary": "17/17 (V2.1) + 13/13 (V2.5) + 33/33 (V2.7) + 31/31 (Kilo K1) tests passed, exit code 0; 56 app unit tests",
+      "knownIssues": "None",
+      "docsUpdated": [
+        "README.md",
+        "app/README.md",
+        "app/rule.md",
+        "PROVIDER_DEVELOPMENT_GUIDE.md",
+        "CHANGELOG.md",
+        "PROJECT_STATE.md",
+        "CURRENT_RELEASE.md",
+        "release_registry.json",
+        "ROADMAP.md",
+        "bdf/VERSION.md",
+        "_agent/JOURNEY_TO_V3.md"
+      ]
+    },
+    {
+      "version": "2.5.0",
+      "builderVersion": "V2.7",
+      "date": "2026-08-06",
+      "status": "Previous",
+      "summary": "Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.schema.json before builder validation (F1), pre-flight dependency check (F2), -WhatIf dry run (F3), backup retention (F4), provenance sidecar (F5), -Doctor diagnostics (F6), merge diff summary (F7), 9-stage pipeline. P2 dynamic target artifact (profiles/<profile>/target.json) + P1 env-key policy.",
+      "highlights": [
+        "F1 JSON Schema validation (seven live schemas under schemas/)",
+        "F2 pre-flight dependency check catches missing provider files before any merge",
+        "F3 -WhatIf dry run (validate + merge, write nothing)",
+        "F4 backup retention via -KeepBackups (default 10), artifact-prefix aware",
+        "F5 provenance sidecar opencode.provenance.json",
+        "F6 -Doctor read-only diagnostics (exit 0 clean / 1 issues)",
+        "F7 merge diff summary vs previous backup",
+        "P2 dynamic target artifact: optional profiles/<profile>/target.json -> {artifact} drives output, backup prefix, provenance, WhatIf; default opencode.json",
+        "P1 env-key policy: builder never carries/restores/invents API keys; providers carry {env:VAR} placeholders only",
+        "31-test V2.7 harness in addition to 17/17 (V2.1) + 13/13 (V2.5)"
+      ],
+      "newFeatures": [
+        "scripts/build-opencode-v2.7.ps1",
+        "scripts/test-opencode-v2.7.ps1 (31 tests)",
+        "schemas/schema.json, settings.schema.json, provider.schema.json, models.schema.json, plugins.schema.json, mcp.schema.json, targets.schema.json",
+        "-SchemaDir, -WhatIf, -KeepBackups, -Doctor, -ProvenancePath CLI flags",
+        "profiles/<profile>/target.json (P2 dynamic artifact)"
+      ],
+      "improvements": [
+        "Schema validation powers an entry gate before any merge",
+        "Backups pruned to the newest N per prefix",
+        "Provenance stamping without touching opencode.json",
+        "Real-world build reproducibility (identical output + silent diff on rerun)"
+      ],
+      "bugFixes": [
+        "F7 diff summary correctly enumerates IDictionary backup properties (OrderedDictionary)",
+        "Doctor no longer faults on missing settings file path",
+        "Empty active-provider lists no longer produce a phantom '' provider reference"
+      ],
+      "breakingChanges": "None",
+      "migrationRequired": "No",
+      "testingSummary": "17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7) tests passed, exit code 0",
+      "knownIssues": "None",
+      "docsUpdated": [
+        "BUILDER_SPEC.md",
+        "JSON_SCHEMAS.md",
+        "TESTING.md",
+        "ARCHITECTURE.md",
+        "FOLDER_STRUCTURE.md",
+        "ADAPTER.md",
+        "README.md",
+        "bdf/TESTING.md",
+        "bdf/VERSION.md",
+        "schemas/README.md",
+        "release_registry.json"
+      ]
+    },
+    {
+      "version": "2.4.0",
+      "builderVersion": "V2.5",
+      "date": "2026-08-05",
+      "status": "Previous",
+      "summary": "Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level <provider>-models.json with highest precedence.",
+      "highlights": [
+        "All-provider discovery (providers/*.json)",
+        "Interactive active-provider selection persisted to profile settings.json",
+        "Profile-level per-provider model files (<provider>-models.json)",
+        "-Provider / -NonInteractive CLI switches",
+        "Active providers without a models source are dropped (with a warning) instead of failing the build",
+        "13-test V2.5 harness + builder-regeneration guarantee in docs"
+      ],
+      "newFeatures": [
+        "scripts/build-opencode-v2.5.ps1",
+        "scripts/test-opencode-v2.5.ps1",
+        "profiles/<profile>/<provider>-models.json"
+      ],
+      "improvements": [
+        "Model precedence: profile <provider>-models.json > providers/<p>/models.json > inline > global",
+        "settings.json backed up before activeProviders write"
+      ],
+      "bugFixes": [
+        "settings.json no longer rewritten when the active-provider list is unchanged (no-op runs keep the file byte-identical)"
+      ],
+      "breakingChanges": "None",
+      "migrationRequired": "No",
+      "testingSummary": "17/17 (V2.1) + 13/13 (V2.5) tests passed, exit code 0",
+      "knownIssues": "None",
+      "docsUpdated": [
+        "BUILDER_SPEC.md",
+        "JSON_SCHEMAS.md",
+        "FOLDER_STRUCTURE.md",
+        "ADAPTER.md",
+        "ARCHITECTURE.md",
+        "TESTING.md",
+        "README.md",
+        "PROJECT_STATE.md",
+        "CHANGELOG.md",
+        "CURRENT_RELEASE.md",
+        "bdf/VERSION.md",
+        "_agent/JOURNEY_TO_V3.md"
+      ]
+    },
+    {
+      "version": "2.3.0",
+      "builderVersion": "V2.3",
+      "date": "2026-08-04",
+      "status": "Previous",
+      "summary": "BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets.",
+      "highlights": [
+        "Framework generalization (first step to BDF V3)",
+        "Single source of truth for adapter fields",
+        "Testable adapter validation checklist",
+        "Impact Analysis record for the Blueprint Engine",
+        "Generic release process documented (RELEASE_MANAGER.md)",
+        "Generic test-harness pattern documented (TESTING.md)"
+      ],
+      "newFeatures": [
+        "bdf/NEW_PROJECT_GUIDE.md - the onboarding process for starting a new project with the framework",
+        "bdf/RELEASE_MANAGER.md - the generic release process document (registry, generator, generated documents)",
+        "bdf/TESTING.md - the generic test-harness pattern document",
+        "Adapter field table now lives only in templates/ADAPTER.template.md (single source of truth)",
+        "Adapter validation checklist (executable yes/no criteria) in PROJECT_ADAPTER.md",
+        "Impact Analysis record required output of the Blueprint Engine Impact Analysis stage"
+      ],
+      "improvements": [
+        "Framework boundaries audited: OpenCode-specific file names removed from bdf/ (Layer 1 no longer depends on Layer 2)",
+        "templates/README.md: placeholder audit ({{PLACEHOLDER_NAME}} row added), cross-reference matrix, provider placeholders confirmed generic, template sync rule stated",
+        "FRAMEWORK.md and bdf/README.md register the three new framework documents",
+        "Reference ADAPTER.md passes the new adapter validation checklist",
+        "docs/TESTING.md aligned with bdf/TESTING.md (test groups + definition of complete)"
+      ],
+      "bugFixes": [
+        "Removed OpenCode-specific file names from bdf/MIGRATION.md and bdf/PROJECT_ADAPTER.md examples",
+        "Generalized a Layer 2 description in bdf/MIGRATION.md from OpenCode-specific to project-specific"
+      ],
+      "breakingChanges": "None",
+      "migrationRequired": "No",
+      "testingSummary": "17/17 tests passed, exit code 0",
+      "knownIssues": "None",
+      "docsUpdated": [
+        "bdf/NEW_PROJECT_GUIDE.md (new)",
+        "bdf/RELEASE_MANAGER.md (new)",
+        "bdf/TESTING.md (new)",
+        "bdf/FRAMEWORK.md",
+        "bdf/PROJECT_ADAPTER.md",
+        "bdf/AI_WORKFLOW.md",
+        "bdf/PROJECT_GENERATOR.md",
+        "bdf/BLUEPRINT_ENGINE.md",
+        "bdf/MIGRATION.md",
+        "bdf/README.md",
+        "bdf/VERSION.md",
+        "bdf/templates/README.md",
+        "bdf/templates/ADAPTER.template.md",
+        "ADAPTER.md",
+        "PROJECT_STATE.md",
+        "ROADMAP.md",
+        "TESTING.md",
+        "CHANGELOG.md",
+        "CURRENT_RELEASE.md",
+        "_agent/JOURNEY_TO_V3.md"
+      ]
+    },
+    {
+      "version": "2.2.0",
+      "builderVersion": "V2.1",
+      "date": "2026-08-04",
+      "status": "Previous",
+      "summary": "Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing.",
+      "highlights": [
+        "Provider-specific models",
+        "Modular merge pipeline",
+        "Extended validation",
+        "Pre-write output verification",
+        "Automated test harness"
+      ],
+      "newFeatures": [
+        "scripts/test-opencode-v2.ps1 - automated test harness (17 tests: 9 builder + 8 Release Docs)",
+        "Provider-specific models: providers/<provider>/models.json takes precedence over inline provider models and global models.json",
+        "-ConfigRoot parameter on the builder for isolated test builds",
+        "Output verification stage (JSON round-trip, providers, models, plugins, MCP) before writing"
+      ],
+      "improvements": [
+        "Validation extended: duplicate provider/model/plugin/MCP identifiers, duplicate model names, malformed provider and profile definitions, missing required fields, invalid configuration structure",
+        "Duplicate-key detection scans raw JSON text (PowerShell 5.1 ConvertFrom-Json silently drops duplicates)",
+        "Merge logic split into independent stages: settings, providers, models, plugins, MCP, final",
+        "Concise count-based logging (e.g. Provider 'omniroute': 58 model(s))"
+      ],
+      "bugFixes": [
+        "Fixed $Section: here-string parse errors",
+        "Fixed unreliable PSObject.Properties.Count checks (wrapped with @())",
+        "Fixed plugin single-element array unrolling in output (return ,$Plugins.plugin)",
+        "Removed 2 corrupted backups created during intermediate buggy runs"
+      ],
+      "breakingChanges": "None",
+      "migrationRequired": "No",
+      "testingSummary": "17/17 tests passed, exit code 0",
+      "knownIssues": "None",
+      "docsUpdated": [
+        "BUILDER_SPEC.md",
+        "CHANGELOG.md",
+        "PROJECT_STATE.md",
+        "TESTING.md",
+        "ROADMAP.md",
+        "FOLDER_STRUCTURE.md",
+        "ARCHITECTURE.md",
+        "ADAPTER.md",
+        "README.md",
+        "bdf/VERSION.md"
+      ]
+    }
+  ]
 }

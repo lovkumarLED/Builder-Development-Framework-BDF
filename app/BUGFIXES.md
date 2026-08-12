@@ -234,3 +234,14 @@ Copy this block into Entries when a fix lands:
   entry).
 - **Verified:** Interactive builder prompt test — provider file gains
   `reasoningFormat` with backup; harnesses green.
+
+### 2026-08-12 - Provider endpoint (base URL) missing on the Overview relay card
+
+- **Symptom:** In the Overview page's "Your provider relay" block, the OmniRoute card showed no endpoint (and on opencode the TokenRouter card showed a double-slash URL like `https://api.tokenrouter.com//v1`). Kilo was affected; opencode was not - which made the bug look agent-specific.
+- **Root cause (two parts):**
+  1. The real providers/omniroute.json had been emptied during earlier session testing (empty `baseURL` and `apiKey`), so the API returned a blank endpoint.
+  2. Editing the provider file with PowerShell `Set-Content -Encoding UTF8` wrote a UTF-8 BOM (`EF BB BF`) at the start of the file. The app's JSON readers used `encoding="utf-8"`, which rejects a BOM - so the whole file failed to parse and `baseUrl` came back empty. Any provider file touched by a BOM-writing editor would silently lose its endpoint.
+- **Fix:**
+  1. Restored providers/omniroute.json from the backup (real endpoint http://localhost:20128/v1 + key), and fixed opencode's TokenRouter double slash to https://api.tokenrouter.com/v1.
+  2. Hardened every JSON read in the app to be BOM-tolerant: pp/app/agentstore.py `_read_json`, pp/app/discovery.py (main-config scan), and pp/app/storage.py `_read` now use `encoding="utf-8-sig"`, which transparently strips a BOM. Writes remain BOM-less UTF-8.
+- **Verified:** All 5 provider files across both agents parse with correct `baseURL` (BOM-free); the Overview relay card on kilo shows both endpoints (https://api.tokenrouter.com/v1 and http://localhost:20128/v1); opencode's TokenRouter shows the single-slash URL; 79 unit tests pass (1 pre-existing unrelated gui.html cache-param failure).
