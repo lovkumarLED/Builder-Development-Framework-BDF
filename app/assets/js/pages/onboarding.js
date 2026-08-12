@@ -188,9 +188,13 @@ function providerScreenMarkup() {
 }
 
 function readyScreenMarkup() {
-  const providerLine = skippedProvider
-    ? `<p><span class="ready-check is-neutral">${icon("info")}</span>No provider added — add one later from Providers</p>`
-    : `<p><span class="ready-check">${icon("check")}</span>${escapeHtml(providerPresets[selectedProvider].name)} active</p>`;
+  // Only claim a provider is active if the user actually added one in this
+  // onboarding session. A skipped wizard or an already-imported workspace
+  // must never invent "LiteLLM active" (the default preset).
+  const addedProvider = !skippedProvider && selectedKind === "provider-added";
+  const providerLine = addedProvider
+    ? `<p><span class="ready-check">${icon("check")}</span>${escapeHtml(providerPresets[selectedProvider].name)} active</p>`
+    : `<p><span class="ready-check is-neutral">${icon("info")}</span>Your providers stay as configured - manage them from the dashboard</p>`;
   const guide = setupGuide ? setupGuideMarkup(setupGuide) : "";
   return shellMarkup("ready", `<h1 id="startupTitle">You’re ready</h1><p class="onboarding-step-count">04 of 04</p><p class="onboarding-intro">All set! Here's a quick summary.</p><div class="ready-summary"><p><span class="ready-check">${icon("check")}</span>${escapeHtml(chosenAgent?.name || "Agent")} connected</p>${providerLine}<p><span class="ready-check">${icon("check")}</span>Local proxy online</p></div><label class="endpoint-label" for="localEndpoint">Local proxy endpoint</label><div class="endpoint-field"><code id="localEndpoint">127.0.0.1:9090</code><button id="copyEndpoint" type="button" aria-label="Copy local proxy endpoint">${icon("copy")}</button></div>${guide}`, `<p class="ready-privacy">${icon("lock")}<span>Your keys stay on this computer.</span></p><button id="openDashboard" class="onboarding-button onboarding-button--primary" type="button">Open dashboard <span aria-hidden="true">→</span></button>`);
 }
@@ -365,11 +369,13 @@ function bindReviewScreen() {
 
 async function useWorkspace() {
   const button = host.querySelector("#useWorkspace");
+  const freshSetup = !scanResult?.hasBuilder;   // true only for first-time setup
   button.disabled = true;
-  setMessage(scanResult?.hasBuilder ? "Connecting this workspace…" : "Generating the local builder…");
+  setMessage(freshSetup ? "Generating the local builder…" : "Connecting this workspace…");
+  setupGuide = null;                            // never leak a previous guide
   try {
     const agent = chosenAgent?.raw || { name: "opencode", dir: chosenAgent?.path || "" };
-    if (!scanResult?.hasBuilder) {
+    if (freshSetup) {
       const result = await api.scaffold({ agent: agent.name, dir: agent.dir });
       if (!result.ok) throw new Error(result.message || "Builder generation did not complete.");
     }
@@ -379,6 +385,10 @@ async function useWorkspace() {
       if (known) await api.switchAgent(agent.name);
       else await api.addAgent({ name: agent.name, dir: agent.dir });
     } catch { /* registry unreachable — continue without registering */ }
+
+    // The verify + auto-revert + guide are for FIRST-TIME setup only.
+    // Returning users already have a working config - just continue.
+    if (!freshSetup) { render("provider"); return; }
 
     // Post-setup health check: test every provider + confirm the generated
     // main config carries providers, MCPs and plugins.
@@ -499,6 +509,7 @@ async function saveFirstProvider(event) {
   try {
     const created = await api.createProvider({ ...preset, id, name, baseUrl, npm: selectedSdk(), apiKey: key, reasoningFormat: format, models, activate: false });
     await api.switchProvider(created.id);
+    selectedKind = "provider-added";
     render("ready");
   } catch (error) { setMessage(error.message, true); }
 }

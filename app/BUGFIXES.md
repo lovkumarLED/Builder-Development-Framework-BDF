@@ -245,3 +245,17 @@ Copy this block into Entries when a fix lands:
   1. Restored providers/omniroute.json from the backup (real endpoint http://localhost:20128/v1 + key), and fixed opencode's TokenRouter double slash to https://api.tokenrouter.com/v1.
   2. Hardened every JSON read in the app to be BOM-tolerant: pp/app/agentstore.py `_read_json`, pp/app/discovery.py (main-config scan), and pp/app/storage.py `_read` now use `encoding="utf-8-sig"`, which transparently strips a BOM. Writes remain BOM-less UTF-8.
 - **Verified:** All 5 provider files across both agents parse with correct `baseURL` (BOM-free); the Overview relay card on kilo shows both endpoints (https://api.tokenrouter.com/v1 and http://localhost:20128/v1); opencode's TokenRouter shows the single-slash URL; 79 unit tests pass (1 pre-existing unrelated gui.html cache-param failure).
+
+### 2026-08-12 - Returning users got "Checking everything works" + auto-revert errors on every open
+
+- **Symptom:** Opening the Kilo app (already set up) showed "Checking everything works…" and a "Setup was rolled back automatically… fix them" error after pressing "Use this workspace". The app seemed broken for any returning user; OpenCode appeared to work.
+- **Root cause:** useWorkspace ran the post-setup verification (/api/setup/verify) and auto-revert **unconditionally** on every connect - including when the agent already had a builder. Returning users have real providers with real keys; the verify's connection tests (and the import-time empty baseURL/key cases) made it fail and the auto-revert wrongly fired, rolling back kilo.json and blocking entry.
+- **Fix:** useWorkspace now only runs verify + auto-revert + the setup guide when reshSetup is true (i.e. !scanResult?.hasBuilder - the scaffold actually ran). Already-set-up agents connect directly to the provider step with no checks, no revert, no guide.
+- **Verified:** Browser walkthrough as a returning user on real kilo: goes straight to "Add your first provider" - no "Checking everything", no errors. The first-time setup path (verify + revert + guide) is unchanged and still triggers only when a builder is actually generated.
+
+### 2026-08-12 - "LiteLLM is active" shown on the ready screen when nothing was configured
+
+- **Symptom:** After onboarding, the ready screen claimed "LiteLLM is active" even though the user never added a provider (or used a workspace with existing providers).
+- **Root cause:** The ready screen rendered providerPresets[selectedProvider].name with selectedProvider defaulting to "litellm" (the first preset), and skippedProvider was false when the ready screen was reached via the verify-success path - so the line "LiteLLM active" appeared by default.
+- **Fix:** The ready screen now only claims a provider is active when one was actually added in this onboarding session (selectedKind === "provider-added", set in saveFirstProvider). Otherwise it shows "Your providers stay as configured - manage them from the dashboard".
+- **Verified:** Skipping the provider step shows the neutral line, no fake "LiteLLM active"; adding a provider shows the real name.
