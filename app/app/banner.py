@@ -132,37 +132,42 @@ def _play_blast_sound():
         pass
 
 
-def _blast_animation(center_row, center_col):
-    """Expand ripples + particles around the banner center (welcome-page burst).
+def _blast_animation(art_top, art_bottom, art_right):
+    """Expand ripples + particles in the MARGIN around the banner art.
 
-    Uses absolute ANSI positioning; every written cell is tracked and cleared
-    afterwards so the banner stays pristine. Best-effort, never throws.
+    The burst radiates outward from the art's center (like the welcome-page
+    logo click), but every particle is clamped to the empty space AROUND the
+    art rectangle so the banner text is never touched or erased. All written
+    cells are cleared afterwards and the cursor is parked back below the art.
+    Best-effort, never throws.
     """
     try:
         size = shutil.get_terminal_size()
     except Exception:
         return
-    if size.columns < 100 or size.lines < 16:
+    if size.columns < 110 or size.lines < art_bottom + 8:
         return
+    center_row = (art_top + art_bottom) // 2
+    center_col = max(2, art_right // 2)
     written = set()
     try:
         sys.stdout.write("\x1b[?25l")
         for step in range(10):
-            radius = 2 + step * 1.7
+            radius = 4 + step * 1.6
             cells = []
-            for i in range(14):
-                angle = (i / 14) * 2 * math.pi
-                r = radius + random.uniform(-0.7, 0.7)
+            for i in range(16):
+                angle = (i / 16) * 2 * math.pi
+                r = radius + random.uniform(-0.8, 0.8)
                 col = center_col + int(math.cos(angle) * r)
-                row = center_row + int(math.sin(angle) * r * 0.5)
-                if 0 < row < size.lines and 0 < col < size.columns:
+                row = center_row + int(math.sin(angle) * r * 0.45)
+                if (row < art_top or row > art_bottom or col > art_right) and 1 <= row <= size.lines and 1 <= col <= size.columns:
                     cells.append((row, col, PLUM if i % 2 else CORAL))
-            for _ in range(7):
+            for _ in range(6):
                 angle = random.uniform(0, 2 * math.pi)
-                dist = random.uniform(radius, radius + 3.5)
+                dist = random.uniform(radius, radius + 3)
                 col = center_col + int(math.cos(angle) * dist)
-                row = center_row + int(math.sin(angle) * dist * 0.5)
-                if 0 < row < size.lines and 0 < col < size.columns:
+                row = center_row + int(math.sin(angle) * dist * 0.45)
+                if (row < art_top or row > art_bottom or col > art_right) and 1 <= row <= size.lines and 1 <= col <= size.columns:
                     cells.append((row, col, CORAL_HI))
             frame = "".join(
                 f"\x1b[{row};{col}H" + _paint("█", rgb, True)
@@ -177,8 +182,8 @@ def _blast_animation(center_row, center_col):
     finally:
         try:
             for row, col in written:
-                if 0 < row < size.lines and 0 < col < size.columns:
-                    sys.stdout.write(f"\x1b[{row};{col}H ")
+                sys.stdout.write(f"\x1b[{row};{col}H ")
+            sys.stdout.write(f"\x1b[{art_bottom + 1};1H")
             sys.stdout.write("\x1b[?25h")
             sys.stdout.flush()
         except Exception:
@@ -208,12 +213,14 @@ def print_banner():
         return
 
     print("\n" + "\n".join(lines))
-    # Welcome-page-style blast: expanding ripples + particles + boom sound.
-    art_width = max(len(line) for line in lines)
-    center_col = max(2, art_width // 2)
-    center_row = max(2, len(lines) // 2 + 1)
+    # Welcome-page-style blast: ripples + particles radiate in the margin
+    # AROUND the art (never over it), with a boom sound.
+    art_height = len(lines)
+    art_top = 2
+    art_bottom = art_top + art_height - 1
+    art_right = max(len(line) for line in lines)
     threading.Thread(target=_play_blast_sound, daemon=True).start()
-    _blast_animation(center_row, center_col)
+    _blast_animation(art_top, art_bottom, art_right)
     print()
 
     # Animated: sweep a coral->plum glow across the tagline.
