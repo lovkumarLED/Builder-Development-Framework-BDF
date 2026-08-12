@@ -1,14 +1,22 @@
-"""Startup banner for the app console: BDF ASCII art in the logo's fire colors.
+"""Startup banner for the app console: BDF SWITCHER ASCII art in the logo's
+fire colors, with a blast burst + sound on launch.
 
-The banner mirrors the brand identity of the Switcher UI:
 - "BDF" sweeps a coral->plum gradient (matching bdf-counterphase-logo.svg)
-- "AI SWITCHER" uses the coral accent
+- "SWITCHER" uses the coral accent
+- A blast burst (expanding ripples + particles, like the welcome-page logo
+  click) fires around the art when the console is interactive, together with
+  a short "boom" sound (winsound beeps). Disabled when piped, NO_COLOR set,
+  reduced terminal width, or NO_SOUND / NO_ANIMATION set.
 - A soft animated shimmer pulses across the tagline (disabled when piped,
   NO_COLOR set, or reduced terminal width), matching the app's motion design.
 """
 
+import math
 import os
+import random
+import shutil
 import sys
+import threading
 import time
 
 from . import APP_VERSION
@@ -105,11 +113,76 @@ def _static_lines(colorful):
     for i, line in enumerate(bdf):
         lines.append(_paint(line, coral_plum[i], colorful))
     lines.append("")
-    switcher = render_word("AI SWITCHER")
+    switcher = render_word("SWITCHER")
     for i, line in enumerate(switcher):
         shade = _lerp(CORAL_HI, CORAL, i / max(1, len(switcher) - 1))
         lines.append(_paint(line, shade, colorful))
     return lines
+
+
+def _play_blast_sound():
+    """Short 'boom' burst via winsound beeps (best-effort, never throws)."""
+    if os.environ.get("NO_SOUND"):
+        return
+    try:
+        import winsound
+        for freq, ms in ((1500, 40), (1000, 45), (700, 50), (420, 130)):
+            winsound.Beep(freq, ms)
+    except Exception:
+        pass
+
+
+def _blast_animation(center_row, center_col):
+    """Expand ripples + particles around the banner center (welcome-page burst).
+
+    Uses absolute ANSI positioning; every written cell is tracked and cleared
+    afterwards so the banner stays pristine. Best-effort, never throws.
+    """
+    try:
+        size = shutil.get_terminal_size()
+    except Exception:
+        return
+    if size.columns < 100 or size.lines < 16:
+        return
+    written = set()
+    try:
+        sys.stdout.write("\x1b[?25l")
+        for step in range(10):
+            radius = 2 + step * 1.7
+            cells = []
+            for i in range(14):
+                angle = (i / 14) * 2 * math.pi
+                r = radius + random.uniform(-0.7, 0.7)
+                col = center_col + int(math.cos(angle) * r)
+                row = center_row + int(math.sin(angle) * r * 0.5)
+                if 0 < row < size.lines and 0 < col < size.columns:
+                    cells.append((row, col, PLUM if i % 2 else CORAL))
+            for _ in range(7):
+                angle = random.uniform(0, 2 * math.pi)
+                dist = random.uniform(radius, radius + 3.5)
+                col = center_col + int(math.cos(angle) * dist)
+                row = center_row + int(math.sin(angle) * dist * 0.5)
+                if 0 < row < size.lines and 0 < col < size.columns:
+                    cells.append((row, col, CORAL_HI))
+            frame = "".join(
+                f"\x1b[{row};{col}H" + _paint("█", rgb, True)
+                for row, col, rgb in cells
+            )
+            sys.stdout.write(frame)
+            written.update((row, col) for row, col, _ in cells)
+            sys.stdout.flush()
+            time.sleep(0.05)
+    except Exception:
+        pass
+    finally:
+        try:
+            for row, col in written:
+                if 0 < row < size.lines and 0 < col < size.columns:
+                    sys.stdout.write(f"\x1b[{row};{col}H ")
+            sys.stdout.write("\x1b[?25h")
+            sys.stdout.flush()
+        except Exception:
+            pass
 
 
 def print_banner():
@@ -134,10 +207,17 @@ def print_banner():
         print("")
         return
 
-    # Animated: print the art, then sweep a coral->plum glow across the tagline.
-    tail = "\n".join(lines)
+    print("\n" + "\n".join(lines))
+    # Welcome-page-style blast: expanding ripples + particles + boom sound.
+    art_width = max(len(line) for line in lines)
+    center_col = max(2, art_width // 2)
+    center_row = max(2, len(lines) // 2 + 1)
+    threading.Thread(target=_play_blast_sound, daemon=True).start()
+    _blast_animation(center_row, center_col)
+    print()
+
+    # Animated: sweep a coral->plum glow across the tagline.
     width = len(tagline)
-    print("\n" + tail + "\n")
     sys.stdout.write("\x1b[?25l")
     try:
         for offset in range(width + len(SHIMMER)):
