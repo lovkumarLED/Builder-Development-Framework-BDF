@@ -29,11 +29,11 @@ The whole flow, from first launch to build - all local, nothing leaves 127.0.0.1
 | | |
 |---|---|
 | **Onboarding wizard** - welcome, agent discovery, review, ready | **Overview dashboard** - provider relay + live activity graphs |
-| ![Onboarding](app/assets/demos/demo-onboarding.gif) | ![Overview](app/assets/demos/demo-overview.gif) |
+| ![Onboarding](app/assets/demos/demo-onboarding.gif?v=2) | ![Overview](app/assets/demos/demo-overview.gif?v=2) |
 | **Provider deck + add wizard** - SDK, reasoning format, custom providers | **Activity & API logs** - filters, charts, token tracking |
-| ![Providers](app/assets/demos/demo-providers.gif) | ![Activity](app/assets/demos/demo-activity.gif) |
+| ![Providers](app/assets/demos/demo-providers.gif?v=2) | ![Activity](app/assets/demos/demo-activity.gif?v=2) |
 | **Settings** - profile switcher, per-model reasoning panel | **Integrations** - plugins + MCP servers (local/remote/expert) |
-| ![Settings](app/assets/demos/demo-settings.gif) | ![Integrations](app/assets/demos/demo-integrations.gif) |
+| ![Settings](app/assets/demos/demo-settings.gif?v=2) | ![Integrations](app/assets/demos/demo-integrations.gif?v=2) |
 
 The dashboard manages your coding agent(s) - providers, plugins, MCP servers,
 models, and the build - all on your machine, nothing leaves 127.0.0.1:
