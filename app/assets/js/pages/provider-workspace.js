@@ -64,7 +64,7 @@ function card(provider, activeProvider) {
     <div class="provider-deck-card__head">${brandMark(provider.name)}<div><h2>${escapeHtml(provider.name)}</h2><p class="provider-health ${active ? "is-healthy" : ""}"><span></span>${active ? "Active" : "Inactive"}</p></div></div>
     <dl class="provider-deck-card__meta">
       <div><dt>Models</dt><dd>${modelCount} ${modelCount === 1 ? "model" : "models"}</dd></div>
-      <div><dt>Endpoint</dt><dd class="mono">${escapeHtml(provider.baseUrl || "â€”")}</dd></div>
+      <div><dt>Endpoint</dt><dd class="mono">${escapeHtml(provider.baseUrl || "—")}</dd></div>
       <div><dt>SDK</dt><dd>${escapeHtml(provider.npm || "OpenAI-compatible")}</dd></div>
       <div><dt>Auth</dt><dd>${provider.hasKey ? "API key stored" : "No key"}</dd></div>
     </dl>

@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # KiloCode Configuration Builder V1 (K1) Adapter
 # ============================================================
 # Author  : Love (owner)
@@ -1328,7 +1328,7 @@ Actual:   $Actual
     }
 
     # Active providers without a models source were already dropped
-    # after Merge-Models (with a warning) â€” every provider left here
+    # after Merge-Models (with a warning) — every provider left here
     # is expected to carry models.
 }
 

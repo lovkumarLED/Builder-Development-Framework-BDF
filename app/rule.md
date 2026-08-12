@@ -55,7 +55,7 @@ theme:
 
 - The app must let a normal person, alone: discover their coding agent, scan
   it, generate their builder scripts, add providers, test connections, switch
-  the active provider, and build �?" WITHOUT an AI agent.
+  the active provider, and build — WITHOUT an AI agent.
 - The app must never: phone home, require an account, or send anything
   anywhere except the user's own requests to the provider they chose
   (local-first, 127.0.0.1).

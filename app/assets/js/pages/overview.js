@@ -1,4 +1,4 @@
-﻿import { api, optional } from "../core/api.js";
+import { api, optional } from "../core/api.js";
 import { store } from "../core/store.js";
 import { escapeHtml, notify } from "../core/dialog.js";
 
@@ -80,7 +80,7 @@ function relayProviderDetail(provider) {
   return `<div class="relay-front__head">${providerLogoMark(provider.name)}<strong>${escapeHtml(provider.name)}</strong>${active ? '<span class="active-pill">Active</span>' : ""}</div>
       <dl class="relay-front__meta">
         <div><dt>Models</dt><dd>${modelCount} ${modelCount === 1 ? "model" : "models"}</dd></div>
-        <div><dt>Endpoint</dt><dd class="mono">${escapeHtml(provider.baseUrl || "â€”")}</dd></div>
+        <div><dt>Endpoint</dt><dd class="mono">${escapeHtml(provider.baseUrl || "—")}</dd></div>
         <div><dt>SDK</dt><dd>${escapeHtml(provider.npm || "OpenAI-compatible")}</dd></div>
         <div><dt>Auth</dt><dd>${provider.hasKey ? "API key stored" : "No key"}</dd></div>
       </dl>
@@ -105,7 +105,7 @@ function relayCard(providers, activeId) {
   const card = document.createElement("article");
   card.className = "card relay-card";
   card.setAttribute("tabindex", "0");
-  card.setAttribute("aria-label", "Provider relay â€” scroll to browse");
+  card.setAttribute("aria-label", "Provider relay — scroll to browse");
   if (!ordered.length) {
     card.innerHTML = `<h2 class="card-title">Your provider relay</h2>
       <div class="empty-state"><h3>No providers configured yet</h3><p>Add a provider (OmniRoute, LiteLLM, CLI Proxy, TokenRouter, OpenRouter, or any custom endpoint) and traffic through the local proxy will route through it.</p><button class="button button--primary" type="button" data-route="providers">Add a provider</button></div>`;
@@ -249,18 +249,18 @@ function kpiCard(kpi, days) {
 }
 
 function kpiGrid(summary, days) {
-  const latency = summary.medianLatencyMs != null ? String(summary.medianLatencyMs) : "â€”";
+  const latency = summary.medianLatencyMs != null ? String(summary.medianLatencyMs) : "—";
   const kpis = [
     { icon: "trendUp", tone: "coral", value: String(summary.requestCount || 0).replace(/\B(?=(\d{3})+(?!\d))/g, ","), unit: "", label: "API calls" },
     { icon: "shield", tone: "violet", value: `${summary.successRate ?? 0}%`, unit: "", label: "success rate" },
-    { icon: "clock", tone: "violet", value: latency, unit: latency === "â€”" ? "" : "ms", label: "median latency" },
+    { icon: "clock", tone: "violet", value: latency, unit: latency === "—" ? "" : "ms", label: "median latency" },
     { icon: "users", tone: "violet", value: String(summary.failedRequestCount ?? 0), unit: "", label: "failed requests" },
   ];
   return `<section class="kpi-grid" aria-label="Proxy activity summary">${kpis.map(kpi => kpiCard(kpi, days)).join("")}</section>`;
 }
 
 function emptyAnalytics() {
-  return `<article class="card kpi-grid-empty"><div class="empty-state"><h3>No proxy traffic yet</h3><p>Requests made through the local proxy (127.0.0.1:9090) appear here with their metadata â€” request count, success rate, latency, and per-provider usage. Nothing is tracked until your tools actually talk to the proxy.</p></div></article>`;
+  return `<article class="card kpi-grid-empty"><div class="empty-state"><h3>No proxy traffic yet</h3><p>Requests made through the local proxy (127.0.0.1:9090) appear here with their metadata — request count, success rate, latency, and per-provider usage. Nothing is tracked until your tools actually talk to the proxy.</p></div></article>`;
 }
 
 function dayKey(date) {
@@ -337,18 +337,18 @@ function usageCard(events) {
 
 function formatTime(iso) {
   const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "â€”";
+  if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
 }
 
 function recentCard(events) {
   const rows = events.slice(0, 5).map(call => {
     const ok = typeof call.status !== "number" || call.status < 400;
-    const latency = typeof call.latencyMs === "number" ? `${call.latencyMs} ms` : "â€”";
+    const latency = typeof call.latencyMs === "number" ? `${call.latencyMs} ms` : "—";
     return `<tr>
       <td class="col-time">${escapeHtml(formatTime(call.timestamp))}</td>
       <td><span class="provider-cell">${providerLogoMark(call.providerId || "unknown", "sm")}${escapeHtml(call.providerId || "unknown")}</span></td>
-      <td class="col-model">${escapeHtml(call.model || "â€”")}</td>
+      <td class="col-model">${escapeHtml(call.model || "—")}</td>
       <td><span class="status-cell"><span class="status-dot ${ok ? "status-dot--ok" : "status-dot--error"}" aria-hidden="true"></span>${ok ? "Success" : `Failed (${call.status})`}</span></td>
       <td class="col-latency">${escapeHtml(latency)}</td>
     </tr>`;

@@ -1,4 +1,4 @@
-﻿{
+{
     "releases":  [
                      {
                          "version":  "2.5.2",
@@ -61,7 +61,7 @@
                          "summary":  "Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.\u003cid\u003e.apiKey for OpenCode, provider.\u003cid\u003e.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. Reasoning formats: per-provider reasoning levels (opencode / openai / claude / gemini / none) with correct variant JSON per format (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); interactive builder runs ask the developer, persist the choice backup-first, and filter invalid levels from the generated config. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.",
                          "highlights":  [
                                             "Dual key placement in app/app/agentstore.py write_provider (top-level apiKey + options.apiKey), options preserved on write",
-                                            "Builder merge-stage dual-key normalization (K1 + V2.7 builders) Î“Ã‡Ã¶ fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)",
+                                            "Builder merge-stage dual-key normalization (K1 + V2.7 builders) ΓÇö fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)",
                                             "Real-provider presets in the Add-provider form (URL + SDK auto-filled), presets kept in sync in app/app/config.py",
                                             "Kilo harness fixtures updated to per-provider models (the global models.json lookup was removed earlier; the fixtures still used it)",
                                             "Stale exact-name harness copy (test-kilo.ps1) replaced with the real K1 harness (backed up)",
@@ -79,7 +79,7 @@
                          "bugFixes":  [
                                           "Kilo 401 \"Token not provided\": key now lands in options.apiKey for runtime reading",
                                           "OpenCode /models not showing a provider: a stray opencode.jsonc (with disabled_providers) was shadowing the built opencode.json",
-                                          "Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change Î“Ã‡Ã¶ fixtures now use per-provider models",
+                                          "Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change ΓÇö fixtures now use per-provider models",
                                           "PS 5.1: Add-Member required when creating a missing options object on parsed JSON"
                                       ],
                          "breakingChanges":  "None",

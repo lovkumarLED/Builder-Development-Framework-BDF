@@ -1,4 +1,4 @@
-﻿import { api } from "./core/api.js";
+import { api } from "./core/api.js";
 import { store } from "./core/store.js";
 import { initRouter, navigate, mobileSidebarInert } from "./core/router.js";
 import { initDesktopSidebar } from "./core/sidebar.js";
@@ -61,7 +61,7 @@ function openBuildDialog(trigger) {
   dialog.querySelector("#runBuild").addEventListener("click", async event => {
     const output = dialog.querySelector("#buildOutput");
     event.currentTarget.disabled = true;
-    output.textContent = "Starting builderâ€¦";
+    output.textContent = "Starting builder…";
     try {
       const result = await api.build("coding");
       output.textContent = result.output || (result.ok ? "Build complete." : "Build did not complete.");
