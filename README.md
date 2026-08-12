@@ -69,78 +69,56 @@ You're welcome. ðŸ˜‚
 ## Table of Contents
 
 1. [What is this? â€” Two worlds, one engine](#-what-is-this--two-worlds-one-engine)
-2. [Quick start](#-quick-start)
-3. [Architecture](#-architecture)
-4. [How the BDF engine works](#-how-the-bdf-engine-works)
-5. [How the AI Switcher app works](#-how-the-ai-switcher-app-works)
-6. [Agent management](#-agent-management)
-7. [Providers, models, plugins, MCP â€” the data model](#-providers-models-plugins-mcp--the-data-model)
-8. [The GUI: screens, theme, animations, assets](#-the-gui-screens-theme-animations-assets)
-9. [Development: setup, structure, testing](#-development-setup-structure-testing)
-10. [Roadmap](#-roadmap)
-11. [Documentation map](#-documentation-map)
-12. [Releases](#-releases)
+## Quick start
 
----
+Three ways to get it, depending on what you want:
 
-## ðŸš€ What is this? â€” Two worlds, one engine
+### 1. Everything - the BDF framework + the AI Switcher app
 
-**BDF is a builder of builders.** Look, the problem is simple: coding agents
-(OpenCode, KiloCode, Aider, Goose, ...) store their configuration in messy
-monolithic JSON files that are painful to maintain. So BDF splits that mess into
-small, well-defined files â€” profiles, providers, models, plugins, MCP servers â€”
-and provides builders that re-merge them into the agent's main config, safely
-and reproducibly. Every single time.
-
-Everything here has **two surfaces powered by the same engine**
-(`scripts/scaffold-agent.ps1` + the generated builders):
-
-| World | Audience | How it drives the engine |
-|-------|----------|--------------------------|
-| **1 â€” The MD framework** (`docs/bdf/*.md`) | developers + AI agents | an agent reads the process docs and runs the scaffold/builders |
-| **2 â€” The AI Switcher app** (`docs/app/`) | normal people | the app itself calls the same scaffold + builders through a GUI â€” no AI agent, no terminal, no JSON editing |
-
-> The app is **not** a separate framework â€” it is a frontend for this one.
-> Anything the framework learns (new agents, new builder features) is
-> available to the app automatically.
-
-```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  WORLD 1 â€” DEVELOPERS (MD framework)        â”‚   â”‚  WORLD 2 â€” NORMAL USERS (AI Switcher app)   â”‚
-â”‚  docs/bdf/*.md define the process           â”‚   â”‚  docs/app/: double-click start.bat â†’ browser â”‚
-â”‚  an AI agent builds/maintains builders      â”‚   â”‚  the app scans, seeds, generates, builds     â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                       â”‚  same engine, same behavior                      â”‚
-                       â–¼                                                  â–¼
-          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-          â”‚  scripts/scaffold-agent.ps1  +  the generated  build-<agent>.ps1 â”‚
-          â”‚  (scan â†’ split â†’ seed profiles â†’ generate builder â†’ build)       â”‚
-          â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+```powershell
+git clone https://github.com/lovkumarLED/Builder-Development-Framework-BDF.git
+cd Builder-Development-Framework-BDF\app
+python -m venv env
+env\Scripts\pip install -r requirements.txt
+env\Scripts\python server.py
 ```
 
----
+### 2. Only the app (the GUI - smallest download)
 
-## âš¡ Quick start
+```powershell
+git clone --depth 1 --filter=blob:none --sparse https://github.com/lovkumarLED/Builder-Development-Framework-BDF.git
+cd Builder-Development-Framework-BDF
+git sparse-checkout set app
+cd app
+python -m venv env
+env\Scripts\pip install -r requirements.txt
+env\Scripts\python server.py
+```
+
+### 3. Only the BDF framework (the docs + templates - no app)
+
+```powershell
+git clone --depth 1 --filter=blob:none --sparse https://github.com/lovkumarLED/Builder-Development-Framework-BDF.git
+cd Builder-Development-Framework-BDF
+git sparse-checkout set bdf
+```
 
 **For normal people (use the app):** no terminal needed, I promise.
 
 1. Install **Python** on Windows (tick *"Add python.exe to PATH"*).
-2. Double-click **`docs\app\install.bat`** once. It creates the app's own
+2. Double-click **`app\install.bat`** once. It creates the app's own
    Python environment (`env\`), installs its packages (one-time, needs
    internet), and puts an **"AI Switcher"** shortcut on your desktop.
-3. From now on, double-click the desktop shortcut (or `docs\app\start.bat`) â€” your
+3. From now on, double-click the desktop shortcut (or `app\start.bat`) - your
    browser opens **`http://127.0.0.1:9090`**. Follow the wizard.
 4. Close the window = the app stops. It is not a background service.
 
-Prefer commands? From PowerShell:
+All three downloads were tested from a fresh clone: the app-only install boots
+the full modern GUI, the framework-only install gets every bdf/ doc + template,
+and the full clone gets both. Your API keys never leave your machine - the
+app only stores them in your own agent's provider files, and the proxy on
+`127.0.0.1:9090` is the only "cloud" involved.
 
-```powershell
-git clone https://github.com/lovkumarLED/Builder-Development-Framework-BDF.git
-cd Builder-Development-Framework-BDF\docs\app
-.\install.bat   # one-time: creates env\, installs packages, adds the desktop shortcut
-```
-
-From then on: double-click the **"AI Switcher"** shortcut (or `start.bat`) - the app is instant.
 
 
 **For developers (use the framework):**
@@ -533,7 +511,7 @@ Never hot-link external images (local-first, offline-friendly).
 ### Setup
 
 ```powershell
-cd docs\app
+cd app
 python -m venv env                 # or just run start.bat once â€” it does this
 env\Scripts\python -m pip install -r requirements.txt
 env\Scripts\python server.py       # runs on http://127.0.0.1:9090
@@ -566,7 +544,7 @@ docs/
 **Unit tests** (fast, isolated â€” they never touch your real config):
 
 ```powershell
-cd docs\app
+cd app
 env\Scripts\python -m unittest discover -s tests
 ```
 
@@ -664,4 +642,5 @@ helped me â€” that's the whole point. â¤ï¸
 **Document Version:** 2.5
 
 Documentation Status: Current Implementation
+
 
