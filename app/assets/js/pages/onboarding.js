@@ -47,6 +47,7 @@ let selectedKind = null;
 let discoveredAgents = [];
 let scanResult = null;
 let scanResultSource = null;
+let setupGuide = null;
 let selectedProvider = "litellm";
 let skippedProvider = false;
 let transitionDirection = "still";
@@ -190,7 +191,33 @@ function readyScreenMarkup() {
   const providerLine = skippedProvider
     ? `<p><span class="ready-check is-neutral">${icon("info")}</span>No provider added — add one later from Providers</p>`
     : `<p><span class="ready-check">${icon("check")}</span>${escapeHtml(providerPresets[selectedProvider].name)} active</p>`;
-  return shellMarkup("ready", `<h1 id="startupTitle">You’re ready</h1><p class="onboarding-step-count">04 of 04</p><p class="onboarding-intro">All set! Here's a quick summary.</p><div class="ready-summary"><p><span class="ready-check">${icon("check")}</span>${escapeHtml(chosenAgent?.name || "Agent")} connected</p>${providerLine}<p><span class="ready-check">${icon("check")}</span>Local proxy online</p></div><label class="endpoint-label" for="localEndpoint">Local proxy endpoint</label><div class="endpoint-field"><code id="localEndpoint">127.0.0.1:9090</code><button id="copyEndpoint" type="button" aria-label="Copy local proxy endpoint">${icon("copy")}</button></div>`, `<p class="ready-privacy">${icon("lock")}<span>Your keys stay on this computer.</span></p><button id="openDashboard" class="onboarding-button onboarding-button--primary" type="button">Open dashboard <span aria-hidden="true">→</span></button>`);
+  const guide = setupGuide ? setupGuideMarkup(setupGuide) : "";
+  return shellMarkup("ready", `<h1 id="startupTitle">You’re ready</h1><p class="onboarding-step-count">04 of 04</p><p class="onboarding-intro">All set! Here's a quick summary.</p><div class="ready-summary"><p><span class="ready-check">${icon("check")}</span>${escapeHtml(chosenAgent?.name || "Agent")} connected</p>${providerLine}<p><span class="ready-check">${icon("check")}</span>Local proxy online</p></div><label class="endpoint-label" for="localEndpoint">Local proxy endpoint</label><div class="endpoint-field"><code id="localEndpoint">127.0.0.1:9090</code><button id="copyEndpoint" type="button" aria-label="Copy local proxy endpoint">${icon("copy")}</button></div>${guide}`, `<p class="ready-privacy">${icon("lock")}<span>Your keys stay on this computer.</span></p><button id="openDashboard" class="onboarding-button onboarding-button--primary" type="button">Open dashboard <span aria-hidden="true">→</span></button>`);
+}
+
+function setupGuideMarkup(verify) {
+  const providerRows = (verify.providers || []).map(p => `<li class="setup-guide-row"><span class="setup-guide-state ${p.ok ? "is-ok" : "is-bad"}">${p.ok ? "✓" : "✗"}</span><strong>${escapeHtml(p.name || p.id)}</strong><span class="setup-guide-msg">${escapeHtml(p.message || (p.ok ? "Connected" : "Failed"))}</span></li>`).join("");
+  const mainState = verify.mainJson?.ok ? "✓" : "✗";
+  const mcpState = verify.mcp?.ok ? "✓" : "✗";
+  const pluginState = verify.plugins?.ok ? "✓" : "✗";
+  return `<div class="setup-guide">
+    <h3>Everything checked - here's how to use it</h3>
+    <p class="setup-guide-intro">We imported your providers, models, MCP servers and plugins, built your config, and tested the connections. Here's what passed:</p>
+    <ul class="setup-guide-checks">
+      <li><span class="setup-guide-state ${verify.mainJson?.ok ? "is-ok" : "is-bad"}">${mainState}</span> Main config generated (${escapeHtml(verify.mainJson?.path || "config")})</li>
+      <li><span class="setup-guide-state ${verify.mcp?.ok ? "is-ok" : "is-bad"}">${mcpState}</span> MCP servers in the config</li>
+      <li><span class="setup-guide-state ${verify.plugins?.ok ? "is-ok" : "is-bad"}">${pluginState}</span> Plugins in the config</li>
+    </ul>
+    <ul class="setup-guide-providers">${providerRows || '<li class="setup-guide-row"><span class="setup-guide-msg">No providers found yet - add one from the dashboard.</span></li>'}</ul>
+    <ol class="setup-guide-steps">
+      <li><strong>Open the dashboard</strong> - your providers and models are already there.</li>
+      <li><strong>Test connections</strong> anytime from the Providers page (the Test button).</li>
+      <li><strong>Add more providers</strong> from the dashboard - pick a preset, paste your key, done.</li>
+      <li><strong>Add MCP servers or plugins</strong> from Integrations (local, remote, or expert JSON).</li>
+      <li><strong>Rebuild anytime</strong> with the Build button - your config regenerates from the profiles.</li>
+    </ol>
+    <p class="setup-guide-note">If something ever looks broken, the app keeps automatic backups and can roll back for you - you never have to edit JSON by hand.</p>
+  </div>`;
 }
 
 export function onboardingScreenMarkup(screen = "agent") {
@@ -352,6 +379,31 @@ async function useWorkspace() {
       if (known) await api.switchAgent(agent.name);
       else await api.addAgent({ name: agent.name, dir: agent.dir });
     } catch { /* registry unreachable — continue without registering */ }
+
+    // Post-setup health check: test every provider + confirm the generated
+    // main config carries providers, MCPs and plugins.
+    setMessage("Checking everything works…");
+    let verify = null;
+    try { verify = await api.verifySetup(); } catch { /* backend too old — skip check */ }
+    if (verify && !verify.ok) {
+      // Something failed - put the config back automatically so the user is
+      // never left with a half-broken setup (no manual backup digging).
+      let reverted = null;
+      try { reverted = await api.revertSetup(); } catch { /* revert unavailable */ }
+      button.disabled = false;
+      setMessage(
+        reverted?.ok
+          ? `Setup was rolled back automatically: ${reverted.message} The imported files stay in profiles/ and providers/ so you can fix them.`
+          : "Some checks failed. Your config was left in place - check the providers and try again.",
+        true,
+      );
+      return;
+    }
+    if (verify) {
+      setupGuide = verify;
+      render("ready");
+      return;
+    }
     render("provider");
   } catch (error) { button.disabled = false; setMessage(error.message, true); }
 }

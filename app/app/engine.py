@@ -119,3 +119,117 @@ def build(body: BuildBody):
         300,
     )
     return {"ok": code == 0, "output": output}
+
+
+class VerifyBody(BaseModel):
+    pass
+
+
+@router.post("/setup/verify")
+def verify_setup(body: VerifyBody):
+    """Post-scaffold health check: every provider, plus the generated main JSON.
+
+    Runs after the auto-build so the user knows the workspace is actually
+    usable before they start. Never writes anything - read-only checks.
+    """
+    from . import testing
+
+    agent, directory = agentstore.current_agent()
+    if not agent or not directory:
+        raise HTTPException(400, "No agent is set up yet. Run the setup wizard first.")
+
+    providers = agentstore.list_providers(directory)
+    results = []
+    for provider in providers:
+        try:
+            result = testing.test(
+                testing.TestBody(id=provider["id"], baseUrl="", apiKey="")
+            )
+            results.append({
+                "id": provider["id"],
+                "ok": result["ok"],
+                "message": result["message"],
+                "latencyMs": result.get("latencyMs"),
+            })
+        except HTTPException as exc:
+            results.append({"id": provider["id"], "ok": False, "message": str(exc.detail), "latencyMs": None})
+
+    # generated main JSON: does it exist and carry the providers?
+    main_files = list(directory.glob("*.json"))
+    main_files = [f for f in main_files if f.name not in ("package.json", "package-lock.json", "kilo.jsonc")]
+    main_json_ok = False
+    main_json_path = ""
+    if main_files:
+        import json as _json
+        try:
+            data = _json.loads(main_files[0].read_text(encoding="utf-8-sig"))
+            found = set((data.get("provider") or {}).keys())
+            expected = {p["id"] for p in providers}
+            main_json_ok = bool(expected) and expected.issubset(found)
+            main_json_path = main_files[0].name
+        except (ValueError, OSError):
+            main_json_ok = False
+
+    # MCP + plugins live in the profile files (the source of truth).
+    # The builder merges them into the generated main config from there.
+    import json as _json
+    mcp_ok = False
+    plugins_ok = False
+    mcp_path = directory / "profiles" / "coding" / "mcp.json"
+    plugins_path = directory / "profiles" / "coding" / "plugins.json"
+    try:
+        data = _json.loads(mcp_path.read_text(encoding="utf-8-sig"))
+        mcp_ok = isinstance(data.get("mcp"), dict) and bool(data.get("mcp"))
+    except (ValueError, OSError):
+        mcp_ok = False
+    try:
+        data = _json.loads(plugins_path.read_text(encoding="utf-8-sig"))
+        plugins_ok = bool(data.get("plugin") or (data.get("plugins")))
+    except (ValueError, OSError):
+        plugins_ok = False
+
+    all_ok = bool(results) and all(r["ok"] for r in results) and main_json_ok and mcp_ok and plugins_ok
+    return {
+        "ok": all_ok,
+        "agent": agent,
+        "providers": results,
+        "mainJson": {"ok": main_json_ok, "path": main_json_path},
+        "mcp": {"ok": mcp_ok},
+        "plugins": {"ok": plugins_ok},
+    }
+
+
+@router.post("/setup/revert")
+def revert_setup(body: VerifyBody):
+    """Restore the agent config from the newest backup taken before the build.
+
+    Called automatically when verification fails - the user never has to dig
+    through backup/ and copy files manually.
+    """
+    import shutil
+
+    agent, directory = agentstore.current_agent()
+    if not agent or not directory:
+        raise HTTPException(400, "No agent is set up yet.")
+
+    backup_dir = directory / "backup"
+    if not backup_dir.is_dir():
+        return {"ok": False, "message": "No backup found - nothing to restore."}
+
+    # Newest timestamped backup of the agent's main config (kilo_*.json / opencode_*.json)
+    main_candidates = sorted(
+        (f for f in backup_dir.glob(f"{agent}_*.json")),
+        key=lambda f: f.stat().st_mtime,
+        reverse=True,
+    )
+    if not main_candidates:
+        return {"ok": False, "message": "No main-config backup found."}
+
+    source = main_candidates[0]
+    # kilo_2026-08-12_11-29-30.json -> kilo.json
+    target = directory / f"{source.stem.split('_')[0]}.json"
+    try:
+        shutil.copy2(source, target)
+        return {"ok": True, "message": f"Restored {target.name} from backup ({source.name})."}
+    except OSError as exc:
+        return {"ok": False, "message": f"Revert failed: {exc}"}
