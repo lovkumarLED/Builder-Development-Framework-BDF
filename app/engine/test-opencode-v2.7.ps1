@@ -1630,14 +1630,15 @@ function Test-ReasoningFormatVariantsMerge {
 }
 
 # ------------------------------------------------------------
-# Test 22 - Reasoning format enforcement: invalid variants dropped
+# Test 22 - Reasoning format enforcement: only truly unknown levels dropped
 # ------------------------------------------------------------
 
 function Test-ReasoningFormatEnforcement {
 
     # Non-interactive: a provider with reasoningFormat=openai and a models
-    # file carrying a 'max' variant (invalid for openai) must produce a
-    # generated config WITHOUT 'max' plus a warning in the build output.
+    # file carrying a 'max' variant (not an openai level, but valid in the
+    # opencode format) must keep 'max' - levels valid in ANY known format
+    # survive the merge. Only levels valid in NO known format are dropped.
 
     $Root = New-V25Root
 
@@ -1661,9 +1662,10 @@ function Test-ReasoningFormatEnforcement {
             "gpt-5.5" = @{
                 name     = "GPT 5.5"
                 variants = @{
-                    low  = @{ reasoningEffort = "low" }
-                    max  = @{ reasoningEffort = "max" }   # invalid for openai
-                    high = @{ reasoningEffort = "high" }
+                    low      = @{ reasoningEffort = "low" }
+                    max      = @{ reasoningEffort = "max" }   # valid in opencode format
+                    high     = @{ reasoningEffort = "high" }
+                    madeup   = @{ reasoningEffort = "madeup" } # invalid everywhere
                 }
             }
         }
@@ -1672,15 +1674,16 @@ function Test-ReasoningFormatEnforcement {
 
         Assert-True ($Run.ExitCode -eq 0) "Builder must succeed. Exit: $($Run.ExitCode): $($Run.Output)"
 
-        Assert-True ($Run.Output.Contains("variant 'max' dropped")) `
-            "Expected a dropped-variant warning. Output: $($Run.Output)"
+        Assert-True ($Run.Output.Contains("variant 'madeup' dropped")) `
+            "Expected a dropped-variant warning for 'madeup'. Output: $($Run.Output)"
 
         $Final = Read-Generated $Root
         $Variants = $Final.provider.gpt.models."gpt-5.5".variants
 
         Assert-True ($Variants.PSObject.Properties.Name -contains "low") "low must survive."
         Assert-True ($Variants.PSObject.Properties.Name -contains "high") "high must survive."
-        Assert-True ($Variants.PSObject.Properties.Name -notcontains "max") "max must be dropped from the generated config."
+        Assert-True ($Variants.PSObject.Properties.Name -contains "max") "max must survive - it is a valid level in the opencode format."
+        Assert-True ($Variants.PSObject.Properties.Name -notcontains "madeup") "madeup must be dropped from the generated config."
     }
     finally {
 

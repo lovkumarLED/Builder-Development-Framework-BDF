@@ -1059,8 +1059,10 @@ function Set-ProviderReasoningFormat {
 
 function Apply-ReasoningFormatFilter {
 
-    # Drops variant levels invalid for the provider's format from the merged
-    # OUTPUT only - source files are never touched. Mirrors the app's write.
+    # Drops variant levels invalid for EVERY known reasoning format from the
+    # merged OUTPUT only - source files are never touched. Variants valid for
+    # any format are preserved: per-model data (e.g. gemini thinking budgets on
+    # a gemini model inside an opencode provider) must survive the merge.
 
     param(
         [object]$Provider,
@@ -1068,7 +1070,7 @@ function Apply-ReasoningFormatFilter {
         [string]$Fmt
     )
 
-    $Allowed = $ReasoningFormats[$Fmt].Levels
+    $AllLevels = @($ReasoningFormats.Values | ForEach-Object { $_.Levels } | Select-Object -Unique)
 
     foreach ($Model in @($Provider.models.PSObject.Properties)) {
 
@@ -1080,13 +1082,13 @@ function Apply-ReasoningFormatFilter {
 
         foreach ($Variant in @($Variants.PSObject.Properties)) {
 
-            if ($Variant.Name -in $Allowed) {
+            if ($Variant.Name -in $AllLevels) {
 
                 $Keep[$Variant.Name] = $Variant.Value
             }
             else {
 
-                Write-Warning "Provider '$ProviderName' model '$($Model.Name)': variant '$($Variant.Name)' dropped - not valid for reasoning format '$Fmt'."
+                Write-Warning "Provider '$ProviderName' model '$($Model.Name)': variant '$($Variant.Name)' dropped - not a valid reasoning level in any known format."
             }
         }
 

@@ -18,6 +18,32 @@ Copy this block into Entries when a fix lands:
 
 ## Entries
 
+### 2026-08-12 — Builder stripped model reasoning variants from the generated config
+
+- **Symptom:** Built `opencode.json` / `kilo.json` carried fewer model variants than
+  `profiles\coding\<provider>-models.json`. E.g. cli-proxy gpt models kept only
+  `high` while the models file had `high/low/medium/xhigh`; the build log warned
+  "variant 'low' dropped - not valid for reasoning format 'opencode'" even though
+  the user never selected that format. Because backups were taken after the strip,
+  no backup preserved the original variants.
+- **Root cause:** `Apply-ReasoningFormatFilter` in `engine\build-opencode-v2.7.ps1`
+  and `engine\kilo\build-kilo-v1.ps1` dropped every variant level outside the
+  PROVIDER's declared format (`$Allowed = $ReasoningFormats[$Fmt].Levels`), and
+  `Resolve-ReasoningFormat` defaults an undeclared format to `opencode`. The
+  intended behavior (levels valid in ANY known format survive; only unknown levels
+  drop) existed only in the local kilo agent copy and was never in the engine —
+  a regression that shipped to fresh scaffolds.
+- **Fix:** Both engine builders now compute `$AllLevels` (union of every known
+  format's levels) and keep a variant if it is valid in ANY format, preserving
+  per-model data (e.g. gemini `thinkingConfig` budgets inside an opencode
+  provider). `test-opencode-v2.7.ps1` Test 22 updated to assert `max` (valid in
+  opencode) survives and only a truly unknown level (`madeup`) is dropped.
+- **Verified:** Rebuilt the real opencode config — 0 dropped-variant warnings,
+  `gpt-5.5` keeps high/low/medium/xhigh, backup created; fresh-scaffold auto-build
+  repro (temp kilo dir) keeps all variants + creates the `kilo_*.json` backup;
+  harnesses green: opencode 33/33, kilo 31/31, app unit tests 80/80.
+
+
 ### 2026-08-10 — Overview page showed invented demo data instead of real config/activity
 
 - **Symptom:** The dashboard's Overview displayed hardcoded OpenAI/OpenRouter/Gemini providers ("1,284 API calls", "98.9% success", a fake May-2025 recent-calls list) regardless of the actual config — violating the design rule that the UI never invents production data.
