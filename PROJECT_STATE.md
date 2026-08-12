@@ -42,20 +42,21 @@ It is regenerated after every major refactor.
 Version
 
 ```
-2.5.0
+2.5.2
 ```
 
 Status
 
 ```
-Builder V2.7 JSON Schema Validation
+Full-system health check + security hardening + per-model reasoning
 ```
 
 ## Version History
 <!-- AUTO-GENERATED START -->
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.5.1 | Current | Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. 56 app unit tests, kilo harness 31/31, opencode harness 33/33. |
+| 2.5.2 | Current | Full-system health check + security hardening + per-model reasoning formats + profile switcher. Security fixes: SSRF-via-redirect in /api/test, proxy userinfo-injection path regex, profile-switch path traversal, scaffold agent-name validation, storage.py lock deadlock. Builders preserve per-model reasoning formats. Settings gains a per-model reasoning panel, delete-model button, and active-profile switcher. Model adds overwrite by ID. 79 app unit tests, 75 frontend contract tests, kilo 31/31 + opencode 31/31 harnesses green. |
+| 2.5.1 | Previous | Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. 56 app unit tests, kilo harness 31/31, opencode harness 33/33. |
 | 2.5.0 | Previous | Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.schema.json before builder validation (F1), pre-flight dependency check (F2), -WhatIf dry run (F3), backup retention (F4), provenance sidecar (F5), -Doctor diagnostics (F6), merge diff summary (F7), 9-stage pipeline. P2 dynamic target artifact (profiles/<profile>/target.json) + P1 env-key policy. |
 | 2.4.0 | Previous | Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level <provider>-models.json with highest precedence. |
 | 2.3.0 | Previous | BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets. |

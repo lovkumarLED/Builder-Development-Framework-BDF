@@ -15,7 +15,7 @@ V2.7
 Project Version
 
 ```
-2.5.1
+2.5.2
 ```
 
 ---
@@ -23,7 +23,7 @@ Project Version
 Release Date
 
 ```
-2026-08-08
+2026-08-12
 ```
 
 ---
@@ -47,7 +47,7 @@ No
 Testing
 
 ```
-17/17 (V2.1) + 13/13 (V2.5) + 33/33 (V2.7) + 31/31 (Kilo K1) tests passed, exit code 0; 56 app unit tests
+kilo harness 31/31, opencode harness 31/31, -WhatIf green; 79 app unit tests, 75 frontend contract tests
 ```
 
 ---

@@ -70,7 +70,9 @@ def index():
         if problem and problem != _last_warning:
             _last_warning = problem
             print(f"[rules] {problem}")
-        return HTMLResponse(inject_before_head(html, build_theme_style(rules.get_theme())))
+        response = HTMLResponse(inject_before_head(html, build_theme_style(rules.get_theme())))
+        response.headers["Cache-Control"] = "no-cache"
+        return response
     return HTMLResponse(PLACEHOLDER)
 
 

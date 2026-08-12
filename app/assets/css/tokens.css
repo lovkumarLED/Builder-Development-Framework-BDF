@@ -1,0 +1,57 @@
+:root {
+  --startup-bg: #080a0f;
+  --workspace-bg: #fbfaf7;
+  --surface: #fffefc;
+  --surface-soft: #f4efe9;
+  --ink: #18181c;
+  --muted: #66636a;
+  --border: #ded9d3;
+  --border-hi: #c8c0b8;
+  --coral: #ff5a49;
+  --coral-hi: #ff7364;
+  --coral-deep: #d63c2c;
+  --coral-soft: #fff0ec;
+  --plum: #6840bd;
+  --plum-deep: #5632a8;
+  --purple-blue: #555acb;
+  --plum-soft: #f1ebfb;
+  --green: #45ad62;
+  --green-soft: #e8f5ea;
+  --red: #d34f45;
+  --amber: #c98928;
+  --radius: 12px;
+  --radius-sm: 10px;
+  --font: "Inter Tight", "Inter", "Segoe UI Variable", "Segoe UI", Arial, sans-serif;
+  --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  --shadow-sm: 0 1px 3px rgb(24 24 28 / 5%);
+  --shadow-md: 0 10px 30px rgb(24 24 28 / 8%);
+  --focus: 0 0 0 3px rgb(255 90 73 / 25%);
+  --sidebar-width: 184px;
+  --rail-width: 80px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+}
+html[data-theme="dark"] {
+  --startup-bg: #080a0f;
+  --workspace-bg: #0e141b;
+  --surface: #151d26;
+  --surface-soft: #1b2530;
+  --ink: #e9ebee;
+  --muted: #9aa4ae;
+  --border: #2b3642;
+  --border-hi: #3b4754;
+  --coral: #ff6d5d;
+  --coral-hi: #ff8374;
+  --coral-deep: #ff9a8e;
+  --coral-soft: #3a201c;
+  --plum: #9d7bdd;
+  --plum-deep: #b495e6;
+  --purple-blue: #8b90e2;
+  --plum-soft: #2b213c;
+  --green: #4fc07a;
+  --green-soft: #1e2f23;
+  --red: #e26a60;
+  --amber: #d9a24a;
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 35%);
+  --shadow-md: 0 10px 30px rgb(0 0 0 / 45%);
+}
+@font-face { font-family: "Inter Tight"; src: url("/assets/fonts/InterTight-Variable.woff2") format("woff2-variations"); font-style: normal; font-weight: 400 700; font-display: swap; }

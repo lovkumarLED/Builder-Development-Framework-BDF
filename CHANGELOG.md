@@ -50,7 +50,7 @@ Example
 
 <!-- AUTO-GENERATED START -->
 
-# Version 2.5.1
+# Version 2.5.2
 
 ## Status
 
@@ -61,80 +61,130 @@ Current
 ## Date
 
 ```
-2026-08-08
+2026-08-12
 ```
-
----
 
 ## Summary
 
-Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. Reasoning formats: per-provider reasoning levels (opencode / openai / claude / gemini / none) with correct variant JSON per format (`reasoningEffort`, `thinking.budgetTokens`, `thinkingConfig.thinkingBudget`); interactive builder runs ask the developer, persist the choice backup-first, and filter invalid levels from the generated config. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.
+Full-system health check + security hardening + per-model reasoning formats + profile switcher. The AI Switcher app was tested end-to-end on a temp clone agent (onboarding, overview, providers wizard, activity tracking with 49 real proxy calls, integrations, settings, builders). Security review found and fixed 6 issues: SSRF-via-redirect in /api/test, SSRF userinfo injection in the proxy path, profile-switch path traversal, unvalidated agent name reaching the scaffold script, a storage.py lock deadlock, and a wrong agent-label display. Builders now preserve per-model reasoning formats (the reasoning-format filter accepts levels valid in ANY format, so gemini models keep thinkingConfig inside an opencode provider). The app supports per-model reasoning format on save, model overwrite-by-ID, model deletion, and an active-profile switcher persisted in state.json. 79 app unit tests, 75 frontend contract tests, kilo + opencode harnesses all green.
+
+## Highlights
+
+- Security: /api/test now blocks redirects and non-http(s) schemes; proxy path regex blocks userinfo/percent/space injection; /api/profiles/switch only accepts listed profiles; scaffold validates the agent name before running the PS1; storage.py set_state made atomic under one lock (fixed a deadlock that hung the app)
+- Builders: Apply-ReasoningFormatFilter now drops only levels invalid in EVERY format, so per-model formats survive the merge (gemini models keep thinkingConfig budgets inside an opencode provider)
+- App: Settings has a per-model reasoning panel (change format + levels without re-adding the model), Add-models sends per-row reasoning format, model IDs overwrite in place, Delete-model endpoint (POST with body, slash-safe), active-profile switcher (GET/POST /api/profiles)
+- Profile JSONs confirmed as the single source of truth: providers -> providers/, models -> profiles/<profile>/<provider>-models.json, MCP/plugins -> profile JSONs; the agent main JSON is generated output only
+- Temp clone agent testing verified every page/button with zero console errors; real kilo config untouched and restored byte-identical
+- Repo cleanup: removed junk folders (AI/image, .tmp_sidebar_video, .playwright-mcp, app/.playwright-cli, app/output, nested docs/superpowers) and 10 stale CONTINUE_* session handoffs; build-kilo.ps1 synced to the v1 builder
+
+## New Features
+
+- Per-model reasoning format editing in Settings (change format + reasoning choices for the selected model, save overwrites in place)
+- Delete model button in Settings
+- Active profile switcher (coding/experimental/minimal for kilo; + default for opencode) persisted in state.json
+
+## Improvements
+
+- Model adds overwrite by model ID (no more 'already configured' rejection)
+- Provider page shows the real agent name for custom agents
+- Reasoning level shapes are regenerated per chosen format (no leftover thinkingConfig on opencode models)
+
+## Bug Fixes
+
+- SSRF-via-redirect in /api/test (Authorization header could be re-pointed at an attacker host)
+- Proxy URL userinfo injection (base_url + '/models@evil.com' could reach an arbitrary host)
+- Profile switch accepted arbitrary directories (path traversal into any folder on disk)
+- Scaffold ran the PowerShell script before validating the agent name
+- storage.py deadlock (double-acquire of a non-reentrant lock) hung every test run
+- build-kilo.ps1 stale copy did not match build-kilo-v1.ps1
+
+## Breaking Changes
+
+None
+
+## Migration Required
+
+No
+
+## Testing Summary
+
+kilo harness 31/31, opencode harness 31/31, -WhatIf dry-run green, 79 app unit tests, 75 frontend contract tests (1 pre-existing onboarding-discovery fail + 1 gui.html cache-param fail, unrelated)
+
+## Docs Updated
+
+- README.md
+- app/README.md
+- app/rule.md
+- PROVIDER_DEVELOPMENT_GUIDE.md
+- CHANGELOG.md
+- PROJECT_STATE.md
+- CURRENT_RELEASE.md
+- release_registry.json
+- ROADMAP.md
+- bdf/VERSION.md
+- _agent/JOURNEY_TO_V3.md
+- _agent/SESSION_LOG.md
 
 ---
+
+# Version 2.5.1
+
+## Status
+
+Previous
+
+---
+
+## Date
+
+```
+2026-08-08
+```
+
+## Summary
+
+Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The AI Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. Reasoning formats: per-provider reasoning levels (opencode / openai / claude / gemini / none) with correct variant JSON per format (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); interactive builder runs ask the developer, persist the choice backup-first, and filter invalid levels from the generated config. 56 app unit tests, kilo harness 31/31, opencode harness 33/33.
 
 ## Highlights
 
 - Dual key placement in app/app/agentstore.py write_provider (top-level apiKey + options.apiKey), options preserved on write
-- Builder merge-stage dual-key normalization (K1 + V2.7 builders) ï¿½?" fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)
+- Builder merge-stage dual-key normalization (K1 + V2.7 builders) Î“Ã‡Ã¶ fixes hand-written provider files on the next build; kilo harness grows a dedicated test (31/31)
 - Real-provider presets in the Add-provider form (URL + SDK auto-filled), presets kept in sync in app/app/config.py
-- Reasoning formats: REASONING_FORMATS registry (opencode/openai/claude/gemini/none) in agentstore.py, GET /api/formats, Reasoning format dropdown in the provider modal + Models card, preset auto-pick (CLI Proxy/OpenAI -> openai, Google -> gemini); models written with the format's variant JSON, invalid levels dropped (e.g. max is never written for openai)
-- Builder reasoning formats (V2.7 + K1): interactive prompt when a provider has models without a format or with invalid levels; choice persisted to providers/<id>.json backup-first; merged output filtered per format with [!] warnings
 - Kilo harness fixtures updated to per-provider models (the global models.json lookup was removed earlier; the fixtures still used it)
 - Stale exact-name harness copy (test-kilo.ps1) replaced with the real K1 harness (backed up)
 - User rules documented: never hand-edit the generated main config, never create opencode.jsonc next to opencode.json (it shadows the built config); generating both formats planned for a future update
-
----
 
 ## New Features
 
 - Add-provider presets: TokenRouter, Modal, OpenAI, Google (Gemini), OpenRouter, NVIDIA NIM (SDK auto-fill on preset pick)
 - Builder dual-key normalization with a "Dual-key: options.apiKey mirrored" build-log line
-
----
+- Reasoning formats per provider (opencode/openai/claude/gemini/none) with per-format variant JSON (reasoningEffort, thinking.budgetTokens, thinkingConfig.thinkingBudget); GET /api/formats; Reasoning format dropdown in provider modal + Models card; interactive builder prompt for developers (persist backup-first + filter invalid levels from output)
 
 ## Improvements
 
 - OpenCode and Kilo both work from one provider file (no more "works in OpenCode, 401 in Kilo")
 - Builder-only workflow produces identical output to the app workflow
 
----
-
 ## Bug Fixes
 
 - Kilo 401 "Token not provided": key now lands in options.apiKey for runtime reading
 - OpenCode /models not showing a provider: a stray opencode.jsonc (with disabled_providers) was shadowing the built opencode.json
-- Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change â€” fixtures now use per-provider models
+- Kilo harness: 10 tests used the removed global-models fixture and failed after the model guard change Î“Ã‡Ã¶ fixtures now use per-provider models
 - PS 5.1: Add-Member required when creating a missing options object on parsed JSON
-
----
 
 ## Breaking Changes
 
 None
 
----
-
 ## Migration Required
 
 No
-
----
 
 ## Testing Summary
 
 17/17 (V2.1) + 13/13 (V2.5) + 33/33 (V2.7) + 31/31 (Kilo K1) tests passed, exit code 0; 56 app unit tests
 
----
-
-## Known Issues
-
-None
-
----
-
-## Documentation
-
-Updated
+## Docs Updated
 
 - README.md
 - app/README.md
@@ -164,13 +214,9 @@ Previous
 2026-08-06
 ```
 
----
-
 ## Summary
 
 Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.schema.json before builder validation (F1), pre-flight dependency check (F2), -WhatIf dry run (F3), backup retention (F4), provenance sidecar (F5), -Doctor diagnostics (F6), merge diff summary (F7), 9-stage pipeline. P2 dynamic target artifact (profiles/<profile>/target.json) + P1 env-key policy.
-
----
 
 ## Highlights
 
@@ -185,8 +231,6 @@ Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.
 - P1 env-key policy: builder never carries/restores/invents API keys; providers carry {env:VAR} placeholders only
 - 31-test V2.7 harness in addition to 17/17 (V2.1) + 13/13 (V2.5)
 
----
-
 ## New Features
 
 - scripts/build-opencode-v2.7.ps1
@@ -195,8 +239,6 @@ Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.
 - -SchemaDir, -WhatIf, -KeepBackups, -Doctor, -ProvenancePath CLI flags
 - profiles/<profile>/target.json (P2 dynamic artifact)
 
----
-
 ## Improvements
 
 - Schema validation powers an entry gate before any merge
@@ -204,43 +246,25 @@ Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.
 - Provenance stamping without touching opencode.json
 - Real-world build reproducibility (identical output + silent diff on rerun)
 
----
-
 ## Bug Fixes
 
 - F7 diff summary correctly enumerates IDictionary backup properties (OrderedDictionary)
 - Doctor no longer faults on missing settings file path
 - Empty active-provider lists no longer produce a phantom '' provider reference
 
----
-
 ## Breaking Changes
 
 None
-
----
 
 ## Migration Required
 
 No
 
----
-
 ## Testing Summary
 
 17/17 (V2.1) + 13/13 (V2.5) + 31/31 (V2.7) tests passed, exit code 0
 
----
-
-## Known Issues
-
-None
-
----
-
-## Documentation
-
-Updated
+## Docs Updated
 
 - BUILDER_SPEC.md
 - JSON_SCHEMAS.md
@@ -270,13 +294,9 @@ Previous
 2026-08-05
 ```
 
----
-
 ## Summary
 
 Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level <provider>-models.json with highest precedence.
-
----
 
 ## Highlights
 
@@ -287,56 +307,34 @@ Builder V2.5 Active-Provider Selector: discovers all providers, interactive acti
 - Active providers without a models source are dropped (with a warning) instead of failing the build
 - 13-test V2.5 harness + builder-regeneration guarantee in docs
 
----
-
 ## New Features
 
 - scripts/build-opencode-v2.5.ps1
 - scripts/test-opencode-v2.5.ps1
 - profiles/<profile>/<provider>-models.json
 
----
-
 ## Improvements
 
 - Model precedence: profile <provider>-models.json > providers/<p>/models.json > inline > global
 - settings.json backed up before activeProviders write
 
----
-
 ## Bug Fixes
 
 - settings.json no longer rewritten when the active-provider list is unchanged (no-op runs keep the file byte-identical)
-
----
 
 ## Breaking Changes
 
 None
 
----
-
 ## Migration Required
 
 No
-
----
 
 ## Testing Summary
 
 17/17 (V2.1) + 13/13 (V2.5) tests passed, exit code 0
 
----
-
-## Known Issues
-
-None
-
----
-
-## Documentation
-
-Updated
+## Docs Updated
 
 - BUILDER_SPEC.md
 - JSON_SCHEMAS.md
@@ -367,13 +365,9 @@ Previous
 2026-08-04
 ```
 
----
-
 ## Summary
 
 BDF V2.5 framework generalization: generalized the framework for reuse across OpenCode, Claude Code, and KiloCode targets.
-
----
 
 ## Highlights
 
@@ -384,8 +378,6 @@ BDF V2.5 framework generalization: generalized the framework for reuse across Op
 - Generic release process documented (RELEASE_MANAGER.md)
 - Generic test-harness pattern documented (TESTING.md)
 
----
-
 ## New Features
 
 - bdf/NEW_PROJECT_GUIDE.md - the onboarding process for starting a new project with the framework
@@ -395,8 +387,6 @@ BDF V2.5 framework generalization: generalized the framework for reuse across Op
 - Adapter validation checklist (executable yes/no criteria) in PROJECT_ADAPTER.md
 - Impact Analysis record required output of the Blueprint Engine Impact Analysis stage
 
----
-
 ## Improvements
 
 - Framework boundaries audited: OpenCode-specific file names removed from bdf/ (Layer 1 no longer depends on Layer 2)
@@ -405,42 +395,24 @@ BDF V2.5 framework generalization: generalized the framework for reuse across Op
 - Reference ADAPTER.md passes the new adapter validation checklist
 - docs/TESTING.md aligned with bdf/TESTING.md (test groups + definition of complete)
 
----
-
 ## Bug Fixes
 
 - Removed OpenCode-specific file names from bdf/MIGRATION.md and bdf/PROJECT_ADAPTER.md examples
 - Generalized a Layer 2 description in bdf/MIGRATION.md from OpenCode-specific to project-specific
 
----
-
 ## Breaking Changes
 
 None
-
----
 
 ## Migration Required
 
 No
 
----
-
 ## Testing Summary
 
 17/17 tests passed, exit code 0
 
----
-
-## Known Issues
-
-None
-
----
-
-## Documentation
-
-Updated
+## Docs Updated
 
 - bdf/NEW_PROJECT_GUIDE.md (new)
 - bdf/RELEASE_MANAGER.md (new)
@@ -479,13 +451,9 @@ Previous
 2026-08-04
 ```
 
----
-
 ## Summary
 
 Builder V2.1: extended validation, modular merge pipeline, provider-specific models, output verification, and automated testing.
-
----
 
 ## Highlights
 
@@ -495,16 +463,12 @@ Builder V2.1: extended validation, modular merge pipeline, provider-specific mod
 - Pre-write output verification
 - Automated test harness
 
----
-
 ## New Features
 
 - scripts/test-opencode-v2.ps1 - automated test harness (17 tests: 9 builder + 8 Release Docs)
 - Provider-specific models: providers/<provider>/models.json takes precedence over inline provider models and global models.json
 - -ConfigRoot parameter on the builder for isolated test builds
 - Output verification stage (JSON round-trip, providers, models, plugins, MCP) before writing
-
----
 
 ## Improvements
 
@@ -513,8 +477,6 @@ Builder V2.1: extended validation, modular merge pipeline, provider-specific mod
 - Merge logic split into independent stages: settings, providers, models, plugins, MCP, final
 - Concise count-based logging (e.g. Provider 'omniroute': 58 model(s))
 
----
-
 ## Bug Fixes
 
 - Fixed $Section: here-string parse errors
@@ -522,35 +484,19 @@ Builder V2.1: extended validation, modular merge pipeline, provider-specific mod
 - Fixed plugin single-element array unrolling in output (return ,$Plugins.plugin)
 - Removed 2 corrupted backups created during intermediate buggy runs
 
----
-
 ## Breaking Changes
 
 None
-
----
 
 ## Migration Required
 
 No
 
----
-
 ## Testing Summary
 
 17/17 tests passed, exit code 0
 
----
-
-## Known Issues
-
-None
-
----
-
-## Documentation
-
-Updated
+## Docs Updated
 
 - BUILDER_SPEC.md
 - CHANGELOG.md
@@ -562,6 +508,9 @@ Updated
 - ADAPTER.md
 - README.md
 - bdf/VERSION.md
+
+---
+
 <!-- AUTO-GENERATED END -->
 
 # Version 2.1.0

@@ -24,10 +24,14 @@ def _write(path, data):
 
 
 def get_state():
-    return _read(STATE_FILE, {})
+    with _lock:
+        return _read(STATE_FILE, {})
 
 
 def set_state(**values):
-    data = get_state()
-    data.update(values)
-    _write(STATE_FILE, data)
+    with _lock:
+        data = _read(STATE_FILE, {})
+        data.update(values)
+        tmp = STATE_FILE.with_suffix(STATE_FILE.suffix + ".tmp")
+        tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(STATE_FILE)

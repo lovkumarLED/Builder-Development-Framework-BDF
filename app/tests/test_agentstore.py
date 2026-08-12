@@ -196,12 +196,12 @@ class AgentStoreTests(unittest.TestCase):
         self.assertEqual(data["models"]["plain"]["variants"], {})
         self.assertEqual(agentstore.read_models(self.agent_dir, "smoke", format_id="none")[0]["thinking"], [])
 
-    def test_read_models_filters_to_provider_format(self):
+    def test_read_models_returns_all_stored_variant_levels(self):
         agentstore.write_models(self.agent_dir, "smoke", [
             {"model": "gpt-5.5", "name": "GPT 5.5", "thinking": ["max", "high"]},
         ])
         thinking = agentstore.read_models(self.agent_dir, "smoke", format_id="openai")[0]["thinking"]
-        self.assertEqual(thinking, ["high"])
+        self.assertEqual(thinking, ["high", "max"])
 
     def test_provider_format_roundtrip_and_default(self):
         provider = agentstore.write_provider(self.agent_dir, "smoke", "Smoke", "http://a/v1", "k", reasoning_format="claude")
@@ -218,11 +218,11 @@ class AgentStoreTests(unittest.TestCase):
         self.assertEqual(agentstore.resolve_format("bogus"), "opencode")
         self.assertEqual(agentstore.resolve_format("gemini"), "gemini")
 
-    def test_models_update_replaces_and_backs_up(self):
+    def test_models_update_merges_and_preserves_untouched_models(self):
         agentstore.write_models(self.agent_dir, "smoke", [{"model": "a", "name": "A", "thinking": ["high"]}])
         agentstore.write_models(self.agent_dir, "smoke", [{"model": "b", "name": "B", "thinking": ["max"]}])
         models = agentstore.read_models(self.agent_dir, "smoke")
-        self.assertEqual([m["model"] for m in models], ["b"])
+        self.assertEqual([m["model"] for m in models], ["a", "b"])
         self.assertEqual(len(list((self.agent_dir / "backup").glob("smoke-models_*.json"))), 1)
 
     def test_models_delete_backs_up_and_removes(self):

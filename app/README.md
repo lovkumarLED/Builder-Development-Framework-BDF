@@ -1,7 +1,9 @@
 ﻿# AI Switcher
 
-A small app that lives on your computer and lets you **switch between AI
-servers (providers) with one click** â€” no technical knowledge needed.
+A local Windows control room for people who already understand coding agents,
+models, and API keys. It lets you **switch between AI servers (providers)**,
+inspect the local proxy, and build your agent configuration without hand-editing
+generated JSON.
 
 Your AI tool (for example OpenCode, Cursor, or anything that speaks the
 "OpenAI way") points at this app once, and the app forwards everything to
@@ -46,6 +48,11 @@ the app** (or just leave it open while you work).
 
 > If a browser tab doesn't open, go to `http://127.0.0.1:9090` yourself.
 
+The app always opens on the **Welcome** screen and stays there — it never
+jumps ahead on its own. From Welcome, **Set up your workspace** starts the
+wizard; the dashboard is reached through the wizard's final **Open dashboard**
+step (or any time after setup, by going through the wizard).
+
 ---
 
 ## How the app's Python works
@@ -67,21 +74,65 @@ internet).
 
 ## First-time setup (the wizard)
 
-The first time you open the app, it walks you through 5 easy steps:
+The wizard is fully wired to the real engine — everything it shows comes from
+your actual configs. The four guided stages:
 
-1. **Welcome** â€” click "Let's get started".
-2. **Your coding agent** â€” click "Find my agent automatically". The app looks
-   for the coding agents on your computer (OpenCode, Kilo, Aider, Goose, ...).
-   Found one? Great. (Or type the folder path yourself, e.g.
-   `C:\Users\YourName\.config\opencode`.)
-3. **Scanning** â€” the app reads your agent's configuration **by itself**.
-   Nothing is changed, it only looks.
-4. **What it found** â€” the app shows cards: your MCP servers, your plugins,
-   your profiles. Click **"Generate my builder"**.
-5. **Done** â€” the app has created your profiles and your personal builder
-   scripts, using the engine that ships with the app itself
-   (`app\engine\` - no downloads, nothing lives outside the repo). Now add a
-   provider.
+1. **Welcome** — the local-first intro with the interactive Counterphase
+   symbol. You stay here until you choose to continue.
+2. **Workspace** — the app detects the agents actually installed on this
+   computer (**OpenCode** and **Kilo** are the verified targets; manual folder
+   entry is available for anything else). You pick **one** agent — the app
+   immediately scans that agent's config, and if the agent isn't set up yet it
+   runs the BDF setup itself: creates `profiles/coding` + `experimental` +
+   `minimal`, seeds `mcp.json`/`plugins.json` in the coding profile **from
+   your target JSON's MCP/plugin sections**, writes `settings.json` with the
+   detected active providers, creates the `providers/` folder, backs up before
+   every write, and never touches files you already own. A summary line shows
+   what was found ("Scanned KiloCode: 2 providers · 7 MCP servers · 0
+   plugins"). Continue stays disabled until you actually choose an agent.
+3. **Provider** — you see the providers already in your config as status
+   chips (name + active/not-active), and the cards are only the BDF presets
+   **LiteLLM** and **CLI Proxy** plus **Custom** — any preset you already have
+   is hidden. Every card shows the full configuration form: Base URL, SDK
+   type (OpenAI-compatible, OpenAI, Claude, Gemini, DeepSeek, Groq, Other…),
+   reasoning format (OpenCode/OpenAI/Claude/Gemini levels or none), API key,
+   and structured **Models** rows (model ID + display name, add/remove).
+   **Custom** additionally asks for a **Provider ID** (lowercase letters,
+   numbers, hyphens, underscores) and a **Display name**, and saves the
+   provider file with exactly the ID you typed. **Skip for now** goes straight
+   to the final step — you are never forced to add a provider; add or manage
+   them later on the Providers page.
+4. **Complete** — summary of what's connected, the local endpoint
+   (`127.0.0.1:9090`), and **Open dashboard**.
+
+---
+
+## The Overview page
+
+The dashboard's home screen shows **only real data** — nothing is invented:
+
+- **Provider relay** — a deck of your actual providers, with the active one
+  forward. Hover it and scroll (or use the arrow keys): the deck cycles
+  through your providers with a smooth depth animation — the front card moves
+  forward and fades, and the next one takes its place (scroll back to reverse).
+- **Activity summary** — request count, success rate, median latency, and
+  failed requests over the last 30 days, read straight from the local
+  activity log. When there's no traffic yet, the page says so honestly
+  instead of showing sample numbers.
+- **Requests over time** and **Provider usage** — charted from the same real
+  proxy metadata; **Recent proxy calls** lists the actual latest calls.
+- The header chip beside `127.0.0.1:9090` shows **which agent you're managing**
+  (OpenCode or Kilo), and the sidebar shows **● Local proxy online** just above
+  the theme and help buttons.
+
+The sidebar also gained working tools: the **theme button** switches the whole
+workspace to a dark palette (remembered on reload), and the **help button**
+opens the docs.
+
+Provider logos: the main providers (OmniRoute, LiteLLM, CLI Proxy, TokenRouter,
+OpenRouter) carry their real brand marks, bundled locally in the app; any
+custom provider gets its own generated logo (a colored tile with its initials)
+— no provider ever shows a wrong brand.
 
 ---
 
@@ -143,7 +194,9 @@ To add one:
    change it anytime.
 8. (Optional) Add its **models** â€” each with the thinking levels of the chosen format.
 9. Click **"Test connection"** â€” green âœ“ means it works.
-10. Click **Save** â€” the provider is added **and switched on** automatically, so the next build includes it. (Switch to another one anytime with one click.)
+10. Click **Save** â€” the provider is added but remains inactive. Use the
+    separate **Switch provider** action when you intentionally want to route
+    traffic through it.
 
 > **Real providers (TokenRouter, Modal, OpenAI, Google, OpenRouter, NVIDIA â€¦)
 > work just like proxies**: add one, save, rebuild, and it appears in your
@@ -268,6 +321,8 @@ Everything stays inside the `app` folder (or next to your agent):
 | `profiles\` | your agent's profiles (`coding`, `experimental`, `minimal`) |
 | `<agent>\scripts\build-<agent>.ps1` etc. | your generated builder scripts (created by the app's bundled engine in `app\engine\`) |
 | `env\` | the app's private Python environment (created on first run â€” safe to delete, recreated next launch) |
+| `preferences.json` | app-only local preferences: Activity retention and motion preference; request-content redaction stays on |
+| `activity.jsonl` | bounded local proxy metadata for the Activity page; not agent configuration and not sent anywhere |
 | `rule.md` | the app's look (theme colors) + the rulebook for AI agents |
 
 To move the app, copy the whole folder. Your providers live with your agent â€”
@@ -275,9 +330,22 @@ copy your agent's config folder too (or re-add your providers in the app).
 
 ---
 
-## How to change the look
+## Hybrid Studio look and interaction
 
-Everything about the look lives in one file: `rule.md` (next to this README).
+Hybrid Studio has a dark cinematic startup and a warm operational workspace.
+The Counterphase symbol is the letter-free product mark: its pointer response
+and click burst are bounded, keyboard reachable, and disabled when reduced
+motion is requested. Operational pages use the same small purposeful motion
+for navigation, cards, and dialogs â€” never perpetual decorative effects.
+
+The app bundles OFL-licensed **Inter Tight** locally in
+`assets\fonts\InterTight-Variable.woff2`; it never fetches fonts, scripts, or
+visual assets from a CDN. The main destinations are **Overview**, **Providers**,
+**Activity**, **Integrations**, and **Settings**. They adapt from wide desktop
+to a narrow Windows window, retain labelled controls, 44px targets, visible
+focus, keyboard dialogs, and a readable forced-colors mode.
+
+The editable theme tokens remain in `rule.md` (next to this README).
 
 - The top part of `rule.md` is the **theme** â€” colors and corner rounding.
   Edit a color (e.g. change `accent` to a color you like), save the file, and
@@ -303,10 +371,23 @@ built-in look and shows a warning in the black window â€” nothing breaks.
 
 ---
 
-## Privacy
+## Privacy and Activity
 
 - The app runs **only on your computer** (`127.0.0.1`) â€” nothing is sent
   anywhere except your own requests to the provider you chose.
-- No account, no phone-home, no analytics.
+- No account, no phone-home, and no remote telemetry.
 - Keys never appear in the app's own files, logs, or on screen (only inside
   your agent's `providers\` folder, in your own files).
+- **Activity is local and metadata-only.** It records the time, generated trace
+  ID, provider/model IDs, route/method, status, latency, optional numeric token
+  counts, and a sanitized error category for requests sent through the local
+  proxy. It never stores prompts, messages, responses, response content, API
+  keys, authorization headers, or raw request/response bodies.
+- Activity retention is configurable from 1 to 365 days (30 by default) and
+  is bounded to 1,000 records. Request-content redaction is mandatory and
+  cannot be turned off. The page shows an honest empty state until the local
+  proxy has traffic; it never invents usage data.
+- Integrations shows plugin identifiers only and MCP configurations as
+  **Configured** with their declared type. It does not claim plugin installs,
+  MCP connectivity, discovered tools, provider health, or a successful test
+  unless you explicitly run the relevant provider test.

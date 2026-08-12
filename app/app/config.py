@@ -16,6 +16,8 @@ SCAFFOLD_SCRIPT = SCRIPT_DIR / "scaffold-agent.ps1"
 ENGINE_SCHEMAS = ENGINE_DIR / "schemas"
 
 STATE_FILE = APP_DIR / "state.json"
+PREFERENCES_FILE = APP_DIR / "preferences.json"
+ACTIVITY_FILE = APP_DIR / "activity.jsonl"
 
 HOST = "127.0.0.1"
 PORT = 9090

@@ -1,5 +1,7 @@
 """Provider CRUD and switching endpoints (BDF provider files in the agent's config)."""
 
+import re
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -12,15 +14,18 @@ class ModelItem(BaseModel):
     model: str = ""
     name: str = ""
     thinking: list[str] = []
+    reasoningFormat: str = ""
 
 
 class ProviderBody(BaseModel):
+    id: str = ""
     name: str = ""
     baseUrl: str = ""
     apiKey: str = ""
     npm: str = ""
     reasoningFormat: str = ""
     models: list[ModelItem] | None = None
+    activate: bool = True
 
 
 class SwitchBody(BaseModel):
@@ -75,7 +80,12 @@ def create_provider(body: ProviderBody):
     if not base_url:
         raise HTTPException(400, "The base URL can't be empty.")
     _validate_format(body.reasoningFormat)
-    provider_id = agentstore.slugify(name)
+    if body.id.strip():
+        if not re.fullmatch(r"[a-z0-9_-]+", body.id.strip()):
+            raise HTTPException(400, "The provider id may only contain lowercase letters, numbers, hyphens, or underscores.")
+        provider_id = body.id.strip()
+    else:
+        provider_id = agentstore.slugify(name)
     if not provider_id:
         raise HTTPException(400, "That name can't be used as a provider id — use letters and numbers.")
     agent_dir = agentstore.require_agent_dir()
@@ -85,7 +95,8 @@ def create_provider(body: ProviderBody):
         agent_dir, provider_id, name, base_url, body.apiKey.strip(), body.npm.strip(),
         reasoning_format=agentstore.resolve_format(body.reasoningFormat),
     )
-    agentstore.activate_provider(agent_dir, provider_id)
+    if body.activate:
+        agentstore.activate_provider(agent_dir, provider_id)
     models = []
     if body.models is not None:
         models = agentstore.write_models(
@@ -138,3 +149,41 @@ def switch_provider(body: SwitchBody):
         raise HTTPException(404, "That provider doesn't exist anymore. Refresh the page.")
     agentstore.activate_provider(agent_dir, body.id)
     return {"ok": True, "activeProvider": body.id}
+
+
+class DeleteModelBody(BaseModel):
+    model: str = ""
+
+
+@router.post("/providers/{provider_id}/models/delete")
+def delete_model(provider_id: str, body: DeleteModelBody):
+    agent_dir = agentstore.require_agent_dir()
+    if not agentstore.read_provider(agent_dir, provider_id):
+        raise HTTPException(404, "That provider doesn't exist anymore. Refresh the page.")
+    model_id = body.model.strip()
+    if not model_id:
+        raise HTTPException(400, "Type a model ID.")
+    if not agentstore.delete_model(agent_dir, provider_id, model_id):
+        raise HTTPException(404, "That model doesn't exist anymore. Refresh the page.")
+    return {"ok": True}
+
+
+@router.post("/providers/{provider_id}/activate")
+def activate(provider_id: str):
+    agent_dir = agentstore.require_agent_dir()
+    if not agentstore.read_provider(agent_dir, provider_id):
+        raise HTTPException(404, "That provider doesn't exist anymore. Refresh the page.")
+    agentstore.activate_provider(agent_dir, provider_id)
+    return {"ok": True, "active": True}
+
+
+@router.post("/providers/{provider_id}/deactivate")
+def deactivate(provider_id: str):
+    agent_dir = agentstore.require_agent_dir()
+    if not agentstore.read_provider(agent_dir, provider_id):
+        raise HTTPException(404, "That provider doesn't exist anymore. Refresh the page.")
+    agentstore.set_active_providers(
+        agent_dir,
+        [pid for pid in agentstore.get_active_providers(agent_dir) if pid != provider_id],
+    )
+    return {"ok": True, "active": False}

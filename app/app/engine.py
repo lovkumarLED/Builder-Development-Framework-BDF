@@ -63,6 +63,7 @@ def scaffold(body: ScaffoldBody):
     directory = Path(body.dir)
     if not directory.is_dir():
         raise HTTPException(400, "That folder doesn't exist on this computer.")
+    agentstore._require_valid_agent_name(body.agent)
     if not SCAFFOLD_SCRIPT.is_file():
         raise HTTPException(
             500,

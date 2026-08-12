@@ -1,19 +1,24 @@
 ---
 theme:
   colors:
-    bg: "#0A0D16"
-    card: "#111527"
-    border: "#232A3D"
-    border-hi: "#35405C"
-    text: "#E8EEF9"
-    muted: "#8B96B0"
-    accent: "#00C8FF"
-    accent-hi: "#4CDEFF"
-    green: "#3FB950"
-    red: "#FF3B30"
-    amber: "#FF9702"
-  radius: "14px"
-  radius-sm: "10px"
+    startup-bg: "#0B0D12"
+    workspace-bg: "#F8F4EE"
+    surface: "#FFFDFC"
+    surface-soft: "#F2ECE6"
+    ink: "#1B191B"
+    muted: "#746D70"
+    border: "#DED7D2"
+    border-hi: "#BDB3AD"
+    coral: "#F16E5B"
+    coral-hi: "#FF8A75"
+    plum: "#6842AE"
+    plum-deep: "#3E193B"
+    green: "#3C9A63"
+    red: "#D34F45"
+    amber: "#C98928"
+    radius: "16px"
+    radius-sm: "12px"
+    font: "Inter Tight, Segoe UI Variable, Segoe UI, sans-serif"
 ---
 
 # AI Switcher — App Rules
@@ -25,17 +30,26 @@ theme:
 > 2. The sections below are the **rulebook** for humans and AI agents working
 >    on this app — read them before changing anything.
 
-## Design rules (colors)
+## Hybrid Studio design rules
 
-- Dark theme only — near-black backgrounds, subtle borders.
-- ONE accent color for actions. Everything else stays muted.
-- Green / red / amber are STATUS ONLY (success / error / testing) — never
-  decoration.
-- Big friendly cards for providers — no tables, no jargon, no raw JSON.
-- Plain words everywhere: "Connect", "Switch to this", "Build my config".
-- Large click targets (≥44px), rounded corners, soft shadows, generous
-  spacing. System font stack — no webfont downloads.
-- `prefers-reduced-motion` must be respected — heavy animations disabled.
+- Startup and onboarding use the dark cinematic surface. Operational pages
+  use the warm-cloud workspace; this is the approved hybrid exception to the
+  previous dark-only direction.
+- The Counterphase symbol is the only brand mark. It contains no letters and
+  replaces all flame/shield imagery.
+- Coral identifies the primary action and active provider. Plum supports
+  selection and data hierarchy. Green / red / amber remain status-only.
+- Use locally bundled, OFL-licensed Inter Tight with Segoe UI fallbacks. Never
+  load a font, script, or visual asset from a CDN.
+- Provider cards represent software routes, not payment cards. Selecting a
+  card never activates it; only the explicit "Switch provider" action does.
+- Large click targets (at least 44px), visible 2px focus, semantic landmarks,
+  focus-trapped dialogs, forced-colors support, and responsive layouts from
+  wide desktop through narrow Windows windows are required.
+- Motion is purposeful: page transitions, a directional provider deck, and
+  the bounded Counterphase click burst. No perpetual particles or embers.
+- `prefers-reduced-motion` disables pointer tracking, bubbles, flips, and
+  chart entrance animation.
 
 ## Feature rules
 
@@ -51,6 +65,16 @@ theme:
   OpenAI → openai, Google → gemini); users can change it. Levels invalid for
   the format are never written (e.g. `max` is NOT written for `openai` — GPT-5.x
   rejects it). The format lives in the provider file, never in the models file.
+- Top-level navigation is Overview, Providers, Activity, Integrations, and
+  Settings. Plugins and MCP server configurations live in Integrations.
+- Activity stores allowlisted local proxy metadata only. Prompts, responses,
+  keys, authorization headers, and raw bodies are never stored. Redaction is
+  mandatory. Empty activity states must never invent traffic.
+- Plugins are identifiers only; never claim installed, running, version, or
+  health state. MCP entries are configurations only; display "Configured" and
+  declared type, never connectivity or discovered tools. Expert JSON is an
+  explicit disclosure inside the guided MCP flow.
+- Only OpenCode and Kilo are shown as verified setup targets.
 
 ## Architecture rules
 

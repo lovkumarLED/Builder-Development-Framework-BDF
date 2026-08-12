@@ -52,6 +52,30 @@ class RuleParsingTests(unittest.TestCase):
         )
         self.assertEqual(theme["--font"], '-apple-system, "Segoe UI", sans-serif')
 
+    def test_hybrid_theme_accepts_workspace_tokens_and_local_font(self):
+        """Catches a parser regression that rejects the approved Hybrid Studio theme."""
+        theme, _, problem = rules._parse_rule_file(
+            "---\n"
+            "theme:\n"
+            "  colors:\n"
+            "    startup-bg: \"#0B0D12\"\n"
+            "    workspace-bg: \"#F8F4EE\"\n"
+            "    surface: \"#FFFDFC\"\n"
+            "    ink: \"#1B191B\"\n"
+            "    coral: \"#F16E5B\"\n"
+            "    plum: \"#6842AE\"\n"
+            "    font: \"Inter Tight, Segoe UI\"\n"
+            "---\n"
+        )
+        self.assertEqual(theme["--startup-bg"], "#0B0D12")
+        self.assertEqual(theme["--workspace-bg"], "#F8F4EE")
+        self.assertEqual(theme["--surface"], "#FFFDFC")
+        self.assertEqual(theme["--ink"], "#1B191B")
+        self.assertEqual(theme["--coral"], "#F16E5B")
+        self.assertEqual(theme["--plum"], "#6842AE")
+        self.assertEqual(theme["--font"], "Inter Tight, Segoe UI")
+        self.assertIsNone(problem)
+
 
 class CacheAndFallbackTests(unittest.TestCase):
     def test_missing_file_uses_defaults_and_problem(self):

@@ -1,5 +1,6 @@
 import unittest
 
+from app import serve
 from app.serve import build_theme_style, inject_before_head
 
 
@@ -18,3 +19,14 @@ class ThemeInjectionTests(unittest.TestCase):
     def test_no_head_returns_unchanged(self):
         html = "<html><body>x</body></html>"
         self.assertEqual(inject_before_head(html, "<style></style>"), html)
+
+    def test_index_serves_accessible_modular_hybrid_shell(self):
+        """Catches removal of primary navigation or return to an inline monolith."""
+        response = serve.index()
+        html = response.body.decode("utf-8")
+        self.assertIn('id="startupMark"', html)
+        self.assertIn('aria-label="Primary"', html)
+        for destination in ("overview", "providers", "activity", "integrations", "settings"):
+            self.assertIn(f'data-route="{destination}"', html)
+        self.assertIn('<script type="module" src="/assets/js/main.js"></script>', html)
+        self.assertNotIn("logo.png", html)

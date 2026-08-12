@@ -11,12 +11,13 @@ import json
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from fastapi import HTTPException
 from starlette.requests import Request
 
-from app import agentstore, config, rules, serve
+from app import agentstore, config, rules, serve, storage
 from app.providers import ProviderBody, SwitchBody, delete_provider, switch_provider, update_provider
 from app.storage import set_state
 from app.testing import TestBody, test as test_connection
@@ -26,6 +27,14 @@ class SecurityTestBase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
+        self.state_tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.state_tmp.cleanup)
+        original_config_state = config.STATE_FILE
+        original_storage_state = storage.STATE_FILE
+        config.STATE_FILE = Path(self.state_tmp.name) / "state.json"
+        storage.STATE_FILE = config.STATE_FILE
+        self.addCleanup(setattr, config, "STATE_FILE", original_config_state)
+        self.addCleanup(setattr, storage, "STATE_FILE", original_storage_state)
         self.agent_dir = Path(self.tmp.name)
         self._orig_state = None
         self._backup_state_file()
@@ -150,6 +159,30 @@ class PathTraversalTests(SecurityTestBase):
 
 
 class ThemeInjectionTests(SecurityTestBase):
+    def test_switch_profile_rejects_traversal(self):
+        from app.profiles import switch_profile
+
+        with self.assertRaises(HTTPException) as ctx:
+            switch_profile({"profile": "../../../Windows"})
+        self.assertEqual(ctx.exception.status_code, 404)
+
+    def test_switch_profile_rejects_arbitrary_dirs(self):
+        from app.profiles import switch_profile
+
+        agent_dir = Path(self.tmp.name)
+        (agent_dir / "profiles" / "coding").mkdir(parents=True)
+        with patch.object(agentstore, "require_agent_dir", return_value=agent_dir):
+            with self.assertRaises(HTTPException) as ctx:
+                switch_profile({"profile": ".."})
+            self.assertEqual(ctx.exception.status_code, 404)
+
+    def test_test_connection_rejects_non_http_scheme(self):
+        from app.testing import TestBody, test as test_connection
+
+        with self.assertRaises(HTTPException) as ctx:
+            test_connection(TestBody(baseUrl="file:///etc/passwd", apiKey=""))
+        self.assertEqual(ctx.exception.status_code, 400)
+
     def test_font_breakout_is_rejected(self):
         theme, _, problem = rules._parse_rule_file(
             "---\ntheme:\n  colors:\n    font: \"</style><script>alert(1)</script>\"\n---\n"
@@ -223,6 +256,13 @@ class ProxyRedirectTests(SecurityTestBase):
         super().setUp()
         _RedirectHandler.hits = []
         _RedirectHandler.auth_headers = []
+        from app import activity
+
+        self.activity_tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.activity_tmp.cleanup)
+        self.original_activity_file = activity.ACTIVITY_FILE
+        activity.ACTIVITY_FILE = Path(self.activity_tmp.name) / "activity.jsonl"
+        self.addCleanup(setattr, activity, "ACTIVITY_FILE", self.original_activity_file)
         agentstore.write_provider(
             self.agent_dir, "redir", "Redir", f"http://127.0.0.1:{self.port}/v1", "sk-sec-test"
         )
@@ -258,6 +298,139 @@ class ProxyRedirectTests(SecurityTestBase):
         self.assertNotIn(b"SECRET_DATA", response.body)
         self.assertEqual(_RedirectHandler.hits, ["/v1/models"])
         self.assertEqual(_RedirectHandler.auth_headers, ["Bearer sk-sec-test"])
+
+    def test_proxy_rejects_injection_paths(self):
+        from app.proxy import _PATH_SAFE_RE
+
+        for bad_path in ["models@evil.com", "a b", "models?x=1", "models%0aheader"]:
+            self.assertIsNone(_PATH_SAFE_RE.match(bad_path), f"path {bad_path} not blocked")
+        self.assertIsNotNone(_PATH_SAFE_RE.match("models"))
+        self.assertIsNotNone(_PATH_SAFE_RE.match("chat/completions"))
+
+
+class _ActivityHandler(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        if self.path == "/v1/fail":
+            self.send_response(429)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"error":"upstream-response-secret"}')
+            return
+        if b'"stream":true' in body:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.end_headers()
+            self.wfile.write(b'data: {"delta":"stream-response-secret"}\n\n')
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(
+            b'{"choices":[{"message":{"content":"response-private"}}],'
+            b'"usage":{"prompt_tokens":4,"completion_tokens":6,"total_tokens":10}}'
+        )
+
+    def log_message(self, *args):
+        pass
+
+
+class ProxyActivityTests(SecurityTestBase):
+    @classmethod
+    def setUpClass(cls):
+        cls.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _ActivityHandler)
+        cls.port = cls.httpd.server_address[1]
+        cls.thread = threading.Thread(target=cls.httpd.serve_forever, daemon=True)
+        cls.thread.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+
+    def setUp(self):
+        super().setUp()
+        from app import activity
+
+        self.activity = activity
+        self.activity_tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.activity_tmp.cleanup)
+        self.original_activity_file = activity.ACTIVITY_FILE
+        activity.ACTIVITY_FILE = Path(self.activity_tmp.name) / "activity.jsonl"
+        self.addCleanup(setattr, activity, "ACTIVITY_FILE", self.original_activity_file)
+        agentstore.write_provider(
+            self.agent_dir, "activity", "Activity", f"http://127.0.0.1:{self.port}/v1", "sk-sec-test"
+        )
+        settings_dir = self.agent_dir / "profiles" / "coding"
+        settings_dir.mkdir(parents=True)
+        (settings_dir / "settings.json").write_text(
+            json.dumps({"activeProviders": ["activity"]}), encoding="utf-8"
+        )
+
+    def _proxy_request(self, path="chat/completions", body=b"{}"):
+        async def receive():
+            return {"type": "http.request", "body": body, "more_body": False}
+
+        scope = {
+            "type": "http",
+            "method": "POST",
+            "path": f"/v1/{path}",
+            "raw_path": f"/v1/{path}".encode(),
+            "query_string": b"",
+            "headers": [(b"host", b"127.0.0.1:9090"), (b"content-type", b"application/json")],
+            "client": ("127.0.0.1", 12345),
+            "server": ("127.0.0.1", 9090),
+            "scheme": "http",
+            "receive": receive,
+        }
+        from app.proxy import proxy
+
+        return asyncio.run(proxy(path, Request(scope, receive)))
+
+    def test_proxy_records_usage_metadata_without_request_or_response_content(self):
+        """Catches proxy telemetry that persists prompt, key, headers, or upstream response text."""
+        response = self._proxy_request(
+            body=b'{"model":"safe-model","messages":[{"content":"private prompt"}]}'
+        )
+        self.assertEqual(response.status_code, 200)
+        events = self.activity.list_events(30, 1)
+        self.assertTrue(events, "a successful proxy attempt must record metadata")
+        event = events[0]
+        self.assertEqual(event["model"], "safe-model")
+        self.assertEqual(event["status"], 200)
+        self.assertEqual(event["inputTokens"], 4)
+        self.assertEqual(event["outputTokens"], 6)
+        self.assertEqual(event["totalTokens"], 10)
+        serialized = json.dumps(event)
+        for forbidden in ("private prompt", "sk-sec-test", "response-private", "Authorization"):
+            self.assertNotIn(forbidden, serialized)
+
+    def test_streaming_proxy_event_has_no_fabricated_token_counts(self):
+        """Catches a streaming path that buffers content or invents unavailable usage metadata."""
+        response = self._proxy_request(body=b'{"model":"safe-model","stream":true}')
+
+        async def collect():
+            return b"".join([part async for part in response.body_iterator])
+
+        self.assertIn(b"stream-response-secret", asyncio.run(collect()))
+        event = self.activity.list_events(30, 1)[0]
+        self.assertEqual((event["inputTokens"], event["outputTokens"], event["totalTokens"]), (None, None, None))
+        self.assertNotIn("stream-response-secret", json.dumps(event))
+
+    def test_error_attempt_is_sanitized_and_recorder_failure_keeps_proxy_usable(self):
+        """Catches error-detail persistence or telemetry failure altering a proxy response."""
+        error_response = self._proxy_request(path="fail", body=b'{"model":"safe-model"}')
+        self.assertEqual(error_response.status_code, 429)
+        error_event = self.activity.list_events(30, 1)[0]
+        self.assertEqual(error_event["errorCategory"], "upstream_http_error")
+        self.assertNotIn("upstream-response-secret", json.dumps(error_event))
+
+        original_record_event = self.activity.record_event
+        self.activity.record_event = lambda event: (_ for _ in ()).throw(RuntimeError("recorder unavailable"))
+        self.addCleanup(setattr, self.activity, "record_event", original_record_event)
+        response = self._proxy_request(body=b'{"model":"safe-model"}')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"response-private", response.body)
 
 
 if __name__ == "__main__":

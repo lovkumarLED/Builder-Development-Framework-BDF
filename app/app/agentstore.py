@@ -289,13 +289,12 @@ def models_file(agent_dir, provider_id, profile=MODEL_PROFILE):
 def read_models(agent_dir, provider_id, profile=MODEL_PROFILE, format_id=None):
     data = _read_json(models_file(agent_dir, provider_id, profile), {})
     models = data.get("models") or {}
-    allowed = set(REASONING_FORMATS[resolve_format(format_id)]["levels"])
     result = []
     for model_id, entry in models.items():
         if not isinstance(entry, dict):
             continue
         variants = entry.get("variants") or {}
-        thinking = sorted(v for v in variants.keys() if isinstance(v, str) and v in allowed)
+        thinking = sorted(v for v in variants.keys() if isinstance(v, str))
         result.append({"model": model_id, "name": entry.get("name") or model_id, "thinking": thinking})
     result.sort(key=lambda m: m["model"])
     return result
@@ -307,18 +306,23 @@ def write_models(agent_dir, provider_id, items, profile=MODEL_PROFILE, format_id
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = _read_json(path, {})
     _backup(path)
-    spec = REASONING_FORMATS[fmt]
-    allowed = set(spec["levels"])
-    models = {}
+    models = dict(existing.get("models") or {})
     for item in items or []:
         model_id = item.get("model")
         if not model_id:
             continue
-        entry = dict(existing.get("models") or {}).get(model_id) or {}
+        entry = dict(models.get(model_id) or {})
         entry["name"] = item.get("name") or model_id
+        explicit_format = bool(item.get("reasoningFormat"))
+        item_format = resolve_format(item.get("reasoningFormat") or fmt)
+        spec = REASONING_FORMATS[item_format]
+        allowed = set(spec["levels"])
+        previous_variants = dict(entry.get("variants") or {})
         variants = {}
         for level in item.get("thinking") or []:
-            if level in allowed and spec["variant"] is not None:
+            if not explicit_format and level in previous_variants:
+                variants[level] = previous_variants[level]
+            elif level in allowed and spec["variant"] is not None:
                 variants[level] = spec["variant"](level)
         entry["variants"] = variants
         models[model_id] = entry
@@ -332,6 +336,20 @@ def delete_models(agent_dir, provider_id, profile=MODEL_PROFILE):
     if path.is_file():
         _backup(path)
         path.unlink()
+
+
+def delete_model(agent_dir, provider_id, model_id, profile=MODEL_PROFILE):
+    """Remove a single model entry from the provider's models file."""
+    path = models_file(agent_dir, provider_id, profile)
+    data = _read_json(path, {})
+    models = data.get("models") or {}
+    if model_id not in models:
+        return False
+    _backup(path)
+    del models[model_id]
+    data["models"] = models
+    _write_json(path, data)
+    return True
 
 
 def plugins_file(agent_dir, profile=MODEL_PROFILE):
@@ -411,6 +429,7 @@ def get_active_providers(agent_dir):
 
 def set_active_providers(agent_dir, provider_ids):
     settings_path = agent_dir / "profiles" / "coding" / "settings.json"
+    settings_path.parent.mkdir(parents=True, exist_ok=True)
     settings = _read_json(settings_path, {})
     _backup(settings_path)
     settings["activeProviders"] = list(provider_ids)

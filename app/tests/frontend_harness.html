@@ -1,0 +1,26 @@
+<!doctype html><html><body>
+<output id="harnessStatus" data-status="RUNNING">RUNNING</output><div id="startupView"></div><div id="appShell"></div><div id="dialogLayer"></div><div id="toastRegion"></div><main id="workspace"></main>
+<button id="openProvider">Open provider wizard</button>
+<script type="module">
+  import { initStartup } from "../assets/js/pages/startup.js";
+  import { openProviderDialog, renderProviders } from "../assets/js/pages/providers.js";
+  window.calls = [];
+  window.fetch = async (path, options = {}) => { const url = String(path), body = options.body ? JSON.parse(options.body) : null; window.calls.push({ path:url, method:options.method || "GET", body }); let data = {ok:true,message:"ok"}; if (url.includes("/api/discover")) data = {agents:[{name:"opencode",dir:"C:\\fixture\\opencode"}],chosen:{name:"opencode",dir:"C:\\fixture\\opencode"}}; else if (url.includes("/api/scan")) data = {hasBuilder:true,mcps:[],plugins:[],profiles:[]}; else if (url.includes("formats")) data = {formats:[]}; else if (url.endsWith("/providers") && (!options.method || options.method === "GET")) data = {providers:[{id:"one",name:"One",baseUrl:"https://one.test/v1",active:false,models:[]},{id:"two",name:"Two",baseUrl:"https://two.test/v1",active:false,models:[]}],activeProvider:null}; return {ok:true,status:200,text:async()=>JSON.stringify(data)}; };
+  document.querySelector("#openProvider").addEventListener("click", event => openProviderDialog(null, event.currentTarget));
+  window.runProviders = () => renderProviders(document.querySelector("#workspace"));
+  window.runStartup = () => initStartup(document.querySelector("#startupView"), () => {});
+  const waitFor = async selector => { for (let count = 0; count < 50; count += 1) { const item = document.querySelector(selector); if (item) return item; await new Promise(resolve => setTimeout(resolve, 10)); } throw new Error(`Missing ${selector}`); };
+  const status = document.querySelector("#harnessStatus");
+  try {
+    window.runStartup(); document.querySelector("#startupBegin").click(); document.querySelector("#discoverAgents").click();
+    (await waitFor("#prepareAgent")).click(); const first = await waitFor("#firstProvider");
+    first.querySelector("#firstProviderName").value = "Startup"; first.querySelector("#firstProviderUrl").value = "https://startup.test/v1"; first.requestSubmit();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const startupCall = window.calls.find(call => call.path.endsWith("/api/providers") && call.method === "POST"); if (startupCall?.body?.activate !== false) throw new Error("Startup activated provider");
+    document.querySelector("#openProvider").click(); const form = await waitFor("#providerForm"); form.requestSubmit(); await new Promise(resolve => setTimeout(resolve, 0));
+    if (window.calls.filter(call => call.path.endsWith("/api/providers") && call.method === "POST").length !== 1) throw new Error("Early Enter submitted provider");
+    const next = document.querySelector("[data-step-next]"); next.click(); form.querySelector("#providerName").value = "Wizard"; form.querySelector("#providerUrl").value = "https://wizard.test/v1"; form.querySelector("#providerKey").value = "never-render-this"; next.click(); next.click(); next.click(); next.click();
+    if (!document.querySelector("[data-provider-panel='4']")?.textContent.includes("Wizard") || document.querySelector("[data-provider-panel='4']")?.textContent.includes("never-render-this")) throw new Error("Unsafe review summary");
+    status.dataset.status = "PASS"; status.textContent = "PASS";
+  } catch (error) { status.dataset.status = "FAIL"; status.textContent = `FAIL: ${error.message}`; }
+</script></body></html>

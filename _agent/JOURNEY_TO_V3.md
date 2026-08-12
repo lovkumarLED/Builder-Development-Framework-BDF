@@ -1,4 +1,5 @@
-﻿# JOURNEY_TO_V3
+﻿- Session 38 (2026-08-12): FULL-SYSTEM HEALTH CHECK + SECURITY HARDENING + 2.5.2 release. App tested end-to-end on a temp clone agent (onboarding, overview graphs with 49 real proxy calls, providers wizard, activity analytics, integrations with all 3 MCP types, settings reasoning panel, builders). Found and fixed 6 issues: SSRF-via-redirect in /api/test, proxy userinfo-injection path regex, profile-switch path traversal, scaffold agent-name validation before PS1, storage.py lock deadlock, stale build-kilo.ps1 copy. Builders now preserve per-model reasoning formats. Settings gained per-model reasoning editing, delete-model, and active-profile switcher. 79 app unit tests, 75 frontend tests, kilo 31/31 + opencode 31/31. Repo junk cleaned (AI/image, stale CONTINUE_* handoffs, old logo images). Demo GIFs added to README. Next: Phase 15 - Claude Code + more agents.
+# JOURNEY_TO_V3
 
 > The live tracker of our position on the road to BDF V3.
 - Session 35 (2026-08-09): reasoning formats shipped (app + framework + kilo); FSC rerun green (report AI/FULL_SYSTEM_CHECK_REPORT_2026-08-09.md); MAJOR FLAW FIXED - app is now self-contained (app/engine/ bundles the generator + builders + testers + schemas; fresh downloads generate builders for opencode/kilo with zero external scripts); FSC fresh-clone gate added; repo healthy and public. Next: Phase 15 - Claude Code + more agents (app/engine/ grows a claude adapter).
@@ -261,3 +262,4 @@ continues exactly where the build stopped. Rules: `AI/CONTINUE_PROJECT_BUILD.md`
 
 **Status:** Active Journey Tracker
 - PART F: FULL SYSTEM CHECK 2026-08-09 (pre-public gate) - all harnesses green (17/17 + 13/13 + 33/33 + 31/31), 56/56 app tests, full GUI click-through PASS; fixed scaffold-bootstrap harness spec paths (relative + skip-if-absent), stale exact-name builder/harness copies re-synced, dead config.PRESETS removed, release-doc counts updated to reasoning-formats state; report: AI/FULL_SYSTEM_CHECK_REPORT_2026-08-09.md
+

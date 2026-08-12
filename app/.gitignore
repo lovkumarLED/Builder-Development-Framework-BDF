@@ -4,3 +4,5 @@ __pycache__/
 providers.json
 providers.backup.json
 state.json
+preferences.json
+activity.jsonl
