@@ -15,7 +15,7 @@
 > nothing leaves your PC.
 
 [![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-development-framework)
-[![Framework](https://img.shields.io/badge/BDF-2.2.10-blue)](#builder-development-framework)
+[![Framework](https://img.shields.io/badge/BDF-2.2.11-blue)](#builder-development-framework)
 [![Tests](https://img.shields.io/badge/tests-kilo%2031%2F31%20%2B%20opencode%2031%2F31%20%2B%20app%2073%20green-brightgreen)](#testing)
 [![Release](https://img.shields.io/badge/release-2.5.1-orange)](#releases)
 [![Status](https://img.shields.io/badge/status-13%2F15%20phases%20complete%20%2B%20V3%20in%20progress-blue)](#roadmap)
@@ -643,4 +643,18 @@ helped me â€” that's the whole point. â¤ï¸
 
 Documentation Status: Current Implementation
 
+**Version:** 2.5.2
 
+---
+
+## License
+
+MIT License - Copyright (c) 2026 Lov Kumar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+See the [LICENSE](LICENSE) file for the full text.

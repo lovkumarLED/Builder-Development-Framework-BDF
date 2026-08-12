@@ -874,3 +874,8 @@ When the framework changes:
 
 **Status:** Active Framework Version
 
+
+## License
+
+The Builder Development Framework is released under the MIT License - see the LICENSE file in the repository root.
+
