@@ -14,62 +14,39 @@
 > Built by a learner, for learners. Free. Local-first. No account, no cloud,
 > nothing leaves your PC.
 
-[![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#builder-development-framework)
-[![Framework](https://img.shields.io/badge/BDF-2.2.11-blue)](#builder-development-framework)
-[![Tests](https://img.shields.io/badge/tests-kilo%2031%2F31%20%2B%20opencode%2031%2F31%20%2B%20app%2073%20green-brightgreen)](#testing)
-[![Release](https://img.shields.io/badge/release-2.5.1-orange)](#releases)
-[![Status](https://img.shields.io/badge/status-13%2F15%20phases%20complete%20%2B%20V3%20in%20progress-blue)](#roadmap)
+[![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#-what-is-this--two-worlds-one-engine)
+[![Framework](https://img.shields.io/badge/BDF-2.2.11-blue)](#-what-is-this--two-worlds-one-engine)
+[![Tests](https://img.shields.io/badge/tests-kilo%2031%2F31%20%2B%20opencode%2031%2F31%20%2B%20app%2073%20green-brightgreen)](#-development-setup-structure-testing)
+[![Release](https://img.shields.io/badge/release-2.5.1-orange)](#-releases)
+[![Status](https://img.shields.io/badge/status-13%2F15%20phases%20complete%20%2B%20V3%20in%20progress-blue)](#-roadmap)
 
 ---
 
-## 📖 The Story Behind the Project
+## 🎬 See it in action
 
-It started with a pretty simple problem: **too many API keys, too many providers, and configuration files that kept growing.** 😅
+The whole flow, from first launch to build - all local, nothing leaves 127.0.0.1:
 
-I'm just a normal guy trying to learn **Python and Machine Learning** - intermediate Python so far, still working my way toward the ML part of the journey. To learn without spending a fortune, I hunted down every free model and free API I could find. Different providers, different coding agents, different websites - anything that gave me more useful AI tools.
+| | |
+|---|---|
+| **Onboarding wizard** - welcome, agent discovery, review, ready | **Overview dashboard** - provider relay + live activity graphs |
+| ![Onboarding](app/assets/demos/demo-onboarding.gif) | ![Overview](app/assets/demos/demo-overview.gif) |
+| **Provider deck + add wizard** - SDK, reasoning format, custom providers | **Activity & API logs** - filters, charts, token tracking |
+| ![Providers](app/assets/demos/demo-providers.gif) | ![Activity](app/assets/demos/demo-activity.gif) |
+| **Settings** - profile switcher, per-model reasoning panel | **Integrations** - plugins + MCP servers (local/remote/expert) |
+| ![Settings](app/assets/demos/demo-settings.gif) | ![Integrations](app/assets/demos/demo-integrations.gif) |
 
-And it worked. Maybe too well.
+The dashboard manages your coding agent(s) - providers, plugins, MCP servers,
+models, and the build - all on your machine, nothing leaves 127.0.0.1:
 
-Before long I had a drawer full of API keys, provider files, model lists, MCP servers, plugins, and profiles. My JSON configs were getting bigger and bigger - and the real kicker is that **every agent reads them differently**. OpenCode reads a provider key from `provider.<id>.apiKey`, KiloCode reads it from `provider.<id>.options.apiKey`. One provider file, two contracts. And a stray `opencode.jsonc` can silently shadow the config you just spent an hour building.
-
-At some point I thought:
-
-> **"There has to be a better way to manage all of this."**
-
-So I built one.
-
-**This project is that way.** It has two halves that share one engine:
-
-- **The BDF builders** (`build-kilo-v1.ps1`, `build-opencode-v2.7.ps1`): they read your `providers/` and `profiles/`, validate everything against JSON schemas, back up before they touch anything, merge, and generate the final config - with a dry-run (`-WhatIf`), a doctor (`-Doctor`), and a provenance sidecar so you always know what happened and why.
-
-- **The Switcher app**: a GUI on top of that same engine. The wizard discovers your agents, scans their
-  configs, and generates their builders. One dashboard shows your agents, providers, models, plugins, and MCP
-  servers. The Add-provider form carries presets - my local proxies (OmniRoute, LiteLLM), TokenRouter,
-  OpenAI, Google Gemini, OpenRouter, NVIDIA NIM - that auto-fill the URL, the SDK, the name, and the
-  reasoning format (OpenAI/ChatGPT → low/medium/high/xhigh, Claude → thinking budgets, Gemini → thinking
-  budgets, OpenCode → default/minimal/high/max). Test a connection, switch the active provider, hit build:
-  done. The builders ask the same question on the command line for developers.
-
-Every provider file is written for **both** agent contracts (dual-key), backups are made first, and keys never leave your machine - the proxy on `127.0.0.1:9090` is the only "cloud" involved.
-
-I didn't know how to build any of this when I started. I know Python, but I had never built a web app, and the builders are PowerShell - a language I don't speak at all. So I built them with the help of **coding agents**, one experiment at a time: days of debugging, breaking things, fixing them, and slowly figuring out how the pieces fit together. That's what made it fun.
-
-I'm not finished. Claude Code and more providers are on the list. But right now, this is the system I built because I actually needed it - and if you like it, you're welcome to contribute. That would make me genuinely happy. ❤️
+The Overview page runs on real data: a scrollable provider relay (scroll to
+cycle your providers with a depth animation), live activity KPIs from the
+local proxy log, honest empty states when there's no traffic, and an active-
+agent chip in the header. Main providers show their real bundled logos;
+custom providers get a generated one.
 
 ---
 
-### 😄 One Last Thing...
-
-If you ever wonder why the generated JSON files - kilo.json, opencode.json - look completely cursed after running a builder...
-
-**Just press `Shift + Alt + F`.**
-
-You're welcome. 😂
-
-## Table of Contents
-
-1. [What is this? — Two worlds, one engine](#-what-is-this--two-worlds-one-engine)
-## Quick start
+## 🚀 Quick start
 
 Three ways to get it, depending on what you want:
 
@@ -133,6 +110,112 @@ powershell -File scripts\scaffold-agent.ps1 -Agent kilo -NonInteractive -Bootstr
 # Build the agent's config from the modular sources
 powershell -File C:\Users\You\.config\kilo\scripts\build-kilo-v1.ps1 -Profile coding -NonInteractive
 ```
+
+---
+
+## Table of Contents
+
+1. [What is this? — Two worlds, one engine](#-what-is-this--two-worlds-one-engine)
+2. [Key features](#-key-features)
+3. [The Story Behind the Project](#-the-story-behind-the-project)
+4. [One Last Thing...](#-one-last-thing)
+5. [Architecture](#-architecture)
+6. [How the BDF engine works](#-how-the-bdf-engine-works)
+7. [How the Switcher app works](#-how-the-switcher-app-works)
+8. [Agent management](#-agent-management)
+9. [Providers, models, plugins, MCP — the data model](#-providers-models-plugins-mcp--the-data-model)
+10. [The GUI: screens, theme, animations, assets](#-the-gui-screens-theme-animations-assets)
+11. [Development: setup, structure, testing](#-development-setup-structure-testing)
+12. [Roadmap](#-roadmap)
+13. [Documentation map](#-documentation-map)
+14. [Releases](#-releases)
+15. [License](#license)
+
+---
+
+## ✨ Key features
+
+- **Two worlds, one engine.** The BDF builders (`build-kilo-v1.ps1`,
+  `build-opencode-v2.7.ps1`) read your `providers/` and `profiles/`, validate
+  everything against JSON schemas, back up before they touch anything, merge,
+  and generate the final config - with a dry-run (`-WhatIf`), a doctor
+  (`-Doctor`), and a provenance sidecar so you always know what happened and
+  why. The Switcher app is a GUI on top of that same engine - it never
+  re-implements it, it calls it.
+- **Wizard setup for your agents.** The wizard discovers your agents, scans
+  their configs, and generates their builders. One dashboard shows your
+  agents, providers, models, plugins, and MCP servers. Manage **many agents
+  at once** (`state.json` registry) and switch between them instantly - the
+  whole app re-routes.
+- **Dual-key provider files.** Every provider file is written for **both**
+  agent contracts: OpenCode reads `provider.<id>.apiKey`, KiloCode reads
+  `provider.<id>.options.apiKey`. One save works in every agent, and the
+  builders mirror hand-written keys automatically at merge time.
+- **Provider presets that auto-fill.** Add-provider presets for my local
+  proxies (OmniRoute, LiteLLM), TokenRouter, OpenAI, Google Gemini,
+  OpenRouter, NVIDIA NIM - picking one fills the URL, the SDK package (15
+  registry-verified packages), the name, and the reasoning format
+  (OpenAI/ChatGPT → low/medium/high/xhigh, Claude → thinking budgets,
+  Gemini → thinking budgets, OpenCode → default/minimal/high/max).
+- **Backup-first, every write.** Providers, models, plugins, MCP, settings -
+  everything is copied to the agent's `backup\` folder before it changes,
+  with SHA256-hash-verified snapshot/restore for testing.
+- **Local-first, No-Secrets.** The server binds `127.0.0.1` only. Keys live
+  only in the user's own provider files - never in code, logs, examples, or
+  API responses. The proxy on `127.0.0.1:9090` is the only "cloud" involved.
+- **The jsonc HARD RULE.** The framework ONLY scans the main `.json`. It
+  never scans, merges, reads, or modifies any `.jsonc` file - ever. A
+  `.jsonc` is never imported and never emptied.
+
+---
+
+## 🧭 What is this? — Two worlds, one engine
+
+**This project is that way.** It has two halves that share one engine:
+
+- **The BDF builders** (`build-kilo-v1.ps1`, `build-opencode-v2.7.ps1`): they read your `providers/` and `profiles/`, validate everything against JSON schemas, back up before they touch anything, merge, and generate the final config - with a dry-run (`-WhatIf`), a doctor (`-Doctor`), and a provenance sidecar so you always know what happened and why.
+
+- **The Switcher app**: a GUI on top of that same engine. The wizard discovers your agents, scans their
+  configs, and generates their builders. One dashboard shows your agents, providers, models, plugins, and MCP
+  servers. The Add-provider form carries presets - my local proxies (OmniRoute, LiteLLM), TokenRouter,
+  OpenAI, Google Gemini, OpenRouter, NVIDIA NIM - that auto-fill the URL, the SDK, the name, and the
+  reasoning format (OpenAI/ChatGPT → low/medium/high/xhigh, Claude → thinking budgets, Gemini → thinking
+  budgets, OpenCode → default/minimal/high/max). Test a connection, switch the active provider, hit build:
+  done. The builders ask the same question on the command line for developers.
+
+Every provider file is written for **both** agent contracts (dual-key), backups are made first, and keys never leave your machine - the proxy on `127.0.0.1:9090` is the only "cloud" involved.
+
+---
+
+## 📖 The Story Behind the Project
+
+It started with a pretty simple problem: **too many API keys, too many providers, and configuration files that kept growing.** 😅
+
+I'm just a normal guy trying to learn **Python and Machine Learning** - intermediate Python so far, still working my way toward the ML part of the journey. To learn without spending a fortune, I hunted down every free model and free API I could find. Different providers, different coding agents, different websites - anything that gave me more useful AI tools.
+
+And it worked. Maybe too well.
+
+Before long I had a drawer full of API keys, provider files, model lists, MCP servers, plugins, and profiles. My JSON configs were getting bigger and bigger - and the real kicker is that **every agent reads them differently**. OpenCode reads a provider key from `provider.<id>.apiKey`, KiloCode reads it from `provider.<id>.options.apiKey`. One provider file, two contracts. And a stray `opencode.jsonc` can silently shadow the config you just spent an hour building.
+
+At some point I thought:
+
+> **"There has to be a better way to manage all of this."**
+
+So I built one.
+
+I didn't know how to build any of this when I started. I know Python, but I had never built a web app, and the builders are PowerShell - a language I don't speak at all. So I built them with the help of **coding agents**, one experiment at a time: days of debugging, breaking things, fixing them, and slowly figuring out how the pieces fit together. That's what made it fun.
+
+I'm not finished. Claude Code and more providers are on the list. But right now, this is the system I built because I actually needed it - and if you like it, you're welcome to contribute. That would make me genuinely happy. ❤️
+
+---
+
+### 😄 One Last Thing...
+
+If you ever wonder why the generated JSON files - kilo.json, opencode.json - look completely cursed after running a builder...
+
+**Just press `Shift + Alt + F`.**
+
+You're welcome. 😂
 
 ---
 
@@ -256,27 +339,6 @@ backup retention → provenance sidecar → merge-diff summary
 ---
 
 ## 🤖 How the Switcher app works
-### See it in action
-
-The whole flow, from first launch to build - all local, nothing leaves 127.0.0.1:
-
-| | |
-|---|---|
-| **Onboarding wizard** - welcome, agent discovery, review, ready | **Overview dashboard** - provider relay + live activity graphs |
-| ![Onboarding](app/assets/demos/demo-onboarding.gif) | ![Overview](app/assets/demos/demo-overview.gif) |
-| **Provider deck + add wizard** - SDK, reasoning format, custom providers | **Activity & API logs** - filters, charts, token tracking |
-| ![Providers](app/assets/demos/demo-providers.gif) | ![Activity](app/assets/demos/demo-activity.gif) |
-| **Settings** - profile switcher, per-model reasoning panel | **Integrations** - plugins + MCP servers (local/remote/expert) |
-| ![Settings](app/assets/demos/demo-settings.gif) | ![Integrations](app/assets/demos/demo-integrations.gif) |
-
-The dashboard manages your coding agent(s) - providers, plugins, MCP servers,
-models, and the build - all on your machine, nothing leaves 127.0.0.1:
-
-The Overview page runs on real data: a scrollable provider relay (scroll to
-cycle your providers with a depth animation), live activity KPIs from the
-local proxy log, honest empty states when there's no traffic, and an active-
-agent chip in the header. Main providers show their real bundled logos;
-custom providers get a generated one.
 
 ### The core idea
 
