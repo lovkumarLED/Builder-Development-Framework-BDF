@@ -31,11 +31,17 @@
 #         plugins.json    - coding: seeded from the main config's plugin section;
 #                           experimental/minimal: created EMPTY, never filled
 #   6. NEVER overwrite mcp.json / plugins.json once they exist - the user
-#      owns those files. The framework only writes settings.json.
-#   7. NEVER write provider or model JSON files - the framework creates the
-#      providers/ folder (like the profile folders), but provider and model
-#      files inside it are 100% user-owned; the framework prints guidance.
-#   8. Never touch .jsonc / non-.json without explicit user consent.
+#      owns those files after creation. The framework writes them only when
+#      they are missing (seeded from the scanned main config).
+#   7. AUTO-IMPORT (V3.1): when the scanned main .json / .jsonc carries
+#      providers, the framework creates providers/<id>.json (dual-key:
+#      apiKey + options.apiKey) and profiles/coding/<id>-models.json for the
+#      first time, so the builder has every provider in one go. Existing
+#      files are never overwritten.
+#   8. The companion .jsonc is always merged (read-only), imported into the
+#      modular sources, then emptied (content lives in the profiles now) -
+#      so it can never shadow or contradict the built config. With -AutoBuild
+#      the generated builder runs immediately with all providers active.
 #   9. Everything is generated from the agent's OWN main config. No work is
 #      done BEFORE scanning. Errors are always user-reportable + fixable.
 # ============================================================
