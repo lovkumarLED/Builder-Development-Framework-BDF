@@ -658,3 +658,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 See the [LICENSE](LICENSE) file for the full text.
+
+### Brand protection
+
+The name **"Builder Development Framework"**, **"BDF"**, **"AI Switcher"**, the logo artwork, and the demo images are **not** part of the MIT grant. You may freely use, modify, and build on the code, but you may not re-publish or sell the project as your own creation, and you may not reuse the name, logo, or brand assets without permission. You are expected to keep the original copyright notice (as the MIT license requires) so the real author is always identifiable.

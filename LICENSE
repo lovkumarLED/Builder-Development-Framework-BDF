@@ -19,3 +19,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+Brand notice
+
+The project name ("Builder Development Framework", "BDF", "AI Switcher"), the
+logo and brand assets (including the bdf-counterphase-logo.svg artwork and the
+demo images under app/assets/demos/), and any associated trademarks or trade
+dress are NOT granted under the MIT license above. They remain the exclusive
+property of the copyright holder and may not be used, copied, rebranded, or
+re-distributed as your own, in whole or in part, for any product or service,
+without prior written permission.
+
+This notice does not restrict the normal use of the licensed software itself
+under the MIT terms - it only protects the project's name and visual identity
+from being passed off as someone else's work.
