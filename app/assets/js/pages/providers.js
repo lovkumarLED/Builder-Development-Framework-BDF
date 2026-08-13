@@ -87,7 +87,8 @@ export function openProviderDialog(provider = null, trigger = document.activeEle
   footer.insertAdjacentHTML("afterbegin", '<button class="button button--quiet" type="button" data-step-back>Back</button><button class="button button--primary" type="button" data-step-next>Next</button>');
   const preset = dialog.querySelector("#providerPreset");
   preset.addEventListener("change", () => { const value = presets[preset.value]; if (!value) return; dialog.querySelector("#providerUrl").value = value.baseUrl; dialog.querySelector("#providerSdk").value = value.npm; dialog.querySelector("#providerFormat").value = value.reasoningFormat; if (!dialog.querySelector("#providerName").value && preset.value !== "Custom") dialog.querySelector("#providerName").value = preset.value; });
-  const values = () => ({ name: dialog.querySelector("#providerName").value.trim(), baseUrl: dialog.querySelector("#providerUrl").value.trim(), npm: dialog.querySelector("#providerSdk").value.trim(), apiKey: dialog.querySelector("#providerKey").value.trim(), reasoningFormat: dialog.querySelector("#providerFormat").value, models: dialog.querySelector("#providerModels").value.split(/\r?\n/).map(model => model.trim()).filter(Boolean).map(model => ({ model, name: "", thinking: [] })) });
+  const existingModels = provider?.models || [];
+  const values = () => ({ name: dialog.querySelector("#providerName").value.trim(), baseUrl: dialog.querySelector("#providerUrl").value.trim(), npm: dialog.querySelector("#providerSdk").value.trim(), apiKey: dialog.querySelector("#providerKey").value.trim(), reasoningFormat: dialog.querySelector("#providerFormat").value, models: dialog.querySelector("#providerModels").value.split(/\r?\n/).map(model => model.trim()).filter(Boolean).map(model => { const existing = existingModels.find(item => item.model === model); return { model, name: existing?.name || "", thinking: existing?.thinking || [] }; }) });
   dialog.querySelector("[data-test-form]").addEventListener("click", async () => { const value = values(); const message = dialog.querySelector("#providerFormMessage"); if (!value.baseUrl) { message.textContent = "Enter the base URL before testing."; return; } message.textContent = "Testing the endpoint…"; try { const result = await api.testProvider(provider && !value.apiKey ? { id: provider.id } : { baseUrl: value.baseUrl, apiKey: value.apiKey }); message.textContent = result.message || (result.ok ? "Connection passed." : "Connection failed."); } catch (error) { message.textContent = error.message; } });
   let step = 0, completed = 0;
   const stepButtons = [...dialog.querySelectorAll(".segment button")];
@@ -113,8 +114,12 @@ async function handleAction(workspace, provider, action, trigger) {
   }
   if (action === "switch") { try { await api.switchProvider(provider.id); notify(`Switched to ${provider.name}.`, "success"); renderProviders(workspace); } catch (error) { notify(error.message, "error"); } return; }
   if (action === "activate") { try { await api.activateProvider(provider.id); notify(`Added ${provider.name} to the build.`, "success"); renderProviders(workspace); } catch (error) { notify(error.message, "error"); } return; }
-  if (action === "deactivate") { try { await api.deactivateProvider(provider.id); notify(`Removed ${provider.name} from the build.`, "success"); renderProviders(workspace); } catch (error) { notify(error.message, "error"); } return; }
-  if (action === "delete") { const confirmed = await confirmAction({ title: `Delete ${provider.name}?`, message: "This removes the provider source file after making a backup. Generated agent config is not edited directly.", confirmLabel: "Delete provider", danger: true, trigger }); if (!confirmed) return; try { await api.deleteProvider(provider.id); notify("Provider deleted.", "success"); renderProviders(workspace); } catch (error) { notify(error.message, "error"); } }
+  if (action === "deactivate") { try { await api.deactivateProvider(provider.id); notify(`${provider.name} deactivated.`, "success"); renderProviders(workspace); } catch (error) { notify(error.message, "error"); } return; }
+  if (action === "remove" || action === "delete") {
+    const confirmed = await confirmAction({ title: `Remove ${provider.name} permanently?`, message: "This deletes the provider source and its profile model file after making a backup. It also removes the provider from the active build.", confirmLabel: "Remove provider", danger: true, trigger });
+    if (!confirmed) return;
+    try { await api.deleteProvider(provider.id); notify(`${provider.name} removed.`, "success"); renderProviders(workspace); } catch (error) { notify(error.message, "error"); }
+  }
 }
 
 async function renderProvidersLegacy(workspace) {

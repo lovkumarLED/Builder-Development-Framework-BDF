@@ -26,3 +26,10 @@ test("toast motion and stacking match the polished interface", () => {
   assert.match(css, /@keyframes toast-progress/);
   assert.match(css, /@media \(prefers-reduced-motion:\s*reduce\)[\s\S]*\.toast/);
 });
+
+test("success toast uses the coral-plum theme without a status rail", () => {
+  assert.doesNotMatch(css, /\.toast::before/);
+  assert.match(css, /\.toast--success\s*\{\s*--toast-accent:\s*var\(--coral\)/);
+  assert.match(css, /\.toast__progress[\s\S]*linear-gradient\(90deg,\s*var\(--toast-accent\),\s*var\(--toast-secondary\)/);
+  assert.match(css, /\.toast--success\s*\{[^}]*--toast-secondary:\s*var\(--plum\)/);
+});

@@ -131,6 +131,7 @@
 }
 .toast {
   --toast-accent: var(--plum);
+  --toast-secondary: var(--coral);
   position: relative;
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) 32px;
@@ -148,15 +149,8 @@
   pointer-events: auto;
   animation: toast-enter 240ms cubic-bezier(.2, .85, .24, 1) both;
 }
-.toast::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--toast-accent);
-}
-.toast--success { --toast-accent: var(--green); }
-.toast--error { --toast-accent: var(--red); }
+.toast--success { --toast-accent: var(--coral); --toast-secondary: var(--plum); }
+.toast--error { --toast-accent: var(--red); --toast-secondary: var(--plum); }
 .toast__icon {
   display: grid;
   width: 42px;
@@ -191,7 +185,7 @@
   position: absolute;
   inset: auto 0 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--toast-accent), color-mix(in srgb, var(--toast-accent) 45%, var(--plum)));
+  background: linear-gradient(90deg, var(--toast-accent), var(--toast-secondary));
   transform-origin: left;
   animation: toast-progress 4.2s linear both;
 }

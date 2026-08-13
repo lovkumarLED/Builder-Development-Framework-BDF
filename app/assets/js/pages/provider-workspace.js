@@ -69,8 +69,10 @@ function card(provider, activeProvider) {
       <div><dt>Auth</dt><dd>${provider.hasKey ? "API key stored" : "No key"}</dd></div>
     </dl>
     <div class="provider-deck-card__actions">
-      ${active ? '<button class="button button--danger button--small" type="button" data-provider-action="deactivate">Remove provider</button>' : '<button class="button button--primary button--small" type="button" data-provider-action="activate">Add provider</button>'}
-      <button class="button button--quiet button--small" type="button" data-provider-action="details">Details</button><button class="button button--quiet button--small" type="button" data-provider-action="test">Test connection</button>
+      ${active ? '<button class="button button--quiet button--small" type="button" data-provider-action="deactivate">Deactivate provider</button>' : '<button class="button button--primary button--small" type="button" data-provider-action="activate">Add provider</button>'}
+      <button class="button button--quiet button--small" type="button" data-provider-action="details">Details</button>
+      <button class="button button--quiet button--small" type="button" data-provider-action="test">Test connection</button>
+      <button class="button button--danger button--small" type="button" data-provider-action="remove">Remove provider</button>
     </div>
   </article>`;
 }

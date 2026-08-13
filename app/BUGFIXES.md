@@ -18,6 +18,20 @@ Copy this block into Entries when a fix lands:
 
 ## Entries
 
+### 2026-08-13 — Overview relay action label did not describe its behavior
+
+- **Symptom:** The Overview relay card called its active-provider action “Remove provider” and its inactive-provider action “Add provider,” even though the actions only changed whether the provider was included in the active build.
+- **Root cause:** The Overview template reused destructive-sounding add/remove labels for the existing activate/deactivate handlers.
+- **Fix:** Renamed the actions in `app/assets/js/pages/overview.js` to “Deactivate provider” and “Activate provider.” The existing behavior is unchanged; destructive provider deletion remains available only on the Providers page.
+- **Verified:** `app/tests/overview_visual_contract.test.mjs` asserts both semantic labels and rejects the old labels; the focused Node test passes.
+
+### 2026-08-13 — Models added via the provider wizard got no thinking levels, and editing a provider wiped saved levels
+
+- **Symptom:** Picking a reasoning format (OpenAI, OpenCode, Gemini, Claude…) while adding a provider wrote the models with an empty `variants` dict — no thinking levels at all. Worse, opening an existing provider in the add/edit wizard and saving erased the thinking levels the user had set in the Model Settings editor.
+- **Root cause:** `write_models` (agentstore.py) only builds variants from the `thinking` list each model item carries, and both provider forms always send `thinking: []` — the wizard never asks for or reads levels. With an empty list the variant loop never ran, and on edit the empty list overwrote the previously saved variants.
+- **Fix:** `write_models` now treats an empty `thinking` list (with no per-model format override) as "all levels of the provider's reasoning format" — picking a format yields its full level set automatically; the "No reasoning" format still writes `{}`. The wizard dialog (providers.js `values()`) now sends each model's existing thinking and name back on edit instead of empties, so saved levels survive. The embedded add-only panel needs no change — the backend rule covers it.
+- **Verified:** New tests in tests/test_agentstore.py assert empty thinking fills all OpenAI and OpenCode levels, stays empty for the "none" format, and that re-saving previously saved custom levels preserves them; full test suite passes.
+
 ### 2026-08-12 — Terminal banner blast painted over the banner and scrambled the console
 
 - **Symptom:** On server start the BDF SWITCHER banner burst ran, but particles

@@ -46,6 +46,13 @@ test("connected agent indicator is status text without a decorative dropdown arr
   assert.doesNotMatch(workspaceSource, /connected\s*<span>/);
 });
 
+test("provider cards separate deactivation from destructive removal", () => {
+  assert.match(workspaceSource, /data-provider-action="deactivate">Deactivate provider/);
+  assert.match(workspaceSource, /data-provider-action="remove">Remove provider/);
+  assert.match(providersSource, /action === "remove"/);
+  assert.match(providersSource, /api\.deleteProvider\(provider\.id\)/);
+});
+
 test("agent switching avoids redundant writes and calls the backend for a different agent", async () => {
   const calls = [];
   const apiClient = { switchAgent: async name => calls.push(name) };

@@ -10,8 +10,10 @@ DEFAULT_PREFERENCES = {
     "activityRetentionDays": 30,
     "requestContentRedaction": True,
     "reducedMotion": "system",
+    "browser": "default",
 }
 _MOTION_PREFERENCES = {"system", "reduce"}
+_BROWSER_PREFERENCES = {"default", "firefox"}
 
 router = APIRouter()
 
@@ -29,6 +31,7 @@ def get_preferences():
     preferences["activityRetentionDays"] = days if 1 <= days <= 365 else DEFAULT_PREFERENCES["activityRetentionDays"]
     preferences["requestContentRedaction"] = True
     preferences["reducedMotion"] = data.get("reducedMotion") if data.get("reducedMotion") in _MOTION_PREFERENCES else "system"
+    preferences["browser"] = data.get("browser") if data.get("browser") in _BROWSER_PREFERENCES else "default"
     return preferences
 
 
@@ -51,6 +54,10 @@ def update_preferences(values):
     if reduced_motion not in _MOTION_PREFERENCES:
         raise HTTPException(400, "Motion preference must be 'system' or 'reduce'.")
     current["reducedMotion"] = reduced_motion
+    browser = values.get("browser", current["browser"])
+    if browser not in _BROWSER_PREFERENCES:
+        raise HTTPException(400, "Browser preference must be 'default' or 'firefox'.")
+    current["browser"] = browser
     _write(PREFERENCES_FILE, current)
     return current
 

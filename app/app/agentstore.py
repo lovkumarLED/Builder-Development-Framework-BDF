@@ -347,7 +347,10 @@ def write_models(agent_dir, provider_id, items, profile=MODEL_PROFILE, format_id
         allowed = set(spec["levels"])
         previous_variants = dict(entry.get("variants") or {})
         variants = {}
-        for level in item.get("thinking") or []:
+        requested = item.get("thinking") or []
+        if not requested and not explicit_format:
+            requested = list(spec["levels"])
+        for level in requested:
             if not explicit_format and level in previous_variants:
                 variants[level] = previous_variants[level]
             elif level in allowed and spec["variant"] is not None:

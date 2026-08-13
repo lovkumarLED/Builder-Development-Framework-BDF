@@ -35,7 +35,9 @@
 .provider-deck-card__meta dt { color: var(--muted); font-size: .78rem; flex: 0 0 auto; }
 .provider-deck-card__meta dd { min-width: 0; margin: 0; font-size: .78rem; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .provider-deck-card__meta dd.mono { font-size: .7rem; }
-.provider-deck-card__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 14px; }
+.provider-deck-card__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: auto; padding-top: 14px; }
+.provider-deck-card__actions .button { min-width: 0; width: 100%; padding-inline: 8px; white-space: nowrap; }
+.provider-deck-card__actions [data-provider-action="remove"] { grid-column: 1 / -1; }
 .provider-deck-card:not(.provider-deck-card--front) .provider-deck-card__actions { visibility: hidden; }
 .provider-deck-controls { display: flex; align-items: center; justify-content: center; gap: 34px; width: min(670px, 100%); margin-top: 10px; color: var(--muted); }
 .provider-deck-controls .icon-button { box-shadow: var(--shadow-sm); }

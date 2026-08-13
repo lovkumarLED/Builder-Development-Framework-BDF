@@ -84,7 +84,7 @@ function relayProviderDetail(provider) {
         <div><dt>SDK</dt><dd>${escapeHtml(provider.npm || "OpenAI-compatible")}</dd></div>
         <div><dt>Auth</dt><dd>${provider.hasKey ? "API key stored" : "No key"}</dd></div>
       </dl>
-      <div class="relay-front__actions">${active ? '<button class="button button--danger" type="button" data-relay-action="deactivate">Remove provider</button>' : '<button class="button button--primary" type="button" data-relay-action="activate">Add provider</button>'}<button class="button button--outline" type="button" data-route="providers">View details</button></div>`;
+      <div class="relay-front__actions">${active ? '<button class="button button--danger" type="button" data-relay-action="deactivate">Deactivate provider</button>' : '<button class="button button--primary" type="button" data-relay-action="activate">Activate provider</button>'}<button class="button button--outline" type="button" data-route="providers">View details</button></div>`;
 }
 
 function relayProviderMini(provider) {

@@ -24,6 +24,13 @@ test("overview header range control reloads overview data for every supported ra
   assert.match(overview, /overviewRange[\s\S]*addEventListener\("change"/);
 });
 
+test("overview relay action labels match their activation semantics", () => {
+  assert.match(overview, /data-relay-action="deactivate">Deactivate provider/);
+  assert.match(overview, /data-relay-action="activate">Activate provider/);
+  assert.doesNotMatch(overview, /data-relay-action="deactivate">Remove provider/);
+  assert.doesNotMatch(overview, /data-relay-action="activate">Add provider/);
+});
+
 test("browser pages do not render fake desktop window controls", () => {
   assert.doesNotMatch(gui, /class="title-bar"/);
   assert.doesNotMatch(gui, /title-bar__button/);

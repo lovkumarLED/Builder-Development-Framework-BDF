@@ -1,5 +1,6 @@
 """Switcher — entry point. Serves the GUI and starts the local server."""
 
+import os
 import threading
 import webbrowser
 
@@ -58,8 +59,32 @@ app.include_router(profiles_router)
 app.include_router(activity_router)
 app.include_router(proxy_router)
 
+def open_app_browser(url):
+    """Open the app in the preferred browser (from local preferences), else the default."""
+    try:
+        from app.preferences import get_preferences
+
+        preferred = get_preferences().get("browser", "default")
+    except Exception:
+        preferred = "default"
+    if preferred == "firefox":
+        try:
+            webbrowser.get("firefox")
+        except webbrowser.Error:
+            candidates = [
+                os.path.join(os.environ.get("ProgramFiles", ""), "Mozilla Firefox", "firefox.exe"),
+                os.path.join(os.environ.get("ProgramFiles(x86)", ""), "Mozilla Firefox", "firefox.exe"),
+                os.path.join(os.environ.get("LOCALAPPDATA", ""), "Mozilla Firefox", "firefox.exe"),
+            ]
+            for path in candidates:
+                if path and os.path.isfile(path):
+                    webbrowser.register("firefox", None, webbrowser.GenericBrowser(path), preferred=True)
+                    break
+    webbrowser.open(url)
+
+
 if __name__ == "__main__":
     print_banner()
     url = f"http://{config.HOST}:{config.PORT}"
-    threading.Timer(1.2, lambda: webbrowser.open(url)).start()
+    threading.Timer(1.2, lambda: open_app_browser(url)).start()
     uvicorn.run(app, host=config.HOST, port=config.PORT, log_level="info")
