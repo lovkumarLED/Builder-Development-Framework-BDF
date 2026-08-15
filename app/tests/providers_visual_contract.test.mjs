@@ -60,3 +60,17 @@ test("agent switching avoids redundant writes and calls the backend for a differ
   assert.equal(await switchProviderAgent(apiClient, "opencode", "kilo"), true);
   assert.deepEqual(calls, ["opencode"]);
 });
+
+test("provider cards expose an edit entry point", () => {
+  assert.match(workspaceSource, /data-provider-action="edit">Edit provider/);
+});
+
+test("edit action opens the pre-filled edit wizard", () => {
+  assert.match(providersSource, /action === "edit"/);
+  assert.match(providersSource, /openProviderDialog\(provider, trigger\)/);
+});
+
+test("details dialog is read-only without an edit button", () => {
+  assert.doesNotMatch(providersSource, /data-edit-provider/);
+  assert.match(providersSource, /data-dialog-close>Close<\/button>/);
+});

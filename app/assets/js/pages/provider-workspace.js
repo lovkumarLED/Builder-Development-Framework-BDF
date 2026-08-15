@@ -1,5 +1,7 @@
 import { api } from "../core/api.js";
 import { escapeHtml, notify } from "../core/dialog.js";
+import { isClaude } from "../core/capabilities.js";
+import { renderClaudeRoutes } from "./claude-routes.js";
 
 const BRANDS = {
   omniroute: "/assets/brands/omniroute.svg",
@@ -72,6 +74,7 @@ function card(provider, activeProvider) {
       ${active ? '<button class="button button--quiet button--small" type="button" data-provider-action="deactivate">Deactivate provider</button>' : '<button class="button button--primary button--small" type="button" data-provider-action="activate">Add provider</button>'}
       <button class="button button--quiet button--small" type="button" data-provider-action="details">Details</button>
       <button class="button button--quiet button--small" type="button" data-provider-action="test">Test connection</button>
+      <button class="button button--quiet button--small" type="button" data-provider-action="edit">Edit provider</button>
       <button class="button button--danger button--small" type="button" data-provider-action="remove">Remove provider</button>
     </div>
   </article>`;
@@ -219,6 +222,10 @@ function bindPanel(workspace, rerender) {
 }
 
 export function renderProviderWorkspace(workspace, { providers, activeProvider, activeAgent, activeAgentId, onAgentChange, onAction, rerender }) {
+  if (isClaude()) {
+    renderClaudeRoutes(workspace);
+    return;
+  }
   const items = providers;
   workspace.innerHTML = `<section class="providers-workspace">
     <header class="providers-page-head"><h1>Providers &amp; agents</h1><div class="providers-page-head__actions"><button id="reopenProviderPanel" class="button button--primary" type="button" hidden>Add provider</button><div class="provider-agent-selector" aria-label="Connected agent"><span class="status-dot status-dot--ok"></span>${escapeHtml(activeAgent)} · connected</div><button class="button button--quiet manage-agents" type="button">♙&nbsp; Manage agents</button></div></header>

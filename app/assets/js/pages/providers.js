@@ -1,7 +1,9 @@
 import { api, optional } from "../core/api.js";
 import { store } from "../core/store.js";
 import { confirmAction, escapeHtml, notify, openDialog } from "../core/dialog.js";
+import { isClaude } from "../core/capabilities.js";
 import { renderProviderWorkspace } from "./provider-workspace.js";
+import { renderClaudeRoutes } from "./claude-routes.js";
 
 const presets = {
   "OmniRoute": { baseUrl: "http://localhost:20128/v1", npm: "@ai-sdk/openai-compatible", reasoningFormat: "opencode" },
@@ -64,7 +66,7 @@ function card(provider) {
 }
 
 function details(provider, trigger) {
-  openDialog({ title: provider.name, trigger, content: `<dl class="stack"><div><dt class="eyebrow">Endpoint</dt><dd class="mono">${escapeHtml(provider.baseUrl)}</dd></div><div><dt class="eyebrow">SDK package</dt><dd class="mono">${escapeHtml(provider.npm || "@ai-sdk/openai-compatible")}</dd></div><div><dt class="eyebrow">Reasoning format</dt><dd>${escapeHtml(provider.reasoningFormat || "opencode")}</dd></div><div><dt class="eyebrow">API key</dt><dd>${provider.hasKey ? "Stored locally (hidden)" : "Not configured"}</dd></div><div><dt class="eyebrow">Models</dt><dd>${provider.models?.length ? `<ul>${provider.models.map(model => `<li><span class="mono">${escapeHtml(model.model)}</span>${model.name ? ` — ${escapeHtml(model.name)}` : ""}</li>`).join("")}</ul>` : "No models configured"}</dd></div></dl>`, actions: `<button class="button button--quiet" type="button" data-dialog-close>Close</button><button class="button button--primary" type="button" data-edit-provider>Edit provider</button>`, onOpen(dialog) { dialog.querySelector("[data-edit-provider]").addEventListener("click", () => { dialog.querySelector("[data-dialog-close]").click(); openProviderDialog(provider, trigger); }); } });
+  openDialog({ title: provider.name, trigger, content: `<dl class="stack"><div><dt class="eyebrow">Endpoint</dt><dd class="mono">${escapeHtml(provider.baseUrl)}</dd></div><div><dt class="eyebrow">SDK package</dt><dd class="mono">${escapeHtml(provider.npm || "@ai-sdk/openai-compatible")}</dd></div><div><dt class="eyebrow">Reasoning format</dt><dd>${escapeHtml(provider.reasoningFormat || "opencode")}</dd></div><div><dt class="eyebrow">API key</dt><dd>${provider.hasKey ? "Stored locally (hidden)" : "Not configured"}</dd></div><div><dt class="eyebrow">Models</dt><dd>${provider.models?.length ? `<ul>${provider.models.map(model => `<li><span class="mono">${escapeHtml(model.model)}</span>${model.name ? ` — ${escapeHtml(model.name)}` : ""}</li>`).join("")}</ul>` : "No models configured"}</dd></div></dl>`, actions: `<button class="button button--quiet" type="button" data-dialog-close>Close</button>` });
 }
 
 function providerForm(provider) {
@@ -106,6 +108,7 @@ export function openProviderDialog(provider = null, trigger = document.activeEle
 }
 
 async function handleAction(workspace, provider, action, trigger) {
+  if (action === "edit") { openProviderDialog(provider, trigger); return; }
   if (action === "details") { details(provider, trigger); return; }
   if (action === "test") {
     store.set({ providerTests: { ...store.get().providerTests, [provider.id]: "testing" } });
@@ -142,10 +145,14 @@ async function renderProvidersLegacy(workspace) {
 }
 
 export async function renderProviders(workspace) {
+  if (isClaude()) {
+    await renderClaudeRoutes(workspace);
+    return;
+  }
   let providers = [], status = { agent: "opencode" };
   try { [providers, status] = await Promise.all([loadProviders(), optional(() => api.status(), status)]); } catch (error) { notify(error.message, "error"); }
   const agent = status.agent || "opencode";
-  const displayNames = { opencode: "OpenCode", kilo: "KiloCode", kilocode: "KiloCode", claudecode: "ClaudeCode" };
+  const displayNames = { opencode: "OpenCode", kilo: "KiloCode", kilocode: "KiloCode" };
   const activeAgentId = ["opencode", "kilo"].includes(agent) ? agent : "opencode";
   const activeAgent = displayNames[agent] || agent;
   renderProviderWorkspace(workspace, {
