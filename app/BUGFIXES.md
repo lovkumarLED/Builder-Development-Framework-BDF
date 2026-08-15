@@ -18,6 +18,20 @@ Copy this block into Entries when a fix lands:
 
 ## Entries
 
+### 2026-08-15 - Edit provider button added to provider cards
+
+- **Symptom:** Rotating an API key (e.g. OrcaRouter) meant deleting and re-adding the provider, or hand-editing JSON — the edit wizard existed but was buried inside card → Details → Edit provider and was never discoverable.
+- **Root cause:** The edit entry point was one level too deep; nothing on the card itself hinted at editing.
+- **Fix:** Every provider card now has an "Edit provider" button (provider-workspace.js) that opens the existing pre-filled wizard; the Details dialog is read-only now. Backend PUT was already in place.
+- **Verified:** Contract tests 11/11; live E2E in a temp environment — base URL/SDK/reasoning format edits persisted, API key preserved when left blank, key replaced when entered, zero console errors.
+
+### 2026-08-13 - Onboarding rail exposed an irrelevant docs link
+
+- **Symptom:** The onboarding rail ended with a “Need help? / Open docs” link that pulled users away from setup instead of communicating the app’s local privacy model.
+- **Root cause:** The rail still used the original help-link placeholder after the onboarding flow had become self-guided.
+- **Fix:** Replaced it with a compact shield reassurance card: “Private by default,” “Keys stay on this computer,” and “Prompts are never logged.” The card is informational and does not open another page.
+- **Verified:** `app/tests/frontend_review.test.mjs` asserts the privacy card copy and rejects the old docs link; the focused test and onboarding JavaScript syntax check pass.
+
 ### 2026-08-13 — Overview relay action label did not describe its behavior
 
 - **Symptom:** The Overview relay card called its active-provider action “Remove provider” and its inactive-provider action “Add provider,” even though the actions only changed whether the provider was included in the active build.
