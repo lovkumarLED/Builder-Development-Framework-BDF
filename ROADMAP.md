@@ -739,6 +739,17 @@ This ensures that the roadmap always reflects future work rather than project hi
 
 ---
 
+## Narrow Unique Adapter Effort (2026-08-14)
+
+A later approved direction: the Switcher app gains a narrow Claude Code routing
+adapter as a unique bounded adapter (one scalar route at a time), documented
+under `adapters/claude-code/`. This is a later decision that does not rewrite
+the historical Phase 11 outcome (see `planning/DECISIONS.md`). Lifecycle
+status: **Integrated, not live validated**. Live validation (Gate 5) remains
+unauthorized.
+
+---
+
 **Document Version:** 1.1
 
 **Status:** Active Development Roadmap

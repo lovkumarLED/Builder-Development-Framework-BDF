@@ -15,8 +15,8 @@ test("model editor normalizes a multi-model batch with provider-supported reason
     ["default", "minimal", "high", "max"],
   );
   assert.deepEqual(result.added, [
-    { model: "new/model", name: "New model", thinking: ["minimal", "high"] },
-    { model: "second/model", name: "", thinking: ["max"] },
+    { model: "new/model", name: "New model", apiModelId: "", thinking: ["minimal", "high"] },
+    { model: "second/model", name: "", apiModelId: "", thinking: ["max"] },
   ]);
   assert.equal(result.models.length, 3);
 });
@@ -29,8 +29,8 @@ test("model editor overwrites an existing model with the same ID", () => {
     ["minimal", "high", "max"],
   );
   assert.equal(result.models.length, 1);
-  assert.deepEqual(result.models[0], { model: "same", name: "Duplicate", thinking: ["minimal", "max"] });
-  assert.deepEqual(result.added, [{ model: "same", name: "Duplicate", thinking: ["minimal", "max"] }]);
+  assert.deepEqual(result.models[0], { model: "same", name: "Duplicate", apiModelId: "", thinking: ["minimal", "max"] });
+  assert.deepEqual(result.added, [{ model: "same", name: "Duplicate", apiModelId: "", thinking: ["minimal", "max"] }]);
 });
 
 test("model editor allows the same model ID twice in one batch - last wins", () => {
@@ -44,7 +44,33 @@ test("model editor allows the same model ID twice in one batch - last wins", () 
     ["minimal", "high", "max"],
   );
   assert.equal(result.models.length, 1);
-  assert.deepEqual(result.models[0], { model: "same", name: "Second", thinking: ["minimal"] });
+  assert.deepEqual(result.models[0], { model: "same", name: "Second", apiModelId: "", thinking: ["minimal"] });
+});
+
+test("model editor carries an optional apiModelId through normalization", () => {
+  assert.equal(typeof editor.normalizeModelBatch, "function");
+  const result = editor.normalizeModelBatch(
+    [{ model: "orcarouter/deepseek-v4-flash-free", name: "Deepseek V4 Flash Free", apiModelId: "deepseek/deepseek-v4-flash-free", thinking: ["max"] }],
+    [],
+    ["default", "minimal", "high", "max"],
+  );
+  assert.equal(result.models.length, 1);
+  assert.equal(result.models[0].apiModelId, "deepseek/deepseek-v4-flash-free");
+  const fresh = editor.normalizeModelBatch(
+    [],
+    [{ model: "orcarouter/free", name: "Orca Free", apiModelId: "deepseek/deepseek-v4-flash-free", thinking: ["max"] }],
+    ["max"],
+  );
+  assert.equal(fresh.models[0].apiModelId, "deepseek/deepseek-v4-flash-free");
+});
+
+test("model editor row markup includes the API model ID field and per-model test button", () => {
+  assert.equal(typeof editor.modelEditorRowMarkup, "function");
+  const markup = editor.modelEditorRowMarkup(0, [], "opencode");
+  assert.match(markup, /settings-model-api-id/);
+  assert.match(markup, /Exact ID sent to the gateway/);
+  assert.match(markup, /data-test-model/);
+  assert.match(markup, /Test model/);
 });
 
 test("model editor includes both provider format and per-model reasoning choices", () => {

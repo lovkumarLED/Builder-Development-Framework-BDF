@@ -99,3 +99,8 @@ Example benefits:
 ## Notes
 
 This folder was intentionally included before schema implementation so the project structure stays stable. Builder V2.7 activates it.
+
+## Adapter-Owned Schemas
+
+- `claude-code-routing.schema.json` - routing profile schema for the Claude
+  Code unique adapter (see `adapters/claude-code/`).

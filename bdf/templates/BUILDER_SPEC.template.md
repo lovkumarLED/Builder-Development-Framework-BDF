@@ -1272,6 +1272,15 @@ The map records only the agents the scaffold registry handles.
 
 ---
 
+## Dedicated Engine Adapters (generic)
+
+Build routing: universal-contract targets use the universal path; unique
+bounded targets route to dedicated engine adapters whose detailed behavior
+contracts live in the adapter's BUILDER_SPEC. The generic path never absorbs
+target-specific facts.
+
+---
+
 **Document Version:** {{DOC_VERSION}}
 
 **Status:** Current Builder Specification

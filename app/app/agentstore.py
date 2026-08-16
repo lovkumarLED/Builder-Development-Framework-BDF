@@ -323,7 +323,13 @@ def read_models(agent_dir, provider_id, profile=MODEL_PROFILE, format_id=None):
             continue
         variants = entry.get("variants") or {}
         thinking = sorted(v for v in variants.keys() if isinstance(v, str))
-        result.append({"model": model_id, "name": entry.get("name") or model_id, "thinking": thinking})
+        api_model_id = entry.get("apiModelId")
+        result.append({
+            "model": model_id,
+            "name": entry.get("name") or model_id,
+            "apiModelId": api_model_id if isinstance(api_model_id, str) and api_model_id.strip() else "",
+            "thinking": thinking,
+        })
     result.sort(key=lambda m: m["model"])
     return result
 
@@ -341,6 +347,11 @@ def write_models(agent_dir, provider_id, items, profile=MODEL_PROFILE, format_id
             continue
         entry = dict(models.get(model_id) or {})
         entry["name"] = item.get("name") or model_id
+        api_model_id = item.get("apiModelId")
+        if isinstance(api_model_id, str) and api_model_id.strip():
+            entry["apiModelId"] = api_model_id.strip()
+        else:
+            entry.pop("apiModelId", None)
         explicit_format = bool(item.get("reasoningFormat"))
         item_format = resolve_format(item.get("reasoningFormat") or fmt)
         spec = REASONING_FORMATS[item_format]

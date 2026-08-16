@@ -1,0 +1,25 @@
+{
+  "model": "old/model",
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://old.invalid/v1",
+    "ANTHROPIC_API_KEY": "FAKE_EXISTING_SECRET_MARKER",
+    "ANTHROPIC_AUTH_TOKEN": "FAKE_EXISTING_SECRET_MARKER",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "150000",
+    "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "0",
+    "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "false",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "0",
+    "UNKNOWN_TEXT": "preserve-me",
+    "UNKNOWN_MARKER": "FAKE_EXISTING_SECRET_MARKER",
+    "UNKNOWN_NESTED": { "array": [3, 2, 1], "flag": true, "nothing": null }
+  },
+  "enabledPlugins": { "fictional.plugin": true },
+  "extraKnownMarketplaces": { "fictional-market": { "source": "fixture-only" } },
+  "mcpLikeData": { "fictional-server": { "command": ["fixture", "arg"], "enabled": false } },
+  "unknownRoot": {
+    "string": "value",
+    "number": 42.5,
+    "boolean": true,
+    "nullValue": null,
+    "array": ["first", 2, false, null, { "nested": "object" }]
+  }
+}

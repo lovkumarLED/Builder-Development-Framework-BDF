@@ -19,7 +19,7 @@ Every change to the framework must be recorded here.
 Version
 
 ```
-2.2.11
+2.3.0
 ```
 
 Status
@@ -34,10 +34,10 @@ Active
 
 | Item | Value |
 |------|-------|
-| Framework Version | 2.2.11 |
+| Framework Version | 2.3.0 |
 | Supported Builder Versions | V2.7, V2.5, V2.3, V2.1 |
-| Compatible Projects | OpenCode Configuration Manager documentation, KiloCode V1 adapter, V3 universal scaffold |
-| Last Updated | 2026-08-12 |
+| Compatible Projects | OpenCode Configuration Manager documentation, KiloCode V1 adapter, V3 universal scaffold, unique agent adapters |
+| Last Updated | 2026-08-14 |
 | Breaking Changes | None |
 | Migration Required | No |
 
@@ -117,6 +117,62 @@ Example
 
 # Change History
 
+## Version 2.3.0
+
+Date
+
+```
+2026-08-14
+```
+
+Status
+
+```
+Current
+```
+
+Summary
+
+```
+Unique bounded adapter category and capability-driven unique-adapter layer
+added to the framework: adapter categories (same-architecture and unique
+bounded patch), the fixed five-file `adapters/<agent>/` documentation
+namespace, evidence gates (fixture, integration, live), and lifecycle status
+vocabulary. First application: a unique bounded routing adapter for the
+Switcher app; its target-specific paths and facts are documented only in its
+own adapter namespace.
+```
+
+Changed
+
+- `FRAMEWORK.md` - Adapter Categories and evidence gates sections.
+- `PROJECT_ADAPTER.md` - Unique Agent Adapters section.
+- `AI_WORKFLOW.md` - Unique adapter read order and gate-aware status checks.
+- `TESTING.md` - Adapter test groups.
+- `BUILDER_EVOLUTION.md` - Adapter documentation and compatibility evolution.
+- `README.md` - Unique agent adapters summary.
+- `templates/ADAPTER.template.md`, `templates/ARCHITECTURE.template.md`,
+  `templates/BUILDER_SPEC.template.md`,
+  `templates/CONTRIBUTING_FOR_AI.template.md`,
+  `templates/FOLDER_STRUCTURE.template.md`,
+  `templates/JSON_SCHEMAS.template.md`, `templates/README.template.md`,
+  `templates/TESTING.template.md` - neutral adapter-category structure.
+- `templates/README.md` - template inventory and pairing matrix updated.
+
+Breaking Changes
+
+```
+None
+```
+
+Migration Required
+
+```
+No
+```
+
+---
+
 ## Version 2.2.11
 
 Date
@@ -128,7 +184,7 @@ Date
 Status
 
 ```
-Current
+Previous
 ```
 
 Summary
@@ -835,7 +891,8 @@ No
 
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.2.11 | Current | Template sync round 3 (session 33): 9 templates gained missing sections, jsonc-shadow warning everywhere, placeholder audit 66/66 |
+| 2.3.0 | Current | Unique bounded adapter category, five-file adapter namespace, capability-driven unique-adapter layer, evidence gates (fixture/integration/live) |
+| 2.2.11 | Previous | Template sync round 3 (session 33): 9 templates gained missing sections, jsonc-shadow warning everywhere, placeholder audit 66/66 |
 | 2.2.9 | Previous | README Synchronization Rule (README updated in same change, versions in sync, no false status claims) |
 | 2.2.8 | Previous | Phase 8: 4 onboarding guides + 4 templates (15 → 19) |
 | 2.2.7 | Previous | README rebuilt (badges, mermaid diagrams, quick start, rules); template mirrored |

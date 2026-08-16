@@ -6,3 +6,5 @@ providers.backup.json
 state.json
 preferences.json
 activity.jsonl
+state/
+full-run.log

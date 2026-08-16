@@ -55,7 +55,9 @@ Examples:
 - any open-source coding agent sharing their architecture
 - Future applications
 
-Claude Code is not a target (dropped 2026-08-08 — see `planning/DECISIONS.md`).
+Claude Code is not a same-architecture target (historical: dropped from the
+universal scaffold 2026-08-08 - see `planning/DECISIONS.md`; a narrow unique
+routing adapter is approved separately).
 
 Every application follows the same process:
 
@@ -375,7 +377,7 @@ Examples:
 - Kilo Builder → Kilo Adapter
 - Future Builder → Future Adapter
 
-(Claude Builder was dropped 2026-08-08 - see `planning/DECISIONS.md`.)
+(Claude Builder was dropped as a universal scaffold target 2026-08-08 - historical; see `planning/DECISIONS.md`.)
 
 The framework never requires rewriting.
 
@@ -397,6 +399,30 @@ The app is NOT a separate framework - it is a frontend for this one. Any new
 adapter/agent support the framework gains is available to the app automatically
 (via the scaffold registry), and future agents beyond OpenCode + KiloCode are
 expected to work through both surfaces (untested yet - see ROADMAP Phase 15).
+
+---
+
+## Unique Agent Adapters (Framework 2.3.0)
+
+The project adapter covers the project's primary target. A project may also
+carry one or more reusable unique-agent adapters for targets whose contracts
+differ materially from the universal scaffold (see FRAMEWORK.md, Adapter
+Categories).
+
+Each unique-agent adapter:
+
+- owns a dedicated `adapters/<agent>/` documentation namespace with a fixed
+  five-file contract (README, ADAPTER, BUILDER_SPEC, TESTING, COMPATIBILITY);
+- uses an approved target-specific implementation mapping, with any packaged
+  engine copy explicitly derived from the canonical source;
+- keeps generic BDF documents and templates free of target-specific paths,
+  setting names, environment variables, and support claims;
+- preserves its lifecycle status vocabulary (fixture validated, compatibility
+  evaluated, integrated - not live validated, supported after live
+  validation).
+
+Historical statements about a specific target remain historical; newer narrow
+adapters are recorded as later decisions without rewriting history.
 
 ---
 

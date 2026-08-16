@@ -522,6 +522,16 @@ This approach minimizes breaking changes and keeps the project maintainable over
 
 ---
 
+## Unique Adapter and Hybrid Documentation Layers (generic)
+
+Repositories may use a hybrid documentation architecture: generic contracts
+define reusable adapter categories, root documents summarize and link, unique
+adapter namespaces own durable target-specific documentation, and gate
+evidence lives under `planning/`. Engine ownership layers canonical
+unique-adapter implementation with derived packaged copies.
+
+---
+
 **Document Version:** {{DOC_VERSION}}
 
 **Status:** Current Architecture

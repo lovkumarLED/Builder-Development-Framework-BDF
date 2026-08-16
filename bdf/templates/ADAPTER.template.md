@@ -228,6 +228,17 @@ When the framework references a project-specific value, this adapter defines it.
 
 ---
 
+## Unique Agent Adapter Namespaces (generic)
+
+A project may carry unique bounded adapters in addition to its project
+adapter. Each unique adapter owns `adapters/<agent>/` with a fixed five-file
+documentation contract (README, ADAPTER, BUILDER_SPEC, TESTING,
+COMPATIBILITY) and an approved implementation mapping. Generic templates carry
+only the reusable structure; target-specific paths, settings, environment
+variables, versions, and support claims belong in the adapter documents.
+
+---
+
 **Document Version:** {{DOC_VERSION}}
 
 **Status:** Active Project Adapter

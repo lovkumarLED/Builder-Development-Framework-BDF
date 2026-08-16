@@ -400,3 +400,17 @@ built-in look and shows a warning in the black window — nothing breaks.
   **Configured** with their declared type. It does not claim plugin installs,
   MCP connectivity, discovered tools, provider health, or a successful test
   unless you explicitly run the relevant provider test.
+
+## Claude Code
+
+The app includes a narrow Claude Code routing adapter (one scalar route at a
+time) documented under `adapters/claude-code/`. Claude Code is its own mode
+in the app: a tile on "Connect your agent", a tab in the agent switcher, and
+a separate Routes page (routing profiles + the Gateway compatibility
+assistant). Saving a route can create the gateway credential as a Windows
+environment variable for you and removes it again when the route is removed.
+A read-only inventory shows the MCP servers (with types) and plugins Claude
+Code has configured, scanned from the Claude state file and the managed
+settings file - never edited. Lifecycle status: **Integrated, not live
+validated** - not supported for normal use; live validation (Gate 5) remains
+unauthorized.

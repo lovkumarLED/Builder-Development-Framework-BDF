@@ -1,0 +1,5 @@
+{
+  "model": "broken",
+  "env": {
+    "BROKEN": true
+  }

@@ -305,6 +305,16 @@ When the framework references a project-specific value, this adapter defines it.
 
 ---
 
+## Unique Agent Adapter Namespaces
+
+The project adapter covers the OpenCode primary target. The project may also
+carry unique bounded adapters for targets whose contracts differ materially
+from the universal scaffold. Each unique adapter owns `adapters/<agent>/`
+(fixed five-file documentation contract) and an approved implementation
+mapping. Target-specific detail lives in the adapter documents, not here.
+
+---
+
 **Document Version:** 1.1
 
 **Status:** Active Project Adapter

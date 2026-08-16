@@ -1,8 +1,31 @@
 import { api, optional } from "../core/api.js";
 import { escapeHtml, notify, openDialog } from "../core/dialog.js";
 import { reducedMotion, setMotionPreference } from "../core/motion.js";
+import { isClaude } from "../core/capabilities.js";
 import { levelsForProvider, modelEditorMarkup, modelEditorRowMarkup, normalizeModelBatch, thinkingLevelMarkup } from "./settings-model-editor.js";
 import { modelManagerRows, settingsWorkspaceMarkup } from "./settings-workspace.js";
+
+const CLAUDE_RESTART_NOTICE = "Restarting Claude Code may be required for startup-only values.";
+
+async function renderClaudeSettings(workspace) {
+  workspace.innerHTML = `<section class="settings-workspace"><div class="card card--padded skeleton"></div></section>`;
+  const [routes, status, inventory] = await Promise.all([
+    optional(() => api.claudeRoutes(), { routes: [], appliedRouteId: null }),
+    optional(() => api.claudeStatus(), null),
+    optional(() => api.claudeScan(), { mcps: [], plugins: [], statePresent: false, stateParseError: false, projectCount: 0 }),
+  ]);
+  const applied = (routes.routes || []).find(route => route.id === routes.appliedRouteId) || null;
+  const mcps = Array.isArray(inventory.mcps) ? inventory.mcps : [];
+  const plugins = Array.isArray(inventory.plugins) ? inventory.plugins : [];
+  const mcpRows = mcps.map(mcp => `<li class="claude-inventory-row"><strong>${escapeHtml(mcp.name)}</strong><span class="claude-type-chip">${escapeHtml(mcp.type)}</span><span class="muted">${escapeHtml(mcp.scope)}${mcp.project ? ` · ${escapeHtml(mcp.project)}` : ""}</span></li>`).join("");
+  const pluginChips = plugins.map(name => `<span class="chip">${escapeHtml(name)}</span>`).join("");
+  const stateNote = !inventory.statePresent
+    ? "No .claude.json found."
+    : inventory.stateParseError
+      ? "Could not read .claude.json."
+      : `Scanned from .claude.json${inventory.projectCount ? ` (${inventory.projectCount} project scope${inventory.projectCount === 1 ? "" : "s"})` : ""} - read-only, never edited by Switcher.`;
+  workspace.innerHTML = `<section class="settings-workspace"><div class="card card--padded"><p class="eyebrow">Routing profiles</p><h2 class="page-title">Claude Code settings</h2><p class="page-intro">Claude-owned settings preserved. Marketplaces, plugin installation, MCP servers, skills, permissions, hooks, memory, and other settings stay Claude-owned and unsupported in this release.</p></div><div class="claude-settings-grid"><div class="card card--padded"><p class="eyebrow">Routing profile status</p><dl class="stack"><div><dt>Saved routes</dt><dd>${(routes.routes || []).length}</dd></div><div><dt>Applied route</dt><dd>${applied ? escapeHtml(applied.name) : "None"}</dd></div><div><dt>Applied model</dt><dd>${applied ? escapeHtml(applied.model) : "�?None"}</dd></div><div><dt>Backup available</dt><dd>${status?.lastBackupAvailable ? "Yes" : "No"}</dd></div><div><dt>Real-target lock</dt><dd>${status?.realTargetLocked ? "Locked until Gate 5 approval" : "Unlocked"}</dd></div></dl><p class="muted">${CLAUDE_RESTART_NOTICE}</p></div><div class="card card--padded"><p class="eyebrow">Claude inventory (read-only)</p><div class="claude-inventory-chips"><span class="chip chip--strong">${mcps.length} MCP servers</span><span class="chip chip--strong">${plugins.length} plugins</span></div>${mcpRows ? `<ul class="claude-inventory-list">${mcpRows}</ul>` : ""}${pluginChips ? `<div class="claude-inventory-plugins">${pluginChips}</div>` : ""}<p class="muted claude-inventory-note">${stateNote}</p></div></div></section>`;
+}
 
 const defaultPreferences = { activityRetentionDays: 30, requestContentRedaction: true, reducedMotion: "system" };
 
@@ -30,14 +53,35 @@ function openAddModelDialog(trigger, provider, formats, onSaved) {
     rows.dataset.nextIndex = String(index + 1);
     rows.lastElementChild.querySelector("input")?.focus();
   });
-  rows.addEventListener("click", event => {
+  rows.addEventListener("click", async event => {
     const remove = event.target.closest("[data-remove-model]");
-    if (!remove) return;
-    const row = remove.closest("[data-model-row]");
-    if (rows.children.length === 1) {
-      row.querySelectorAll("input").forEach(input => { input.value = ""; input.checked = false; });
-      row.querySelector("input")?.focus();
-    } else row.remove();
+    if (remove) {
+      const row = remove.closest("[data-model-row]");
+      if (rows.children.length === 1) {
+        row.querySelectorAll("input").forEach(input => { input.value = ""; input.checked = false; });
+        row.querySelector("input")?.focus();
+      } else row.remove();
+      return;
+    }
+    const testButton = event.target.closest("[data-test-model]");
+    if (!testButton) return;
+    const row = testButton.closest("[data-model-row]");
+    const result = row.querySelector("[data-test-result]");
+    const modelId = row.querySelector(".settings-model-id").value.trim();
+    const apiModelId = row.querySelector(".settings-model-api-id").value.trim();
+    if (!modelId && !apiModelId) { result.textContent = "Enter a model ID first."; return; }
+    testButton.disabled = true;
+    result.textContent = "Testing…";
+    try {
+      const response = await api.testModel(provider.id, { model: modelId, apiModelId });
+      result.textContent = response.message || (response.ok ? "Model replied OK." : "Model test failed.");
+      result.classList.toggle("is-error", !response.ok);
+    } catch (error) {
+      result.textContent = error.message;
+      result.classList.add("is-error");
+    } finally {
+      testButton.disabled = false;
+    }
   });
   rows.addEventListener("change", event => {
     const format = event.target.closest("[data-reasoning-format]");
@@ -56,6 +100,7 @@ function openAddModelDialog(trigger, provider, formats, onSaved) {
       const candidates = [...rows.querySelectorAll("[data-model-row]")].map(row => ({
         model: row.querySelector(".settings-model-id").value,
         name: row.querySelector(".settings-model-name").value,
+        apiModelId: row.querySelector(".settings-model-api-id").value,
         thinking: [...row.querySelectorAll("[data-reasoning-level]:checked")].map(input => input.value),
         reasoningFormat: row.querySelector("[data-reasoning-format]:checked")?.value || selectedFormat,
       }));
@@ -69,6 +114,10 @@ function openAddModelDialog(trigger, provider, formats, onSaved) {
 }
 
 export async function renderSettings(workspace) {
+  if (isClaude()) {
+    await renderClaudeSettings(workspace);
+    return;
+  }
   workspace.innerHTML = `<section class="settings-workspace"><div class="card card--padded skeleton"></div><div class="card card--padded skeleton"></div></section>`;
   const [providerData, formatData, preferenceData, pluginData, mcpData, profileData] = await Promise.all([
     optional(() => api.providers(), { providers: [] }),

@@ -531,6 +531,54 @@ function Test-ProfileModelsHighestPrecedence {
 }
 
 # ------------------------------------------------------------
+# Test 6b - apiModelId aliases the output model key
+# ------------------------------------------------------------
+
+function Test-ApiModelIdAliasesOutputKey {
+
+    $Root = New-V25Root
+
+    try {
+
+        Write-ProfileSettings $Root -Active @("modal")
+
+        Write-ValidProvider $Root "modal" "Modal"
+
+        Write-ProfileProviderModels $Root "default" "modal" @{
+            "display/modal-id" = @{ name = "Modal Display"; apiModelId = "upstream/modal-id"; variants = @{ max = @{ reasoningEffort = "max" } } }
+            "display/plain-id" = @{ name = "Plain Display" }
+        }
+
+        $Run = Invoke-Builder $Root -NonInteractive
+
+        Assert-True ($Run.ExitCode -eq 0) "Builder exited with code $($Run.ExitCode): $($Run.Output)"
+
+        $Generated = Read-Generated $Root
+
+        $Models = $Generated.provider.modal.models
+
+        Assert-True ($null -ne $Models."upstream/modal-id") `
+            "apiModelId 'upstream/modal-id' must become the output model key."
+
+        Assert-True ($null -eq $Models."display/modal-id") `
+            "Display key 'display/modal-id' must not remain in the output."
+
+        Assert-True ($null -ne $Models."display/plain-id") `
+            "A model without apiModelId keeps its key."
+
+        Assert-True ($null -eq $Models."upstream/modal-id".PSObject.Properties['apiModelId']) `
+            "apiModelId must not leak into the generated output."
+
+        Assert-True ($Models."upstream/modal-id".name -eq "Modal Display") `
+            "Display name must be preserved under the aliased key."
+    }
+    finally {
+
+        Remove-TestRoot $Root
+    }
+}
+
+# ------------------------------------------------------------
 # Test 7 - Non-active profile models are ignored
 # ------------------------------------------------------------
 
@@ -1767,6 +1815,7 @@ Run-Test "Non-interactive uses stored"          { Test-NonInteractiveUsesStored 
 Run-Test "Provider arg skips prompt"            { Test-ProviderArgSkipsPrompt }
 Run-Test "Provider arg unknown fails"           { Test-ProviderArgUnknownFails }
 Run-Test "Profile models highest precedence"    { Test-ProfileModelsHighestPrecedence }
+Run-Test "apiModelId aliases output key"        { Test-ApiModelIdAliasesOutputKey }
 Run-Test "Non-active profile models ignored"    { Test-NonActiveProfileModelsIgnored }
 Run-Test "Settings persist round-trip"          { Test-SettingsPersistRoundTrip }
 Run-Test "Settings backup created"              { Test-SettingsBackupCreated }

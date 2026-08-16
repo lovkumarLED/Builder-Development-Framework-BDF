@@ -137,6 +137,36 @@ Context: Rule in `AI/CONTINUE_PROJECT_BUILD.md`; context budget in
 
 Reversal: None.
 
+### 2026-08-14 - Narrow unique routing adapter for Claude Code approved (reverses only the blanket exclusion)
+
+Decision: Claude Code remains excluded from the universal OpenCode/Kilo
+architecture, but is approved as a unique bounded routing adapter that manages
+exactly one scalar route at a time through the Switcher app.
+
+Why: The historical 2026-08-08 rejection correctly ruled out treating Claude
+Code as a same-architecture universal target and managing its entropic state as
+generated configuration. A narrow adapter that patches only approved routing
+fields and preserves every unsupported semantic value is safe and useful.
+
+Context: Gate 1 research established the user-scope settings target and the
+Claude-owned exclusions; Gates 2-4 proved fixture, provider/model, and app
+integration behavior. The Switcher app surface treats
+`app/engine/claude-code/` (shared routing core, fixture and production entry
+points, fixtures, harness) as the canonical implementation location and
+`app/state/claude-routes.json` as the canonical route source; the research
+plan's root-level canonical proposal (`providers/claude-code.json`,
+`profiles/<profile>/claude-settings.json`, root `schemas/`, `scripts/`) is the
+proposal for a future BDF-native surface and is not created by Gate 4.
+
+Preserved prohibitions: no generation or replacement of Claude-owned state; no
+fake multi-provider registry; no implied management of plugins, marketplaces,
+MCP, skills, permissions, hooks, memory, sessions, or credentials. Live
+validation (Gate 5) remains unauthorized.
+
+Reversal: Reverses only the blanket conclusion in the 2026-08-08 entry that no
+Claude adapter may exist. The 2026-08-08 entry remains historical and
+byte-identical.
+
 ---
 
 **Document Version:** 1.0

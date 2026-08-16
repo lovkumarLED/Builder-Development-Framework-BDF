@@ -10,7 +10,7 @@
 
 The OpenCode Configuration Manager is a modular configuration generation system.
 
-Its purpose is to generate a valid `opencode.json` from a set of smaller configuration files.
+Its purpose is to generate a valid `opencode.json (absent)` from a set of smaller configuration files.
 
 The project separates:
 
@@ -24,6 +24,11 @@ The documentation is organized into two layers.
 Layer 1: the Builder Development Framework (BDF), reusable engineering knowledge shared by every builder project.
 
 Layer 2: the OpenCode-specific project documentation.
+
+A hybrid unique-adapter layer adds adapter namespaces (the generic notation adapters/<agent>/) for targets
+whose contracts differ materially from the universal scaffold. The Switcher
+app currently carries one unique bounded adapter: Claude Code (lifecycle
+status **Integrated, not live validated**; see `adapters/claude-code/`).
 
 The project-specific facts are defined in the project adapter:
 
@@ -75,7 +80,7 @@ Full-system health check + security hardening + per-model reasoning
 The `opencode` directory is the root of the entire project.
 
 ```
-opencode/
+opencode/ (the docs repository root)
 
 ├── backup/
 ├── docs/
@@ -706,7 +711,7 @@ Recorded in `bdf/VERSION.md`.
 Current framework version:
 
 ```
-2.2.9
+2.3.0
 ```
 
 ---
@@ -754,6 +759,12 @@ Planned features are documented only in `ROADMAP.md`.
 
 ---
 
+
+The Switcher app additionally contains a narrow Claude Code routing adapter
+(one scalar route at a time) implemented under `app/engine/claude-code/` and
+documented under `adapters/claude-code/`. Lifecycle status: **Integrated, not
+live validated** - not supported for normal use. Live validation (Gate 5)
+remains unauthorized. Runtime state is Git-ignored under `app/state/`.
 # 12. Known Limitations
 
 - One active profile at build time.
@@ -768,37 +779,11 @@ These limitations simplify development and provide a stable foundation for futur
 
 # 13. Next Planned Work
 
-## Immediate
-
-- Committed: 459d407 (docs batch, sessions 28b-28f) + b3a0bdb (Switcher app, session 29) + session 31 commit (real-provider fix + presets + builder parity + docs).
-- Pending: user acceptance of Kilo chat with TokenRouter (done — works), then commit; future app update to generate BOTH opencode.json and opencode.jsonc (planned, not yet).
-
-## Roadmap Phases
-
-Phase 4 — Additional Providers
-
-Phase 8 — Documentation Expansion
-
-Phase 12 — KiloCode Builder V1 (COMPLETED 2026-08-07, harness 31/31)
-
-Phase 14 — GUI App (COMPLETED 2026-08-08, session 29)
-
-Phase 15 — More Coding Agents (PLANNED — OpenCode + KiloCode verified; other open-source coding agents expected to work with the universal engine but untested yet)
-
-Phase 13 — V3 Universal Builder Generator (IN PROGRESS — universal scaffold core,
-sessions 24b-26b)
-
-Phase 11 — Claude Code Builder V1 — DROPPED 2026-08-08 (entropic `~/.claude.json`, no
-provider support; see `planning/DECISIONS.md`)
-
-Phases 3, 5, 6, and 7 (Validation Framework, Automated Testing, Builder Refactoring, BDF Generalization) were completed in Builder V2.1 (version 2.2.0).
-
-Phase 10 (BDF V2.5: Framework Generalization) was completed in version 2.3.0.
-
-All phases are planned only. They are documented exclusively in `ROADMAP.md`.
-
----
-
+- Gate 5 live validation of the Claude Code unique adapter (unauthorized
+  until a dedicated human-approved handoff).
+- Triaging the three established baseline test failures (two preference
+  tests, one onboarding-copy frontend test).
+- Phase 15 continues: additional coding agents remain unverified.
 # 14. File Relationships
 
 ```
@@ -875,6 +860,11 @@ PROJECT_STATE.md
 10. Consistency is more important than speed.
 
 ---
+
+A narrow unique routing adapter for Claude Code was approved on 2026-08-14
+(`planning/DECISIONS.md`), reversing only the blanket exclusion of the
+2026-08-08 decision for a unique bounded routing adapter. The historical
+decision remains byte-identical.
 
 **Document Version:** 1.2
 

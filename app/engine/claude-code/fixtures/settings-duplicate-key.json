@@ -1,0 +1,8 @@
+{
+  "model": "old/model",
+  "env": {},
+  "nested": {
+    "duplicateProbe": "first",
+    "duplicateProbe": "second"
+  }
+}

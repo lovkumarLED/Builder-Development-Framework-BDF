@@ -297,6 +297,19 @@ The roadmap moves completed work to the changelog.
 
 ---
 
+## Adapter Documentation and Compatibility Evolution (Framework 2.3.0)
+
+When a unique bounded adapter changes:
+
+- Update the five adapter documents and the approved canonical implementation
+  or schema together.
+- Update the compatibility ledger with the evidence level actually reached;
+  never extrapolate support from one version.
+- Reuse generic BDF concepts; never move target-specific facts into generic
+  templates.
+
+---
+
 **Document Version:** 1.0
 
 **Status:** Active Builder Evolution

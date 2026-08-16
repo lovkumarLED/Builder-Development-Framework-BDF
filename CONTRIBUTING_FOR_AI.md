@@ -269,6 +269,21 @@ than before the contribution began.
 
 ---
 
+## Adapter Status and Gate Checks
+
+Before editing a unique adapter namespace or its implementation:
+
+1. Read the five adapter documents and the governing research plan and gate
+   reports.
+2. Check the adapter lifecycle status and never claim a stronger phrase than
+   the evidence gate allows.
+3. Keep target-specific paths, setting names, environment variables, versions,
+   and support claims inside the adapter documents, never in generic BDF
+   documents or templates.
+4. Follow the README synchronization rule for any user-visible status change.
+
+---
+
 **Document Version:** 1.0
 
 **Status:** AI Contribution Guide

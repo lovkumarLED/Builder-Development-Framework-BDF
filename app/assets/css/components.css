@@ -21,7 +21,7 @@
 .status-dot--ok { background: var(--green); } .status-dot--warn { background: var(--amber); } .status-dot--error { background: var(--red); }
 .field { display: grid; gap: 7px; }
 .field label { font-size: .82rem; font-weight: 650; }
-.field input, .field select, .field textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--ink); }
+.field input:not([type="checkbox"]), .field select, .field textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--ink); }
 .field textarea { min-height: 118px; resize: vertical; font-family: var(--mono); font-size: .82rem; }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--coral); box-shadow: var(--focus); }
 .field-note { margin: 0; color: var(--muted); font-size: .78rem; }

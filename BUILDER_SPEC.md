@@ -1566,6 +1566,16 @@ no provider support — see planning/DECISIONS.md 2026-08-08).
 
 ---
 
+## Dedicated Engine Adapters
+
+Build routing: targets that satisfy the universal scaffold contract use the
+universal path. Unique bounded targets route to dedicated engine adapters
+under `app/engine/<agent>/`, whose detailed behavior contracts live in
+`adapters/<agent>/BUILDER_SPEC.md`. The generic path never absorbs
+target-specific facts.
+
+---
+
 **Document Version:** 1.0
 
 **Status:** Current Builder Specification

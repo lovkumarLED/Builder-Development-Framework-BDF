@@ -18,6 +18,13 @@ Copy this block into Entries when a fix lands:
 
 ## Entries
 
+### 2026-08-16 - Claude route form checkboxes rendered huge
+
+- **Symptom:** Every checkbox in the Add-route dialog (gateway discovery, disable betas, suppress nonessential traffic, confirmation box) rendered as a giant full-width box with an enormous checkmark.
+- **Root cause:** `app/assets/css/components.css` styles `.field input` with `width: 100%; min-height: 44px` — the same rule matched `input[type="checkbox"]` inside any `.field`, stretching checkboxes into 44px-high full-width blocks.
+- **Fix:** Excluded checkboxes from the text-input rule: `.field input:not([type="checkbox"]), .field select, .field textarea` (components.css). Checkboxes now render at native size.
+- **Verified:** Focused frontend contract suite green (44/44); diff check clean; visual check in the live app after refresh.
+
 ### 2026-08-15 - Edit provider button added to provider cards
 
 - **Symptom:** Rotating an API key (e.g. OrcaRouter) meant deleting and re-adding the provider, or hand-editing JSON — the edit wizard existed but was buried inside card → Details → Edit provider and was never discoverable.

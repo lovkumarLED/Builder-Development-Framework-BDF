@@ -1,5 +1,6 @@
 const state = {
   status: null,
+  capabilities: null,
   route: "overview",
   providers: [],
   activeProvider: null,

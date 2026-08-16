@@ -84,6 +84,7 @@ function icon(name) {
     eye: '<svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>',
     copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="12" rx="1"/><path d="M16 8V4H5v12h3"/></svg>',
     lock: '<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
+    shield: '<svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.4-2.9 8.3-7 10-4.1-1.7-7-5.6-7-10V6z"/><path d="m9.2 12.1 2 2 3.8-4"/></svg>',
     info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg>',
     profile: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-5 3.5-7 8-7s7.2 2 8 7" fill="currentColor" stroke="none"/></svg>',
     plugin: '<svg viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v3.8h1.5a2.7 2.7 0 1 1 0 5.4H2V20a2 2 0 0 0 2 2h3.8v-1.5a2.7 2.7 0 1 1 5.4 0V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5Z" fill="currentColor"/></svg>',
@@ -105,7 +106,7 @@ function sidebarMarkup(screen) {
     const classes = completed.includes(number) ? "is-done" : number === step ? "is-current" : "";
     return `<li class="${classes}"><span>${completed.includes(number) ? icon("check") : String(number).padStart(2, "0")}</span><b>${label}</b></li>`;
   }).join("");
-  return `<aside class="onboarding-rail">${brandMarkup()}<p class="onboarding-label">ONBOARDING</p><ol class="onboarding-rail-steps">${steps}</ol><div class="onboarding-help"><span>${icon("help")}</span><p>Need help?<a href="/docs" target="_blank" rel="noreferrer">Open docs ↗</a></p></div></aside>`;
+  return `<aside class="onboarding-rail">${brandMarkup()}<p class="onboarding-label">ONBOARDING</p><ol class="onboarding-rail-steps">${steps}</ol><div class="onboarding-privacy" role="note"><span>${icon("shield")}</span><p><strong>Private by default</strong><small>Your keys stay on your computer.<br>Prompts aren’t stored by Switcher.</small></p></div></aside>`;
 }
 
 function progressMarkup(screen) {
@@ -123,7 +124,7 @@ function shellMarkup(screen, body, footer) {
 function agentIcon(id) {
   if (id === "opencode") return '<span class="agent-tile agent-tile--brand" aria-hidden="true"><img src="/assets/brands/opencode.svg" alt=""></span>';
   if (id === "kilo") return '<span class="agent-tile agent-tile--brand" aria-hidden="true"><img src="/assets/brands/kilocode.svg" alt=""></span>';
-  if (id === "claudecode") return '<span class="agent-tile agent-tile--claude" aria-hidden="true"><img src="/assets/brands/claudecode.svg" alt=""></span>';
+  if (id === "claudecode" || id === "claude-code") return '<span class="agent-tile agent-tile--claude" aria-hidden="true"><img src="/assets/brands/claudecode.svg" alt=""></span>';
   return `<span class="agent-tile agent-tile--manual" aria-hidden="true">${icon("folder")}</span>`;
 }
 
@@ -132,8 +133,7 @@ function agentScreenMarkup() {
   const continueDisabled = selectedKind ? "" : "disabled";
   const note = scanResult && scanResultSource && chosenAgent && scanResultSource.id === chosenAgent.id && scanResultSource.dir === chosenAgent.path
     ? `<p class="agent-scan-note">Scanned ${escapeHtml(chosenAgent.name)}: ${(scanResult.providers || []).length} providers · ${(scanResult.mcps || []).length} MCP servers · ${(scanResult.plugins || []).length} plugins</p>`
-    : "";
-  return shellMarkup("agent", `<h1 id="startupTitle">Connect your agent</h1><p class="onboarding-step-count">02 of 04</p><p class="onboarding-intro">Choose an AI coding agent already installed on this computer.</p><div class="agent-choices">${cards || '<p class="agent-empty">Looking for your agents…</p>'}<button id="manualAgentChoice" class="agent-choice" type="button" aria-pressed="${selectedKind === "manual"}">${agentIcon("manual")}<span class="agent-copy"><strong>Choose a folder manually</strong><small>Select a different agent folder</small></span><span class="choice-radio" aria-hidden="true"></span><span class="choice-chevron" aria-hidden="true">›</span></button></div>${note}<div id="manualDialog" class="onboarding-dialog" hidden><div class="onboarding-dialog-card" role="dialog" aria-modal="true" aria-labelledby="manualDialogTitle"><h2 id="manualDialogTitle">Choose a folder manually</h2><p class="onboarding-dialog-copy">Point to the config folder of an AI coding agent on this computer.</p><label for="manualAgentPath">Agent folder</label><div class="onboarding-input"><input id="manualAgentPath" type="text" placeholder="C:\\Users\\you\\.config\\opencode" autocomplete="off"></div><p id="manualDialogError" class="onboarding-dialog-error" role="alert"></p><div class="onboarding-dialog-actions"><button id="manualCancel" class="onboarding-button onboarding-button--outline" type="button">Cancel</button><button id="manualConfirm" class="onboarding-button onboarding-button--primary" type="button">Use this folder</button></div></div></div>`, `<button id="onboardingBack" class="onboarding-button onboarding-button--outline" type="button">Back</button><button id="agentContinue" class="onboarding-button onboarding-button--primary" type="button" ${continueDisabled}>Continue</button>`);
+    : "";  return shellMarkup("agent", `<h1 id="startupTitle">Connect your agent</h1><p class="onboarding-step-count">02 of 04</p><p class="onboarding-intro">Choose an AI coding agent already installed on this computer.</p><div class="agent-choices">${cards || '<p class="agent-empty">Looking for your agents…</p>'}<button id="manualAgentChoice" class="agent-choice" type="button" aria-pressed="${selectedKind === "manual"}">${agentIcon("manual")}<span class="agent-copy"><strong>Choose a folder manually</strong><small>Select a different agent folder</small></span><span class="choice-radio" aria-hidden="true"></span><span class="choice-chevron" aria-hidden="true">›</span></button></div>${note}<div id="manualDialog" class="onboarding-dialog" hidden><div class="onboarding-dialog-card" role="dialog" aria-modal="true" aria-labelledby="manualDialogTitle"><h2 id="manualDialogTitle">Choose a folder manually</h2><p class="onboarding-dialog-copy">Point to the config folder of an AI coding agent on this computer.</p><label for="manualAgentPath">Agent folder</label><div class="onboarding-input"><input id="manualAgentPath" type="text" placeholder="C:\\Users\\you\\.config\\opencode" autocomplete="off"></div><p id="manualDialogError" class="onboarding-dialog-error" role="alert"></p><div class="onboarding-dialog-actions"><button id="manualCancel" class="onboarding-button onboarding-button--outline" type="button">Cancel</button><button id="manualConfirm" class="onboarding-button onboarding-button--primary" type="button">Use this folder</button></div></div></div>`, `<button id="onboardingBack" class="onboarding-button onboarding-button--outline" type="button">Back</button><button id="agentContinue" class="onboarding-button onboarding-button--primary" type="button" ${continueDisabled}>Continue</button>`);
 }
 
 function summaryCard(kind, label, count) {
@@ -256,6 +256,9 @@ async function loadDiscovery() {
     const discovery = await api.discover({});
     const verified = (discovery.agents || []).filter(agent => verifiedAgentNames.has(agent.name));
     discoveredAgents = verified.map(agent => ({ id: agent.name, name: agent.name === "opencode" ? "OpenCode" : "KiloCode", path: agent.dir, detected: true, raw: agent }));
+    // Claude Code is a separate page, not a detected provider: the tile is
+    // always offered and its scan reads only app-owned saved-route state.
+    discoveredAgents = [...discoveredAgents, { id: "claude-code", name: "Claude Code", path: "", detected: true, raw: { name: "claude-code" } }];
   } catch {
     setMessage("Could not scan for agents. Use the manual folder option.", true);
   }
@@ -271,6 +274,13 @@ async function scanChosenAgent(agent) {
     resolved = { id: "manual", name: candidate.name === "opencode" ? "OpenCode" : candidate.name, path: candidate.dir, detected: false, raw: candidate };
   }
   chosenAgent = resolved;
+  if (resolved.id === "claude-code") {
+    let probe = null;
+    try { probe = await api.claudeScan(); } catch { probe = null; }
+    scanResult = probe || { agent: "claude-code", split: false, mcps: [], plugins: [], providers: [], activeProviders: [], hasBuilder: false, savedRoutes: 0 };
+    scanResultSource = { id: "claude-code", dir: "" };
+    return resolved;
+  }
   let result = await api.scan({ agent: resolved.id, dir: resolved.path });
   if (!result.split) {
     setMessage("Setting up your agent workspace (profiles, MCP, plugins)…");
@@ -353,6 +363,11 @@ async function continueFromAgent() {
       agent = { id: "manual", name: candidate.name === "opencode" ? "OpenCode" : candidate.name, path: candidate.dir, detected: false, raw: candidate };
     }
     const source = { id: agent.id, dir: agent.path };
+    if (agent.id === "claude-code") {
+      if (!scanResult || !scanResultSource || scanResultSource.id !== source.id) await scanChosenAgent(agent);
+      render("review");
+      return;
+    }
     if (!scanResult || !scanResultSource || scanResultSource.id !== source.id || scanResultSource.dir !== source.dir) {
       setMessage("Scanning your local agent workspace…");
       scanResult = await api.scan({ agent: source.id, dir: source.dir });
@@ -375,6 +390,13 @@ async function useWorkspace() {
   setupGuide = null;                            // never leak a previous guide
   try {
     const agent = chosenAgent?.raw || { name: "opencode", dir: chosenAgent?.path || "" };
+    if (agent.name === "claude-code" || chosenAgent?.id === "claude-code") {
+      setMessage("Connecting Claude Code…");
+      const connect = await api.claudeConnect();
+      if (!connect.ok) throw new Error(connect.message || "Claude Code could not be connected.");
+      render("ready");
+      return;
+    }
     if (freshSetup) {
       const result = await api.scaffold({ agent: agent.name, dir: agent.dir });
       if (!result.ok) throw new Error(result.message || "Builder generation did not complete.");

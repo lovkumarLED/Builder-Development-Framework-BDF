@@ -136,7 +136,7 @@ reference which templates, so a change to one document always shows what must be
 
 | Framework document | Templates referenced |
 |--------------------|----------------------|
-| `FRAMEWORK.md` | The template set as a component; `DESIGN_PRINCIPLES.template.md` (principles). |
+| `FRAMEWORK.md` | The template set as a component; `DESIGN_PRINCIPLES.template.md` (principles); adapter categories are documented in the framework document, templates carry only generic structure. |
 | `PROJECT_ADAPTER.md` | `ADAPTER.template.md` (adapter contents, field table, creating an adapter). |
 | `PROJECT_GENERATOR.md` | All 19 templates (Stage 4 copy list + Stage 5 rename map). |
 | `NEW_PROJECT_GUIDE.md` | `ADAPTER.template.md`, `PROJECT_STATE.template.md`, `FOLDER_STRUCTURE.template.md`, `JSON_SCHEMAS.template.md`, `BUILDER_SPEC.template.md`. |
@@ -146,6 +146,7 @@ reference which templates, so a change to one document always shows what must be
 | `MIGRATION.md` | The template set (Stage 5 aligns project documents with templates). |
 | `VERSION.md` | `PROJECT_STATE.template.md` (recorded in framework change history). |
 | `FRAMEWORK_LIFECYCLE.md` | The template set (as a framework component). |
+| Adapter namespaces (`adapters/<agent>/`) | Not templated: adapter documents are target-specific and are never generated from generic templates. |
 
 ## How to Use the Matrix
 

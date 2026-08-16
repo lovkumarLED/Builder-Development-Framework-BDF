@@ -1,7 +1,7 @@
 import { api } from "./core/api.js";
 import { store } from "./core/store.js";
 import { initRouter, navigate, mobileSidebarInert } from "./core/router.js";
-import { initDesktopSidebar } from "./core/sidebar.js";
+import { initDesktopSidebar, applyCapabilityNavigation } from "./core/sidebar.js";
 import { openAboutDialog } from "./core/about.js";
 import { enterPage, initSidebarBrandMark, setMotionPreference } from "./core/motion.js";
 import { escapeHtml, notify, openDialog } from "./core/dialog.js";
@@ -19,16 +19,36 @@ const startupView = document.querySelector("#startupView");
 const appShell = document.querySelector("#appShell");
 const workspace = document.querySelector("#workspace");
 
-const AGENT_DISPLAY = { opencode: "OpenCode", kilo: "Kilo" };
+const AGENT_DISPLAY = { opencode: "OpenCode", kilo: "Kilo", "claude-code": "Claude Code" };
 const agentDisplayName = name => AGENT_DISPLAY[name] || name || "Local agent";
 
 async function refreshAgentContext() {
+  const [status, agents, capabilityData] = await Promise.all([
+    api.status(),
+    api.agents(),
+    api.capabilities(),
+  ]);
+  store.set({ status, capabilities: capabilityData.capabilities });
+  applyCapabilityNavigation(capabilityData.capabilities);
+  document.querySelector("#activeAgentName").textContent = agentDisplayName(capabilityData.displayName || agents.active || status.agent || "Local agent");
+}
+
+async function safeRefreshAgentContext() {
   try {
-    const [status, agents] = await Promise.all([api.status(), api.agents()]);
-    store.set({ status });
-    document.querySelector("#activeAgentName").textContent = agentDisplayName(agents.active || status.agent || "Local agent");
-  } catch {
+    await refreshAgentContext();
+    return true;
+  } catch (error) {
+    const caps = store.get().capabilities;
+    if (caps) {
+      document.querySelector("#activeAgentName").textContent = "Local agent";
+      notify(error.message || "Could not refresh agent context.", "error");
+      return true;
+    }
+    store.set({ capabilities: null });
+    applyCapabilityNavigation(null);
     document.querySelector("#activeAgentName").textContent = "Local agent";
+    notify(error.message || "Could not load agent capabilities.", "error");
+    return false;
   }
 }
 
@@ -49,10 +69,15 @@ async function renderRoute(route, { focus = true } = {}) {
   }
 }
 
-function showWorkspace() {
+async function showWorkspace() {
   startupView.hidden = true;
+  const loaded = await safeRefreshAgentContext();
+  if (!loaded) {
+    appShell.hidden = false;
+    workspace.innerHTML = `<div class="empty-state"><h1 class="page-title">This workspace could not load</h1><p>Agent capabilities could not be loaded. Reload the page to try again.</p></div>`;
+    return;
+  }
   appShell.hidden = false;
-  refreshAgentContext();
   initRouter(renderRoute);
 }
 
@@ -94,7 +119,11 @@ function bindShell() {
   syncSidebar(false);
   menu.addEventListener("click", () => syncSidebar(!sidebar.classList.contains("is-open")));
   window.addEventListener("resize", () => syncSidebar(window.innerWidth >= 900 ? false : sidebar.classList.contains("is-open")));
-  document.querySelector("#globalBuildButton").addEventListener("click", event => openBuildDialog(event.currentTarget));
+  document.querySelector("#globalBuildButton").addEventListener("click", event => {
+    const caps = store.get().capabilities;
+    if (!caps || caps.builderAvailable === false) return;
+    openBuildDialog(event.currentTarget);
+  });
   document.querySelector('.sidebar-tool[aria-label="Toggle color theme"]').addEventListener("click", () => {
     const root = document.documentElement;
     const dark = root.getAttribute("data-theme") !== "dark";
@@ -106,7 +135,7 @@ function bindShell() {
     if (localStorage.getItem("ai-switcher-theme") === "dark") document.documentElement.setAttribute("data-theme", "dark");
   } catch { /* private mode */ }
   document.addEventListener("ai-switcher:refresh", event => { if (event.detail === store.get().route || event.detail === "providers") renderRoute(store.get().route, { focus: false }); });
-  document.addEventListener("ai-switcher:agent-changed", () => { refreshAgentContext(); navigate("overview"); });
+  document.addEventListener("ai-switcher:agent-changed", async () => { await safeRefreshAgentContext(); navigate("overview"); });
 }
 
 async function boot() {

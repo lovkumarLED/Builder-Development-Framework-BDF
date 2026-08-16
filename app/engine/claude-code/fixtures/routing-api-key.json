@@ -1,0 +1,15 @@
+{
+  "target": "claude-code",
+  "scope": "user",
+  "endpoint": {
+    "baseUrl": "http://127.0.0.1:20128/v1",
+    "auth": { "apiKeySecretRef": "BDF_CLAUDE_GATE2_API_KEY" }
+  },
+  "model": { "value": "gateway/native-model-id", "source": "environment" },
+  "envPolicy": {
+    "gatewayDiscovery": true,
+    "disableExperimentalBetas": true,
+    "autoCompactWindow": 190000,
+    "disableNonessentialTraffic": false
+  }
+}

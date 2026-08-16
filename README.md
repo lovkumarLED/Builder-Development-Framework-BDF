@@ -205,6 +205,8 @@ So I built one.
 
 I didn't know how to build any of this when I started. I know Python, but I had never built a web app, and the builders are PowerShell - a language I don't speak at all. So I built them with the help of **coding agents**, one experiment at a time: days of debugging, breaking things, fixing them, and slowly figuring out how the pieces fit together. That's what made it fun.
 
+A narrow Claude Code routing adapter is now **integrated, not live validated** (see `adapters/claude-code/`) - it manages one scalar route at a time and preserves everything Claude owns.
+
 I'm not finished. Claude Code and more providers are on the list. But right now, this is the system I built because I actually needed it - and if you like it, you're welcome to contribute. That would make me genuinely happy. ❤️
 
 ---

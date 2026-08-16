@@ -463,6 +463,14 @@ Each file contributes one independent section to the final configuration.
 
 No configuration file is responsible for another file's contents.
 
+## Adapter-Owned Schemas (generic)
+
+Unique bounded adapters may own schema files under the engine schemas
+directory; adapter schema responsibilities live in the adapter's own
+documentation.
+
+---
+
 **Document Version:** {{DOC_VERSION}}
 
 **Status:** Current JSON Schemas

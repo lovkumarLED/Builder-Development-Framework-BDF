@@ -13,6 +13,7 @@ router = APIRouter(prefix="/api")
 class ModelItem(BaseModel):
     model: str = ""
     name: str = ""
+    apiModelId: str = ""
     thinking: list[str] = []
     reasoningFormat: str = ""
 

@@ -990,6 +990,17 @@ Future project ideas are documented exclusively in `ROADMAP.md`.
 
 ---
 
+## Unique Agent Adapter Folders
+
+- `adapters/` - unique bounded adapter documentation namespaces, one folder per
+  agent, each with the fixed five-file contract.
+- `adapters/<agent>/` - README, ADAPTER, BUILDER_SPEC, TESTING, COMPATIBILITY.
+- `app/engine/<agent>/` - packaged unique-adapter implementation, fixtures,
+  and harnesses (derived from the approved canonical source).
+- `app/state/` - app-owned runtime state for unique adapters (Git-ignored).
+
+---
+
 **Document Version:** 1.3
 
 **Status:** Current Project Structure

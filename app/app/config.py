@@ -19,13 +19,20 @@ STATE_FILE = APP_DIR / "state.json"
 PREFERENCES_FILE = APP_DIR / "preferences.json"
 ACTIVITY_FILE = APP_DIR / "activity.jsonl"
 
+# Claude adapter runtime state (Git-ignored via app/.gitignore rule `state/`).
+CLAUDE_ROUTES_FILE = APP_DIR / "state" / "claude-routes.json"
+CLAUDE_MANIFEST_FILE = APP_DIR / "state" / "claude-backup-manifest.json"
+CLAUDE_ACTIVITY_FILE = APP_DIR / "state" / "claude-activity.jsonl"
+# Structural segments of the user-scope Claude settings target; never a literal
+# real path and never resolved against real Claude state by Gate 4 code paths.
+CLAUDE_SETTINGS_REL = (".claude", "settings.json")
+
 HOST = "127.0.0.1"
 PORT = 9090
 
 AGENT_REGISTRY = [
     {"name": "opencode", "home": ".config\\opencode", "main": ["opencode.json"], "plugkeys": ["plugin"]},
     {"name": "kilo", "home": ".config\\kilo", "main": ["kilo.json"], "plugkeys": ["plugin", "skills.urls"]},
-    {"name": "claudecode", "home": ".claude", "main": [".claude.json", "settings.json"], "plugkeys": ["plugins"]},
     {"name": "aider", "home": ".aider", "main": [".aider.conf.json"], "plugkeys": ["plugins"]},
     {"name": "goose", "home": ".config\\goose", "main": ["config.json"], "plugkeys": ["plugins"]},
     {"name": "codex-cli", "home": ".codex", "main": ["config.toml"], "plugkeys": ["plugins"]},

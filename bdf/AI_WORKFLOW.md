@@ -313,6 +313,22 @@ When the master workflow is followed:
 
 ---
 
+## Unique Adapter Read Order and Gate-Aware Status Checks (Framework 2.3.0)
+
+Before editing an adapter namespace or its implementation:
+
+1. Read the target's five adapter documents under `adapters/<agent>/` when they
+   exist, plus the governing research plan and gate reports.
+2. Check the adapter lifecycle status before claiming or changing behavior.
+   Fixture evidence, integration evidence, and live evidence authorize
+   different claims; never use a stronger phrase than the evidence gate allows.
+3. When a unique adapter drives an adaptive interface, consume the central
+   capability contract; do not invent per-agent checks in pages.
+4. Keep generic framework documents and templates free of target-specific
+   paths, setting names, environment variables, versions, and support claims.
+
+---
+
 **Document Version:** 1.0
 
 **Status:** Active AI Workflow

@@ -1,3 +1,6 @@
+import { store } from "./store.js";
+import { resolveDestination } from "./capabilities.js";
+
 const destinations = new Set(["overview", "providers", "activity", "integrations", "settings"]);
 let renderDestination = null;
 
@@ -11,15 +14,19 @@ export function currentRoute() {
 }
 
 export function navigate(route, { replace = false, focus = true } = {}) {
-  if (!destinations.has(route)) route = "overview";
+  const resolved = resolveDestination(route, store.get().capabilities);
+  if (!destinations.has(resolved)) {
+    navigate("overview", { replace: true, focus });
+    return;
+  }
   const url = new URL(window.location.href);
-  url.searchParams.set("view", route);
-  window.history[replace ? "replaceState" : "pushState"]({ route }, "", url);
+  url.searchParams.set("view", resolved);
+  window.history[replace ? "replaceState" : "pushState"]({ route: resolved }, "", url);
   document.querySelectorAll("[data-route]").forEach(button => {
-    if (button.dataset.route === route) button.setAttribute("aria-current", "page");
+    if (button.dataset.route === resolved) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
   });
-  renderDestination?.(route, { focus });
+  renderDestination?.(resolved, { focus });
 }
 
 export function initRouter(render) {

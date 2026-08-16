@@ -1,6 +1,9 @@
 import { api, optional } from "../core/api.js";
 import { store } from "../core/store.js";
 import { escapeHtml, notify } from "../core/dialog.js";
+import { isClaude } from "../core/capabilities.js";
+
+const RESTART_NOTICE = "Restarting Claude Code may be required for startup-only values.";
 
 const icon = {
   calendar: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.8h17M8 3v4M16 3v4"/></svg>`,
@@ -360,6 +363,10 @@ function recentCard(events) {
 }
 
 export async function renderOverview(workspace, days = 7) {
+  if (isClaude()) {
+    await renderClaudeOverview(workspace);
+    return;
+  }
   const [providerData, summaryData, events, statusData] = await Promise.all([
     optional(() => api.providers(), { providers: [], activeProvider: null }),
     optional(() => api.activitySummary(days), { requestCount: 0, failedRequestCount: 0, successRate: 0, medianLatencyMs: null }),
@@ -374,4 +381,29 @@ export async function renderOverview(workspace, days = 7) {
   const mount = workspace.querySelector("#relayMount");
   if (mount) mount.replaceWith(relayCard(providers, providerData.activeProvider));
   workspace.querySelector("#overviewRange")?.addEventListener("change", event => renderOverview(workspace, Number(event.target.value)));
+}
+
+async function renderClaudeOverview(workspace) {
+  const [routes, status, activity, inventory] = await Promise.all([
+    optional(() => api.claudeRoutes(), { routes: [], appliedRouteId: null, appliedRouteConfigSha256: null }),
+    optional(() => api.claudeStatus(), null),
+    optional(() => api.claudeActivity(10), { events: [] }),
+    optional(() => api.claudeScan(), { mcps: [], plugins: [], statePresent: false, stateParseError: false, projectCount: 0 }),
+  ]);
+  const applied = (routes.routes || []).find(route => route.id === routes.appliedRouteId) || null;
+  const configMatches = Boolean(applied?.configSha256) && routes.appliedRouteConfigSha256 === applied.configSha256;
+  const locked = Boolean(status?.realTargetLocked);
+  const events = Array.isArray(activity.events) ? activity.events : [];
+  const eventLines = events.slice(0, 8).map(event => `<li><span class="claude-activity-row__time muted mono">${escapeHtml(String(event.ts || "").slice(0, 19).replace("T", " "))}</span><strong>${escapeHtml(String(event.type || "").replaceAll("_", " "))}</strong>${event.routeId ? ` <span class="muted mono">${escapeHtml(event.routeId)}</span>` : ""}</li>`).join("");
+  const mcps = Array.isArray(inventory.mcps) ? inventory.mcps : [];
+  const plugins = Array.isArray(inventory.plugins) ? inventory.plugins : [];
+  const typeCounts = mcps.reduce((counts, mcp) => { counts[mcp.type] = (counts[mcp.type] || 0) + 1; return counts; }, {});
+  const typeChips = Object.entries(typeCounts).map(([type, count]) => `<span class="chip chip--mono">${escapeHtml(type)} ${count}</span>`).join("");
+  const pluginChips = plugins.slice(0, 12).map(name => `<span class="chip">${escapeHtml(name)}</span>`).join("");
+  const stateNote = !inventory.statePresent
+    ? "No .claude.json found - nothing to inventory."
+    : inventory.stateParseError
+      ? "Could not read .claude.json - inventory unavailable."
+      : "Scanned from .claude.json - read-only, never edited by Switcher.";
+  workspace.innerHTML = `<div class="page-head overview-head"><h1 class="page-title">Workspace overview</h1><div class="page-controls"><span class="chip"><span class="status-dot status-dot--ok" aria-hidden="true"></span>Claude Code</span><span class="chip chip--mono">${icon.terminal}<span>127.0.0.1:9090</span></span></div></div><div class="overview-masonry claude-overview-masonry"><div class="card card--padded claude-overview-card claude-overview-card--route"><p class="eyebrow">Applied route</p>${applied ? `<h2>${escapeHtml(applied.name)}</h2><p class="muted mono">${escapeHtml(applied.baseUrl)}</p><p class="muted">Model ${escapeHtml(applied.model)} ${configMatches ? "" : '<span class="claude-route-status claude-route-status--pending">Changes not applied</span>'}</p>` : "<h2>No route applied</h2><p class='muted'>Save a route and apply it from the Routes page.</p>"}${applied ? "" : '<button class="button button--primary button--small" type="button" data-route="providers">Open Routes</button>'}</div><div class="card card--padded claude-overview-card claude-overview-card--status"><p class="eyebrow">Status</p><dl class="stack"><div><dt>Settings file</dt><dd>${status?.settingsPresent === true ? "Present" : status?.settingsPresent === null ? "Unknown (locked)" : "Missing"}</dd></div><div><dt>Endpoint configured</dt><dd>${applied ? "Yes" : "No"}</dd></div><div><dt>Auth reference</dt><dd>${applied ? "Configured" : "Not configured"}</dd></div><div><dt>Saved routes</dt><dd>${(routes.routes || []).length}</dd></div><div><dt>Latest backup</dt><dd>${status?.lastBackupAvailable ? "Available" : "None"}</dd></div><div><dt>Real-target lock</dt><dd>${locked ? "Locked" : "Unlocked"}</dd></div></dl><p class="muted">${RESTART_NOTICE}</p></div><div class="card card--padded claude-overview-card claude-overview-card--inventory"><p class="eyebrow">Claude inventory</p><div class="claude-inventory-chips"><span class="chip chip--strong">${mcps.length} MCP servers</span><span class="chip chip--strong">${plugins.length} plugins</span>${typeChips}${pluginChips}</div><p class="muted claude-inventory-note">${stateNote}</p></div><div class="card card--padded claude-overview-card claude-overview-card--activity"><p class="eyebrow">Recent routing activity</p>${eventLines ? `<ul class="claude-activity-timeline">${eventLines}</ul>` : '<p class="muted">No routing activity yet.</p>'}</div></div>`;
 }

@@ -32,13 +32,16 @@ test("provider cards use branded marks and a circular deck", () => {
   assert.match(source, /circularProviderIndex/);
 });
 
-test("provider agent tabs switch between the two currently supported agents", () => {
+test("provider agent tabs switch between the three supported agents", () => {
   assert.match(workspaceSource, /data-provider-agent="opencode"/);
   assert.match(workspaceSource, /data-provider-agent="kilo"/);
+  assert.match(workspaceSource, /data-provider-agent="claude-code"/);
+  assert.match(workspaceSource, /brands\/claudecode\.svg/);
   assert.doesNotMatch(workspaceSource, /ClaudeCode/);
   assert.doesNotMatch(workspaceSource, /data-add-agent/);
   assert.match(providersSource, /switchProviderAgent\(api,/);
   assert.match(providersSource, /renderProviders\(workspace\)/);
+  assert.match(providersSource, /"claude-code": "Claude Code"/);
 });
 
 test("connected agent indicator is status text without a decorative dropdown arrow", () => {
@@ -59,6 +62,14 @@ test("agent switching avoids redundant writes and calls the backend for a differ
   assert.equal(await switchProviderAgent(apiClient, "kilo", "kilo"), false);
   assert.equal(await switchProviderAgent(apiClient, "opencode", "kilo"), true);
   assert.deepEqual(calls, ["opencode"]);
+});
+
+test("switching to Claude Code goes through the lock-free connect registration", async () => {
+  const calls = [];
+  const apiClient = { switchAgent: async name => calls.push(["switch", name]), claudeConnect: async () => calls.push(["connect"]) };
+  assert.equal(await switchProviderAgent(apiClient, "claude-code", "opencode"), true);
+  assert.equal(await switchProviderAgent(apiClient, "opencode", "claude-code"), true);
+  assert.deepEqual(calls, [["connect"], ["switch", "opencode"]]);
 });
 
 test("provider cards expose an edit entry point", () => {

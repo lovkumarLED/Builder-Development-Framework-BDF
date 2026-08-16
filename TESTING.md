@@ -1061,6 +1061,15 @@ Future versions may extend automated testing with:
 
 ---
 
+## Adapter Test Groups
+
+Unique bounded adapters add fixture, compatibility, integration, and
+live-validation test groups (see `adapters/<agent>/TESTING.md` for the
+target's own procedures). A passing group proves behavior at its gate and
+never converts to a support claim.
+
+---
+
 **Document Version:** 1.0
 
 **Status:** Manual Testing Guide

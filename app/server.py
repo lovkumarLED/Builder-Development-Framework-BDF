@@ -13,6 +13,8 @@ from app import APP_VERSION, config
 from app.activity import router as activity_router
 from app.agents import router as agents_router
 from app.banner import print_banner
+from app.capabilities import router as capabilities_router
+from app.claude_adapter import router as claude_router
 from app.discovery import router as discovery_router
 from app.engine import router as engine_router
 from app.mcp import router as mcp_router
@@ -48,6 +50,8 @@ app.add_middleware(
 
 app.include_router(serve_router)
 app.include_router(agents_router)
+app.include_router(capabilities_router)
+app.include_router(claude_router)
 app.include_router(discovery_router)
 app.include_router(providers_router)
 app.include_router(engine_router)

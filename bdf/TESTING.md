@@ -138,6 +138,22 @@ stage).
 
 ---
 
+## Adapter Test Groups (Framework 2.3.0)
+
+Unique bounded adapters add generic test groups without target-specific
+commands:
+
+- Fixture group: isolated behavior on repository fixtures, no real target.
+- Compatibility group: versioned evidence ledger entries at the evidence level
+  actually reached.
+- Integration group: app wiring on temporary targets only.
+- Live-validation group: authorized only after the live gate; never assumed.
+
+A passing group proves behavior at its gate. It never converts to a support
+claim; lifecycle status vocabulary governs the wording.
+
+---
+
 **Document Version:** 1.0
 
 **Status:** Active Testing Framework

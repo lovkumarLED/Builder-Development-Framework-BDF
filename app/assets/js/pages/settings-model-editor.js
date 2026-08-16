@@ -39,6 +39,7 @@ function cleanModel(model, allowedLevels) {
   const cleaned = {
     model: String(model?.model || "").trim(),
     name: String(model?.name || "").trim(),
+    apiModelId: String(model?.apiModelId || "").trim(),
     thinking: [...new Set(model?.thinking || [])].filter(level => allowed.has(level)),
   };
   const reasoningFormat = String(model?.reasoningFormat || "").trim();
@@ -51,6 +52,7 @@ export function normalizeModelBatch(existingModels, candidates, allowedLevels = 
   const existing = (existingModels || []).map(model => ({
     model: String(model?.model || "").trim(),
     name: String(model?.name || "").trim(),
+    apiModelId: String(model?.apiModelId || "").trim(),
     thinking: [...new Set(model?.thinking || [])],
   }));
   const map = new Map(existing.map(model => [model.model.toLowerCase(), model]));
@@ -79,7 +81,12 @@ export function modelEditorRowMarkup(index, formats = [], selectedFormat = "open
     <div class="model-editor-fields">
       <label><span>ID</span><input class="settings-model-id" placeholder="model-id" autocomplete="off"></label>
       <label><span>Name</span><input class="settings-model-name" placeholder="Display Name" autocomplete="off"></label>
+      <label><span>API model ID <em>(optional)</em></span><input class="settings-model-api-id" placeholder="Exact ID sent to the gateway" autocomplete="off"></label>
       <button class="model-editor-remove" type="button" data-remove-model aria-label="Remove model ${index + 1}">×</button>
+    </div>
+    <div class="model-editor-row-tools">
+      <button class="button settings-outline-button model-editor-test" type="button" data-test-model>Test model</button>
+      <span class="model-editor-test-result" data-test-result role="status" aria-live="polite"></span>
     </div>
     ${reasoning}
   </fieldset>`;

@@ -1061,6 +1061,69 @@ function Apply-ReasoningFormatFilter {
     }
 }
 
+function Apply-ApiModelIdAliases {
+
+    # When a model entry carries an optional apiModelId, the OUTPUT model key
+    # becomes the apiModelId (the exact ID sent to the gateway); the entry's
+    # name stays the display label. Source model files are never modified.
+    # Entry keys that are not valid JSON property names when aliased are
+    # rejected instead of silently producing an unusable config.
+
+    param(
+        [object]$Models
+    )
+
+    if (-not $Models -or -not $Models.models) { return }
+
+    $Rebuilt = [ordered]@{}
+
+    foreach ($Model in @($Models.models.PSObject.Properties)) {
+
+        $Entry = $Model.Value
+
+        $ApiId = $null
+
+        if ($Entry.PSObject.Properties['apiModelId']) {
+
+            $ApiId = [string]$Entry.apiModelId
+
+            $ApiId = $ApiId.Trim()
+        }
+
+        if ([string]::IsNullOrEmpty($ApiId)) {
+
+            $Rebuilt[$Model.Name] = $Entry
+
+            continue
+        }
+
+        $Alias = $ApiId
+
+        if ($Alias -match '[\r\n]') {
+
+            throw "Model '$($Model.Name)' apiModelId contains a newline and cannot be used as a model ID."
+        }
+
+        if ($Rebuilt.Contains($Alias)) {
+
+            throw "Model '$($Model.Name)' apiModelId '$Alias' collides with another output model ID."
+        }
+
+        $Aliased = [ordered]@{}
+
+        foreach ($Prop in $Entry.PSObject.Properties) {
+
+            if ($Prop.Name -eq 'apiModelId') { continue }
+
+            $Aliased[$Prop.Name] = $Prop.Value
+        }
+
+        $Rebuilt[$Alias] = [pscustomobject]$Aliased
+    }
+
+    $Models.models = [pscustomobject]$Rebuilt
+}
+
 function Enforce-ReasoningFormat {
 
     # Full developer-side flow for one provider: prompt (interactive only),
@@ -1113,6 +1176,7 @@ function Merge-Models {
         if ($null -ne $ProfileModels) {
             Set-ObjectProperty $ProviderRoot[$ProviderName] "models" $ProfileModels.models
             $Count = @($ProfileModels.models.PSObject.Properties).Count
+            Apply-ApiModelIdAliases $ProviderRoot[$ProviderName]
             Write-Detail "Provider '$ProviderName': $Count model(s) (profile-level)"
             Enforce-ReasoningFormat $ProviderRoot[$ProviderName] $ProviderName (Join-Path $ProvidersRoot "$ProviderName.json") $Count
             $Expected[$ProviderName] = $Count
@@ -1138,6 +1202,8 @@ function Merge-Models {
 
             Set-ObjectProperty $ProviderRoot[$ProviderName] "models" $Specific.models
 
+            Apply-ApiModelIdAliases $ProviderRoot[$ProviderName]
+
             Write-Detail "Provider '$ProviderName': $Count model(s) (provider-specific)"
 
             Enforce-ReasoningFormat $ProviderRoot[$ProviderName] $ProviderName (Join-Path $ProvidersRoot "$ProviderName.json") $Count
@@ -1155,6 +1221,8 @@ function Merge-Models {
 
             $Count = @($Inline.PSObject.Properties).Count
 
+            Apply-ApiModelIdAliases $ProviderRoot[$ProviderName]
+
             Write-Detail "Provider '$ProviderName': $Count model(s) (inline)"
 
             Enforce-ReasoningFormat $ProviderRoot[$ProviderName] $ProviderName (Join-Path $ProvidersRoot "$ProviderName.json") $Count
@@ -1171,6 +1239,8 @@ function Merge-Models {
             $Count = @($GlobalModels.models.PSObject.Properties).Count
 
             Set-ObjectProperty $ProviderRoot[$ProviderName] "models" $GlobalModels.models
+
+            Apply-ApiModelIdAliases $ProviderRoot[$ProviderName]
 
             Write-Detail "Provider '$ProviderName': $Count model(s) (global)"
 

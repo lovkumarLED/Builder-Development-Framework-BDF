@@ -261,6 +261,14 @@ Planned work is documented separately in `ROADMAP.md`.
 
 **Version:** {{CURRENT_VERSION}}
 
+## Unique Agent Adapters (generic)
+
+A project may combine the universal scaffold with unique bounded adapters,
+each with a fixed five-file documentation namespace. Root documents summarize
+and link; adapter documents specify.
+
+---
+
 **Document Version:** {{DOC_VERSION}}
 
 Documentation Status: Current Implementation

@@ -421,6 +421,46 @@ Future builders may use the same framework without rewriting it.
 
 ---
 
+## Adapter Categories (Framework 2.3.0)
+
+The framework recognizes two reusable adapter categories for configuration
+targets.
+
+### Same-architecture adapter
+
+A target that safely conforms to the universal scaffold and builder
+assumptions: compatible source folders, provider/model collections, generated
+artifact ownership, and scaffold behavior. OpenCode and KiloCode are current
+examples. Same-architecture targets use the universal scaffold path unchanged.
+
+### Unique bounded (patch) adapter
+
+A target whose native configuration ownership, routing model, precedence, state
+files, or write safety differs materially from the universal contract. It uses
+a dedicated `adapters/<agent>/` documentation namespace and an approved
+target-specific implementation mapping. It may reuse generic lifecycle and
+safety contracts, but it does not pretend to satisfy the same provider
+registry or generated-artifact model. A unique bounded adapter typically
+patches a narrow managed surface and preserves every unsupported semantic
+value.
+
+### Capability-driven unique-adapter layers
+
+A unique bounded adapter may drive an adaptive interface through a central
+capability contract: pages and navigation consume capabilities instead of
+scattering per-agent checks. The capability contract lives in one backend
+source of truth and one frontend consumer module.
+
+### Evidence gates
+
+Adapter behavior is proven in stages: fixture gates (isolated, no real target),
+integration gates (app wiring, still fixture or temporary targets), and live
+gates (approved real-target validation). A fixture or integration pass is
+never a support claim; lifecycle status vocabulary defines the allowed wording
+at each stage.
+
+---
+
 **Document Version:** 1.1
 
 **Status:** Active Builder Development Framework

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Claude Code Fixture Routing Profile",
+  "type": "object",
+  "required": ["target", "scope", "endpoint", "model", "envPolicy"],
+  "properties": {
+    "target": { "type": "string" },
+    "scope": { "type": "string" },
+    "endpoint": {
+      "type": "object",
+      "required": ["baseUrl", "auth"],
+      "properties": {
+        "baseUrl": { "type": "string" },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "apiKeySecretRef": { "type": "string" },
+            "authTokenSecretRef": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "model": {
+      "type": "object",
+      "required": ["value", "source"],
+      "properties": {
+        "value": { "type": "string" },
+        "source": { "type": "string", "enum": ["environment"] }
+      },
+      "additionalProperties": false
+    },
+    "envPolicy": {
+      "type": "object",
+      "required": ["gatewayDiscovery", "disableExperimentalBetas", "autoCompactWindow", "disableNonessentialTraffic"],
+      "properties": {
+        "gatewayDiscovery": { "type": "boolean" },
+        "disableExperimentalBetas": { "type": "boolean" },
+        "autoCompactWindow": { "type": "integer" },
+        "disableNonessentialTraffic": { "type": "boolean" }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": ["gatewayDiscovery", "disableNonessentialTraffic"],
+            "properties": {
+              "gatewayDiscovery": { "const": true },
+              "disableNonessentialTraffic": { "const": true }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

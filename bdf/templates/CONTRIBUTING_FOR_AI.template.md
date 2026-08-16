@@ -271,6 +271,16 @@ than before the contribution began.
 
 ---
 
+## Adapter Status and Gate Checks (generic)
+
+Before editing an adapter namespace or its implementation: read the adapter
+documents and governing gate reports; check the lifecycle status and never
+claim a stronger phrase than the evidence gate allows; keep target-specific
+facts inside adapter documents, never in generic templates; follow the README
+synchronization rule.
+
+---
+
 **Document Version:** {{DOC_VERSION}}
 
 **Status:** AI Contribution Guide

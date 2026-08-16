@@ -432,6 +432,16 @@ Each file contributes one independent section to the final configuration.
 
 No configuration file is responsible for another file's contents.
 
+## Adapter-Owned Schemas
+
+Unique bounded adapters may own schema files under
+`app/engine/schemas/` (for example `claude-code-routing.schema.json`).
+Adapter schema responsibilities and validation subsets are documented in the
+adapter's own BUILDER_SPEC and JSON schema notes under `adapters/<agent>/`.
+Generic schema contracts never absorb target-specific fields.
+
+---
+
 **Document Version:** 1.1
 
 **Status:** Current JSON Schemas

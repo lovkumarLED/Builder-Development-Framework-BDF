@@ -176,6 +176,30 @@ Templates are changed only through the framework change process, never to satisf
 
 ---
 
+## Unique Agent Adapters
+
+A project may combine the universal scaffold with one or more unique bounded
+adapters. Unique adapters live under `adapters/<agent>/` with a fixed five-file
+documentation contract, and their implementation and schema locations are
+approved per adapter. Generic framework contracts describe the categories; the
+adapter documents carry all target-specific detail.
+
+The generic contracts summarized here are defined in:
+
+- `bdf/FRAMEWORK.md` - adapter categories (same-architecture and unique bounded
+  patch) and the capability-driven unique-adapter layer.
+- `bdf/PROJECT_ADAPTER.md` - project adapter plus reusable unique-agent adapter
+  contract.
+- `bdf/AI_WORKFLOW.md` - unique-adapter read order and gate-aware status checks.
+- `bdf/TESTING.md` - generic fixture, compatibility, integration, and
+  live-validation test groups.
+- `bdf/BUILDER_EVOLUTION.md` - adapter documentation and compatibility evidence
+  evolution rules.
+- `bdf/VERSION.md` - framework version 2.3.0 change history for the
+  unique-adapter layer.
+
+---
+
 **Document Version:** 1.1
 
 **Status:** Active Builder Development Framework

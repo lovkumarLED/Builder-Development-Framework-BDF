@@ -81,6 +81,16 @@ test("onboarding screens preserve the approved visible copy and controls", () =>
   assert.match(ready, /Open dashboard/);
 });
 
+test("onboarding rail presents privacy reassurance instead of a docs link", () => {
+  const markup = onboardingScreenMarkup("agent");
+  assert.match(markup, /onboarding-privacy/);
+  assert.match(markup, /Private by default/);
+  assert.match(markup, /Your keys stay on your computer/);
+  assert.match(markup, /Prompts aren.t stored by Switcher/);
+  assert.doesNotMatch(markup, /Need help/);
+  assert.doesNotMatch(markup, /Open docs/);
+});
+
 test("provider setup has bounded keyboard-usable steps", () => {
   assert.equal(nextProviderStep(0, 1), 1);
   assert.equal(nextProviderStep(4, 1), 4);

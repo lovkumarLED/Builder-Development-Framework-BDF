@@ -93,10 +93,20 @@
 .model-editor-row { min-width: 0; margin: 0; padding: 12px 14px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
 .model-editor-row:focus-within { border-color: #8b63cb; box-shadow: 0 0 0 3px rgb(119 80 189 / 10%); }
 .model-editor-row legend { float: left; width: 96px; padding: 14px 0 0; color: #6840bd; font-size: .74rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
-.model-editor-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 12px; align-items: end; }
+.model-editor-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 12px; align-items: end; }
 .model-editor-fields label { display: grid; gap: 6px; color: var(--muted); font-size: .7rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.model-editor-fields label em { font-style: normal; font-weight: 500; opacity: .8; }
 .model-editor-fields input { min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; text-transform: none; letter-spacing: normal; }
 .model-editor-fields input:focus { border-color: #7750bd; outline: 3px solid rgb(119 80 189 / 10%); }
+.model-editor-row-tools { clear: both; display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.model-editor-test { min-height: 38px; padding: 0 14px; }
+.model-editor-test-result { color: var(--muted); font-size: .78rem; }
+.model-editor-test-result.is-error { color: #df4f42; }
+@media (max-width: 639px) {
+  .model-editor-fields { grid-template-columns: 1fr 1fr; }
+  .model-editor-fields .settings-model-api-id { grid-column: 1 / -1; }
+  .model-editor-fields .model-editor-remove { grid-column: 2; }
+}
 .model-editor-reasoning { clear: both; display: grid; grid-template-columns: 108px minmax(0, 1fr); align-items: center; gap: 12px; margin-top: 14px; }
 .model-editor-reasoning + .model-editor-reasoning { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
 .model-editor-reasoning > div:first-child { display: grid; gap: 2px; }

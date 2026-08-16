@@ -1,0 +1,15 @@
+{
+  "target": "claude-code",
+  "scope": "user",
+  "endpoint": {
+    "baseUrl": "https://fixture.invalid/anthropic",
+    "auth": { "authTokenSecretRef": "BDF_CLAUDE_GATE2_AUTH_TOKEN" }
+  },
+  "model": { "value": "gateway/opaque-token-model", "source": "environment" },
+  "envPolicy": {
+    "gatewayDiscovery": false,
+    "disableExperimentalBetas": false,
+    "autoCompactWindow": 1000000,
+    "disableNonessentialTraffic": true
+  }
+}

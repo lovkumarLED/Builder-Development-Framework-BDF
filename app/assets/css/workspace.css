@@ -1,10 +1,11 @@
 .app-shell { display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); min-height: 100vh; background: var(--workspace-bg); transition: grid-template-columns 380ms var(--ease-out); }
 .app-shell.is-sidebar-collapsed { grid-template-columns: var(--rail-width) minmax(0, 1fr); }
+.app-shell.is-sidebar-collapsed .sidebar { width: var(--rail-width); }
 
 /* Faux desktop window chrome (matches the approved mock) */
 
 /* Sidebar — light panel, brand stacked, pale-coral active nav */
-.sidebar { position: sticky; top: 0; display: flex; flex-direction: column; align-items: stretch; height: 100vh; padding: 48px 10px 40px; border-right: 1px solid var(--border); background: var(--surface); }
+.sidebar { position: fixed; top: 0; left: 0; bottom: 0; z-index: 40; display: flex; flex-direction: column; align-items: stretch; width: var(--sidebar-width); height: 100vh; padding: 48px 10px 40px; border-right: 1px solid var(--border); background: var(--surface); transition: width 380ms var(--ease-out); }
 .brand-lockup { display: grid; justify-items: center; gap: 18px; }
 .sidebar-brand-mark { position: relative; display: grid; place-items: center; width: 47px; height: 53px; padding: 0; border: 0; border-radius: 16px; background: transparent; cursor: pointer; perspective: 280px; transform: translate3d(var(--brand-x, 0), var(--brand-y, 0), 0) rotateX(var(--brand-tilt-x, 0deg)) rotateY(var(--brand-tilt-y, 0deg)); transform-style: preserve-3d; transition: background 180ms ease, box-shadow 220ms ease; isolation: isolate; }
 .sidebar-brand-mark::before { position: absolute; z-index: -1; inset: 6px; border-radius: 50%; background: radial-gradient(circle, rgb(255 97 85 / 16%), rgb(132 72 113 / 8%) 54%, transparent 74%); opacity: .2; filter: blur(7px); transform: scale(.8); transition: opacity 180ms ease, transform 220ms var(--ease-out); content: ""; }
@@ -64,7 +65,7 @@ html[data-motion="reduce"] .sidebar-brand-mark::before { display: none; }
 .app-shell.is-sidebar-collapsed .sidebar-status { justify-content: center; padding-inline: 0; }
 .app-shell.is-sidebar-collapsed .sidebar-foot { gap: 2px; }
 
-.app-stage { min-width: 0; }
+.app-stage { min-width: 0; grid-column: 2; }
 .app-bar { display: none; }
 #workspace { width: 100%; max-width: none; min-height: 100vh; padding: 40px 39px 26px 34px; }
 .page-enter { animation: page-enter 200ms var(--ease-out) both; }
@@ -87,6 +88,7 @@ html[data-motion="reduce"] .sidebar-brand-mark::before { display: none; }
 .chip .status-dot { width: 9px; height: 9px; }
 .chip--mono { font-family: var(--mono); font-size: .82rem; letter-spacing: -.01em; }
 .chip--mono svg { stroke-width: 2; }
+.chip--strong { border-color: var(--plum); color: var(--plum); font-weight: 650; }
 
 /* Generic section title inside cards */
 .card-title { margin: 0; font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; }
@@ -98,6 +100,15 @@ html[data-motion="reduce"] .sidebar-brand-mark::before { display: none; }
 .kpi-grid { grid-column: 10 / span 15; grid-row: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; align-self: start; height: 250px; }
 .overview-masonry .chart-card { grid-column: 1 / span 13; grid-row: 2; align-self: start; padding: 20px 21px 14px; }
 .overview-masonry .usage-card { grid-column: 14 / span 11; grid-row: 1 / span 2; align-self: end; padding: 20px 24px; }
+
+/* Claude overview: explicit masonry placement (cards must never auto-place) */
+.claude-overview-masonry .claude-overview-card--route { grid-column: 1 / span 10; grid-row: 1; }
+.claude-overview-masonry .claude-overview-card--status { grid-column: 11 / span 14; grid-row: 1; }
+.claude-overview-masonry .claude-overview-card--inventory { grid-column: 1 / span 24; grid-row: 2; }
+.claude-overview-masonry .claude-overview-card--activity { grid-column: 1 / span 24; grid-row: 3; }
+.claude-overview-masonry .claude-overview-card--route .button { margin-top: 12px; }
+.claude-inventory-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.claude-inventory-note { margin: 12px 0 0; font-size: 13px; }
 
 /* Brand marks */
 .brand-mark { display: inline-grid; place-items: center; flex: 0 0 auto; }

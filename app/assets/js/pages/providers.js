@@ -48,7 +48,8 @@ export const canSubmitProviderStep = step => step === 4;
 export const providerReviewData = value => ({ name: value.name, baseUrl: value.baseUrl, format: value.reasoningFormat || "opencode", models: (value.models || []).map(model => model.model).join(", ") || "None", key: value.apiKey ? "Present" : "Not provided" });
 export async function switchProviderAgent(apiClient, nextAgent, currentAgent) {
   if (nextAgent === currentAgent) return false;
-  await apiClient.switchAgent(nextAgent);
+  if (nextAgent === "claude-code") await apiClient.claudeConnect();
+  else await apiClient.switchAgent(nextAgent);
   return true;
 }
 
@@ -152,8 +153,8 @@ export async function renderProviders(workspace) {
   let providers = [], status = { agent: "opencode" };
   try { [providers, status] = await Promise.all([loadProviders(), optional(() => api.status(), status)]); } catch (error) { notify(error.message, "error"); }
   const agent = status.agent || "opencode";
-  const displayNames = { opencode: "OpenCode", kilo: "KiloCode", kilocode: "KiloCode" };
-  const activeAgentId = ["opencode", "kilo"].includes(agent) ? agent : "opencode";
+  const displayNames = { opencode: "OpenCode", kilo: "KiloCode", kilocode: "KiloCode", "claude-code": "Claude Code" };
+  const activeAgentId = ["opencode", "kilo", "claude-code"].includes(agent) ? agent : "opencode";
   const activeAgent = displayNames[agent] || agent;
   renderProviderWorkspace(workspace, {
     providers,
@@ -164,6 +165,10 @@ export async function renderProviders(workspace) {
       const changed = await switchProviderAgent(api, nextAgent, activeAgentId);
       if (!changed) return;
       notify(`Switched workspace to ${displayNames[nextAgent] || nextAgent}.`, "success");
+      if (nextAgent === "claude-code" || activeAgentId === "claude-code") {
+        document.dispatchEvent(new CustomEvent("ai-switcher:agent-changed"));
+        return;
+      }
       await renderProviders(workspace);
     },
     onAction: (provider, action, trigger) => handleAction(workspace, provider, action, trigger),

@@ -544,6 +544,18 @@ This approach minimizes breaking changes and keeps the project maintainable over
 
 ---
 
+## Unique Adapter and Hybrid Documentation Layers
+
+The repository uses a hybrid documentation architecture: generic BDF contracts
+define reusable adapter categories, root project documents summarize and link,
+unique adapter namespaces (`adapters/<agent>/`) own durable target-specific
+documentation, and gate evidence lives under `planning/`. Engine ownership is
+layered: canonical unique-adapter implementation plus an explicitly derived
+packaged copy under `app/engine/<agent>/` when the app ships a self-contained
+engine.
+
+---
+
 **Document Version:** 1.1
 
 **Status:** Current Architecture
