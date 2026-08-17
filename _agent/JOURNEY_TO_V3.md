@@ -29,7 +29,7 @@ Every session reads it at start and updates it at end.
 
 # The Destination
 
-> **BDF V3 â€” the first stable public version of the Builder Development Framework.**
+> **BDF V3 — the first stable public version of the Builder Development Framework.**
 
 V3 is complete when the same engineering framework can successfully create and maintain
 builders for:
@@ -40,30 +40,30 @@ builders for:
 
 without redesigning the framework. Only Project Adapters should differ.
 
-Claude Code is NOT supported (entropic `~/.claude.json`, no provider support â€”
+Claude Code is NOT supported (entropic `~/.claude.json`, no provider support —
 decision 2026-08-08, `planning/DECISIONS.md`).
 
 V3 turns the framework into a **Builder Generator**:
 
 ```
 Create New Builder Project
-â†“
+↓
 Discover installed open-source coding agents (OpenCode / KiloCode / same-architecture)
-â†“
+↓
 Choose agent
-â†“
+↓
 Read project schema
-â†“
+↓
 Generate adapter
-â†“
+↓
 Generate docs
-â†“
+↓
 Generate folder structure
-â†“
+↓
 Generate builder
-â†“
+↓
 Generate tests
-â†“
+↓
 Done
 ```
 
@@ -72,22 +72,22 @@ Done
 # The Journey Map
 
 ```
-Step 0 â€” Current (Builder V2.2.0, Release Manager V1)          âœ… complete
-â†“
-Step 1 â€” BDF V2.5: Framework Generalization                    âœ… complete
-â†“
-Step 2 â€” KiloCode Builder V1 (first validation)                âœ… complete
+Step 0 — Current (Builder V2.2.0, Release Manager V1)          ✅ complete
+↓
+Step 1 — BDF V2.5: Framework Generalization                    ✅ complete
+↓
+Step 2 — KiloCode Builder V1 (first validation)                ✅ complete
        Claude Code V1 DROPPED (2026-08-08, entropic config)
-â†“
-Step 3 â€” Universal Agent Framework core (scaffold-agent.ps1)   â† we are here
-â†“
-Step 4 â€” Framework Improvements (learned from universal)
-â†“
-Step 5 â€” BDF V3: Universal Builder Generator                    â† destination
+↓
+Step 3 — Universal Agent Framework core (scaffold-agent.ps1)   ← we are here
+↓
+Step 4 — Framework Improvements (learned from universal)
+↓
+Step 5 — BDF V3: Universal Builder Generator                    ← destination
 ```
 
 Each step is built, tested, and validated before the next begins.
-Real projects shape the framework â€” never assumptions.
+Real projects shape the framework — never assumptions.
 
 ---
 
@@ -105,30 +105,30 @@ Phase map (roadmap): Phase 14 GUI App COMPLETE; Phase 15 More Coding Agents PLAN
 
 What was completed:
 
-- [x] Step 1 â€” BDF V2.5: Framework Generalization (COMPLETE 100%).
-- [x] Side goal: JSON Schema Validation (`schemas/`) â€” Builder V2.7 (F1-F7), P1 env-key
+- [x] Step 1 — BDF V2.5: Framework Generalization (COMPLETE 100%).
+- [x] Side goal: JSON Schema Validation (`schemas/`) — Builder V2.7 (F1-F7), P1 env-key
       policy + P2 dynamic target artifact. Battery 17/13/31 green, snapshot-22 pinned
       (FULL_SYSTEM_CHECK v1.1 all 7 parts PASS, sessions 22 + 26).
-- [x] Step 2 â€” KiloCode Builder V1 (replaces dropped Claude V1): Kilo directory,
+- [x] Step 2 — KiloCode Builder V1 (replaces dropped Claude V1): Kilo directory,
       `build-kilo-v1.ps1` / `test-kilo-v1.ps1` / `scaffold-kilo-v1.ps1`, harness 30/30,
       real `~/.config/kilo` verified (sessions 24-24b).
-- [x] Step 3 core â€” `scaffold-agent.ps1` rebuilt as the V3 UNIVERSAL core:
+- [x] Step 3 core — `scaffold-agent.ps1` rebuilt as the V3 UNIVERSAL core:
       agent registry (opencode, kilo, claudecode, aider, goose, codex-cli; any
       open-source agent), discovery, -List, -Bootstrap (generates build-/test-/scaffold-
       per agent), scan-first contract, never writes provider/model files, never touches
       .jsonc without consent (session 24b).
 - [x] Bootstrap fix (session 27): scaffold's generated `test-<agent>.ps1` copied raw
-      (stale `build-opencode-v2.7.ps1`/kilo refs) â†’ now token-replaced like the builder;
+      (stale `build-opencode-v2.7.ps1`/kilo refs) → now token-replaced like the builder;
       sandbox `custom` agent bootstrap verified 30/30 harness.
 - [x] Real-config scaffolds verified: kilo + opencode refreshed with backup, settings
       merged full-shape, harness 30/30 both, AGENTS.md relocation reverted (no AGENTS.md
       anywhere; session 26b claim corrected in session 28).
-- [x] Session 28: FULL_SYSTEM_CHECK v1.1 rerun â€” all 7 parts PASS; V2.7 harness count
+- [x] Session 28: FULL_SYSTEM_CHECK v1.1 rerun — all 7 parts PASS; V2.7 harness count
       corrected to 31/31 everywhere; framework 2.2.3 (template sync round 2); experimental/
       minimal omniroute-models.json restored (recurring async-deletion fix).
 - [x] Session 28b: SCAFFOLD CONTRACT FINALIZED (per user ruling):
       - The framework creates the `providers/` folder (like the profile folders) but
-        NEVER writes provider or model JSON files inside it â€” the JSON files are
+        NEVER writes provider or model JSON files inside it — the JSON files are
         100% user-owned.
       - ONE job: scan the agent's OWN main JSON (kilo.json for kilo, never another
         agent's config), split mcp / plugin sections, seed `profiles/coding/mcp.json` +
@@ -142,25 +142,25 @@ What was completed:
       - Kilo test re-run: backup made first, test-kilo-v1.ps1 30/30, main kilo.json
         byte-identical (backup policy verified). Real build correctly fails pre-flight
         without user-created providers (by design).
-- [x] Session 28c: NO-SECRETS RULE (ULTIMATE) codified â€” the SYSTEM's own artifacts
+- [x] Session 28c: NO-SECRETS RULE (ULTIMATE) codified — the SYSTEM's own artifacts
       (scripts, templates, docs, examples) never contain literal API keys ({env:VAR}
       only); USER-owned files (main config, profiles, providers) may contain literal
       keys and the user protects them; the system copies user content verbatim
-      (scan â†’ copy â†’ paste) so generated output carries whatever the user's files
+      (scan → copy → paste) so generated output carries whatever the user's files
       contain, keys included. Verified: system artifacts 0 leaks, user files restored,
       both builds green.
-- [x] Session 28d: PHASE 8 COMPLETE â€” Documentation Expansion: 4 onboarding guides
+- [x] Session 28d: PHASE 8 COMPLETE — Documentation Expansion: 4 onboarding guides
       (DEVELOPER_GUIDE, PROVIDER_DEVELOPMENT_GUIDE, PROFILE_CREATION_GUIDE,
-      BUILDER_EXTENSION_GUIDE) + 4 mirrored templates (15 â†’ 19). ALL 13 roadmap
+      BUILDER_EXTENSION_GUIDE) + 4 mirrored templates (15 → 19). ALL 13 roadmap
       phases now complete except the final V3 release steps.
-- [x] Session 29: PHASE 14 COMPLETE â€” GUI App "Switcher" (docs/app/): the BDF made
+- [x] Session 29: PHASE 14 COMPLETE — GUI App "Switcher" (docs/app/): the BDF made
       autonomous. Modular FastAPI backend (app/ package) + Qwen-built gui.html +
       start.bat; calls the REAL scaffold-agent.ps1 -Bootstrap engine (one engine, two
       surfaces) and the generated builders; local OpenAI-compatible /v1 proxy on
       127.0.0.1:9090 to the ACTIVE provider; No-Secrets + backup-first providers.json.
-      Smoke-tested end-to-end green on the real opencode agent: discover â†’ scan â†’
-      scaffold (real engine) â†’ build PASS â†’ test harness 31/31 â†’ switch â†’ chat.
-- [x] Session 29 (continued): BDF-EXACT data model â€” the app reads/writes the AGENT's own
+      Smoke-tested end-to-end green on the real opencode agent: discover → scan →
+      scaffold (real engine) → build PASS → test harness 31/31 → switch → chat.
+- [x] Session 29 (continued): BDF-EXACT data model — the app reads/writes the AGENT's own
       files (providers/, <provider>-models.json, plugins.json, mcp.json, settings.json
       activeProviders list), backup-first; models with thinking levels; plugins + MCP
       cards; SDK type selector (15 npm packages verified); MULTI-AGENT management
@@ -169,12 +169,12 @@ What was completed:
       Python env; rule.md live theme + rulebook; kilo live (omniroute + tokenrouter,
       19 models in kilo.json); full E2E click-through battery with hash-verified
       restore; commits 459d407 + b3a0bdb.
-- [x] SESSION 30 RESEARCH: real-provider root cause found (web-verified) â€” Kilo reads
-      provider.<id>.options.apiKey, the app wrote only top-level apiKey â†’ Kilo sent no
-      token â†’ TokenRouter 401; plan written (AI/CONTINUE_REAL_PROVIDERS.md). Also fixed:
+- [x] SESSION 30 RESEARCH: real-provider root cause found (web-verified) — Kilo reads
+      provider.<id>.options.apiKey, the app wrote only top-level apiKey → Kilo sent no
+      token → TokenRouter 401; plan written (AI/CONTINUE_REAL_PROVIDERS.md). Also fixed:
       build-kilo.ps1 stale-copy trap (finder prefers highest versioned builder) and
       semantic builder-version selection.
-- [x] SESSION 31: REAL-PROVIDER FIX IMPLEMENTED â€” app/agentstore.py write_provider now
+- [x] SESSION 31: REAL-PROVIDER FIX IMPLEMENTED — app/agentstore.py write_provider now
       writes the key to BOTH top-level apiKey and options.apiKey (options preserved);
       3 new tests (34/34 green); real tokenrouter provider re-created via the app's own
       write_provider (key from the app's backup, never echoed) + models restored +
@@ -182,15 +182,15 @@ What was completed:
       kilo.json tokenrouter verified to carry options.apiKey; hash-verified snapshot
       (only intended files changed); app server restarted with the fix. USER-SCOPED
       feature: real providers (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter,
-      NVIDIA NIM) added via the app and used through agents â€” real-provider presets with
+      NVIDIA NIM) added via the app and used through agents — real-provider presets with
       SDK auto-fill added to the Add-provider form (gui.html + config.py synced);
       Modal researched (OpenAI-compatible; combined proxy token wk-<id>.ws-<secret>);
       app README updated.
 - [x] SESSION 32: ACCEPTANCE PASSED (Kilo chat with TokenRouter answers, no 401) +
       OpenCode /models fixed (stray opencode.jsonc with disabled_providers shadowed the
-      built opencode.json â€” removed, backed up; user rule documented) + BUILDER PARITY:
+      built opencode.json — removed, backed up; user rule documented) + BUILDER PARITY:
       builders mirror the dual key at merge time (K1 + V2.7 + wizard copies; scaffold
-      bootstraps from K1) â€” hand-written provider files now converge with app-written
+      bootstraps from K1) — hand-written provider files now converge with app-written
       ones; kilo harness fixed to per-provider models fixtures + new 'Dual-key options
       mirror' test (31/31), opencode harness 31/31; stale test-kilo.ps1 (OpenCode copy)
       replaced with the real K1 harness; real kilo rebuild dual-keys omniroute too;
@@ -198,28 +198,28 @@ What was completed:
       template, DEVELOPER_GUIDE, CHANGELOG 2.5.1, PROJECT_STATE, FOLDER_STRUCTURE,
       ROADMAP); committed.
 - [x] SESSION 33 (COMPLETE, 2026-08-08): FINAL FULL SYSTEM CHECK (pre-public gate) per
-      AI/CONTINUE_FULL_SYSTEM_CHECK_SESSION_33.md â€” docs coherence audit
+      AI/CONTINUE_FULL_SYSTEM_CHECK_SESSION_33.md — docs coherence audit
       (FSC v1.1 parts 1-7 + dual-key/jsonc/app-docs truth), builder testing
       (kilo 31/31, opencode 31/31, legacy, real builds, sandbox bootstrap),
       adversarial app code review (path traversal, CORS, proxy SSRF, XSS,
       theme injection, secrets/PII leak scan), full GUI click-through on the
       real kilo config with snapshot + hash-verified restore, fix loop until
-      green, report + commit â€” then the repo goes public.
+      green, report + commit — then the repo goes public.
 - [ ] FUTURE: app update to generate BOTH opencode.json and opencode.jsonc (planned,
-      not yet â€” documented); add Modal/other real providers via the app when wanted.
+      not yet — documented); add Modal/other real providers via the app when wanted.
 - [ ] FUTURE (Phase 15): extend the app + universal scaffold to MORE coding agents
-      (OpenCode + KiloCode verified; others expected to work â€” untested yet).
+      (OpenCode + KiloCode verified; others expected to work — untested yet).
 
-Dropped: Claude Code Builder V1 â€” 2026-08-08 decision (entropic `~/.claude.json`, no
+Dropped: Claude Code Builder V1 — 2026-08-08 decision (entropic `~/.claude.json`, no
 provider support). See `planning/DECISIONS.md`.
 
 Next: **Pi agent integration** (Phase 15) — verify Pi end-to-end (discover → scan → scaffold → build → manage providers/models/plugins) through the framework and the app, the next agent after Claude Code (roadmap recorded 2026-08-17); then Step 4 (framework improvements learned from the universal agent) and Step 5 (V3 Universal Builder Generator).
-after the gate: BUILDER_PHASES Alphaâ†’Betaâ†’General + Step 4 / Step 5.
+after the gate: BUILDER_PHASES Alpha→Beta→General + Step 4 / Step 5.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = KiloCode Builder,
 Phases 5-7 = universal V3).
 
-Phase gates: every builder build on the road to V3 must pass the Alpha â†’ Beta â†’
+Phase gates: every builder build on the road to V3 must pass the Alpha → Beta →
 General Release gates in `bdf/BUILDER_PHASES.md` before it becomes the main builder
 and the journey advances to the next step.
 
@@ -233,7 +233,7 @@ Read the `Current Position` section. It tells you the step, the progress, and th
 remaining work. The session then continues from the most recent `Next:` line in
 `SESSION_LOG.md`.
 
-## On session end (every session â€” including "end session")
+## On session end (every session — including "end session")
 
 1. Read `planning/BDF_ROAD_TO_V3.md` (destination rules).
 2. Compare where the session left the project against the Journey Map.
@@ -247,7 +247,7 @@ remaining work. The session then continues from the most recent `Next:` line in
 
 ## Rules
 
-- Keep it short â€” this is a compass, not a journal.
+- Keep it short — this is a compass, not a journal.
 - Never rewrite history here: move forward only. If a step regresses, describe the
   regression in the session log, not by erasing this file.
 - Never delete the Journey Map or the Destination sections.
