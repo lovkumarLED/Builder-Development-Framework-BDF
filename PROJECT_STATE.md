@@ -787,7 +787,11 @@ These limitations simplify development and provide a stable foundation for futur
   until a dedicated human-approved handoff).
 - Triaging the three established baseline test failures (two preference
   tests, one onboarding-copy frontend test).
-- Phase 15 continues: additional coding agents remain unverified.
+- Phase 15 continues: additional coding agents remain unverified. **Pi is the
+  next agent planned** (recorded 2026-08-17): after the Claude Code adapter
+  program (Gates 5B/5C, model roles, DPAPI credential store) ships, Pi is
+  verified end-to-end (discover → scan → scaffold → build → manage) through the
+  framework and the app.
 # 14. File Relationships
 
 ```

@@ -213,7 +213,7 @@ What was completed:
 Dropped: Claude Code Builder V1 â€” 2026-08-08 decision (entropic `~/.claude.json`, no
 provider support). See `planning/DECISIONS.md`.
 
-Next: Phase 15 - make the app + universal scaffold work for Claude Code and more open-source coding agents; the corrected Gate 5B live validation PASSED and Gate 5C sync is complete (session 48) — the Claude adapter is Live validated, the real-target lock is OPEN (apply from the UI for any route works; orcarouter applied live with 3 role models), and the model-roles multi-model route feature is live; next is the deferred normal-user credential UX (design §13 step 5).
+Next: **Pi agent integration** (Phase 15) — verify Pi end-to-end (discover → scan → scaffold → build → manage providers/models/plugins) through the framework and the app, the next agent after Claude Code (roadmap recorded 2026-08-17); then Step 4 (framework improvements learned from the universal agent) and Step 5 (V3 Universal Builder Generator).
 after the gate: BUILDER_PHASES Alphaâ†’Betaâ†’General + Step 4 / Step 5.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = KiloCode Builder,

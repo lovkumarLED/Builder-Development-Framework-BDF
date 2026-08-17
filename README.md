@@ -674,7 +674,11 @@ same-architecture open-source coding agent. Phase 13 (BDF V3) is in progress.
 
 **Phase 15 note:** OpenCode + KiloCode are verified today. The app and the
 universal scaffold are expected to work with **more open-source coding
-agents** â€” untested yet; we will find out when we try them.
+agents** — untested yet; we will find out when we try them. **Pi is the next
+agent on the list** (recorded 2026-08-17): after the Claude Code adapter
+program (Gates 5B/5C, model roles, DPAPI credential store) is complete, Pi
+gets verified end-to-end — discover → scan → scaffold → build → manage
+providers/models/plugins — through both the framework and the app.
 
 ---
 
