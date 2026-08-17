@@ -93,7 +93,7 @@ Real projects shape the framework â€” never assumptions.
 
 # Current Position
 
-Updated: Aug 17, 2026 (session 48: Gate 5B PASS + Gate 5C sync (Claude adapter **Live validated**, real-target lock open), **model-roles** multi-model routes shipped + live, and the **DPAPI credential store UX** shipped + live-verified (keys encrypted with the user's Windows key, app-created env vars auto-migrate into the store, Credentials card in the UI, orcarouter's ORCA_API_KEY migrated live); ROADMAP Phase 15 notes **Pi** as the next agent; next: Pi integration, then Step 4/5 to V3; session work committed in d8ece8d + 1c376db + the credential-store commit pending final report)
+Updated: Aug 17, 2026 (session 48 — OFFICIALLY CLOSED by the owner: Gate 5B PASS + Gate 5C sync (Claude adapter **Live validated**, real-target lock open), **model-roles** multi-model routes shipped + live, **DPAPI credential store UX** shipped + live-verified (keys encrypted with the user's Windows key; ORCA + TOKEN migrated, env vars deleted; FREE_CLAUDE migrates on freecc's next apply), Pi noted as the next agent in ROADMAP/README/PROJECT_STATE/JOURNEY; session fully committed (d8ece8d, 1c376db, f91eaf8, be3398c, f74da11); next: Pi integration whenever the owner starts it, then Step 4/5 to V3)
 
 ```
 Step 3 — Universal Agent Framework core
