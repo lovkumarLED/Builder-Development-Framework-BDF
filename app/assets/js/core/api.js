@@ -28,6 +28,8 @@ export const api = {
   applyClaudeRoute: (id, body) => request(`/api/claude/routes/${encodeURIComponent(id)}/apply`, send("POST", body)),
   restoreClaude: body => request("/api/claude/restore", send("POST", body)),
   claudeActivity: (limit = 100) => request(`/api/claude/activity?limit=${encodeURIComponent(limit)}`),
+claudeCredentials: () => request("/api/claude/credentials"),
+deleteClaudeCredential: name => request(`/api/claude/credentials/${encodeURIComponent(name)}`, send("DELETE", {})),
   discover: body => request("/api/discover", send("POST", body || {})),
   scan: body => request("/api/scan", send("POST", body)),
   scaffold: body => request("/api/scaffold", send("POST", body)),

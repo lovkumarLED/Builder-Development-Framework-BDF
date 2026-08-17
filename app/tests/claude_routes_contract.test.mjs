@@ -134,9 +134,10 @@ test("agent switcher offers Claude Code as a separate page, never a provider til
   assert.doesNotMatch(workspaceSource, /data-provider-action="claude/);
 });
 
-test("routes page fetches the read-only inventory for the chip bar", () => {
+test("routes page fetches the read-only inventory and credentials for the chip bar", () => {
   assert.match(routesSource, /api\.claudeScan\(\)/);
-  assert.match(routesSource, /claudeRoutesMarkup\(data\.routes \|\| \[\], data, inventory\)/);
+  assert.match(routesSource, /api\.claudeCredentials\(\)\.catch\(\(\) => null\)/);
+  assert.match(routesSource, /claudeRoutesMarkup\(data\.routes \|\| \[\], data, inventory, credentials && credentials\.credentials\)/);
 });
 
 test("inventory chips degrade gracefully when the scan is absent", () => {
@@ -281,4 +282,31 @@ test("details view renders assigned roles and picker state", () => {
   const source = routesSource;
   assert.match(source, /role\[0\]\.toUpperCase\(\) \+ role\.slice\(1\)/);
   assert.match(source, /Picker \$\{route\.restrictModelPicker === false \? "unrestricted" : "restricted to route models"\}/);
+});
+
+test("credentials card lists app-managed credentials with backend and usage", () => {
+  const creds = [{ name: "ORCA_API_KEY", backend: "store", usedBy: ["orcarouter"] }];
+  const markup = claudeRoutesMarkup([route], storeData, null, creds);
+  assert.match(markup, /Credentials/);
+  assert.match(markup, /ORCA_API_KEY/);
+  assert.match(markup, /locked store/);
+  assert.match(markup, /Used by orcarouter/);
+  assert.doesNotMatch(markup, /data-cred-delete="ORCA_API_KEY"/);
+});
+
+test("credentials card offers delete only for unreferenced orphans", () => {
+  const creds = [{ name: "ORPHAN_KEY", backend: "store", usedBy: [] }];
+  const markup = claudeRoutesMarkup([route], storeData, null, creds);
+  assert.match(markup, /data-cred-delete="ORPHAN_KEY"/);
+  assert.match(markup, /Not used by any route/);
+});
+
+test("credentials card hides when the fetch is absent", () => {
+  const markup = claudeRoutesMarkup([route], storeData, null, null);
+  assert.doesNotMatch(markup, /claude-cred-list/);
+});
+
+test("credentials endpoints are wired in the client", () => {
+  assert.match(routesSource, /api\.claudeCredentials\(\)/);
+  assert.match(routesSource, /api\.deleteClaudeCredential\(/);
 });

@@ -71,25 +71,28 @@ function routeCard(route, store) {
   return `<article class="claude-route-card ${applied ? "claude-route-card--applied" : "claude-route-card--saved"}" data-route-id="${escapeHtml(route.id)}"><div class="claude-route-card__head"><h3>${escapeHtml(route.name)}</h3>${marker}</div><dl class="claude-route-card__meta"><div><dt>Endpoint</dt><dd class="mono">${escapeHtml(route.baseUrl)}</dd></div><div><dt>Model</dt><dd>${escapeHtml(route.effectiveModel || route.model)}${route.model ? "" : ' <span class="claude-type-chip">from roles</span>'}</dd></div><div><dt>Auth</dt><dd>${authLabel} · <span class="mono">${escapeHtml(route.secretEnvRef)}</span></dd></div></dl><div class="claude-route-card__actions">${actions}</div></article>`;
 }
 
-export function claudeRoutesMarkup(routes, store, inventory = null) {
+export function claudeRoutesMarkup(routes, store, inventory = null, credentials = null) {
   const list = Array.isArray(routes) ? routes : [];
   const inv = inventory || { mcps: [], plugins: [] };
   const applied = list.find(route => route.id === store.appliedRouteId) || null;
   const mcpCount = Array.isArray(inv.mcps) ? inv.mcps.length : 0;
   const pluginCount = Array.isArray(inv.plugins) ? inv.plugins.length : 0;
   const chipbar = `<div class="claude-chipbar" aria-label="Claude Code summary"><span class="chip">${list.length} saved routes</span><span class="chip">Applied: ${applied ? escapeHtml(applied.name) : "none"}</span><span class="chip">${mcpCount} MCP servers</span><span class="chip">${pluginCount} plugins</span></div>`;
-  return `<div class="page-head"><div><p class="eyebrow">Routing</p><h1 class="page-title">Claude routes</h1><p class="page-intro">Multiple saved routes; one route can be applied at a time.</p></div><div class="page-actions"><button id="addClaudeRoute" class="button button--primary" type="button">Add route</button></div></div>${chipbar}<div class="claude-routes-workspace"><section class="claude-routes-main" aria-label="Saved Claude routes">${list.length ? `<div class="claude-routes-grid">${list.map(route => routeCard(route, store)).join("")}</div>` : `<div class="empty-state"><h3>No routes yet</h3><p>Save a routing profile, then apply it to Claude Code.</p><button id="emptyAddClaudeRoute" class="button button--primary" type="button">Add route</button></div>`}</section><aside class="claude-routes-sidebar"><div class="card card--padded"><p class="eyebrow">Claude Code</p><p>${PRESERVATION_NOTICE}</p><p>${RESTART_NOTICE}</p><p class="muted">${UNSAFE_COPY}</p><div class="claude-editor-status" data-claude-status></div></div></aside></div>`;
+  const creds = Array.isArray(credentials) ? credentials : [];
+  const credsCard = `<div class="card card--padded"><p class="eyebrow">Credentials</p><p class="field-note">App-managed keys are stored encrypted (Windows DPAPI); names and usage only are shown here.</p>${creds.length ? `<div class="claude-cred-list">${creds.map(c => `<div class="claude-cred-row"><div><span class="mono">${escapeHtml(c.name)}</span> <span class="claude-type-chip">${c.backend === "store" ? "locked store" : "env var"}</span><p class="muted">${c.usedBy.length ? "Used by " + c.usedBy.map(escapeHtml).join(", ") : "Not used by any route"}</p></div>${c.usedBy.length ? "" : `<button class="button button--danger button--small" type="button" data-cred-delete="${escapeHtml(c.name)}">Delete</button>`}</div>`).join("")}</div>` : `<p class="muted">No app-managed credentials yet.</p>`}</div>`;
+  return `<div class="page-head"><div><p class="eyebrow">Routing</p><h1 class="page-title">Claude routes</h1><p class="page-intro">Multiple saved routes; one route can be applied at a time.</p></div><div class="page-actions"><button id="addClaudeRoute" class="button button--primary" type="button">Add route</button></div></div>${chipbar}<div class="claude-routes-workspace"><section class="claude-routes-main" aria-label="Saved Claude routes">${list.length ? `<div class="claude-routes-grid">${list.map(route => routeCard(route, store)).join("")}</div>` : `<div class="empty-state"><h3>No routes yet</h3><p>Save a routing profile, then apply it to Claude Code.</p><button id="emptyAddClaudeRoute" class="button button--primary" type="button">Add route</button></div>`}</section><aside class="claude-routes-sidebar"><div class="card card--padded"><p class="eyebrow">Claude Code</p><p>${PRESERVATION_NOTICE}</p><p>${RESTART_NOTICE}</p><p class="muted">${UNSAFE_COPY}</p><div class="claude-editor-status" data-claude-status></div></div>${credsCard}</aside></div>`;
 }
 
 export async function renderClaudeRoutes(workspace) {
   workspace.innerHTML = '<div class="card card--padded skeleton"></div>';
   try {
-    const [data, status, inventory] = await Promise.all([
+    const [data, status, inventory, credentials] = await Promise.all([
       api.claudeRoutes(),
       api.claudeStatus().catch(() => null),
       api.claudeScan().catch(() => null),
+      api.claudeCredentials().catch(() => null),
     ]);
-    workspace.innerHTML = claudeRoutesMarkup(data.routes || [], data, inventory);
+    workspace.innerHTML = claudeRoutesMarkup(data.routes || [], data, inventory, credentials && credentials.credentials);
     if (status) {
       const block = workspace.querySelector("[data-claude-status]");
       block.innerHTML = `<p class="muted">Settings file: ${status.settingsPresent === true ? "present" : status.settingsPresent === null ? "unknown (locked)" : "missing"}</p><p class="muted">Last backup available: ${status.lastBackupAvailable ? "yes" : "no"}</p>${status.realTargetLocked ? '<p class="field-error">Real-target writes are locked until Gate 5 approval.</p>' : ""}<button class="button button--outline button--small" type="button" data-claude-restore>Restore latest backup</button>`;
@@ -108,6 +111,17 @@ export async function renderClaudeRoutes(workspace) {
   workspace.querySelectorAll("[data-route-action='details']").forEach(button => button.addEventListener("click", () => {
     const id = button.closest("[data-route-id]").dataset.routeId;
     openRouteDetails(workspace, id);
+  }));
+  workspace.querySelectorAll("[data-cred-delete]").forEach(button => button.addEventListener("click", async () => {
+    const name = button.dataset.credDelete;
+    if (!confirm(`Delete the app-managed credential ${name}?`)) return;
+    try {
+      await api.deleteClaudeCredential(name);
+      notify("Credential deleted.", "success");
+    } catch (error) {
+      notify(error.message, "error");
+    }
+    await renderClaudeRoutes(workspace);
   }));
 }
 

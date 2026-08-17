@@ -31,12 +31,16 @@ class ClaudeAdapterBase(unittest.TestCase):
         self.routes_file = self.tmp / "claude-routes.json"
         self.manifest_file = self.tmp / "claude-backup-manifest.json"
         self.activity_file = self.tmp / "claude-activity.jsonl"
+        self.credentials_file = self.tmp / "claude-credentials.bin"
         patchers = [
             patch.object(claude_adapter, "get_profile_root", return_value=self.profile_root),
             patch.object(claude_adapter, "CLAUDE_ROUTES_FILE", self.routes_file),
             patch.object(claude_adapter, "CLAUDE_MANIFEST_FILE", self.manifest_file),
             patch.object(claude_adapter, "CLAUDE_ACTIVITY_FILE", self.activity_file),
             patch.object(claude_adapter, "ALLOW_REAL_CLAUDE_TARGET", False),
+            patch.object(claude_adapter.claude_credentials, "CREDENTIALS_FILE", self.credentials_file),
+            patch.object(claude_adapter.claude_credentials, "_dpapi_protect", lambda data: b"ENC:" + data),
+            patch.object(claude_adapter.claude_credentials, "_dpapi_unprotect", lambda data: data[4:] if data.startswith(b"ENC:") else (_ for _ in ()).throw(OSError("bad"))),
         ]
         for p in patchers:
             p.start()
@@ -1183,10 +1187,10 @@ class LockedEndpointCoverageTests(ClaudeAdapterBase):
 
 
 class EnvVarLifecycleTests(ClaudeAdapterBase):
-    """Owner-directed credential flow: the app creates the user-scope
-    environment variable from the route's key value and removes it again on
-    route removal. All env-var functions are patched so no real registry or
-    process environment is touched."""
+    """Credential store flow (session 48): route key values are stored in the
+    app's Windows DPAPI-encrypted store (never the environment/registry); the
+    route keeps only the reference name. DPAPI + the store file are patched in
+    the base class, so no real encryption or registry is touched."""
 
     def setUp(self):
         super().setUp()
@@ -1218,65 +1222,126 @@ class EnvVarLifecycleTests(ClaudeAdapterBase):
             expectedRoutesRevision=claude_adapter.claude_routes()["routesRevision"],
         )
 
-    def test_create_with_secret_creates_env_var_and_marks_managed(self):
+    def test_create_with_secret_stores_in_dpapi_and_marks_managed(self):
         route = claude_adapter.claude_route_create(self.create_body(secret_value="sk-test-value"))["route"]
-        claude_adapter.claude_envvars.user_env_exists.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
-        claude_adapter.claude_envvars.set_user_env.assert_called_once_with("BDF_GATE4A_API_KEY_REF", "sk-test-value")
+        self.assertEqual(route["credentialBackend"], "store")
         self.assertTrue(route["envVarManaged"])
-        text = json.dumps(claude_adapter.claude_routes())
-        self.assertNotIn("sk-test-value", text)
+        self.assertEqual(claude_adapter.claude_credentials.resolve("BDF_GATE4A_API_KEY_REF"), "sk-test-value")
+        self.assertNotIn("sk-test-value", json.dumps(claude_adapter.claude_routes()))
 
-    def test_create_without_secret_never_touches_env(self):
+    def test_create_without_secret_never_stores(self):
         route = claude_adapter.claude_route_create(self.create_body(secret_value=""))["route"]
-        claude_adapter.claude_envvars.user_env_exists.assert_not_called()
-        claude_adapter.claude_envvars.set_user_env.assert_not_called()
+        self.assertEqual(route["credentialBackend"], "env")
         self.assertFalse(route["envVarManaged"])
+        self.assertFalse(claude_adapter.claude_credentials.has("BDF_GATE4A_API_KEY_REF"))
 
-    def test_create_reuses_existing_variable_unmanaged(self):
+    def test_create_with_secret_removes_stale_app_created_env_var(self):
         with patch.object(claude_adapter.claude_envvars, "user_env_exists", return_value=True):
-            route = claude_adapter.claude_route_create(self.create_body(secret_value="sk-test"))["route"]
-        claude_adapter.claude_envvars.set_user_env.assert_called_once_with("BDF_GATE4A_API_KEY_REF", "sk-test")
-        self.assertFalse(route["envVarManaged"])
+            claude_adapter.claude_route_create(self.create_body(secret_value="sk-test"))
+        claude_adapter.claude_envvars.delete_user_env.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
 
-    def test_edit_updates_key_and_keeps_managed_flag(self):
-        route = claude_adapter.claude_route_create(self.create_body(secret_value="first"))["route"]
-        edited = claude_adapter.claude_route_edit(route["id"], self.edit_body(secret_value="second"))["route"]
-        claude_adapter.claude_envvars.set_user_env.assert_called_with("BDF_GATE4A_API_KEY_REF", "second")
+    def test_edit_updates_store_value(self):
+        claude_adapter.claude_route_create(self.create_body(secret_value="first"))
+        edited = claude_adapter.claude_route_edit(
+            claude_adapter.claude_routes()["routes"][0]["id"], self.edit_body(secret_value="second"))["route"]
+        self.assertEqual(edited["credentialBackend"], "store")
         self.assertTrue(edited["envVarManaged"])
+        self.assertEqual(claude_adapter.claude_credentials.resolve("BDF_GATE4A_API_KEY_REF"), "second")
 
-    def test_delete_managed_unreferenced_removes_env_var(self):
+    def test_delete_managed_unreferenced_removes_store_entry(self):
         route = claude_adapter.claude_route_create(self.create_body(secret_value="sk-test"))["route"]
         rev = claude_adapter.claude_routes()["routesRevision"]
         result = claude_adapter.claude_route_delete(route["id"], claude_adapter.RouteDeleteBody(expectedRoutesRevision=rev))
         self.assertTrue(result["ok"])
-        claude_adapter.claude_envvars.delete_user_env.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
+        self.assertFalse(claude_adapter.claude_credentials.has("BDF_GATE4A_API_KEY_REF"))
 
-    def test_delete_unmanaged_keeps_env_var(self):
+    def test_delete_unmanaged_keeps_credential(self):
         route = claude_adapter.claude_route_create(self.create_body(secret_value=""))["route"]
         rev = claude_adapter.claude_routes()["routesRevision"]
         claude_adapter.claude_route_delete(route["id"], claude_adapter.RouteDeleteBody(expectedRoutesRevision=rev))
         claude_adapter.claude_envvars.delete_user_env.assert_not_called()
 
-    def test_delete_keeps_var_when_another_route_references_it(self):
+    def test_delete_keeps_store_entry_when_another_route_references_it(self):
         first = claude_adapter.claude_route_create(self.create_body(secret_value="sk-test", name="First"))["route"]
         claude_adapter.claude_route_create(self.create_body(secret_value="", name="Second"))
         rev = claude_adapter.claude_routes()["routesRevision"]
         claude_adapter.claude_route_delete(first["id"], claude_adapter.RouteDeleteBody(expectedRoutesRevision=rev))
-        claude_adapter.claude_envvars.delete_user_env.assert_not_called()
+        self.assertTrue(claude_adapter.claude_credentials.has("BDF_GATE4A_API_KEY_REF"))
 
-    def test_edit_renaming_managed_ref_removes_old_var(self):
+    def test_edit_renaming_managed_ref_removes_old_credential(self):
         route = claude_adapter.claude_route_create(self.create_body(secret_value="sk-test"))["route"]
-        edited = claude_adapter.claude_route_edit(route["id"], self.edit_body(ref="BDF_GATE4A_TOKEN_REF", secret_value=""))["route"]
-        claude_adapter.claude_envvars.delete_user_env.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
-        self.assertFalse(edited["envVarManaged"])
+        claude_adapter.claude_route_edit(route["id"], self.edit_body(ref="BDF_GATE4A_TOKEN_REF", secret_value=""))["route"]
+        self.assertFalse(claude_adapter.claude_credentials.has("BDF_GATE4A_API_KEY_REF"))
+        self.assertFalse(claude_adapter.claude_credentials.has("BDF_GATE4A_TOKEN_REF"))
 
-    def test_apply_ensures_credential_in_process_env(self):
-        route = claude_adapter.claude_route_create(self.create_body(secret_value=""))["route"]
+    def test_apply_resolves_store_credential_into_process_env(self):
+        claude_adapter.claude_route_create(self.create_body(secret_value="sk-resolve-me"))
+        route = claude_adapter.claude_routes()["routes"][0]
+        with patch.dict(os.environ, {}, clear=False):
+            claude_adapter.claude_envvars.os.environ.pop("BDF_GATE4A_API_KEY_REF", None)
+            claude_adapter._resolve_route_credential(route)
+            self.assertEqual(claude_adapter.claude_envvars.os.environ.get("BDF_GATE4A_API_KEY_REF"), "sk-resolve-me")
+
+    def test_apply_migrates_legacy_app_managed_env_var_into_store(self):
+        claude_adapter.claude_route_create(self.create_body(secret_value=""))
+        route = claude_adapter.claude_routes()["routes"][0]
+        route["envVarManaged"] = True
+        route.pop("credentialBackend", None)
+        with patch.object(claude_adapter.claude_envvars, "user_env_get", return_value="sk-legacy"), \
+             patch.object(claude_adapter.claude_envvars, "delete_user_env") as deleter, \
+             patch.dict(os.environ, {}, clear=False):
+            claude_adapter.claude_envvars.os.environ.pop("BDF_GATE4A_API_KEY_REF", None)
+            value = claude_adapter._resolve_route_credential(route)
+        self.assertEqual(value, "sk-legacy")
+        self.assertEqual(claude_adapter.claude_credentials.resolve("BDF_GATE4A_API_KEY_REF"), "sk-legacy")
+        deleter.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
+        self.assertEqual(route["credentialBackend"], "store")
+
+class CredentialsEndpointTests(ClaudeAdapterBase):
+    def _create_route(self, ref="BDF_GATE4A_API_KEY_REF", secret="", name="Cred"):
+        return claude_adapter.claude_route_create(claude_adapter.RouteCreateBody(
+            name=name, baseUrl="https://api.example.test/v1", authKind="apiKey",
+            secretEnvRef=ref, model="sonnet",
+            gatewayDiscovery=True, disableExperimentalBetas=True,
+            autoCompactWindow=190000, disableNonessentialTraffic=False,
+            secretValue=secret))["route"]
+
+    def test_credentials_lists_store_credential_with_usage(self):
+        self._create_route(secret="sk-live-secret")
+        result = claude_adapter.claude_credentials_list()
+        entry = next((c for c in result["credentials"] if c["name"] == "BDF_GATE4A_API_KEY_REF"), None)
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry["backend"], "store")
+        self.assertEqual(entry["usedBy"], ["Cred"])
+        self.assertNotIn("sk-live-secret", json.dumps(result))
+
+    def test_credentials_excludes_pre_existing_user_env_var(self):
+        self._create_route(secret="")
+        result = claude_adapter.claude_credentials_list()
+        self.assertNotIn("BDF_GATE4A_API_KEY_REF", [c["name"] for c in result["credentials"]])
+
+    def test_credentials_delete_blocked_while_referenced(self):
+        self._create_route(secret="sk-live-secret")
+        with self.assertRaises(HTTPException) as ctx:
+            claude_adapter.claude_credential_delete("BDF_GATE4A_API_KEY_REF")
+        self.assertEqual(ctx.exception.status_code, 400)
+        self.assertTrue(claude_adapter.claude_credentials.has("BDF_GATE4A_API_KEY_REF"))
+
+    def test_credentials_delete_orphan_removes_entry(self):
+        route = self._create_route(secret="sk-live-secret")
         rev = claude_adapter.claude_routes()["routesRevision"]
-        with patch.object(claude_adapter.claude_envvars, "ensure_process_env") as ensure:
-            claude_adapter.claude_route_apply(route["id"], claude_adapter.RouteApplyBody(
-                expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
-        ensure.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
+        claude_adapter.claude_route_delete(route["id"], claude_adapter.RouteDeleteBody(expectedRoutesRevision=rev))
+        self.assertFalse(claude_adapter.claude_credentials.has("BDF_GATE4A_API_KEY_REF"))
+
+    def test_credentials_delete_missing_404(self):
+        with self.assertRaises(HTTPException) as ctx:
+            claude_adapter.claude_credential_delete("DOES_NOT_EXIST")
+        self.assertEqual(ctx.exception.status_code, 404)
+
+    def test_store_value_never_appears_in_routes_or_activity(self):
+        self._create_route(secret="sk-top-secret-value")
+        text = json.dumps(claude_adapter.claude_routes()) + "\n" + (self.activity_file.read_text(encoding="utf-8") if self.activity_file.exists() else "")
+        self.assertNotIn("sk-top-secret-value", text)
 
 
 class EnsureProcessEnvTests(unittest.TestCase):

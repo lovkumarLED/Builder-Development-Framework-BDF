@@ -20,7 +20,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
 
-from . import claude_envvars, claude_inventory
+from . import claude_credentials, claude_envvars, claude_inventory
 from .config import (
     CLAUDE_ACTIVITY_FILE,
     CLAUDE_MANIFEST_FILE,
@@ -582,26 +582,61 @@ def _require_unlocked(root):
         raise HTTPException(503, _LOCKED_DETAIL)
 
 
-def _ensure_secret_env(ref, value):
-    """Owner-directed credential flow: the app creates the named user-scope
-    environment variable itself (persistent + applied to the current process
-    so builders inherit it with no restart). Returns True when this call
-    created the variable (i.e. it did not exist before), so the route can be
-    marked app-managed and cleaned up on removal."""
-    created = not claude_envvars.user_env_exists(ref)
-    claude_envvars.set_user_env(ref, value)
-    return created
+def _store_route_credential(ref, value):
+    """Owner-directed credential flow (session 48): the app stores the key
+    value in its own Windows DPAPI-encrypted store under the reference name —
+    never in the environment or registry. When an app-created plaintext
+    environment variable exists for the same reference, it is removed so no
+    plaintext copy survives. Returns nothing; the value is never returned."""
+    claude_credentials.store(ref, value)
+    if claude_envvars.user_env_exists(ref):
+        try:
+            claude_envvars.delete_user_env(ref)
+        except OSError:
+            pass
 
 
-def _remove_route_env_var(store, ref, exclude_id=None):
-    """Best-effort cleanup of an app-managed variable: only when the removed
-    route was app-managed and no remaining route references the same name."""
+def _resolve_route_credential(route):
+    """Resolve the route's credential into the process environment so the
+    production builder child can read it. Store-backed routes decrypt from the
+    DPAPI store; legacy app-created environment variables are migrated into the
+    store and the plaintext variable is deleted (route marked store-backed);
+    pre-existing user environment variables are reused untouched. Returns the
+    resolved value (never printed/logged)."""
+    ref = route["secretEnvRef"]
+    if route.get("credentialBackend") == "store":
+        value = claude_credentials.resolve(ref)
+        if value is not None:
+            os.environ[ref] = value
+            return value
+    if route.get("envVarManaged"):
+        value = claude_envvars.user_env_get(ref) or os.environ.get(ref)
+        if value:
+            claude_credentials.store(ref, value)
+            try:
+                claude_envvars.delete_user_env(ref)
+            except OSError:
+                pass
+            os.environ[ref] = value
+            route["credentialBackend"] = "store"
+            return value
+    return claude_envvars.ensure_process_env(ref)
+
+
+def _remove_route_credential(store, ref, exclude_id=None, store_backed=False, env_managed=False):
+    """Best-effort cleanup of an app-managed credential: only when the removed
+    route was app-managed and no remaining route references the same name.
+    Store-backed entries are removed from the DPAPI store; legacy app-created
+    variables are removed from the environment."""
     if not ref:
         return
     remaining = [r for r in store.get("routes", []) if r.get("id") != exclude_id and r.get("secretEnvRef") == ref]
     if remaining:
         return
-    claude_envvars.delete_user_env(ref)
+    if store_backed:
+        claude_credentials.delete(ref)
+    if env_managed:
+        claude_envvars.delete_user_env(ref)
 
 
 @router.get("/status")
@@ -738,6 +773,65 @@ def claude_route_detail(route_id: str):
         return {"route": _route_view(route), "revision": _target_revision(root), "routesRevision": _routes_revision(store)}
 
 
+@router.get("/credentials", dependencies=[Depends(_check_origin)])
+def claude_credentials_list():
+    """App-managed credentials, names and usage only — never values. Lock-free:
+    app-owned state (the DPAPI store + route store). Store-backed entries and
+    legacy app-created environment variables are reported with their backend;
+    pre-existing user environment variables are not listed."""
+    with _lock:
+        store = _read_store()
+        stored = set(claude_credentials.list_names())
+        referenced = {}
+        for r in store.get("routes", []):
+            ref = r.get("secretEnvRef")
+            if ref:
+                referenced.setdefault(ref, []).append(r.get("name", ""))
+        seen = set()
+        result = []
+        for ref in sorted(set(referenced) | stored):
+            if ref in seen:
+                continue
+            seen.add(ref)
+            app_created = any(r.get("envVarManaged") or r.get("credentialBackend") == "store"
+                              for r in store.get("routes", []) if r.get("secretEnvRef") == ref)
+            if not app_created and ref not in stored:
+                continue
+            backend = "store" if ref in stored else "env"
+            result.append({"name": ref, "backend": backend, "usedBy": referenced.get(ref, [])})
+        return {"credentials": result}
+
+
+@router.delete("/credentials/{name}", dependencies=[Depends(_check_origin)])
+def claude_credential_delete(name: str):
+    """Delete an app-managed credential. Blocked while any saved route
+    references it (delete the route first); store-backed entries are removed
+    from the DPAPI store, legacy app-created environment variables from the
+    environment."""
+    with _lock:
+        store = _read_store()
+        ref = name.strip()
+        if not ref:
+            raise HTTPException(400, "Credential name is required.")
+        if not SECRET_REF_RE.match(ref):
+            raise HTTPException(400, "Credential name is invalid.")
+        used_by = [r.get("name") for r in store.get("routes", []) if r.get("secretEnvRef") == ref]
+        if used_by:
+            raise HTTPException(400, f"This credential is used by {used_by[0]} — remove the route first.")
+        removed = False
+        if claude_credentials.has(ref):
+            claude_credentials.delete(ref)
+            removed = True
+        if claude_envvars.user_env_exists(ref) and any(
+            r.get("envVarManaged") for r in store.get("routes", []) if r.get("secretEnvRef") == ref
+        ):
+            claude_envvars.delete_user_env(ref)
+            removed = True
+        if not removed:
+            raise HTTPException(404, "That credential doesn't exist.")
+        return {"ok": True}
+
+
 @router.post("/routes", status_code=201, dependencies=[Depends(_check_origin)])
 def claude_route_create(body: RouteCreateBody):
     """Save a routing profile. App-owned state only (plus the owner-directed
@@ -753,18 +847,20 @@ def claude_route_create(body: RouteCreateBody):
         route["id"] = _generate_route_id(store)
         route["createdAt"] = datetime.now(timezone.utc).isoformat()
         route["updatedAt"] = route["createdAt"]
-        managed = False
         if body.secretValue.strip():
-            managed = not claude_envvars.user_env_exists(route["secretEnvRef"])
-        route["envVarManaged"] = managed
+            try:
+                _store_route_credential(route["secretEnvRef"], body.secretValue.strip())
+                route["credentialBackend"] = "store"
+                route["envVarManaged"] = True
+            except OSError:
+                route["credentialBackend"] = "env"
+                route["envVarManaged"] = False
+        else:
+            route["credentialBackend"] = "env"
+            route["envVarManaged"] = False
         new_store = dict(store)
         new_store["routes"] = list(store.get("routes", [])) + [route]
         _commit_store_and_activity(new_store, "route_created", route["id"])
-        if body.secretValue.strip():
-            try:
-                claude_envvars.set_user_env(route["secretEnvRef"], body.secretValue.strip())
-            except OSError:
-                pass
         return {"route": _route_view(route), "routesRevision": _routes_revision(new_store)}
 
 
@@ -783,25 +879,26 @@ def claude_route_edit(route_id: str, body: RouteEditBody):
         route["name"] = body.name.strip()
         _validate_route(route, store, exclude_id=route_id)
         route["updatedAt"] = datetime.now(timezone.utc).isoformat()
-        managed = bool(existing.get("envVarManaged"))
+        old_backend = existing.get("credentialBackend")
+        old_managed = bool(existing.get("envVarManaged"))
         old_ref = existing.get("secretEnvRef")
         new_ref = route["secretEnvRef"]
         if old_ref != new_ref:
-            if managed:
-                _remove_route_env_var(store, old_ref, exclude_id=route_id)
-            managed = False
+            _remove_route_credential(store, old_ref, exclude_id=route_id,
+                                     store_backed=old_backend == "store", env_managed=old_managed)
+            route["credentialBackend"] = "env"
+            route["envVarManaged"] = False
         if body.secretValue.strip():
-            if not claude_envvars.user_env_exists(new_ref):
-                managed = True
-        route["envVarManaged"] = managed
+            try:
+                _store_route_credential(new_ref, body.secretValue.strip())
+                route["credentialBackend"] = "store"
+                route["envVarManaged"] = True
+            except OSError:
+                route["credentialBackend"] = "env"
+                route["envVarManaged"] = False
         new_store = dict(store)
         new_store["routes"] = [r if r.get("id") != route_id else route for r in store.get("routes", [])]
         _commit_store_and_activity(new_store, "route_edited", route_id)
-        if body.secretValue.strip():
-            try:
-                claude_envvars.set_user_env(new_ref, body.secretValue.strip())
-            except OSError:
-                pass
         return {"route": _route_view(route), "routesRevision": _routes_revision(new_store)}
 
 
@@ -821,7 +918,9 @@ def claude_route_delete(route_id: str, body: RouteDeleteBody):
         new_store["routes"] = [r for r in store.get("routes", []) if r.get("id") != route_id]
         _commit_store_and_activity(new_store, "route_deleted", route_id)
         if route.get("envVarManaged"):
-            _remove_route_env_var(new_store, route.get("secretEnvRef"), exclude_id=route_id)
+            _remove_route_credential(new_store, route.get("secretEnvRef"), exclude_id=route_id,
+                                 store_backed=route.get("credentialBackend") == "store",
+                                 env_managed=bool(route.get("envVarManaged")))
         return {"ok": True, "routesRevision": _routes_revision(new_store)}
 
 
@@ -981,7 +1080,7 @@ def claude_route_apply(route_id: str, body: RouteApplyBody):
             recovery_path = target.parent / recovery_name
             shutil.copy2(str(target), str(recovery_path))
             recovery_sha = _sha256_file(recovery_path)
-            claude_envvars.ensure_process_env(route["secretEnvRef"])
+            _resolve_route_credential(route)
             code, stdout, stderr = _run_production([
                 "-Operation", "Apply",
                 "-ProfileRoot", str(root),
@@ -1009,6 +1108,11 @@ def claude_route_apply(route_id: str, body: RouteApplyBody):
             new_store = dict(store)
             new_store["appliedRouteId"] = route["id"]
             new_store["appliedRouteConfigSha256"] = _fingerprint(route)
+            if route.get("credentialBackend") == "store":
+                stored_routes = store.get("routes", [])
+                current = next((r for r in stored_routes if r.get("id") == route["id"]), None)
+                if current and current.get("credentialBackend") != "store":
+                    new_store["routes"] = [r if r.get("id") != route["id"] else dict(r, credentialBackend="store") for r in stored_routes]
             entries = _read_manifest()
             if len(entries) >= MANIFEST_CAP:
                 prune_staged = _prepare_prune(entries, root)
