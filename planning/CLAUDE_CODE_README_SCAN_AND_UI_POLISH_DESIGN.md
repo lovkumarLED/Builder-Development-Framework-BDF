@@ -1,7 +1,7 @@
 # Claude Code Read-Only Inventory Scan + Claude-Mode UI Polish — Design
 
 Status: **Approved design (owner, 2026-08-16, session 43), not yet implemented**
-Lifecycle: **Integrated, not live validated** (unchanged)
+Lifecycle: **Live validated** (2026-08-17, corrected Gate 5B PASS + Gate 5C approved; see `CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md`; the real-target lock stays closed until the owner opens it)
 Supersedes in part: `planning/CLAUDE_CODE_SETTINGS_ONLY_SCOPE_CORRECTION_DESIGN.md`
 (§2 "Claude-owned state — never read user `.claude.json`" is narrowed to:
 read-only inventory scans only; every mutation prohibition stands).

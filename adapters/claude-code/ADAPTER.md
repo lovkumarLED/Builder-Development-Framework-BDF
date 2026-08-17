@@ -1,8 +1,8 @@
 # Claude Code Adapter Contract
 
-Lifecycle status: **Integrated, not live validated**
+Lifecycle status: **Live validated**
 
-Evidence date: 2026-08-14
+Evidence date: 2026-08-17
 
 ## Target and adapter category
 
@@ -193,14 +193,14 @@ claim live reload.
 
 ## Release and support boundary
 
-- Current status: **Integrated, not live validated**. Not supported for normal
-  use.
-- Gate 5 live validation is required before any stronger status and remains
-  unauthorized.
+- Current status: **Live validated** (2026-08-17, corrected Gate 5B pass + Gate
+  5C approved) for the env-only routing scope exercised by the gate.
+- The real-target lock stays closed until the owner opens it; apply/restore
+  return 503 by default.
 - No release entry exists for this adapter.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
-**Status:** Integrated, not live validated
+**Status:** Live validated

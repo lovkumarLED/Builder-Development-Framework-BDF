@@ -28,7 +28,7 @@ Layer 2: the OpenCode-specific project documentation.
 A hybrid unique-adapter layer adds adapter namespaces (the generic notation adapters/<agent>/) for targets
 whose contracts differ materially from the universal scaffold. The Switcher
 app currently carries one unique bounded adapter: Claude Code (lifecycle
-status **Integrated, not live validated**; see `adapters/claude-code/`).
+status **Live validated**; see `adapters/claude-code/`).
 
 The project-specific facts are defined in the project adapter:
 

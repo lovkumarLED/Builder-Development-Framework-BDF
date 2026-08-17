@@ -1,8 +1,8 @@
 # Claude Code Adapter
 
-Lifecycle status: **Integrated, not live validated**
+Lifecycle status: **Live validated**
 
-Evidence date: 2026-08-14
+Evidence date: 2026-08-17
 
 ## Purpose and audience
 
@@ -18,12 +18,15 @@ every unsupported semantic value.
 
 ## Current lifecycle status
 
-**Integrated, not live validated.** This means the adapter is integrated into
-the app and its production-path logic is proven on temporary fixture copies. It
-is NOT supported for normal use, and it does not imply Gate 5 evidence. Stronger
-statuses ("Supported", "Production ready", "Live validated") require approved
-live validation against a real Claude installation, which is Gate 5 and remains
-unauthorized.
+**Live validated** (2026-08-17, Gate 5B corrected live validation PASS + Gate 5C
+approved). The adapter is integrated into the app, its production-path logic is
+proven on temporary fixture copies (Gates 2-4A), and an approved live validation
+run against the real user-scope `.claude/settings.json` passed: one saved
+loopback route applied and surgically restored, `/status` evidence collected,
+and one no-session-persistence routing request returned the fixed marker with
+the applied route's model verified from structured response metadata. The
+real-target lock stays closed until the owner opens it; apply/restore remain
+503-gated by default.
 
 ## Reading order
 
@@ -42,9 +45,14 @@ Managed by this adapter:
 - Only the top-level `env` object of the user-scope Claude settings target
   (`settings.json`) is surgically patched, and only for exactly one scalar
   routing profile: endpoint base URL, exactly one auth strategy by
-  environment-variable reference, `ANTHROPIC_MODEL`, and the four curated
-  compatibility options. Top-level `model` and every unrelated byte are
-  preserved exactly; the document is never regenerated.
+  environment-variable reference, `ANTHROPIC_MODEL`, the four curated
+  compatibility options, and the four role aliases (`opus`/`sonnet`/`haiku`/
+  `fable` via `ANTHROPIC_DEFAULT_*_MODEL`, each set only when the route assigns
+  a model to that role and removed when it does not). Two managed top-level
+  keys are also patched: `availableModels` (the route's model set) and
+  `enforceAvailableModels` (true) whenever the route restricts the `/model`
+  picker. Top-level `model` and every unrelated byte are preserved exactly; the
+  document is never regenerated.
 - Saved routing profiles (multiple saved, exactly one applied) in the app-owned
   route store, with backup/restore status and redacted routing activity.
 
@@ -55,10 +63,22 @@ Explicitly NOT managed (Claude-owned, read-only or unsupported; zero access):
 - The Claude state file, `.claude/plugins`, project/local settings, `.mcp.json`,
   FCC executables, and anything under `.local\bin`.
 
+## Model roles (opus / sonnet / haiku / fable)
+
+A route can assign additional model IDs to Claude Code's four role aliases.
+Each role holds at most one model ID; on apply the adapter writes the matching
+`ANTHROPIC_DEFAULT_<ROLE>_MODEL` env value and, when the route restricts the
+picker, top-level `availableModels` + `enforceAvailableModels` so `/model`
+shows only the route's models. A blank role is never written, and any stale
+value is removed on apply - leftover models cannot survive a route switch.
+`enforceAvailableModels` enforcement requires Claude Code 2.1.175+ (ignored
+before that; the allowlist itself works now). Role values are read at startup,
+so the restart notice applies.
+
 ## Implementation and schema locations
 
 - Shared routing core: `app/engine/claude-code/claude-routing-core.psm1`
-  (adapter implementation version 0.2.0).
+  (adapter implementation version 0.3.0).
 - Fixture entry point: `app/engine/claude-code/build-claude-code.ps1`.
 - Production entry point: `app/engine/claude-code/build-claude-code-production.ps1`.
 - Routing schema: `app/engine/schemas/claude-code-routing.schema.json`.
@@ -79,11 +99,16 @@ Explicitly NOT managed (Claude-owned, read-only or unsupported; zero access):
   rounds.
 - Gate 4 (integration documentation): this document set and
   `planning/CLAUDE_CODE_GATE_4_APP_INTEGRATION_REPORT.md`.
-- Gate 5 (approved live validation): NOT reached and NOT authorized. Gate 5B.4
-  remains historical `HARD_FAILURE` evidence under the superseded broad
-  ownership contract; the corrected env-only scope is documented in
-  `planning/CLAUDE_CODE_SETTINGS_ONLY_SCOPE_CORRECTION_DESIGN.md` and its
-  implementation report.
+- Gate 5 (approved live validation): REACHED (2026-08-17, corrected env-only
+  contract). Session 46 proved every transaction mechanic; session 48 secured
+  the routing evidence (fixed marker `GATE5B_ROUTE_OK` returned, applied model
+  verified from structured metadata) - see
+  `planning/CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md` and
+  `planning/CLAUDE_CODE_GATE_5C_DOCUMENTATION_RELEASE_SYNC_REPORT.md`. The
+  historical Gate 5B.4 `HARD_FAILURE` report remains valid context under the
+  superseded broad ownership contract and does not justify restoring or
+  deleting Claude-owned state; the corrected env-only scope is documented in
+  `planning/CLAUDE_CODE_SETTINGS_ONLY_SCOPE_CORRECTION_DESIGN.md`.
 
 ## Governing decisions
 
@@ -99,23 +124,25 @@ Explicitly NOT managed (Claude-owned, read-only or unsupported; zero access):
 
 ## Warning
 
-Fixture, integration, and production-path evidence must never be interpreted as
-a stronger status. This adapter is **Integrated, not live validated** until
-approved Gate 5 live validation passes and is released. Gate 5 is not
-authorized by this document.
+The adapter is **Live validated** only for the corrected env-only routing
+scope and the loopback gateway exercised by the gate. Fixture, integration,
+and production-path evidence must never be interpreted as a broader support
+claim: Claude-owned state outside `settings.json`'s managed `env` fields
+remains entirely outside BDF access, and the real-target lock stays closed
+until the owner opens it.
 
 ## Document versions
 
 | Document | Version |
 |---|---|
-| README.md | 1.0 |
-| ADAPTER.md | 1.0 |
-| BUILDER_SPEC.md | 1.0 |
-| TESTING.md | 1.0 |
-| COMPATIBILITY.md | 1.0 |
+| README.md | 1.1 |
+| ADAPTER.md | 1.1 |
+| BUILDER_SPEC.md | 1.1 |
+| TESTING.md | 1.1 |
+| COMPATIBILITY.md | 1.1 |
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
-**Status:** Integrated, not live validated
+**Status:** Live validated

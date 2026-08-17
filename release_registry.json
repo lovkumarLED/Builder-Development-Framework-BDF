@@ -30,8 +30,8 @@
       ],
       "breakingChanges": "None",
       "migrationRequired": "No (existing profiles were backfilled with lsp.json enabled:false on disk; new scaffolds seed it)",
-      "testingSummary": "Gate 2 65/65, Gate 3 OVERALL PASS (Claude untouched); opencode harness 40/40, kilo harness 37/37; full Python 217 (2 accepted preference baselines); full frontend 133 (1 accepted onboarding-copy baseline); git diff --check 0; live toggle ON->build->lsp:true, OFF->build->lsp:false on both agents, all snapshot files restored byte-equal",
-      "knownIssues": "Accepted unrelated baselines unchanged (2 preference, 1 onboarding-copy). Gate 5B live validation still NOT PASS (routing evidence blocked by upstream 429 in session 46; retry handoff AI/CLAUDE_CODE_GATE_5B_RETRY_RESUME_PROMPT.md).",
+      "testingSummary": "Gate 2 65/65, Gate 3 OVERALL PASS (Claude untouched); opencode harness 40/40, kilo harness 37/37; full Python 217 (2 accepted preference baselines); full frontend 133 (1 accepted onboarding-copy baseline); git diff --check 0; live toggle ON->build->lsp:true, OFF->build->lsp:false on both agents, all snapshot files restored byte-equal; Gate 5B corrected live validation PASS 2026-08-17 (apply + /status + routing marker + byte-verified restore + relock verified)",
+      "knownIssues": "Accepted unrelated baselines unchanged (2 preference, 1 onboarding-copy). Gate 5B corrected live validation PASSED 2026-08-17 (sessions 46 + 48): transaction mechanics + routing evidence (fixed marker GATE5B_ROUTE_OK returned, applied model verified from structured metadata) - see planning/CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md; Gate 5C documentation/release sync completed (planning/CLAUDE_CODE_GATE_5C_DOCUMENTATION_RELEASE_SYNC_REPORT.md). Claude adapter lifecycle is now Live validated; the real-target lock is OPEN (owner decision, session 48) so apply/restore work from the UI. Model-roles feature added (opus/sonnet/haiku/fable + picker allowlist) with two fixes (credential reload after server restart, dangling-comma on trailing-run removals) - see superpowers/specs/2026-08-17-claude-model-roles-design.md.",
       "docsUpdated": [
         "README.md",
         "app/README.md",
@@ -60,7 +60,23 @@
         "bdf/templates/ARCHITECTURE.template.md",
         "release_registry.json",
         "_agent/JOURNEY_TO_V3.md",
-        "_agent/SESSION_LOG.md"
+        "_agent/SESSION_LOG.md",
+        "adapters/claude-code/README.md",
+        "adapters/claude-code/ADAPTER.md",
+        "adapters/claude-code/BUILDER_SPEC.md",
+        "adapters/claude-code/COMPATIBILITY.md",
+        "adapters/claude-code/TESTING.md",
+        "planning/CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md",
+        "planning/CLAUDE_CODE_GATE_5C_DOCUMENTATION_RELEASE_SYNC_REPORT.md",
+        "planning/CLAUDE_CODE_SETTINGS_ONLY_SCOPE_CORRECTION_DESIGN.md",
+        "planning/CLAUDE_CODE_CREDENTIAL_UX_APP_MANAGED_ENV_VARS.md",
+        "superpowers/specs/2026-08-17-claude-model-roles-design.md",
+        "app/app/claude_envvars.py",
+        "app/app/claude_adapter.py",
+        "app/engine/claude-code/claude-routing-core.psm1",
+        "app/engine/schemas/claude-code-routing.schema.json",
+        "app/assets/js/pages/claude-routes.js",
+        "app/BUGFIXES.md"
       ]
     },
     {

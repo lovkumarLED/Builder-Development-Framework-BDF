@@ -1,7 +1,9 @@
 # Claude Code Credential UX — App-Managed Environment Variables (Design + Implementation Record)
 
 Status: **Implemented + live-verified (2026-08-16, session 45)**
-Lifecycle: **Integrated, not live validated** (unchanged; apply/restore still gated)
+Lifecycle: **Live validated** (2026-08-17, corrected Gate 5B PASS + Gate 5C
+approved; apply/restore stay lock-gated until the owner opens the real-target
+lock)
 Commits: none
 Supersedes in part: `planning/CLAUDE_CODE_FUTURE_CREDENTIAL_UX_FIX.md` (the
 env-reference developer workaround now gets an in-app key input; the full

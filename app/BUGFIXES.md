@@ -18,6 +18,27 @@ Copy this block into Entries when a fix lands:
 
 ## Entries
 
+### 2026-08-17 - Route save rejected when the main Model ID was blank despite role models
+
+- **Symptom:** Editing a route, clearing the main Model ID and leaving only Sonnet/Haiku role models filled, the save failed with "you have to fill this" even though role models were provided.
+- **Root cause:** The main Model ID was hard-required both in the form (`required`) and in `_validate_route` ("The model ID is required."), with no allowance for role-only routes.
+- **Fix:** The main model is now optional whenever at least one role model is assigned. `_effective_model()` (claude_adapter.py) derives the active `ANTHROPIC_MODEL` from the roles when blank (Sonnet first, then Haiku, Opus, Fable); the fingerprint and routing profile use the derived value; the route view exposes `effectiveModel`; the form field is no longer `required` and shows "derived from your Sonnet role (or first role) when blank"; cards/details mark a role-derived model with a "from roles" chip.
+- **Verified:** 4 new `ModelRolesTests` (blank-main-with-roles accepted, blank-main-no-roles rejected with the new message, sonnet derivation, precedence); focused Python 149/149; focused frontend 56/56; live: orcarouter edited to blank main + roles, `effectiveModel` derived from Sonnet, save 200.
+
+### 2026-08-17 - Applying a route failed "referenced secret missing" after a server restart
+
+- **Symptom:** Applying the orcarouter route from the app returned 400 "The route could not be applied to the Claude settings target." while the tokenrouter/omniroute applies worked. The production builder log showed `VALIDATION FAILED; referenced secret missing`.
+- **Root cause:** App-managed credentials (e.g. `ORCA_API_KEY`) are persisted in the user-scope registry and applied to the *running* server process at creation time. When the server restarts from a parent shell that never loaded that variable (fresh login shell / another tool's shell), the new server process does not inherit it, and the production builder child cannot resolve the route's credential. The session-45 "no restart gotcha" only held when the variable was created after the current server started.
+- **Fix:** `claude_envvars.ensure_process_env(ref)` (claude_envvars.py) resolves a missing credential from the user-scope registry into `os.environ`; `claude_route_apply` calls it right before invoking the production builder (claude_adapter.py).
+- **Verified:** Repro `VALIDATION FAILED; referenced secret missing` → after fix the orcarouter apply returns 200 and settings.json carries the orca env + allowlist; `EnsureProcessEnvTests` (3) + `EnvVarLifecycleTests.test_apply_ensures_credential_in_process_env` green; Gate 2 73/73, focused Python 145/145, focused frontend 56/56.
+
+### 2026-08-17 - Surgical patcher left a dangling comma when removing a trailing run of managed env keys
+
+- **Symptom:** Applying a route with no role assignments to settings that still carried the four `ANTHROPIC_DEFAULT_*_MODEL` keys produced "surgical output malformed JSON" (the env object ended `"value",}`).
+- **Root cause:** The removal-span coalescer merged a trailing run of member removals starting *after* the previous member's comma, leaving that comma dangling when nothing followed the run. The latent bug was never exercised because prior tests removed at most one key or a mid-run key.
+- **Fix:** `Repair-DanglingRemovalCommas` (claude-routing-core.psm1) extends a removal span back over the preceding comma when the span ends at the object's closing brace; applied to both the env and the top-level (availableModels/enforceAvailableModels) removals.
+- **Verified:** New G2-8 harness tests "stale tier models removed" + "allowlist removed when off" pass; Gate 2 73/73.
+
 ### 2026-08-17 - LSP card status line ignored the toggle state
 
 - **Symptom:** With the LSP toggle OFF, the Integrations page still read "Built-in servers enabled — kilo.json will carry "lsp": true." even though the builder writes `"lsp": false` when the toggle is off. The status line contradicted the actual build output.

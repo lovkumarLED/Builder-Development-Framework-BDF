@@ -1,8 +1,19 @@
 # Claude Code Settings-Only Scope Correction Design
 
-Status: **Approved design, not implemented**  
+Status: **Approved design, implemented and live validated**
 Approved by user: 2026-08-14  
-Lifecycle: **Integrated, not live validated**
+Lifecycle: **Live validated**
+
+> **LIVE VALIDATED (2026-08-17, session 48, owner-approved):** the corrected
+> Gate 5B live validation PASSED against the real user-scope
+> `.claude/settings.json` (mechanics proven in session 46, routing evidence
+> secured in session 48: the fixed marker `GATE5B_ROUTE_OK` was returned and
+> the applied route's model verified from structured response metadata;
+> see `planning/CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md`)
+> and Gate 5C documentation/release synchronization was approved and completed
+> (`planning/CLAUDE_CODE_GATE_5C_DOCUMENTATION_RELEASE_SYNC_REPORT.md`). The
+> design's completion sequence (§13) steps 3-4 are satisfied; the real-target
+> lock stays closed until the owner opens it.
 
 > **SUPERSEDED IN PART (2026-08-16, session 43, owner directive):** Section 2's
 > "Claude-owned state — BDF must never read … user `.claude.json`" is narrowed
@@ -37,10 +48,20 @@ Within that file's top-level `env` object, BDF manages exactly:
    - `env.ANTHROPIC_API_KEY`, or
    - `env.ANTHROPIC_AUTH_TOKEN`.
 3. `env.ANTHROPIC_MODEL`.
-4. `env.CLAUDE_CODE_AUTO_COMPACT_WINDOW`.
+4. `env.CLAUDE_CODE_AUTO_COMPACT_WINDOW` (optional: absent when the route does
+   not configure it).
 5. `env.CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY`.
 6. `env.CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS`.
 7. `env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`.
+
+**Extended (2026-08-17, session 48, owner-approved - model roles):** BDF also
+manages the four role aliases `env.ANTHROPIC_DEFAULT_OPUS_MODEL`,
+`env.ANTHROPIC_DEFAULT_SONNET_MODEL`, `env.ANTHROPIC_DEFAULT_HAIKU_MODEL`,
+`env.ANTHROPIC_DEFAULT_FABLE_MODEL` (set only when the route assigns that role,
+removed otherwise), and the two top-level keys `availableModels` (the route's
+model set) + `enforceAvailableModels` (true) whenever the route restricts the
+`/model` picker. The surgical byte-preserving patch philosophy is unchanged;
+see `superpowers/specs/2026-08-17-claude-model-roles-design.md`.
 
 When applying one auth strategy, BDF removes only the opposite auth field. It
 does not remove or alter any other environment entry.
@@ -309,7 +330,9 @@ Update Claude adapter documentation and planning evidence to state:
 - prior Gate 5B.4 is historical `HARD_FAILURE` under an over-broad acceptance
   contract and does not justify restoring or deleting Claude-owned state;
 - lifecycle remains `Integrated, not live validated` until a corrected live
-  gate passes and Gate 5C is separately approved.
+  gate passes and Gate 5C is separately approved — that condition is now met
+  (corrected Gate 5B PASS + Gate 5C approved, 2026-08-17); lifecycle moved to
+  **Live validated**.
 
 Do not rewrite or conceal prior reports. Add superseding design/implementation
 evidence while preserving the historical record.
@@ -327,12 +350,14 @@ evidence while preserving the historical record.
 
 ## 13. Completion sequence
 
-1. DeepSeek implements this settings-only correction under a separate handoff.
-2. Sol reviews implementation and test evidence.
-3. A corrected, separately approved Gate 5B live validation runs.
+1. DeepSeek implements this settings-only correction under a separate handoff. ✅ (session 42)
+2. Sol reviews implementation and test evidence. ✅ (session 42)
+3. A corrected, separately approved Gate 5B live validation runs. ✅ PASS
+   (sessions 46 + 48, 2026-08-17)
 4. Gate 5C documentation/release synchronization runs only after Gate 5B
-   passes.
+   passes. ✅ (session 48, 2026-08-17)
 5. DeepSeek implements the deferred normal-user credential UX afterward.
+   ⬜ pending — future work, not yet started.
 
 ## 14. Official sources
 

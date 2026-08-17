@@ -1,8 +1,8 @@
 # Claude Code Adapter Compatibility Ledger
 
-Lifecycle status: **Integrated, not live validated**
+Lifecycle status: **Live validated**
 
-Evidence date: 2026-08-14
+Evidence date: 2026-08-17
 
 ## Version identities
 
@@ -69,17 +69,21 @@ records only what the cited gate reports prove.
 
 ## Last verification date and evidence source
 
-2026-08-14. `planning/CLAUDE_CODE_GATE_4A_IMPLEMENTATION_REPORT.md` and its
-three repair rounds; Gate 1, Gate 2, and Gate 3 reports.
+2026-08-17. Corrected Gate 5B live validation PASS
+(`planning/CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md`) +
+Gate 5C documentation/release sync (`planning/CLAUDE_CODE_GATE_5C_DOCUMENTATION_RELEASE_SYNC_REPORT.md`);
+Gates 1-4A reports remain the fixture/integration evidence ledger.
 
 ## Status
 
-**Integrated, not live validated.** Compatibility rows report what was
-observed at their evidence level; they do not extrapolate support from one
-version. Gate 5 live validation remains unauthorized.
+**Live validated** (2026-08-17). Compatibility rows report what was observed
+at their evidence level; they do not extrapolate support from one version.
+Live validation covers the corrected env-only routing scope and the loopback
+gateway exercised by the gate; the real-target lock stays closed until the
+owner opens it.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
-**Status:** Integrated, not live validated
+**Status:** Live validated

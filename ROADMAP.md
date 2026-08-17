@@ -656,6 +656,11 @@ several agents; the goal is to verify and support each one end-to-end (discover
 → scan → scaffold → build → manage providers/models/plugins) through the same
 two surfaces: the MD framework and the GUI app.
 
+Next agent planned: **Pi** (recorded 2026-08-17, session 48). Pi is the next
+coding agent to be added and verified after the Claude credential-store UX is
+complete — the Claude Code adapter program (Gates 5B/5C, model roles) is done;
+Pi comes next, then the remaining roadmap phases.
+
 Definition of complete (when tried)
 
 - Each new agent verified end-to-end through the app and the framework.
@@ -747,8 +752,9 @@ A later approved direction: the Switcher app gains a narrow Claude Code routing
 adapter as a unique bounded adapter (one scalar route at a time), documented
 under `adapters/claude-code/`. This is a later decision that does not rewrite
 the historical Phase 11 outcome (see `planning/DECISIONS.md`). Lifecycle
-status: **Integrated, not live validated**. Live validation (Gate 5) remains
-unauthorized.
+status: **Live validated** (2026-08-17, corrected Gate 5B live validation
+PASS + Gate 5C approved; see `planning/CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md`).
+The real-target lock stays closed until the owner opens it.
 
 ---
 

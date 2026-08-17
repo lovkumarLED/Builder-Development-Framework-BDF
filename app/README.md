@@ -415,6 +415,7 @@ assistant). Saving a route can create the gateway credential as a Windows
 environment variable for you and removes it again when the route is removed.
 A read-only inventory shows the MCP servers (with types) and plugins Claude
 Code has configured, scanned from the Claude state file and the managed
-settings file - never edited. Lifecycle status: **Integrated, not live
-validated** - not supported for normal use; live validation (Gate 5) remains
-unauthorized.
+settings file - never edited. Lifecycle status: **Live validated** (2026-08-17,
+corrected Gate 5B live validation PASS + Gate 5C approved; see
+`adapters/claude-code/`). Apply/restore stay lock-gated until the owner opens
+the real-target lock.

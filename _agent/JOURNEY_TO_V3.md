@@ -93,11 +93,11 @@ Real projects shape the framework â€” never assumptions.
 
 # Current Position
 
-Updated: Aug 17, 2026 (session 47: LSP feature built end-to-end for OpenCode + KiloCode — engine (lsp.json in every profile, both builders + harnesses 40/40 + 37/37, Claude untouched) + app (/api/lsp + Integrations LSP toggle card) + full SDD review MERGE-READY + post-review fixes (OFF emits lsp:false, per-agent copy, toggle-aware status) logged in BUGFIXES; Gate 5B retry handoff written: AI/CLAUDE_CODE_GATE_5B_RETRY_RESUME_PROMPT.md — 5B still NOT PASS pending routing-evidence retry, 5C after owner approval)
+Updated: Aug 17, 2026 (session 48: Gate 5B routing-evidence retry PASS + Gate 5C sync COMPLETE — Claude adapter **Live validated**; real-target lock OPEN (owner decision) so apply/restore work from the UI; **model-roles multi-model routes feature built + live**: routes assign models to opus/sonnet/haiku/fable aliases + optional picker allowlist (availableModels/enforceAvailableModels), auto-compact now optional, builder core 0.3.0; two bugs fixed (credential reload after server restart via ensure_process_env, dangling-comma on trailing-run removals); **orcarouter applied live with the owner's 3 role models** (deepseek-v4-pro-free opus, deepseek-v4-flash-free sonnet, qwen3.8-27b-free haiku) + allowlist; Gate 2 73/73, Gate 3 OVERALL PASS, OpenCode 40/40, Kilo 37/37, Python 145/145 + 225/2-baseline, frontend 56/56 + 138/1-baseline; design superpowers/specs/2026-08-17-claude-model-roles-design.md; next: deferred normal-user credential UX (design §13 step 5))
 
 ```
 Step 3 — Universal Agent Framework core
-Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08 and narrowly reversed 2026-08-14 as a unique routing adapter; GUI app = BDF made autonomous, session 29; real-provider fix + presets + builder parity, sessions 31-32; env-only surgical scope correction implemented, session 42; Claude Code UI entry points implemented, session 43; read-only inventory scan + Claude-mode UI polish, session 44; app-managed credential env vars + lock-free route CRUD, session 45; corrected Gate 5B live validation RUN session 46 - mechanics pass, routing evidence blocked by upstream 429, NOT PASS; LSP feature for OpenCode + KiloCode built + reviewed, session 47 - Gate 5B retry pending)
+Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08 and narrowly reversed 2026-08-14 as a unique routing adapter; GUI app = BDF made autonomous, session 29; real-provider fix + presets + builder parity, sessions 31-32; env-only surgical scope correction implemented, session 42; Claude Code UI entry points implemented, session 43; read-only inventory scan + Claude-mode UI polish, session 44; app-managed credential env vars + lock-free route CRUD, session 45; corrected Gate 5B live validation RUN session 46 - mechanics pass, routing evidence blocked by upstream 429; LSP feature for OpenCode + KiloCode built + reviewed + committed by owner, session 47; Gate 5B routing-evidence RETRY PASS session 48 - corrected Gate 5B live validation COMPLETE)
 Progress: ~98%
 ```
 
@@ -213,7 +213,7 @@ What was completed:
 Dropped: Claude Code Builder V1 â€” 2026-08-08 decision (entropic `~/.claude.json`, no
 provider support). See `planning/DECISIONS.md`.
 
-Next: Phase 15 - make the app + universal scaffold work for Claude Code and more open-source coding agents; commit session-34 updates on the owner's request.
+Next: Phase 15 - make the app + universal scaffold work for Claude Code and more open-source coding agents; the corrected Gate 5B live validation PASSED and Gate 5C sync is complete (session 48) — the Claude adapter is Live validated, the real-target lock is OPEN (apply from the UI for any route works; orcarouter applied live with 3 role models), and the model-roles multi-model route feature is live; next is the deferred normal-user credential UX (design §13 step 5).
 after the gate: BUILDER_PHASES Alphaâ†’Betaâ†’General + Step 4 / Step 5.
 
 Detailed plan: `planning/NEXT_PHASE_IMPLEMENTATION_PLAN.md` (Phase 3 = KiloCode Builder,

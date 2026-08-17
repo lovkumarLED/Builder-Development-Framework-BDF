@@ -1,8 +1,8 @@
 # Claude Code Adapter Builder Specification
 
-Lifecycle status: **Integrated, not live validated**
+Lifecycle status: **Live validated**
 
-Evidence date: 2026-08-14
+Evidence date: 2026-08-17
 
 ## Command interfaces
 
@@ -187,19 +187,21 @@ exercised deterministically).
   finalization returns a generic hard failure, never success, and preserves
   exactly the verified evidence file that could not be deleted.
 
-## Gate 5 remains unauthorized
+## Gate 5 reached
 
 This specification describes production-path behavior proven on temporary
-fixture copies only. Lifecycle status is **Integrated, not live validated**.
-Gate 5 live validation against a real Claude installation is unauthorized and
-unperformed.
+fixture copies (Gates 2-4A) and now validated live (2026-08-17, corrected Gate
+5B pass + Gate 5C approved) against the real user-scope `.claude/settings.json`
+with one saved loopback route, `/status` evidence, and one no-session routing
+request returning the fixed marker. Lifecycle status is **Live validated**.
 
 ## Status-specific restrictions
 
 - Gate 2 files prove fixture-only behavior.
 - Gate 4A files prove production-path logic on temporary fixture copies only.
-- Status is **Integrated, not live validated**; no fixture or integration
-  evidence justifies a stronger claim.
+- Gate 5B live validation proves the env-only routing scope on the real target;
+  it does not broaden the managed surface beyond the top-level `env` routing
+  fields, and the real-target lock stays closed until the owner opens it.
 
 ## Implementation traceability
 
@@ -209,6 +211,6 @@ describes the contract, the module is the executable source of truth.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
-**Status:** Integrated, not live validated
+**Status:** Live validated

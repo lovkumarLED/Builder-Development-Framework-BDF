@@ -1,8 +1,8 @@
 # Claude Code Adapter Testing Guide
 
-Lifecycle status: **Integrated, not live validated**
+Lifecycle status: **Live validated**
 
-Evidence date: 2026-08-14
+Evidence date: 2026-08-17
 
 ## Test groups and gate authorization
 
@@ -14,7 +14,7 @@ Evidence date: 2026-08-14
 | Unit tests (frontend contract) | Gate 4A | Capability-driven UI, routes workspace, adaptive pages, compatibility assistant (35 tests) |
 | Regression tests | Every gate | Gate 2 65/65, Gate 3 overall pass, OpenCode 34/34, Kilo 32/32, focused and full Python and frontend suites (exact commands below) |
 | Integration tests | Gate 4A | In-process app API integration on temporary GUID roots with the profile root injected; never against the real profile |
-| Live validation | Gate 5 only | Real-target behavior; NOT authorized |
+| Live validation | Gate 5 (corrected env-only contract) | Real-target behavior; PASSED 2026-08-17 (`planning/CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md`) |
 
 ## Isolation and privacy constraints
 
@@ -53,9 +53,11 @@ Evidence date: 2026-08-14
 
 ## Separation of passing tests from a support claim
 
-A green suite is evidence of behavior at its gate. It is never a support
-claim. Status remains **Integrated, not live validated** until approved live
-validation passes and is released.
+A green suite is evidence of behavior at its gate. It is never a broader
+support claim. The adapter moved to **Live validated** only after the corrected
+Gate 5B live validation passed (2026-08-17) and Gate 5C was approved; the
+live-validated scope is the env-only routing surface exercised by the gate,
+and the real-target lock stays closed until the owner opens it.
 
 ## Exact current commands, exits, and counts
 
@@ -108,6 +110,6 @@ the Gate 4 result:
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
-**Status:** Integrated, not live validated
+**Status:** Live validated

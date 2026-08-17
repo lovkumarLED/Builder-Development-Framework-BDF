@@ -127,6 +127,26 @@ opencode harness 40/40, kilo harness 37/37 (5 new LSP tests each); full Python 2
 - _agent/SESSION_LOG.md
 - app/BUGFIXES.md
 
+## Claude Code Adapter — Live Validated (2026-08-17)
+
+The Claude Code routing adapter moved from **Integrated, not live validated**
+to **Live validated** after the corrected Gate 5B live validation PASSED and
+Gate 5C documentation/release sync was approved:
+
+- Corrected env-only contract (`planning/CLAUDE_CODE_SETTINGS_ONLY_SCOPE_CORRECTION_DESIGN.md` §9/§13): qualify the default 2.1.153 command, keep FCC/.local\bin untouched, snapshot settings.json + app-owned state (hash-verified restore), apply exactly one saved loopback route (omniroute), one bounded /status check, one no-session-persistence routing request, semantic tool-use determination, restore in finally with byte-equality.
+- Session 46 proved every transaction mechanic; session 48 secured the routing evidence: one no-session routing request returned the exact fixed marker `GATE5B_ROUTE_OK` with the applied route's model (`gemini/gemini-3.5-flash-lite`) verified from structured response metadata, zero tools, no fallback, budget-capped.
+- Backup = pre-run SHA exactly; restore returned the pre-run revision; all managed targets byte-equal after; relock verified (apply → 503, `realTargetLocked: true`).
+- Evidence: `planning/CLAUDE_CODE_GATE_5B_CORRECTED_LIVE_VALIDATION_PASS_REPORT.md` + `planning/CLAUDE_CODE_GATE_5C_DOCUMENTATION_RELEASE_SYNC_REPORT.md`. The real-target lock is open (owner decision, session 48) — apply/restore work from the app UI.
+
+## Claude Code Adapter — Model Roles + Multi-Model Routes (2026-08-17, session 48)
+
+- Routes can now assign model IDs to Claude's role aliases (`opus` / `sonnet` / `haiku` / `fable`); on apply the adapter writes `ANTHROPIC_DEFAULT_<ROLE>_MODEL` for each assigned role and **removes** any unassigned role key, so stale models (e.g. a leftover haiku default) can never survive a route switch.
+- Optional "Restrict the /model picker" toggle writes top-level `availableModels` (the route's model set) + `enforceAvailableModels: true` so `/model` shows only the route's models (`enforceAvailableModels` engages on Claude Code 2.1.175+; the allowlist works now).
+- Auto-compact window is now optional (enable checkbox + value; off = key removed).
+- Design: `superpowers/specs/2026-08-17-claude-model-roles-design.md`; builder core 0.2.0 → 0.3.0.
+- Fixes: credential "referenced secret missing" after server restart (registry reload via `ensure_process_env`); surgical patcher dangling-comma on trailing-run removals.
+- Verified: Gate 2 73/73 (8 new), Gate 3 OVERALL PASS, OpenCode 40/40, Kilo 37/37, focused Python 145/145, full Python 225 (2 accepted baselines), focused frontend 56/56 (5 new), full frontend 138 (1 accepted baseline); live: orcarouter applied with 3 role models + allowlist, restore byte-equal, lock open.
+
 ---
 
 # Version 2.5.2
