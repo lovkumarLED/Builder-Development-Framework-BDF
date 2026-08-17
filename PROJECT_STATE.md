@@ -47,20 +47,21 @@ It is regenerated after every major refactor.
 Version
 
 ```
-2.5.2
+2.5.3
 ```
 
 Status
 
 ```
-Full-system health check + security hardening + per-model reasoning
+LSP support (OpenCode + KiloCode) in the engine and Switcher app
 ```
 
 ## Version History
 <!-- AUTO-GENERATED START -->
 | Version | Status | Description |
 |----------|--------|-------------|
-| 2.5.2 | Current | Full-system health check + security hardening + per-model reasoning formats + profile switcher. Security fixes: SSRF-via-redirect in /api/test, proxy userinfo-injection path regex, profile-switch path traversal, scaffold agent-name validation, storage.py lock deadlock. Builders preserve per-model reasoning formats. Settings gains a per-model reasoning panel, delete-model button, and active-profile switcher. Model adds overwrite by ID. 79 app unit tests, 75 frontend contract tests, kilo 31/31 + opencode 31/31 harnesses green. |
+| 2.5.3 | Current | LSP support for OpenCode + KiloCode in BOTH the BDF engine and the Switcher app: new `profiles/<profile>/lsp.json` (`{ "lsp": <bool|object>, "enabled": <bool> }`) seeded by the scaffold in every profile (disabled by default, user-owned after), both builders (OpenCode V2.7 + Kilo K1) merge LSP with an interactive toggle + `-NonInteractive`, `lsp.schema.json` pre-flight, app `GET/PUT /api/lsp` + Integrations LSP block between Plugins and MCP. Claude Code untouched. Harnesses opencode 40/40, kilo 37/37 (5 new LSP tests each); full Python 217 (2 accepted baselines), full frontend 133 (1 accepted onboarding-copy baseline). |
+| 2.5.2 | Previous | Full-system health check + security hardening + per-model reasoning formats + profile switcher. Security fixes: SSRF-via-redirect in /api/test, proxy userinfo-injection path regex, profile-switch path traversal, scaffold agent-name validation, storage.py lock deadlock. Builders preserve per-model reasoning formats. Settings gains a per-model reasoning panel, delete-model button, and active-profile switcher. Model adds overwrite by ID. 79 app unit tests, 75 frontend contract tests, kilo 31/31 + opencode 31/31 harnesses green. |
 | 2.5.1 | Previous | Real-provider compatibility: the app and the builders now write the API key in both places agents read it (provider.<id>.apiKey for OpenCode, provider.<id>.options.apiKey for Kilo), fixing the TokenRouter 401 in Kilo. The Switcher gains real-provider presets (TokenRouter, Modal, OpenAI, Google Gemini, OpenRouter, NVIDIA NIM) with SDK auto-fill. Builders mirror the dual key automatically at merge time, so builder-only users get the same result as app users. 56 app unit tests, kilo harness 31/31, opencode harness 33/33. |
 | 2.5.0 | Previous | Builder V2.7 JSON Schema Validation: config sources validated against schemas/*.schema.json before builder validation (F1), pre-flight dependency check (F2), -WhatIf dry run (F3), backup retention (F4), provenance sidecar (F5), -Doctor diagnostics (F6), merge diff summary (F7), 9-stage pipeline. P2 dynamic target artifact (profiles/<profile>/target.json) + P1 env-key policy. |
 | 2.4.0 | Previous | Builder V2.5 Active-Provider Selector: discovers all providers, interactive active-provider selection persisted to settings.json, profile-level <provider>-models.json with highest precedence. |
@@ -366,6 +367,8 @@ models.json
 plugins.json
 
 mcp.json
+
+lsp.json
 ```
 
 Additional profiles contain only `settings.json` and contribute their provider selection to the build.
@@ -461,9 +464,10 @@ scaffold-agent.ps1
 
 The V3 UNIVERSAL core: open-source agent registry (opencode, kilo, claudecode — allowed
 name only, aider, goose, codex-cli), discovery, `-List`, `-Bootstrap` per-agent builder
-generation. ONE job: scan the agent's own main JSON, split mcp/plugin sections, seed
-`profiles/coding/mcp.json` + `plugins.json` (user-owned after creation), create
-`profiles/{coding,experimental,minimal}` with settings/mcp/plugins. Creates the
+generation. ONE job: scan the agent's own main JSON, split mcp/plugin/lsp sections, seed
+`profiles/coding/mcp.json` + `plugins.json` + `lsp.json` (user-owned after creation; LSP
+disabled by default), create
+`profiles/{coding,experimental,minimal}` with settings/mcp/plugins/lsp. Creates the
 `providers/` folder but NEVER writes provider/model files inside it (user-owned),
 never touches `.jsonc` without consent. Closed-source agents never touched.
 

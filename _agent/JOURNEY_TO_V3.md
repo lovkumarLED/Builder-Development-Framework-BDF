@@ -93,11 +93,11 @@ Real projects shape the framework â€” never assumptions.
 
 # Current Position
 
-Updated: Aug 16, 2026 (session 45: Claude route credential UX - app-managed environment variables (create from the form, delete with the route, no restart needed), lock-free route CRUD, checkbox fix; whole Claude Code integration program COMMITTED; next: corrected Gate 5B live validation + Gate 5C)
+Updated: Aug 17, 2026 (session 47: LSP feature built end-to-end for OpenCode + KiloCode — engine (lsp.json in every profile, both builders + harnesses 40/40 + 37/37, Claude untouched) + app (/api/lsp + Integrations LSP toggle card) + full SDD review MERGE-READY + post-review fixes (OFF emits lsp:false, per-agent copy, toggle-aware status) logged in BUGFIXES; Gate 5B retry handoff written: AI/CLAUDE_CODE_GATE_5B_RETRY_RESUME_PROMPT.md — 5B still NOT PASS pending routing-evidence retry, 5C after owner approval)
 
 ```
 Step 3 — Universal Agent Framework core
-Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08 and narrowly reversed 2026-08-14 as a unique routing adapter; GUI app = BDF made autonomous, session 29; real-provider fix + presets + builder parity, sessions 31-32; env-only surgical scope correction implemented, session 42; Claude Code UI entry points implemented, session 43; read-only inventory scan + Claude-mode UI polish, session 44; app-managed credential env vars + lock-free route CRUD, session 45)
+Status: IN PROGRESS (core built; bootstrap fix session 27; Claude dropped 2026-08-08 and narrowly reversed 2026-08-14 as a unique routing adapter; GUI app = BDF made autonomous, session 29; real-provider fix + presets + builder parity, sessions 31-32; env-only surgical scope correction implemented, session 42; Claude Code UI entry points implemented, session 43; read-only inventory scan + Claude-mode UI polish, session 44; app-managed credential env vars + lock-free route CRUD, session 45; corrected Gate 5B live validation RUN session 46 - mechanics pass, routing evidence blocked by upstream 429, NOT PASS; LSP feature for OpenCode + KiloCode built + reviewed, session 47 - Gate 5B retry pending)
 Progress: ~98%
 ```
 

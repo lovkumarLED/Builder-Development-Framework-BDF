@@ -175,6 +175,8 @@ Every new builder project begins by defining its adapter.
 - The framework remains generic.
 - The adapter contains all project-specific knowledge.
 - The adapter is complete before templates are customized.
+- The scaffold seeds `lsp.json` (disabled by default, user-owned after creation)
+  in every profile alongside `mcp.json`/`plugins.json`.
 
 ---
 

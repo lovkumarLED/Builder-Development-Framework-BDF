@@ -246,6 +246,32 @@ keys never fail older builders; unknown keys pass through unchanged.
 
 ---
 
+# LSP Configuration File
+
+`lsp.json`
+
+## Location
+
+```
+{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/lsp.json
+```
+
+## Schema
+
+| Key | Type | Required | Description |
+|------|------|----------|-------------|
+| lsp | Boolean or Object | Yes | Either a plain on/off boolean or an object of LSP server definitions (each may carry optional `command`, `extensions`, `disabled`, `env`, `initialization`). |
+| enabled | Boolean | Yes | Master switch; LSP is disabled by default (`false`). |
+
+## Validation Rules
+
+- Disabled by default — the user turns it on (the app's Integrations page toggle or the builder's interactive prompt).
+- User-owned after creation (Seed-IfMissing; the framework never overwrites it).
+- Validated against `{{SCHEMA_DIR}}/lsp.schema.json` when present.
+- The builder merges it only when `lsp.json` exists.
+
+---
+
 # Target Configuration File
 
 `target.json` (P2, optional)
@@ -318,6 +344,7 @@ The following files are considered source files.
 | <provider>-models.json | Yes |
 | plugins.json | Yes |
 | mcp.json | Yes |
+| lsp.json | Yes |
 | target.json | Yes (optional) |
 | {{CURRENT_PROVIDER}}.json | Yes |
 
@@ -375,6 +402,7 @@ The live schema files live in `{{SCHEMA_DIR}}/`.
 | `models.schema.json` | Covers BOTH `models.json` AND `<provider>-models.json` (profile-level per-provider model files) | `models` (object); model entries require `name` (string) | false |
 | `plugins.schema.json` | `{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/plugins.json` | `plugin` (array of strings) | false |
 | `mcp.schema.json` | `{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/mcp.json` | `mcp` (object); server entries permissive by design | false at root |
+| `lsp.schema.json` | `{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/lsp.json` | `lsp` (boolean or object — permissive), `enabled` (boolean) | false at root |
 | `targets.schema.json` | `{{CONFIG_SOURCE_DIR}}/{{DEFAULT_PROFILE}}/target.json` | `artifact` (string) | false |
 
 Each configuration source file has a matching `*.schema.json` file.
@@ -406,6 +434,7 @@ The supported keyword subset:
 - <provider>-models.json
 - plugins.json
 - mcp.json
+- lsp.json
 - target.json
 - {{CURRENT_PROVIDER}}.json
 
@@ -453,6 +482,10 @@ plugins.json
 ↓
 
 mcp.json
+
+↓
+
+lsp.json
 
 ↓
 

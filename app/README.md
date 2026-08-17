@@ -84,8 +84,9 @@ your actual configs. The four guided stages:
    entry is available for anything else). You pick **one** agent — the app
    immediately scans that agent's config, and if the agent isn't set up yet it
    runs the BDF setup itself: creates `profiles/coding` + `experimental` +
-   `minimal`, seeds `mcp.json`/`plugins.json` in the coding profile **from
-   your target JSON's MCP/plugin sections**, writes `settings.json` with the
+   `minimal`, seeds `mcp.json`/`plugins.json`/`lsp.json` in the coding profile
+   **from your target JSON's MCP/plugin/LSP sections** (LSP disabled by default),
+   writes `settings.json` with the
    detected active providers, creates the `providers/` folder, backs up before
    every write, and never touches files you already own. A summary line shows
    what was found ("Scanned KiloCode: 2 providers · 7 MCP servers · 0
@@ -325,6 +326,7 @@ Everything stays inside the `app` folder (or next to your agent):
 | `<agent>\profiles\coding\<provider>-models.json` | your models (with thinking levels) — the app writes them when you add models |
 | `<agent>\profiles\coding\plugins.json` | your plugins — the app writes them from the Plugins card |
 | `<agent>\profiles\coding\mcp.json` | your MCP servers — the app writes them from the MCP card |
+| `<agent>\profiles\coding\lsp.json` | your LSP on/off + value — the app writes it from the Integrations LSP block (disabled by default) |
 | `<agent>\profiles\coding\settings.json` | which provider is active (`activeProviders`) — the app updates it when you switch |
 | `<agent>\backup\` | automatic backups of everything the app changes |
 | `profiles\` | your agent's profiles (`coding`, `experimental`, `minimal`) |
@@ -396,8 +398,10 @@ built-in look and shows a warning in the black window — nothing breaks.
   is bounded to 1,000 records. Request-content redaction is mandatory and
   cannot be turned off. The page shows an honest empty state until the local
   proxy has traffic; it never invents usage data.
-- Integrations shows plugin identifiers only and MCP configurations as
-  **Configured** with their declared type. It does not claim plugin installs,
+- Integrations shows plugin identifiers only, MCP configurations as
+  **Configured** with their declared type, and an LSP block between Plugins and
+  MCP (on/off toggle persisted via `PUT /api/lsp`, server-name chips, "Edit
+  JSON" expert dialog). It does not claim plugin installs,
   MCP connectivity, discovered tools, provider health, or a successful test
   unless you explicitly run the relevant provider test.
 

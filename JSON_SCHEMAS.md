@@ -237,7 +237,29 @@ keys never fail older builders; unknown keys pass through unchanged.
 
 ---
 
-# target.json (P2, optional)
+# lsp.json
+
+## Location
+
+```
+profiles/<profile>/lsp.json
+```
+
+## Schema
+
+| Key | Type | Required | Description |
+|------|------|----------|-------------|
+| lsp | Boolean or Object | Yes | Either a plain on/off boolean or an object of LSP server definitions (each may carry optional `command`, `extensions`, `disabled`, `env`, `initialization`). |
+| enabled | Boolean | Yes | Master switch; LSP is disabled by default (`false`). |
+
+## Validation Rules
+
+- Disabled by default — the user turns it on (the app's Integrations page toggle or the builder's interactive prompt).
+- User-owned after creation (Seed-IfMissing; the framework never overwrites it).
+- Validated against `schemas/lsp.schema.json` when present.
+- The builder merges it only when `lsp.json` exists.
+
+---
 
 Profile-level target artifact; selects the file the builder generates for this profile.
 
@@ -314,6 +336,7 @@ The following files are considered source files.
 | <provider>-models.json | Yes |
 | plugins.json | Yes |
 | mcp.json | Yes |
+| lsp.json | Yes |
 | target.json | Yes (optional) |
 | omniroute.json | Yes |
 
@@ -355,6 +378,7 @@ Validation is performed by the builder before configuration generation.
 - <provider>-models.json
 - plugins.json
 - mcp.json
+- lsp.json
 - target.json (P2 dynamic target artifact)
 - omniroute.json
 
@@ -370,7 +394,7 @@ Implemented in Builder V2.7.
 
 ## JSON Schema Files (Builder V2.7)
 
-The seven live schema files live in `schemas/`.
+The eight live schema files live in `schemas/`.
 
 | File | Validates | Required | additionalProperties |
 |------|-----------|----------|----------------------|
@@ -380,6 +404,7 @@ The seven live schema files live in `schemas/`.
 | `models.schema.json` | Covers BOTH `models.json` AND `<provider>-models.json` (profile-level per-provider model files) | `models` (object); model entries require `name` (string) | false |
 | `plugins.schema.json` | `profiles/<profile>/plugins.json` | `plugin` (array of strings) | false |
 | `mcp.schema.json` | `profiles/<profile>/mcp.json` | `mcp` (object); server entries permissive by design | false at root |
+| `lsp.schema.json` | `profiles/<profile>/lsp.json` | `lsp` (boolean or object — permissive), `enabled` (boolean) | false at root |
 | `targets.schema.json` | `profiles/<profile>/target.json` | `artifact` (string) | false |
 
 ---
@@ -422,6 +447,10 @@ plugins.json
 ↓
 
 mcp.json
+
+↓
+
+lsp.json
 
 ↓
 

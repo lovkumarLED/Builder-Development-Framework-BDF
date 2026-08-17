@@ -50,11 +50,90 @@ Example
 
 <!-- AUTO-GENERATED START -->
 
-# Version 2.5.2
+# Version 2.5.3
 
 ## Status
 
 Current
+
+---
+
+## Date
+
+```
+2026-08-17
+```
+
+## Summary
+
+LSP support for OpenCode + KiloCode in BOTH the BDF engine and the Switcher app. New `profiles/<profile>/lsp.json` source `{ "lsp": <bool|object>, "enabled": <bool> }` seeded by the scaffold in EVERY profile (coding + experimental + minimal, disabled by default, user-owned after creation — Seed-IfMissing, never overwritten). Both builders (OpenCode V2.7 + Kilo K1) merge LSP: interactive "LSP servers: [1] enabled [2] disabled (Enter keeps current)" prompt (skipped under `-NonInteractive`, stored `enabled` used), backup-first persist, `-WhatIf` never writes, verification throws if an enabled LSP is missing from the output, diff summary adds/removes "LSP servers", Doctor reports it via the generic sources walk. New `lsp.schema.json` (Draft-07) pre-flight dependency. App: `GET/PUT /api/lsp` router + Integrations page LSP block between Plugins and MCP (on/off toggle persisted via PUT, server-name chips, "Edit JSON" expert dialog). Claude Code untouched. Harnesses: opencode 40/40, kilo 37/37 (5 new LSP tests each); full Python 217 (2 accepted preference baselines), full frontend 133 (1 accepted onboarding-copy baseline).
+
+## Highlights
+
+- Engine: lsp.json in every profile (disabled by default), seeded like mcp.json/plugins.json (Seed-IfMissing, never overwritten)
+- Builders: Merge-Lsp — enabled → generated config carries `"lsp": <value>` (true or object); disabled → `"lsp": false`; no lsp.json → no `lsp` key
+- lsp.schema.json (Draft-07) next to mcp.schema.json/plugins.schema.json: `lsp` (boolean or object) + `enabled` (boolean), both required
+- App: new app/lsp.py GET/PUT /api/lsp (400 on invalid shape); Integrations page LSP servers block between Plugins and MCP
+- Per-agent + toggle-aware copy: "kilo.json will carry..." / "opencode.json will carry..." / "LSP is off — <config> will carry lsp: false"
+
+## New Features
+
+- `app/engine/schemas/lsp.schema.json`, `app/app/lsp.py`, `app/tests/test_lsp.py`
+- Integrations page LSP servers block with on/off toggle (persists immediately via PUT) + server-name chips + "Edit JSON" expert dialog
+
+## Improvements
+
+- Builder interactive prompt for the LSP toggle; `-NonInteractive` and the app use the stored `enabled`
+- Backup-first persist of the LSP toggle; `-WhatIf` never writes
+- 5 new harness tests each (enabled true / object round-trip / disabled / no-file / false value): opencode 40/40, kilo 37/37
+
+## Bug Fixes
+
+- LSP toggle OFF now emits `"lsp": false` (was: key removed entirely)
+- LSP card copy named the wrong config file (hardcoded "opencode.json" → per-agent kilo.json/opencode.json)
+- LSP card status line now reflects the toggle (OFF → "LSP is off — <config> will carry lsp: false")
+
+## Breaking Changes
+
+None
+
+## Migration Required
+
+No (existing profiles were backfilled with lsp.json enabled:false on disk; new scaffolds seed it)
+
+## Testing Summary
+
+opencode harness 40/40, kilo harness 37/37 (5 new LSP tests each); full Python 217 (2 accepted preference baselines); full frontend 133 (1 accepted onboarding-copy baseline)
+
+## Docs Updated
+
+- README.md
+- app/README.md
+- BUILDER_SPEC.md
+- FOLDER_STRUCTURE.md
+- JSON_SCHEMAS.md
+- PROFILE_CREATION_GUIDE.md
+- ARCHITECTURE.md
+- ADAPTER.md
+- DEVELOPER_GUIDE.md
+- PROJECT_STATE.md
+- CHANGELOG.md
+- ROADMAP.md
+- bdf/FRAMEWORK.md
+- bdf/PROJECT_GENERATOR.md
+- bdf/README.md
+- bdf/templates/README.md
+- _agent/JOURNEY_TO_V3.md
+- _agent/SESSION_LOG.md
+- app/BUGFIXES.md
+
+---
+
+# Version 2.5.2
+
+## Status
+
+Previous
 
 ---
 

@@ -428,6 +428,7 @@ models.json
 <provider>-models.json   (new in Phase 10.5)
 plugins.json
 mcp.json
+lsp.json
 ```
 
 Reserved location and workflow
@@ -561,8 +562,9 @@ Definition of complete
 - No framework redesign is required per project — main configs (JSON), profiles, MCP,
   plugin-splitting, per-agent generated build/test/scaffold scripts.
 - The scaffold's ONE job for any agent: scan the agent's OWN main JSON, split it into
-  mcp / plugin sections, and seed the profiles — `coding` (always the main profile) +
-  `experimental` + `minimal`, each with `settings.json`, `mcp.json`, `plugins.json`.
+  mcp / plugin / lsp sections, and seed the profiles — `coding` (always the main profile) +
+  `experimental` + `minimal`, each with `settings.json`, `mcp.json`, `plugins.json`,
+  `lsp.json` (disabled by default).
 - The framework creates the `providers/` folder but NEVER writes provider or model
   files inside it — providers and models are 100% user-owned. The framework never
   copies another agent's config into a project; each agent's profiles are seeded
@@ -582,7 +584,7 @@ COMPLETED 2026-08-08 (session 29) — docs/app/: FastAPI backend + gui.html fron
 local OpenAI-compatible proxy on 127.0.0.1:9090, calls the real scaffold-agent.ps1 -Bootstrap
 engine (one engine, two surfaces). Smoke-tested end-to-end green on the real opencode agent.
 Feature set: BDF-exact data model (app reads/writes the agent's own providers/,
-<provider>-models.json, plugins.json, mcp.json, settings.json activeProviders — backup-first),
+<provider>-models.json, plugins.json, mcp.json, lsp.json, settings.json activeProviders — backup-first),
 MULTI-AGENT management (Agents card: add any agent's config folder, switch the managed agent
 instantly, already-set-up folders load directly without the wizard), models with thinking
 levels (default/minimal/high/max, provider modal + Models card), plugins card, MCP servers

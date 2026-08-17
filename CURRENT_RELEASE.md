@@ -1,4 +1,4 @@
-﻿# Current Release
+# Current Release
 
 > Quick reference for the current release of the OpenCode Configuration Manager.
 
@@ -15,7 +15,7 @@ V2.7
 Project Version
 
 ```
-2.5.2
+2.5.3
 ```
 
 ---
@@ -23,7 +23,7 @@ Project Version
 Release Date
 
 ```
-2026-08-12
+2026-08-17
 ```
 
 ---

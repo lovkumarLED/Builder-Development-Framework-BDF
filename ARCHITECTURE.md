@@ -70,7 +70,8 @@ The following diagram illustrates the overall system structure.
         |   ├── <provider>-models.json               |
         |   ├── models.json                          |
         |   ├── plugins.json                         |
-        |   └── mcp.json                             |
+        |   ├── mcp.json                             |
+        |   └── lsp.json                             |
         |                                            |
         +--------------------------------------------+
 
@@ -216,7 +217,7 @@ Responsibilities:
 - Load profile configuration.
 - Load provider definitions.
 - Validate configuration (structure, duplicates, malformed definitions).
-- Merge configuration in stages (settings, providers, models, plugins, MCP).
+- Merge configuration in stages (settings, providers, models, plugins, MCP, LSP).
 - Create backups.
 - Verify the generated configuration before writing.
 - Generate `opencode.json`.

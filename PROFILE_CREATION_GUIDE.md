@@ -27,7 +27,7 @@ experimental/
 minimal/
 ```
 
-Each profile carries exactly three files:
+Each profile carries exactly four files:
 
 ```
 profiles/<profile>/
@@ -35,6 +35,7 @@ profiles/<profile>/
 settings.json
 mcp.json
 plugins.json
+lsp.json
 ```
 
 ## coding — the main profile
@@ -42,6 +43,8 @@ plugins.json
 - `settings.json` — `$schema` + `activeProviders` (framework-writable).
 - `mcp.json` — seeded once from the agent's own main JSON; **user-owned after**.
 - `plugins.json` — seeded once from the agent's own main JSON; **user-owned after**.
+- `lsp.json` — seeded from the main config's `lsp` value; **user-owned after**.
+  Disabled by default (`enabled: false`) until you turn it on.
 - May also carry `<provider>-models.json` (user-owned models, highest precedence).
 
 ## experimental / minimal
@@ -49,6 +52,7 @@ plugins.json
 - `settings.json` — written by the framework.
 - `mcp.json` — created EMPTY, never filled by the framework.
 - `plugins.json` — created EMPTY, never filled by the framework.
+- `lsp.json` — created with the default `{ "lsp": true, "enabled": false }`.
 
 ---
 
@@ -95,13 +99,36 @@ User-owned after creation. The framework never overwrites it.
 
 User-owned after creation. The framework never overwrites it.
 
+## lsp.json
+
+```json
+{
+  "lsp": true,
+  "enabled": false
+}
+```
+
+- `lsp` — either a plain on/off boolean or an object keyed by server name (each
+  server may carry optional `command`, `extensions`, `disabled`, `env`,
+  `initialization`). Copied verbatim into the generated config as the `lsp` key
+  when enabled.
+- `enabled` — the LSP master switch. **Disabled by default**; the user turns it
+  on (the app's Integrations page toggle or the builder's interactive prompt).
+- User-owned after creation. The framework never overwrites it.
+- Builder behavior: `enabled: true` → generated config carries `"lsp": <value>`;
+  `enabled: false` → generated config carries `"lsp": false`; no `lsp.json` → no
+  `lsp` key. The interactive prompt asks "LSP servers: [1] enabled [2] disabled
+  (Enter keeps current)" when not `-NonInteractive`; the app and
+  `-NonInteractive` runs use the stored `enabled` value.
+
 ---
 
 # Creating a New Profile
 
 1. Create the folder: `profiles/<name>/`.
 2. Create `settings.json` (or let the framework create it).
-3. Create `mcp.json` and `plugins.json` (empty is fine; you fill them).
+3. Create `mcp.json`, `plugins.json`, and `lsp.json` (empty is fine; you fill
+   them).
 4. Add provider models if the profile needs them:
    `profiles/<name>/<provider>-models.json`.
 5. Build with: `-Profile <name>`.
@@ -113,6 +140,7 @@ profiles/gaming/
 ├── settings.json
 ├── mcp.json
 ├── plugins.json
+├── lsp.json
 └── omniroute-models.json
 ```
 
@@ -140,8 +168,8 @@ Active providers are read from `settings.json` → `activeProviders`.
 - The generated main config must never be shadowed by a `.jsonc` of the same
   name — OpenCode reads the `.jsonc` *instead of* the `.json` when both exist,
   and the built config silently disappears from `/models`.
-- mcp.json / plugins.json are user-owned after creation — the framework never
-  overwrites them.
+- mcp.json / plugins.json / lsp.json are user-owned after creation — the
+  framework never overwrites them.
 - The user may add more profiles or edit any file at any time.
 - `target.json` (optional, P2) can change the generated artifact name per
   profile:

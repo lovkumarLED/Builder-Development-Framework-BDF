@@ -77,6 +77,7 @@ The following diagram illustrates the overall system structure.
         |   ├── models file                          |
         |   ├── plugins file                         |
         |   ├── service configuration file           |
+        |   ├── lsp.json                             |
         |   └── optional target file                 |
         |                                            |
         +--------------------------------------------+

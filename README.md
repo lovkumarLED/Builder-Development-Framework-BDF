@@ -2,7 +2,7 @@
   <img src="app/assets/bdf-counterphase-logo.svg" width="160" alt="Switcher logo">
 </p>
 
-# 🔥 Builder Development Framework (BDF) + Switcher App
+# ðŸ”¥ Builder Development Framework (BDF) + Switcher App
 
 > **Learn the engineering process once. Reuse it forever.**
 >
@@ -17,12 +17,12 @@
 [![Builder](https://img.shields.io/badge/Builder-V2.7%20(JSON%20Schema)-2ea44f)](#-what-is-this--two-worlds-one-engine)
 [![Framework](https://img.shields.io/badge/BDF-2.2.11-blue)](#-what-is-this--two-worlds-one-engine)
 [![Tests](https://img.shields.io/badge/tests-kilo%2031%2F31%20%2B%20opencode%2031%2F31%20%2B%20app%2073%20green-brightgreen)](#-development-setup-structure-testing)
-[![Release](https://img.shields.io/badge/release-2.5.1-orange)](#-releases)
+[![Release](https://img.shields.io/badge/release-2.5.3-orange)](#-releases)
 [![Status](https://img.shields.io/badge/status-13%2F15%20phases%20complete%20%2B%20V3%20in%20progress-blue)](#-roadmap)
 
 ---
 
-## 🎬 See it in action
+## ðŸŽ¬ See it in action
 
 The whole flow, from first launch to build - all local, nothing leaves 127.0.0.1:
 
@@ -46,7 +46,7 @@ custom providers get a generated one.
 
 ---
 
-## 🚀 Quick start
+## ðŸš€ Quick start
 
 Three ways to get it, depending on what you want:
 
@@ -104,7 +104,7 @@ app only stores them in your own agent's provider files, and the proxy on
 # Discover what's installed
 powershell -File scripts\scaffold-agent.ps1 -List
 
-# Scaffold an agent (scan main JSON → seed profiles → generate builder scripts)
+# Scaffold an agent (scan main JSON â†’ seed profiles â†’ generate builder scripts)
 powershell -File scripts\scaffold-agent.ps1 -Agent kilo -NonInteractive -Bootstrap
 
 # Build the agent's config from the modular sources
@@ -115,7 +115,7 @@ powershell -File C:\Users\You\.config\kilo\scripts\build-kilo-v1.ps1 -Profile co
 
 ## Table of Contents
 
-1. [What is this? — Two worlds, one engine](#-what-is-this--two-worlds-one-engine)
+1. [What is this? â€” Two worlds, one engine](#-what-is-this--two-worlds-one-engine)
 2. [Key features](#-key-features)
 3. [The Story Behind the Project](#-the-story-behind-the-project)
 4. [One Last Thing...](#-one-last-thing)
@@ -123,7 +123,7 @@ powershell -File C:\Users\You\.config\kilo\scripts\build-kilo-v1.ps1 -Profile co
 6. [How the BDF engine works](#-how-the-bdf-engine-works)
 7. [How the Switcher app works](#-how-the-switcher-app-works)
 8. [Agent management](#-agent-management)
-9. [Providers, models, plugins, MCP — the data model](#-providers-models-plugins-mcp--the-data-model)
+9. [Providers, models, plugins, MCP â€” the data model](#-providers-models-plugins-mcp--the-data-model)
 10. [The GUI: screens, theme, animations, assets](#-the-gui-screens-theme-animations-assets)
 11. [Development: setup, structure, testing](#-development-setup-structure-testing)
 12. [Roadmap](#-roadmap)
@@ -133,7 +133,7 @@ powershell -File C:\Users\You\.config\kilo\scripts\build-kilo-v1.ps1 -Profile co
 
 ---
 
-## ✨ Key features
+## âœ¨ Key features
 
 - **Two worlds, one engine.** The BDF builders (`build-kilo-v1.ps1`,
   `build-opencode-v2.7.ps1`) read your `providers/` and `profiles/`, validate
@@ -155,8 +155,8 @@ powershell -File C:\Users\You\.config\kilo\scripts\build-kilo-v1.ps1 -Profile co
   proxies (OmniRoute, LiteLLM), TokenRouter, OpenAI, Google Gemini,
   OpenRouter, NVIDIA NIM - picking one fills the URL, the SDK package (15
   registry-verified packages), the name, and the reasoning format
-  (OpenAI/ChatGPT → low/medium/high/xhigh, Claude → thinking budgets,
-  Gemini → thinking budgets, OpenCode → default/minimal/high/max).
+  (OpenAI/ChatGPT â†’ low/medium/high/xhigh, Claude â†’ thinking budgets,
+  Gemini â†’ thinking budgets, OpenCode â†’ default/minimal/high/max).
 - **Backup-first, every write.** Providers, models, plugins, MCP, settings -
   everything is copied to the agent's `backup\` folder before it changes,
   with SHA256-hash-verified snapshot/restore for testing.
@@ -169,7 +169,7 @@ powershell -File C:\Users\You\.config\kilo\scripts\build-kilo-v1.ps1 -Profile co
 
 ---
 
-## 🧭 What is this? — Two worlds, one engine
+## ðŸ§­ What is this? â€” Two worlds, one engine
 
 **This project is that way.** It has two halves that share one engine:
 
@@ -179,17 +179,17 @@ powershell -File C:\Users\You\.config\kilo\scripts\build-kilo-v1.ps1 -Profile co
   configs, and generates their builders. One dashboard shows your agents, providers, models, plugins, and MCP
   servers. The Add-provider form carries presets - my local proxies (OmniRoute, LiteLLM), TokenRouter,
   OpenAI, Google Gemini, OpenRouter, NVIDIA NIM - that auto-fill the URL, the SDK, the name, and the
-  reasoning format (OpenAI/ChatGPT → low/medium/high/xhigh, Claude → thinking budgets, Gemini → thinking
-  budgets, OpenCode → default/minimal/high/max). Test a connection, switch the active provider, hit build:
+  reasoning format (OpenAI/ChatGPT â†’ low/medium/high/xhigh, Claude â†’ thinking budgets, Gemini â†’ thinking
+  budgets, OpenCode â†’ default/minimal/high/max). Test a connection, switch the active provider, hit build:
   done. The builders ask the same question on the command line for developers.
 
 Every provider file is written for **both** agent contracts (dual-key), backups are made first, and keys never leave your machine - the proxy on `127.0.0.1:9090` is the only "cloud" involved.
 
 ---
 
-## 📖 The Story Behind the Project
+## ðŸ“– The Story Behind the Project
 
-It started with a pretty simple problem: **too many API keys, too many providers, and configuration files that kept growing.** 😅
+It started with a pretty simple problem: **too many API keys, too many providers, and configuration files that kept growing.** ðŸ˜…
 
 I'm just a normal guy trying to learn **Python and Machine Learning** - intermediate Python so far, still working my way toward the ML part of the journey. To learn without spending a fortune, I hunted down every free model and free API I could find. Different providers, different coding agents, different websites - anything that gave me more useful AI tools.
 
@@ -207,70 +207,71 @@ I didn't know how to build any of this when I started. I know Python, but I had 
 
 A narrow Claude Code routing adapter is now **integrated, not live validated** (see `adapters/claude-code/`) - it manages one scalar route at a time and preserves everything Claude owns.
 
-I'm not finished. Claude Code and more providers are on the list. But right now, this is the system I built because I actually needed it - and if you like it, you're welcome to contribute. That would make me genuinely happy. ❤️
+I'm not finished. Claude Code and more providers are on the list. But right now, this is the system I built because I actually needed it - and if you like it, you're welcome to contribute. That would make me genuinely happy. â¤ï¸
 
 ---
 
-### 😄 One Last Thing...
+### ðŸ˜„ One Last Thing...
 
 If you ever wonder why the generated JSON files - kilo.json, opencode.json - look completely cursed after running a builder...
 
 **Just press `Shift + Alt + F`.**
 
-You're welcome. 😂
+You're welcome. ðŸ˜‚
 
 ---
 
-## 🏗 Architecture
+## ðŸ— Architecture
 
 ### System overview
 
 ```
 Browser (gui.html, one file: HTML + CSS + vanilla JS + local Anime.js)
-        │  fetch()  (relative paths, same origin)
-        ▼
-FastAPI server (server.py on 127.0.0.1:9090 — LOCAL ONLY)
-        │
-        ├── /api/*   — the app's own API (agents, discover, scan, providers,
-        │              models, plugins, mcp, test, switch, scaffold, build, rules)
-        ├── /v1/*    — OpenAI-compatible proxy → the ACTIVE provider
-        ├── /lib     — static: anime.min.js (local, no CDN)
-        └── /assets  — static: logo + favicon
-        │
-        ▼
+        â”‚  fetch()  (relative paths, same origin)
+        â–¼
+FastAPI server (server.py on 127.0.0.1:9090 â€” LOCAL ONLY)
+        â”‚
+        â”œâ”€â”€ /api/*   â€” the app's own API (agents, discover, scan, providers,
+        â”‚              models, plugins, mcp, test, switch, scaffold, build, rules)
+        â”œâ”€â”€ /v1/*    â€” OpenAI-compatible proxy â†’ the ACTIVE provider
+        â”œâ”€â”€ /lib     â€” static: anime.min.js (local, no CDN)
+        â””â”€â”€ /assets  â€” static: logo + favicon
+        â”‚
+        â–¼
 app/ package (modular Python: one responsibility per module)
-        │
-        ▼
+        â”‚
+        â–¼
 The agent's real config folder (e.g. C:\Users\You\.config\kilo)
-   ├── kilo.json                 ← generated by the builder (never hand-edited)
-   ├── providers\<id>.json       ← app-managed provider files (backup-first;
-   │                               may carry reasoningFormat: opencode | openai |
-   │                               claude | gemini | none)
-   ├── profiles\coding\
-   │     ├── settings.json       ← activeProviders list (the builder's source)
-   │     ├── <provider>-models.json   ← model variants follow the provider's
-   │     │                             reasoning format (reasoningEffort,
-   │     │                             thinking.budgetTokens, or
-   │     │                             thinkingConfig.thinkingBudget)
-   │     ├── plugins.json
-   │     └── mcp.json
-   ├── scripts\build-<agent>.ps1 ← generated builder (created by the app's
-   │                               bundled engine, app\engine\scaffold-agent.ps1)
-   └── backup\                   ← every write is backed up here first
+   â”œâ”€â”€ kilo.json                 â† generated by the builder (never hand-edited)
+   â”œâ”€â”€ providers\<id>.json       â† app-managed provider files (backup-first;
+   â”‚                               may carry reasoningFormat: opencode | openai |
+   â”‚                               claude | gemini | none)
+   â”œâ”€â”€ profiles\coding\
+   â”‚     â”œâ”€â”€ settings.json       â† activeProviders list (the builder's source)
+   â”‚     â”œâ”€â”€ <provider>-models.json   â† model variants follow the provider's
+   â”‚     â”‚                             reasoning format (reasoningEffort,
+   â”‚     â”‚                             thinking.budgetTokens, or
+   â”‚     â”‚                             thinkingConfig.thinkingBudget)
+   â”‚     â”œâ”€â”€ plugins.json
+   â”‚     â”œâ”€â”€ lsp.json            â† LSP on/off + value (disabled by default)
+   â”‚     â””â”€â”€ mcp.json
+   â”œâ”€â”€ scripts\build-<agent>.ps1 â† generated builder (created by the app's
+   â”‚                               bundled engine, app\engine\scaffold-agent.ps1)
+   â””â”€â”€ backup\                   â† every write is backed up here first
 ```
 
 The app is fully self-contained: `app\engine\` ships the generator, both
 builders + testers, and the schemas, so a downloaded copy creates everything
 above for OpenCode or Kilo with zero external setup.
 
-### Request flow — one example end to end
+### Request flow â€” one example end to end
 
 ```
 User clicks "Test" on a provider card
-  → POST /api/test {id}
-    →     `app/app/testing.py` reads providers\<id>.json via app/app/agentstore.py
-    → GET <baseUrl>/v1/models with Authorization: Bearer <key>
-    → {ok, message, latencyMs} → the card dot turns green
+  â†’ POST /api/test {id}
+    â†’     `app/app/testing.py` reads providers\<id>.json via app/app/agentstore.py
+    â†’ GET <baseUrl>/v1/models with Authorization: Bearer <key>
+    â†’ {ok, message, latencyMs} â†’ the card dot turns green
 ```
 
 ### The backend modules (`docs/app/app/`)
@@ -283,36 +284,38 @@ User clicks "Test" on a provider card
 | `config.py` | paths, host/port, and app-owned runtime-data locations |
 | `banner.py` | local startup banner and local addresses |
 | `storage.py` | `state.json` persistence (atomic writes) |
-| `agents.py` | `/api/agents` — register/remove/switch which agent the app manages |
-| `discovery.py` | `/api/status`, `/api/discover`, `/api/scan` — find agents, read their main JSON read-only |
+| `agents.py` | `/api/agents` â€” register/remove/switch which agent the app manages |
+| `discovery.py` | `/api/status`, `/api/discover`, `/api/scan` â€” find agents, read their main JSON read-only |
 | `agentstore.py` | **the heart**: reads/writes the agent's real BDF files (providers, models, plugins, mcp, settings), backups, builder discovery, agent registry logic |
 | `providers.py` | `/api/providers` CRUD + `/api/switch` + models writing |
 | `engine.py` | `/api/scaffold` (runs the **bundled** `app/engine/scaffold-agent.ps1 -Bootstrap` - self-contained, nothing lives outside the repo) + `/api/build` (runs the agent's generated builder) |
-| `testing.py` | `/api/test` — connection tester (GET /v1/models) |
-| `plugins.py` | `/api/plugins` — profile plugin list |
-| `mcp.py` | `/api/mcp` — profile MCP servers |
-| `proxy.py` | `/v1/*` — OpenAI-compatible passthrough to the ACTIVE provider |
-| `serve.py` | `GET /` (gui.html), `GET /api/rules` — serves the GUI with the rule.md theme injected |
+| `testing.py` | `/api/test` â€” connection tester (GET /v1/models) |
+| `plugins.py` | `/api/plugins` â€” profile plugin list |
+| `mcp.py` | `/api/mcp` â€” profile MCP servers |
+| `proxy.py` | `/v1/*` â€” OpenAI-compatible passthrough to the ACTIVE provider |
+| `serve.py` | `GET /` (gui.html), `GET /api/rules` â€” serves the GUI with the rule.md theme injected |
 | `rules.py` | parses `rule.md` (theme front-matter + rulebook), never crashes, defaults on bad input |
 
 ---
 
-## 🔄 How the BDF engine works
+## ðŸ”„ How the BDF engine works
 
-The framework's ONE job, the same for ANY open-source coding agent — no
+The framework's ONE job, the same for ANY open-source coding agent â€” no
 exceptions, no special cases:
 
 1. **Discover** the agent's config location (registry: opencode, kilo, aider,
-   goose, codex-cli, ... — add more by extending `$AgentRegistry` in
+   goose, codex-cli, ... â€” add more by extending `$AgentRegistry` in
    `scripts/scaffold-agent.ps1`).
 2. **Scan** the agent's OWN main JSON first, read-only. Never another agent's
    config, never `.jsonc` without consent.
-3. **Split** the main config into sections: `mcp`, `plugin`, `settings`
+3. **Split** the main config into sections: `mcp`, `plugin`, `lsp`, `settings`
    (providers are detected for guidance only).
-4. **Seed** the three profiles — `coding` (the main) + `experimental` +
-   `minimal` — each with exactly `settings.json`, `mcp.json`, `plugins.json`.
-   `mcp.json`/`plugins.json` are user-owned after creation — the framework
-   NEVER overwrites them.
+4. **Seed** the three profiles â€” `coding` (the main) + `experimental` +
+   `minimal` â€” each with exactly `settings.json`, `mcp.json`, `plugins.json`,
+   `lsp.json`.
+   `mcp.json`/`plugins.json`/`lsp.json` are user-owned after creation â€” the
+   framework NEVER overwrites them. LSP is disabled by default
+   (`enabled: false`) until you turn it on.
 5. **Generate the builder scripts** (`build-<agent>.ps1`,
    `test-<agent>.ps1`, `scaffold-<agent>.ps1`) via `-Bootstrap`, adapted from
    the reference builders.
@@ -323,9 +326,9 @@ exceptions, no special cases:
 The generated builders all share one pipeline:
 
 ```
-F1 JSON Schema validation → F2 pre-flight dependency check → merge stages
-(settings → providers → models → plugins → mcp) → output verification →
-backup retention → provenance sidecar → merge-diff summary
+F1 JSON Schema validation â†’ F2 pre-flight dependency check â†’ merge stages
+(settings â†’ providers â†’ models â†’ plugins â†’ mcp â†’ lsp) â†’ output verification â†’
+backup retention â†’ provenance sidecar â†’ merge-diff summary
 ```
 
 - `-WhatIf` = dry run (validate + merge, never write).
@@ -334,22 +337,22 @@ backup retention → provenance sidecar → merge-diff summary
   a provider with **no models is dropped** (the model guard).
 - **Dual-key normalization** happens in the provider merge stage: if a
   provider file carries `apiKey` but no `options.apiKey`, the builder mirrors
-  it automatically — the app and hand-written providers produce the same
+  it automatically â€” the app and hand-written providers produce the same
   output. Builder-only users get the same result as app users (no ups and
   downs between the two worlds).
 
 ---
 
-## 🤖 How the Switcher app works
+## ðŸ¤– How the Switcher app works
 
 ### The core idea
 
-The app is BDF made autonomous. It never re-implements the engine — it calls
+The app is BDF made autonomous. It never re-implements the engine â€” it calls
 it. That's the whole trick, honestly:
 
-- `POST /api/scaffold` → runs `scaffold-agent.ps1 -Agent <agent> -ConfigRoot <dir>
-  -NonInteractive -Bootstrap` → profiles + builder scripts.
-- `POST /api/build` → runs the agent's real `build-<agent>*.ps1 -Profile coding
+- `POST /api/scaffold` â†’ runs `scaffold-agent.ps1 -Agent <agent> -ConfigRoot <dir>
+  -NonInteractive -Bootstrap` â†’ profiles + builder scripts.
+- `POST /api/build` â†’ runs the agent's real `build-<agent>*.ps1 -Profile coding
   -NonInteractive` (it finds `build-kilo-v1.ps1` too).
 
 ### The agent registry (`state.json`)
@@ -368,26 +371,26 @@ The app can manage **many agents at once**:
 }
 ```
 
-- `agents` — every registered agent (name + config folder).
-- `activeAgent` — the one being managed right now. **Every** `/api/*` call
+- `agents` â€” every registered agent (name + config folder).
+- `activeAgent` â€” the one being managed right now. **Every** `/api/*` call
   operates on the active agent via `agentstore.current_agent()`.
 - Legacy `{agent, dir}` keys are auto-migrated to the registry on first use.
 
-### Readiness — when the wizard appears
+### Readiness â€” when the wizard appears
 
 An agent is **ready** if its `scripts\` folder contains any `build-*.ps1`
 (`agentstore.has_any_builder`). `/api/status` reports `ready` for the active
 agent:
 
-- ready → the app boots straight to the dashboard.
-- not ready → the wizard. **Adding an already-set-up agent skips the wizard
+- ready â†’ the app boots straight to the dashboard.
+- not ready â†’ the wizard. **Adding an already-set-up agent skips the wizard
   entirely** (the app detects the builder and loads it immediately).
-- the wizard's "Looks good — open it →" button also uses this check to skip
+- the wizard's "Looks good â€” open it â†’" button also uses this check to skip
   re-scaffolding.
 
 ### The active-provider list
 
-`profiles\coding\settings.json` holds `activeProviders` — a **list**. Every
+`profiles\coding\settings.json` holds `activeProviders` â€” a **list**. Every
 provider in the list is merged into the build (each with its own models). The
 **first** one is the *primary*:
 
@@ -399,7 +402,7 @@ provider in the list is merged into the build (each with its own models). The
 ### The proxy (`127.0.0.1:9090/v1`)
 
 Any OpenAI-compatible tool can point at the app once. `app/app/proxy.py` reads the
-active agent's settings → takes the primary provider → forwards every
+active agent's settings â†’ takes the primary provider â†’ forwards every
 `/v1/*` request with `Authorization: Bearer <key>` (SSE streaming passes
 through). Switching providers = one click in the GUI, zero tool reconfiguration.
 
@@ -412,26 +415,26 @@ null token counts; all Activity data stays on the PC.
 
 ---
 
-## 🧩 Agent management
+## ðŸ§© Agent management
 
 | Action | What happens |
 |--------|--------------|
-| **Add agent** | `POST /api/agents {name, dir}` → validated (folder must exist) → registered → auto-switched → `ready` returned |
-| **Switch** | `POST /api/agents/switch {name}` → `activeAgent` changes → the whole app re-routes (providers, models, plugins, MCP, build follow) |
-| **Remove** | `DELETE /api/agents/{name}` → removed from the registry (files untouched) → falls back to the next agent, or the wizard if none remain |
+| **Add agent** | `POST /api/agents {name, dir}` â†’ validated (folder must exist) â†’ registered â†’ auto-switched â†’ `ready` returned |
+| **Switch** | `POST /api/agents/switch {name}` â†’ `activeAgent` changes â†’ the whole app re-routes (providers, models, plugins, MCP, build follow) |
+| **Remove** | `DELETE /api/agents/{name}` â†’ removed from the registry (files untouched) â†’ falls back to the next agent, or the wizard if none remain |
 | **Wizard scaffold** | registers the agent too (`upsert_agent`) |
 
-Every add/remove/switch re-checks `/api/status` and re-renders the dashboard —
+Every add/remove/switch re-checks `/api/status` and re-renders the dashboard â€”
 no page refresh needed.
 
 ---
 
-## 🧩 Providers, models, plugins, MCP — the data model
+## ðŸ§© Providers, models, plugins, MCP â€” the data model
 
 All data lives in the **agent's own config** (BDF-style). The app never keeps
 a private copy.
 
-### Provider file — `providers\<id>.json`
+### Provider file â€” `providers\<id>.json`
 
 ```json
 {
@@ -439,12 +442,12 @@ a private copy.
   "provider": {
     "tokenrouter": {
       "name": "TokenRouter",
-      "apiKey": "sk-...",                    ← OpenCode reads this
+      "apiKey": "sk-...",                    â† OpenCode reads this
       "options": {
         "baseURL": "https://api.tokenrouter.com/v1",
-        "apiKey": "sk-..."                   ← Kilo reads this (dual key)
+        "apiKey": "sk-..."                   â† Kilo reads this (dual key)
       },
-      "npm": "@ai-sdk/openai-compatible",    ← SDK type
+      "npm": "@ai-sdk/openai-compatible",    â† SDK type
       "models": {}
     }
   }
@@ -453,33 +456,33 @@ a private copy.
 
 **The dual key is the compatibility contract.** Different agents read the key
 from different fields: **OpenCode** reads `provider.<id>.apiKey`, **Kilo**
-reads `provider.<id>.options.apiKey`. The app writes **both** — one save works
+reads `provider.<id>.options.apiKey`. The app writes **both** â€” one save works
 in every agent. Hand-written provider files get the same treatment: the
 builders mirror `apiKey` into `options.apiKey` automatically at merge time
 (the "Dual-key" line in the build log), so builder-only users get the same
 result as app users.
 
 The **SDK type** (`npm`) is chosen from a dropdown of 15 registry-verified
-packages: `@ai-sdk/openai-compatible` (default — fits OmniRoute, LiteLLM, CLI
+packages: `@ai-sdk/openai-compatible` (default â€” fits OmniRoute, LiteLLM, CLI
 proxies, TokenRouter, Modal, NVIDIA NIM, any local gateway),
 `@ai-sdk/openai`, `@openrouter/ai-sdk-provider`, `@ai-sdk/anthropic`,
 `@ai-sdk/google`, `@ai-sdk/mistral`, `@ai-sdk/xai`, `@ai-sdk/deepseek`,
 `@ai-sdk/groq`, `@ai-sdk/perplexity`, `@ai-sdk/togetherai`,
 `@ai-sdk/cerebras`, `@ai-sdk/azure`, `@ai-sdk/amazon-bedrock`,
-`@ai-sdk/cohere` — or a custom package name.
+`@ai-sdk/cohere` â€” or a custom package name.
 
-### Real providers — not just proxies
+### Real providers â€” not just proxies
 
 The app started as a proxy switcher (OmniRoute, LiteLLM, CLI Proxy), and that
 still works exactly as before. **Real, legitimate providers work the same
 way**: the Add-provider form has presets for **TokenRouter, Modal, OpenAI,
-Google (Gemini), OpenRouter, and NVIDIA NIM** — picking a preset fills the
-base URL *and* the SDK package automatically, then it's key → test → save →
-build → chat in your agent. (For Modal, paste your own endpoint URL — every
-account has its own — and use the combined proxy token `wk-…ws-…` as the
+Google (Gemini), OpenRouter, and NVIDIA NIM** â€” picking a preset fills the
+base URL *and* the SDK package automatically, then it's key â†’ test â†’ save â†’
+build â†’ chat in your agent. (For Modal, paste your own endpoint URL â€” every
+account has its own â€” and use the combined proxy token `wk-â€¦ws-â€¦` as the
 key.)
 
-### Models — `profiles\coding\<provider>-models.json`
+### Models â€” `profiles\coding\<provider>-models.json`
 
 ```json
 {
@@ -497,20 +500,23 @@ key.)
 }
 ```
 
-Added from the provider modal or the **Models card** (pick a provider → rows
-with thinking chips). Providers **without models are skipped by the build** —
+Added from the provider modal or the **Models card** (pick a provider â†’ rows
+with thinking chips). Providers **without models are skipped by the build** â€”
 the app warns about this.
 
-### Plugins & MCP — `profiles\coding\plugins.json` / `mcp.json`
+### Plugins & MCP â€” `profiles\coding\plugins.json` / `mcp.json`
 
 - Plugins: `{ "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"] }`
-  — the Plugins card add/remove, deduped.
+  â€” the Plugins card add/remove, deduped.
 - MCP: `{ "mcp": { "context7": { "type": "local", "command": ["npx", "-y", ...] } } }`
-  — the MCP card, with JSON validation (bad config = friendly inline error).
+  â€” the MCP card, with JSON validation (bad config = friendly inline error).
+- LSP: `{ "lsp": true, "enabled": false }` â€” the Integrations page LSP block
+  (between Plugins and MCP) turns LSP on; the builder then carries the `lsp`
+  value into the generated config. Disabled by default.
 
 ### Safety invariants (the rules)
 
-- **No-Secrets:** keys live only in the user's own provider files — never in
+- **No-Secrets:** keys live only in the user's own provider files â€” never in
   code, logs, examples, or API responses (`hasKey` only on GET).
 - **Backup-first:** every write (provider, models, plugins, mcp, settings) is
   copied to the agent's `backup\` folder first.
@@ -519,35 +525,35 @@ the app warns about this.
 
 ### Rules for users (what NOT to do)
 
-- **Never hand-edit your agent's main config** — `opencode.json` / `kilo.json`
+- **Never hand-edit your agent's main config** â€” `opencode.json` / `kilo.json`
   are *generated* by the builder from `providers\` + `profiles\`. Edit a
   provider or model in the app and rebuild instead; hand edits are overwritten
   by the next build.
 - **Never create `opencode.jsonc` next to `opencode.json`.** OpenCode reads
-  the `.jsonc` *instead of* the `.json` when both exist — your built config
+  the `.jsonc` *instead of* the `.json` when both exist â€” your built config
   silently disappears from `/models`. (Same trap: a stale `kilo.jsonc`.)
   The app and the builder target `opencode.json` today; generating both
-  formats is planned for a future update — not right now.
+  formats is planned for a future update â€” not right now.
 
 ---
 
-## 🎨 The GUI: screens, theme, animations, assets
+## ðŸŽ¨ The GUI: screens, theme, animations, assets
 
 ### Screens (one HTML file, shown/hidden by JS)
 
-- **Setup wizard** — welcome → agent location → scanning → found cards →
+- **Setup wizard** â€” welcome â†’ agent location â†’ scanning â†’ found cards â†’
   generate/open. Progress bar, slide transitions.
-- **Dashboard** — Agents card, the glowing active-hero (every active provider
+- **Dashboard** â€” Agents card, the glowing active-hero (every active provider
   side-by-side), provider cards (switch/test/edit/delete), Plugins, MCP
   servers, Models cards, Build panel, Advanced panel.
 
-### The theme engine — `rule.md`
+### The theme engine â€” `rule.md`
 
 `docs/app/rule.md` has **two jobs**:
 
 1. **Theme** (YAML front-matter): the app injects these as CSS variables into
-   the page at serve time (`app/app/rules.py` → `app/app/serve.py`). Edit a color,
-   save, refresh — the app updates. Invalid values fall back to defaults; the
+   the page at serve time (`app/app/rules.py` â†’ `app/app/serve.py`). Edit a color,
+   save, refresh â€” the app updates. Invalid values fall back to defaults; the
    parser never crashes.
 2. **Rulebook** (markdown): the design/feature/architecture rules AI agents
    must follow when changing the app.
@@ -565,47 +571,47 @@ toasts, and the ember particles in the background.
 | `app/assets/bdf-counterphase-logo.svg` | the Switcher brand logo (app favicon + README header) |
 
 To add images: put them in `app/assets/` and reference them with relative
-paths (`src="assets/my-image.png"`) — the server serves `/assets` statically.
+paths (`src="assets/my-image.png"`) â€” the server serves `/assets` statically.
 Never hot-link external images (local-first, offline-friendly).
 
 ---
 
-## 🛠 Development: setup, structure, testing
+## ðŸ›  Development: setup, structure, testing
 
 ### Setup
 
 ```powershell
 cd app
-python -m venv env                 # or just run start.bat once — it does this
+python -m venv env                 # or just run start.bat once â€” it does this
 env\Scripts\python -m pip install -r requirements.txt
 env\Scripts\python server.py       # runs on http://127.0.0.1:9090
 ```
 
-Adding a dependency? Put it in `requirements.txt` — start.bat re-installs
+Adding a dependency? Put it in `requirements.txt` â€” start.bat re-installs
 automatically (SHA256 hash marker detects the change).
 
 ### Where things live
 
 ```
 docs/
-├── app/                    ← the Switcher app (self-contained)
-│   ├── app/                ← Python package (see module table above)
-│   ├── tests/              ← 48 unit tests (unittest, stdlib-only)
-│   ├── assets/             ← logo + favicon
-│   ├── lib/                ← anime.min.js (local)
-│   ├── gui.html            ← the whole frontend (one file)
-│   ├── rule.md             ← theme + rulebook
-│   ├── server.py / start.bat / requirements.txt
-│   └── README.md           ← plain-language user guide
-├── scripts/                ← scaffold-agent.ps1 (the engine), the builders
-├── bdf/                    ← the framework docs + templates
-├── _agent/                 ← session log, journey tracker
-└── AI/                     ← build plans, continuation files
+â”œâ”€â”€ app/                    â† the Switcher app (self-contained)
+â”‚   â”œâ”€â”€ app/                â† Python package (see module table above)
+â”‚   â”œâ”€â”€ tests/              â† 48 unit tests (unittest, stdlib-only)
+â”‚   â”œâ”€â”€ assets/             â† logo + favicon
+â”‚   â”œâ”€â”€ lib/                â† anime.min.js (local)
+â”‚   â”œâ”€â”€ gui.html            â† the whole frontend (one file)
+â”‚   â”œâ”€â”€ rule.md             â† theme + rulebook
+â”‚   â”œâ”€â”€ server.py / start.bat / requirements.txt
+â”‚   â””â”€â”€ README.md           â† plain-language user guide
+â”œâ”€â”€ scripts/                â† scaffold-agent.ps1 (the engine), the builders
+â”œâ”€â”€ bdf/                    â† the framework docs + templates
+â”œâ”€â”€ _agent/                 â† session log, journey tracker
+â””â”€â”€ AI/                     â† build plans, continuation files
 ```
 
 ### Testing
 
-**Unit tests** (fast, isolated — they never touch your real config):
+**Unit tests** (fast, isolated â€” they never touch your real config):
 
 ```powershell
 cd app
@@ -623,7 +629,7 @@ models, plugins, MCP, settings merge, agent registry, backups).
 3. **Restore** the snapshot and hash-verify every file is byte-identical
    (compare against a manifest captured before the test).
 
-This is the safe way to test write features on a real config — the snapshot +
+This is the safe way to test write features on a real config â€” the snapshot +
 hash manifest is your undo button.
 
 **Frontend checks:** after editing `gui.html`, extract its inline `<script>`
@@ -633,46 +639,46 @@ and run `node --check` on it.
 
 - Modular backend: one responsibility per module, clear interfaces.
 - BDF-exact data model: the app reads/writes the agent's own files.
-- No-Secrets, backup-first, local-first — always.
+- No-Secrets, backup-first, local-first â€” always.
 - README sync rule: any user-visible change must be reflected in the READMEs
   in the same change.
 - Commit only when asked; conventional commit style (`feat(app):`, `docs:`).
 
 ---
 
-## 🧭 Roadmap
+## ðŸ§­ Roadmap
 
-**13 of 15 phases complete** toward **BDF V3** — the first stable public
+**13 of 15 phases complete** toward **BDF V3** â€” the first stable public
 version that generates builders for OpenCode, KiloCode, and any
 same-architecture open-source coding agent. Phase 13 (BDF V3) is in progress.
 
 | Phase | Status |
 |-------|--------|
-| Phase 1 — Foundation | ✅ |
-| Phase 2 — Builder Improvements | ✅ |
-| Phase 3 — Multiple Profiles | ✅ |
-| Phase 4 — Additional Providers | ✅ |
-| Phase 5 — Validation Framework | ✅ |
-| Phase 6 — Automated Testing | ✅ |
-| Phase 7 — Builder Refactoring | ✅ |
-| Phase 8 — Documentation Expansion | ✅ |
-| Phase 9 — Release Manager V1 | ✅ |
-| Phase 10 — BDF V2.5 Framework Generalization | ✅ |
-| Phase 10.5 — Active-Provider Selector Builder | ✅ |
-| Phase 10.6 — JSON Schema Validation | ✅ |
-| Phase 11 — Claude Code Builder V1 | ✅ resolved (dropped) |
-| Phase 12 — KiloCode Builder V1 | ✅ |
-| Phase 13 — BDF V3 Universal Builder Generator | 🔄 in progress |
-| Phase 14 — GUI App (Switcher) | ✅ |
-| Phase 15 — More Coding Agents | 🔜 planned (untested) |
+| Phase 1 â€” Foundation | âœ… |
+| Phase 2 â€” Builder Improvements | âœ… |
+| Phase 3 â€” Multiple Profiles | âœ… |
+| Phase 4 â€” Additional Providers | âœ… |
+| Phase 5 â€” Validation Framework | âœ… |
+| Phase 6 â€” Automated Testing | âœ… |
+| Phase 7 â€” Builder Refactoring | âœ… |
+| Phase 8 â€” Documentation Expansion | âœ… |
+| Phase 9 â€” Release Manager V1 | âœ… |
+| Phase 10 â€” BDF V2.5 Framework Generalization | âœ… |
+| Phase 10.5 â€” Active-Provider Selector Builder | âœ… |
+| Phase 10.6 â€” JSON Schema Validation | âœ… |
+| Phase 11 â€” Claude Code Builder V1 | âœ… resolved (dropped) |
+| Phase 12 â€” KiloCode Builder V1 | âœ… |
+| Phase 13 â€” BDF V3 Universal Builder Generator | ðŸ”„ in progress |
+| Phase 14 â€” GUI App (Switcher) | âœ… |
+| Phase 15 â€” More Coding Agents | ðŸ”œ planned (untested) |
 
 **Phase 15 note:** OpenCode + KiloCode are verified today. The app and the
 universal scaffold are expected to work with **more open-source coding
-agents** — untested yet; we will find out when we try them.
+agents** â€” untested yet; we will find out when we try them.
 
 ---
 
-## 📚 Documentation map
+## ðŸ“š Documentation map
 
 | Area | Documents |
 |------|-----------|
@@ -683,9 +689,9 @@ agents** — untested yet; we will find out when we try them.
 
 ---
 
-## 📦 Releases
+## ðŸ“¦ Releases
 
-Current release: **2.5.1** (Builder V2.7, JSON Schema Validation). History in
+Current release: **2.5.3** (Builder V2.7, LSP support). History in
 `CHANGELOG.md` + `docs/release_registry.json` (regenerated by
 `scripts/release-manager.ps1`).
 
@@ -696,11 +702,11 @@ Current release: **2.5.1** (Builder V2.7, JSON Schema Validation). History in
 ---
 
 Thanks for reading. If this helps one more person learn AI the free way like it
-helped me — that's the whole point. ❤️
+helped me â€” that's the whole point. â¤ï¸
 
 ---
 
-**Version:** 2.5.1
+**Version:** 2.5.3
 **Builder Version:** V2.7 (JSON Schema Validation)
 **Framework Version:** 2.2.10
 **Document Version:** 2.5

@@ -86,6 +86,8 @@ models file
 plugins file
 
 service configuration file
+
+lsp file
 ```
 
 The settings file is required.
@@ -357,12 +359,24 @@ Service Configuration
 
 ↓
 
+LSP
+
+↓
+
 Generated Configuration
 ```
 
 Models are injected into every active provider.
 
 Plugins and service sections are merged only when the corresponding profile file exists.
+
+The LSP section is merged only when the profile carries `lsp.json`:
+
+- `enabled: true` → the generated configuration carries `"lsp": <value>` (the stored boolean or object).
+- `enabled: false` → the generated configuration carries `"lsp": false`.
+- no `lsp.json` → no `lsp` key in the generated configuration.
+
+The `enabled` toggle is persisted backup-first; the interactive prompt asks "LSP servers: [1] enabled [2] disabled (Enter keeps current)" when not `-NonInteractive`, while the app and `-NonInteractive` runs use the stored `enabled` value. `-WhatIf` never writes. Pre-flight (F2) treats `lsp.schema.json` as a required schema dependency when `lsp.json` exists, and verification throws if an enabled LSP is missing from the output. The merge diff summary (F7) reports added/removed "LSP servers".
 
 Each section is merged exactly once.
 
@@ -507,6 +521,8 @@ models file
 plugins file
 
 service configuration file
+
+lsp file
 
 provider definition
 ```
@@ -1184,9 +1200,9 @@ Arguments: `-Agent <name>`, `-ConfigRoot` (defaults to the agent's
 The scaffolds are SYSTEM-RUN ONLY. The user never runs them. The only scripts the
 user runs are the BUILDERS (`{{BUILDER_SCRIPT}}` for this project, and the
 per-agent builder for any other). The system (AI) runs the scaffold once per agent
-to create the profile structure and seed `mcp.json`/`plugins.json` from the agent's
-own main JSON. After seeding, the user edits profiles/providers and runs only the
-builder.
+to create the profile structure and seed `mcp.json`/`plugins.json`/`lsp.json` from
+the agent's own main JSON. After seeding, the user edits profiles/providers and
+runs only the builder.
 
 ## Discovery (V3 rule)
 
@@ -1207,28 +1223,31 @@ invents content and never writes into user-owned files.
    agent's own primary main file (registry order) is the source of truth —
    the framework never scans another agent's config.
    - `.provenance.json` files are NEVER scanned as main configs.
-2. Split the scanned sections: provider (guidance only) / mcp / plugin.
+2. Split the scanned sections: provider (guidance only) / mcp / plugin / lsp.
 3. Paste into `profiles/<profile>/` (coding is ALWAYS the default profile):
    - `mcp` section    -> `profiles/coding/mcp.json` (seeded if missing)
    - plugin section   -> `profiles/coding/plugins.json` (seeded if missing)
-   - experimental/minimal -> mcp.json + plugins.json created EMPTY, never filled.
-   - **mcp.json / plugins.json are USER-OWNED after creation.** The framework
-     NEVER overwrites them on later runs. The user edits MCPs and plugins by
-     hand; the framework's job is to create the files once.
+   - `lsp` section    -> `profiles/coding/lsp.json` (seeded if missing, from the
+     main config's `lsp` value)
+   - experimental/minimal -> mcp.json + plugins.json created EMPTY, never filled;
+     lsp.json created with the default `{ "lsp": true, "enabled": false }`.
+   - **mcp.json / plugins.json / lsp.json are USER-OWNED after creation.** The
+     framework NEVER overwrites them on later runs. The user edits MCPs, plugins,
+     and LSP servers by hand; the framework's job is to create the files once.
 4. The framework creates the `providers/` folder (like the profile folders), but
    NEVER writes `providers/<id>.json` or `<id>-models.json` — provider and model
    files are 100% user-owned. The framework prints guidance about the detected
    provider section only.
 5. Ensure profiles always exist: `coding` (main) + `experimental` + `minimal`.
-   Each profile carries exactly three files: `settings.json`, `mcp.json`,
-   `plugins.json`.
+   Each profile carries exactly four files: `settings.json`, `mcp.json`,
+   `plugins.json`, `lsp.json`.
 6. `settings.json` is the ONLY file the framework writes freely:
    - File missing  -> create with `$schema` + `activeProviders` (detected from
      the main config's provider section). NEVER copy-paste the whole config.
    - File exists   -> merge ONLY `$schema` + `activeProviders` when missing;
      NEVER clobber any user key, never paste the agent shape.
 7. The user may add more profiles or edit any file at any time. The framework
-   only ever ensures the three profile folders + the three files per profile.
+   only ever ensures the three profile folders + the four files per profile.
 8. `-Bootstrap` generates `build-<agent>.ps1`, `test-<agent>.ps1`,
    `scaffold-<agent>.ps1` for that agent from a source builder.
 

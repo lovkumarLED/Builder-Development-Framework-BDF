@@ -35,10 +35,11 @@ profiles/default/settings.json     (required)
 profiles/default/omniroute-models.json   (optional, per-provider models)
 profiles/default/plugins.json    (optional)
 profiles/default/mcp.json        (optional)
+profiles/default/lsp.json        (optional)
 providers/omniroute.json         (provider definition)
 ```
 
-Additional profiles (`coding`, `experimental`, `minimal`) contain `settings.json` (+ `<provider>-models.json` model files and `target.json` as needed) and contribute their provider selection to the build.
+Additional profiles (`coding`, `experimental`, `minimal`) contain `settings.json` (+ `<provider>-models.json` model files, `target.json`, and `lsp.json` as needed) and contribute their provider selection to the build. The Kilo and OpenCode adapters both carry `lsp.json` (disabled by default).
 
 Format:
 
@@ -158,6 +159,9 @@ The complete plugin list is defined in:
 profiles/default/plugins.json
 ```
 
+LSP server configuration is defined separately in `profiles/default/lsp.json`
+(disabled by default).
+
 ---
 
 ## Supported MCP
@@ -179,6 +183,9 @@ The complete MCP configuration is defined in:
 ```
 profiles/default/mcp.json
 ```
+
+LSP server configuration is defined separately in `profiles/default/lsp.json`
+(disabled by default).
 
 ---
 

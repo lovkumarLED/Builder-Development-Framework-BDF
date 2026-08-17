@@ -55,7 +55,7 @@ Every placeholder must be replaced before a project document is released.
 | `{{PROJECT_STATUS}}` | The current project status. | Builder V2.7 JSON Schema Validation |
 | `{{VERSION_DESCRIPTION}}` | The summary of the current version. | Builder V2.7: JSON Schema Validation, pre-flight dependency check, dry-run, backup retention, provenance sidecar, diagnostics, diff summary |
 | `{{PROJECT_ROOT}}` | The root directory of the project. | .config/opencode |
-| `{{CONFIG_FILE}}` | The source configuration files and their format. | profiles/*/settings.json, models.json |
+| `{{CONFIG_FILE}}` | The source configuration files and their format. | profiles/*/settings.json, models.json, lsp.json |
 | `{{SUPPORTED_PROVIDERS}}` | The providers the project supports. | omniroute |
 | `{{SUPPORTED_MODELS}}` | The models the project exposes. | gemini-3.6-flash, ... |
 | `{{SUPPORTED_PLUGINS}}` | The plugins the project enables. | superpowers |

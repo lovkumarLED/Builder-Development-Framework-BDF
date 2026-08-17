@@ -103,7 +103,9 @@ release documentation, version-table rows).
   `providers/` folder but never writes files inside it.
 - No-Secrets Rule: system artifacts never contain literal API keys — only
   `{env:VAR}` placeholders.
-- `mcp.json` / `plugins.json` are user-owned after creation.
+- `mcp.json` / `plugins.json` / `lsp.json` are user-owned after creation —
+  never overwritten. LSP is disabled by default (`enabled: false`) until you
+  turn it on.
 - Backup-first: the system backs up before touching anything.
 - Never touch `.jsonc` without user consent.
 

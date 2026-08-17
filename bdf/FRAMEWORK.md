@@ -143,6 +143,9 @@ If these four questions are answered by the documentation, the framework is cons
 
 Each concept has exactly one responsibility.
 
+The scaffold seeds `mcp.json`/`plugins.json`/`lsp.json` in every profile
+(`lsp.json` disabled by default); all three are user-owned after creation.
+
 No concept performs the responsibility of another.
 
 ---

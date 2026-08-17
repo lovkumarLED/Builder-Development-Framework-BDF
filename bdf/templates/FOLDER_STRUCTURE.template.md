@@ -185,7 +185,7 @@ other-profiles/
 
 The `{{DEFAULT_PROFILE}}` profile is the primary profile (settings, per-provider models, plugins, MCP).
 
-Additional profiles carry a settings file, a small per-provider model file, and an optional `target.json`; they contribute their provider selection to the build.
+Additional profiles carry a settings file, a small per-provider model file, an `lsp.json`, and an optional `target.json`; they contribute their provider selection to the build.
 
 ---
 
@@ -203,6 +203,8 @@ settings.json
 plugins.json
 
 mcp.json
+
+lsp.json
 
 target.json (optional)
 ```
@@ -251,6 +253,19 @@ Defines plugins enabled for the profile.
 Purpose:
 
 Defines MCP server configuration for the profile.
+
+---
+
+### lsp.json
+
+Purpose:
+
+Defines LSP server configuration for the profile.
+
+Shape: `{ "lsp": <bool|object>, "enabled": <bool> }`. Disabled by default
+(`enabled: false`) until the user turns it on. User-owned after creation
+(Seed-IfMissing, never overwritten). Validated against
+`{{SCHEMA_DIR}}/lsp.schema.json` when present.
 
 ---
 
@@ -362,6 +377,7 @@ The schema files are the machine-readable definitions behind `JSON_SCHEMAS.md`:
 - `models.schema.json` — covers both `models.json` and `<provider>-models.json` (profile-level per-provider model files).
 - `plugins.schema.json` — validates plugin files.
 - `mcp.schema.json` — validates MCP files.
+- `lsp.schema.json` — validates `lsp.json` (`lsp` boolean|object + `enabled` boolean, both required).
 - `targets.schema.json` — validates `target.json` (P2).
 
 A README in the schema directory describes the validation flow and the artifact list.

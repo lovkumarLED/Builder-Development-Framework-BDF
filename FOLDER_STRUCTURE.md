@@ -317,13 +317,13 @@ minimal/
 
 The `default` profile is the primary profile of this project (settings, plugins, mcp, per-provider models). It currently exposes `omniroute` via `omniroute-models.json`. No provider files carry literal keys (P1 env-key policy; `{env:VAR}` placeholders only).
 
-`coding/` is a fully developed secondary profile (settings, `<provider>-models.json`, plugins, mcp). `experimental/` and `minimal/` carry `settings.json`, `mcp.json`, and `plugins.json` (three files each); they contribute their provider selection to the build. `target.json` is optional (P2) — absent profiles fall back to `opencode.json`.
+`coding/` is a fully developed secondary profile (settings, `<provider>-models.json`, plugins, mcp, lsp). `experimental/` and `minimal/` carry `settings.json`, `mcp.json`, `plugins.json`, and `lsp.json` (four files each); they contribute their provider selection to the build. `target.json` is optional (P2) — absent profiles fall back to `opencode.json`.
 
 ## V3 scaffold profile shape (any agent)
 
 The UNIVERSAL scaffold (`scaffold-agent.ps1`) always creates three profiles for
 ANY open-source agent: `coding` (the main profile) + `experimental` + `minimal`.
-Each profile carries exactly three files:
+Each profile carries exactly four files:
 
 ```
 profiles/<profile>/
@@ -331,14 +331,19 @@ profiles/<profile>/
 settings.json
 mcp.json
 plugins.json
+lsp.json
 ```
 
 - `coding` is ALWAYS the main profile; its `mcp.json`/`plugins.json` are seeded
-  from the agent's own main config (once, if missing).
+  from the agent's own main config (once, if missing), and its `lsp.json` is
+  seeded from the main config's `lsp` value.
 - `experimental/` and `minimal/` get EMPTY `mcp.json`/`plugins.json` — the
-  framework never fills them; the user does.
-- `mcp.json`/`plugins.json` are USER-OWNED after creation — the framework never
-  overwrites them on later runs.
+  framework never fills them; the user does. Their `lsp.json` is seeded with the
+  default `{ "lsp": true, "enabled": false }`.
+- `mcp.json`/`plugins.json`/`lsp.json` are USER-OWNED after creation — the
+  framework never overwrites them on later runs.
+- LSP is disabled by default (`enabled: false` everywhere) until the user turns
+  it on (the app's Integrations page toggle or the builder's interactive prompt).
 - `settings.json` is the only file the framework writes freely
   (`$schema` + `activeProviders`).
 - The framework creates the `providers/` folder (like the profile folders) but
@@ -360,6 +365,8 @@ settings.json
 plugins.json
 
 mcp.json
+
+lsp.json
 
 target.json (optional)
 ```
@@ -408,6 +415,19 @@ Defines OpenCode plugins enabled for the profile.
 Purpose:
 
 Defines MCP server configuration for the profile.
+
+---
+
+### lsp.json
+
+Purpose:
+
+Defines LSP server configuration for the profile.
+
+Shape: `{ "lsp": <bool|object>, "enabled": <bool> }`. Disabled by default
+(`enabled: false`) until the user turns it on. User-owned after creation
+(Seed-IfMissing, never overwritten). Validated against
+`schemas/lsp.schema.json` when present.
 
 ---
 
@@ -525,12 +545,14 @@ plugins.schema.json
 
 mcp.schema.json
 
+lsp.schema.json
+
 targets.schema.json
 
 README.md
 ```
 
-The seven schema files are the machine-readable definitions behind `JSON_SCHEMAS.md`:
+The eight schema files are the machine-readable definitions behind `JSON_SCHEMAS.md`:
 
 - `schema.json` — root shape of the generated `opencode.json` (documentation only; not validated by the builder pipeline).
 - `settings.schema.json` — validates `profiles/<profile>/settings.json`.
@@ -538,6 +560,7 @@ The seven schema files are the machine-readable definitions behind `JSON_SCHEMAS
 - `models.schema.json` — covers both `models.json` and `<provider>-models.json` (profile-level per-provider model files).
 - `plugins.schema.json` — validates `profiles/<profile>/plugins.json`.
 - `mcp.schema.json` — validates `profiles/<profile>/mcp.json`.
+- `lsp.schema.json` — validates `profiles/<profile>/lsp.json` (`lsp` boolean|object + `enabled` boolean, both required).
 - `targets.schema.json` — validates `profiles/<profile>/target.json` (target artifact, P2).
 
 `README.md` describes the validation flow and the artifact list.
@@ -637,8 +660,8 @@ The user only ever runs the BUILDERS directly:
 
 Everything else — test harnesses, the release manager, and the scaffolds — is
 system/AI-run machinery. The scaffolds run once per agent (to create the profile
-folders and seed `mcp.json`/`plugins.json` from the agent's own main JSON); after
-that the user edits profiles/providers and runs only the builder.
+folders and seed `mcp.json`/`plugins.json`/`lsp.json` from the agent's own main
+JSON); after that the user edits profiles/providers and runs only the builder.
 
 ---
 

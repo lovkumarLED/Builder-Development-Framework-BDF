@@ -229,6 +229,8 @@ profiles/default/plugins.json
 
 profiles/default/mcp.json
 
+profiles/default/lsp.json
+
 providers/omniroute.json
 
 scripts/build-opencode-v2.ps1
@@ -300,6 +302,8 @@ models.json
 plugins.json
 
 mcp.json
+
+lsp.json
 
 omniroute.json
 ```

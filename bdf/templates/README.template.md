@@ -66,9 +66,10 @@ system/AI-run machinery.
 │   │   ├── settings.json          (framework-writable: $schema + activeProviders)
 │   │   ├── mcp.json               (user-owned after creation)
 │   │   ├── plugins.json           (user-owned after creation)
+│   │   ├── lsp.json               (user-owned after creation; disabled by default)
 │   │   └── <provider>-models.json (user-owned models)
-│   ├── experimental/    ← settings.json + EMPTY mcp/plugins
-│   └── minimal/         ← settings.json + EMPTY mcp/plugins
+│   ├── experimental/    ← settings.json + EMPTY mcp/plugins + lsp.json (disabled)
+│   └── minimal/         ← settings.json + EMPTY mcp/plugins + lsp.json (disabled)
 ├── {{PROVIDER_DIR}}/    ← YOU own the JSON files inside (e.g. <provider>.json)
 ├── schemas/             ← JSON Schemas used for validation
 ├── {{SCRIPTS_DIR}}/     ← builder + test harnesses (system-run)
@@ -85,8 +86,9 @@ system/AI-run machinery.
   templates, docs, examples) never contain a literal API key — only `{env:VAR}`
   placeholders. User files may contain keys; the user protects them. The system
   copies user content verbatim — it never invents keys.
-- 🧬 **mcp.json / plugins.json are user-owned after creation.** The system seeds
-  them once from the agent's own main JSON, then never overwrites them.
+- 🧬 **mcp.json / plugins.json / lsp.json are user-owned after creation.** The
+  system seeds them once from the agent's own main JSON, then never overwrites
+  them. LSP is disabled by default (`enabled: false`) until you turn it on.
 - 💾 **Backup-first:** before touching anything, the system backs up the previous
   state.
 - 🚫 **Never touch `.jsonc` without user consent.**

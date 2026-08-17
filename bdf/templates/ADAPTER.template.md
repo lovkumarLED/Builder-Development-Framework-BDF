@@ -64,6 +64,9 @@ The source configuration files and their format.
 {{CONFIG_FILE}}
 ```
 
+The configuration file list includes an optional `profiles/<profile>/lsp.json`
+(LSP servers, disabled by default).
+
 ---
 
 ## Folder Structure
