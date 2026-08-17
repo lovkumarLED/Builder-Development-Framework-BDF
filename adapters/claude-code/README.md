@@ -75,6 +75,20 @@ value is removed on apply - leftover models cannot survive a route switch.
 before that; the allowlist itself works now). Role values are read at startup,
 so the restart notice applies.
 
+## Credential storage
+
+Route key values pasted in the route form are stored in the app's own
+**Windows DPAPI-encrypted** credential store (`app/state/claude-credentials.bin`,
+git-ignored) — encrypted with the current Windows user's key, so keys never
+exist in plaintext in the registry, environment, route store, logs, or
+reports. The route store holds only the reference name. Apply resolves the
+credential from the store into the builder's process. Legacy app-created
+environment variables are migrated into the store automatically on next apply
+and the plaintext variable is deleted; pre-existing user environment variables
+(e.g. `OMNIROUTE_API_KEY`) are left untouched and reused as references. A
+Credentials card on the Routes page lists app-managed credentials (names and
+usage only) with delete blocked while any route references them.
+
 ## Implementation and schema locations
 
 - Shared routing core: `app/engine/claude-code/claude-routing-core.psm1`

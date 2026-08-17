@@ -2,7 +2,11 @@
 
 ## Status
 
-Deferred until after the current Claude Code Gate 5B and Gate 5C work.
+**SUPERSEDED — implemented 2026-08-17 (session 48).** This backlog note's
+body remains the historical record of the product gap. The implemented design
+is `superpowers/specs/2026-08-17-claude-credential-store-design.md` (Windows
+DPAPI-encrypted app-owned store, reference-only routes, automatic migration of
+app-created env vars, reference-counted cleanup, full redaction).
 
 This file records a product gap only. It does not authorize implementation,
 change the current Gate 5 handoffs, unlock real-target access, or permit a live

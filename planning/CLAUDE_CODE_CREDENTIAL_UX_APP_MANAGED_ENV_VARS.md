@@ -1,9 +1,17 @@
 # Claude Code Credential UX — App-Managed Environment Variables (Design + Implementation Record)
 
-Status: **Implemented + live-verified (2026-08-16, session 45)**
+Status: **Implemented + live-verified (2026-08-16, session 45), superseded for storage (2026-08-17, session 48)**
 Lifecycle: **Live validated** (2026-08-17, corrected Gate 5B PASS + Gate 5C
-approved; apply/restore stay lock-gated until the owner opens the real-target
-lock)
+approved; apply/restore work from the UI, real-target lock open)
+
+> **SUPERSEDED IN PART (2026-08-17, session 48):** route key values are now
+> stored in the app's Windows DPAPI-encrypted credential store
+> (`app/app/claude_credentials.py`, `app/state/claude-credentials.bin`)
+> instead of user-scope environment variables. App-created environment
+> variables from the session-45 flow are migrated into the store automatically
+> on next apply and deleted; pre-existing user variables are left untouched.
+> The route form and reference-only route store are unchanged. See
+> `superpowers/specs/2026-08-17-claude-credential-store-design.md`.
 Commits: none
 Supersedes in part: `planning/CLAUDE_CODE_FUTURE_CREDENTIAL_UX_FIX.md` (the
 env-reference developer workaround now gets an in-app key input; the full

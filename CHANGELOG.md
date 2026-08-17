@@ -147,6 +147,14 @@ Gate 5C documentation/release sync was approved:
 - Fixes: credential "referenced secret missing" after server restart (registry reload via `ensure_process_env`); surgical patcher dangling-comma on trailing-run removals.
 - Verified: Gate 2 73/73 (8 new), Gate 3 OVERALL PASS, OpenCode 40/40, Kilo 37/37, focused Python 145/145, full Python 225 (2 accepted baselines), focused frontend 56/56 (5 new), full frontend 138 (1 accepted baseline); live: orcarouter applied with 3 role models + allowlist, restore byte-equal, lock open.
 
+## Claude Code Credential Store — DPAPI-Encrypted (2026-08-17, session 48)
+
+- Route key values are now stored in the app's **Windows DPAPI-encrypted** store (`app/app/claude_credentials.py`, `app/state/claude-credentials.bin`, git-ignored) — encrypted with the user's Windows key, never plaintext in the registry/environment/route store/logs. Works for every Windows user (each user's keys are locked to their own login).
+- Apply resolves the credential from the store into the builder process. Legacy app-created env vars (e.g. `ORCA_API_KEY`, `TOKEN_API_KEY`) migrate into the store automatically on next apply and the plaintext var is deleted; pre-existing user env vars (e.g. `OMNIROUTE_API_KEY`) stay untouched.
+- New `GET/DELETE /api/claude/credentials` + a **Credentials card** on the Routes page (names + usage only, delete blocked while referenced, orphan delete offered).
+- Design: `superpowers/specs/2026-08-17-claude-credential-store-design.md`; supersedes `planning/CLAUDE_CODE_FUTURE_CREDENTIAL_UX_FIX.md` (status header updated, body preserved).
+- Verified: Gate 2 73/73, focused Python 161/161 (12 store unit + 6 endpoint + lifecycle), full Python 252 (2 accepted baselines), focused frontend 61/61 (5 credentials tests), full frontend 143 (1 accepted baseline); live: store round-trip, create→store→apply→delete, orcarouter migration (env var deleted, route store-backed, UI shows "locked store").
+
 ---
 
 # Version 2.5.2

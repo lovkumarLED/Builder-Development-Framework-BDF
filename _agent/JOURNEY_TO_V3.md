@@ -93,7 +93,7 @@ Real projects shape the framework â€” never assumptions.
 
 # Current Position
 
-Updated: Aug 17, 2026 (session 48: Gate 5B routing-evidence retry PASS + Gate 5C sync COMPLETE — Claude adapter **Live validated**; real-target lock OPEN (owner decision) so apply/restore work from the UI; **model-roles multi-model routes feature built + live**: routes assign models to opus/sonnet/haiku/fable aliases + optional picker allowlist (availableModels/enforceAvailableModels), auto-compact now optional, builder core 0.3.0; two bugs fixed (credential reload after server restart via ensure_process_env, dangling-comma on trailing-run removals); **orcarouter applied live with the owner's 3 role models** (deepseek-v4-pro-free opus, deepseek-v4-flash-free sonnet, qwen3.8-27b-free haiku) + allowlist; Gate 2 73/73, Gate 3 OVERALL PASS, OpenCode 40/40, Kilo 37/37, Python 145/145 + 225/2-baseline, frontend 56/56 + 138/1-baseline; design superpowers/specs/2026-08-17-claude-model-roles-design.md; next: deferred normal-user credential UX (design §13 step 5))
+Updated: Aug 17, 2026 (session 48: Gate 5B PASS + Gate 5C sync (Claude adapter **Live validated**, real-target lock open), **model-roles** multi-model routes shipped + live, and the **DPAPI credential store UX** shipped + live-verified (keys encrypted with the user's Windows key, app-created env vars auto-migrate into the store, Credentials card in the UI, orcarouter's ORCA_API_KEY migrated live); ROADMAP Phase 15 notes **Pi** as the next agent; next: Pi integration, then Step 4/5 to V3; session work committed in d8ece8d + 1c376db + the credential-store commit pending final report)
 
 ```
 Step 3 — Universal Agent Framework core

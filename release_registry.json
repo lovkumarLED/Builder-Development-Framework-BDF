@@ -71,12 +71,17 @@
         "planning/CLAUDE_CODE_SETTINGS_ONLY_SCOPE_CORRECTION_DESIGN.md",
         "planning/CLAUDE_CODE_CREDENTIAL_UX_APP_MANAGED_ENV_VARS.md",
         "superpowers/specs/2026-08-17-claude-model-roles-design.md",
+        "superpowers/specs/2026-08-17-claude-credential-store-design.md",
+        "app/app/claude_credentials.py",
         "app/app/claude_envvars.py",
         "app/app/claude_adapter.py",
         "app/engine/claude-code/claude-routing-core.psm1",
         "app/engine/schemas/claude-code-routing.schema.json",
         "app/assets/js/pages/claude-routes.js",
-        "app/BUGFIXES.md"
+        "app/assets/js/core/api.js",
+        "app/tests/test_claude_credentials.py",
+        "app/BUGFIXES.md",
+        "planning/CLAUDE_CODE_FUTURE_CREDENTIAL_UX_FIX.md"
       ]
     },
     {
