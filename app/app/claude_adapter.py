@@ -465,7 +465,7 @@ def _prepare_prune(entries, root):
     staging names. Any failure unstages all successful moves before raising, so
     nothing is stranded and no pre-existing file is overwritten."""
     oldest = entries[0]
-    target_backup = _settings_target(root).parent / oldest["backupName"]
+    target_backup = _settings_target(root).parent / "backup" / oldest["backupName"]
     store_backup = None
     if oldest.get("previousStoreBackupName"):
         store_backup = CLAUDE_ROUTES_FILE.parent / oldest["previousStoreBackupName"]
@@ -599,9 +599,10 @@ def _store_route_credential(ref, value):
 def _resolve_route_credential(route):
     """Resolve the route's credential into the process environment so the
     production builder child can read it. Store-backed routes decrypt from the
-    DPAPI store; legacy app-created environment variables are migrated into the
-    store and the plaintext variable is deleted (route marked store-backed);
-    pre-existing user environment variables are reused untouched. Returns the
+    DPAPI store. Legacy app-created environment variables are migrated into the
+    store (the plaintext variable is deleted only AFTER a successful apply
+    commit, by the caller) so a failed apply can never strand the credential.
+    Pre-existing user environment variables are reused untouched. Returns the
     resolved value (never printed/logged)."""
     ref = route["secretEnvRef"]
     if route.get("credentialBackend") == "store":
@@ -610,13 +611,9 @@ def _resolve_route_credential(route):
             os.environ[ref] = value
             return value
     if route.get("envVarManaged"):
-        value = claude_envvars.user_env_get(ref) or os.environ.get(ref)
+        value = claude_credentials.resolve(ref) or claude_envvars.user_env_get(ref) or os.environ.get(ref)
         if value:
             claude_credentials.store(ref, value)
-            try:
-                claude_envvars.delete_user_env(ref)
-            except OSError:
-                pass
             os.environ[ref] = value
             route["credentialBackend"] = "store"
             return value
@@ -939,7 +936,7 @@ def _validate_apply_output(output, target, expected_revision, schema_identity):
     backup_name = output.get("backupName")
     if not isinstance(backup_name, str) or not TARGET_BACKUP_RE.match(backup_name):
         return "The Claude apply returned an invalid backup name."
-    backup_path = target.parent / backup_name
+    backup_path = target.parent / "backup" / backup_name
     if not backup_path.is_file() or not _no_reparse_component(backup_path):
         return "The Claude apply named an unavailable backup."
     actual_backup = _sha256_file(backup_path)
@@ -1077,9 +1074,12 @@ def claude_route_apply(route_id: str, body: RouteApplyBody):
                 transaction_store_backup = CLAUDE_ROUTES_FILE.parent / previous_store_backup_name
                 _atomic_write(transaction_store_backup, previous_store.decode("utf-8", errors="replace"))
             recovery_name = "settings.backup." + stamp + "." + hashlib.sha256(body.expectedRevision.encode("utf-8")).hexdigest()[:32] + ".json"
-            recovery_path = target.parent / recovery_name
+            backup_dir = target.parent / "backup"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            recovery_path = backup_dir / recovery_name
             shutil.copy2(str(target), str(recovery_path))
             recovery_sha = _sha256_file(recovery_path)
+            was_legacy_backend = route.get("credentialBackend") != "store"
             _resolve_route_credential(route)
             code, stdout, stderr = _run_production([
                 "-Operation", "Apply",
@@ -1122,6 +1122,11 @@ def claude_route_apply(route_id: str, body: RouteApplyBody):
             _atomic_write(CLAUDE_ROUTES_FILE, json.dumps(new_store, indent=2, ensure_ascii=False) + "\n")
             _write_manifest(entries)
             _append_activity("route_applied", route["id"])
+            if was_legacy_backend and route.get("credentialBackend") == "store":
+                try:
+                    claude_envvars.delete_user_env(route["secretEnvRef"])
+                except OSError:
+                    pass
             commit_complete = True
             _finalize_prune(prune_staged)
             if recovery_path.is_file() and not _remove_owned_file(recovery_path, recovery_sha):
@@ -1155,7 +1160,7 @@ def _rollback_apply(root, target, output, recovery_path, recovery_sha, previous_
     if output:
         backup_name = output.get("backupName")
         if isinstance(backup_name, str) and TARGET_BACKUP_RE.match(backup_name):
-            backup_path = target.parent / backup_name
+            backup_path = target.parent / "backup" / backup_name
             backup_sha = str(output.get("backupSha256") or "")
             if backup_path.is_file() and _sha256_file(backup_path) is not None and _sha256_file(backup_path).lower() == backup_sha.lower():
                 restored = _run_rollback_restore(root, target, backup_path, backup_sha, schema_identity)
@@ -1227,7 +1232,7 @@ def claude_restore(body: RestoreBody):
         if not entries:
             raise HTTPException(400, "No backup to restore.")
         entry = entries[-1]
-        backup_path = target.parent / entry["backupName"]
+        backup_path = target.parent / "backup" / entry["backupName"]
         if not TARGET_BACKUP_RE.match(entry.get("backupName", "")):
             raise HTTPException(400, "The backup cannot be restored.")
         if _binding_sha(root) != entry.get("targetBindingSha256"):

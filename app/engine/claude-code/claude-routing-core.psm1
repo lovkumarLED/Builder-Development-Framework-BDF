@@ -641,7 +641,7 @@ function Invoke-ClaudeRoutingApply {
         $tempObject=ConvertFrom-SettingsText $newText "surgical output"
         Verify-Contract $tempObject $routeDoc.Object $auth $unsupported
         $preHash=((Get-FileHash -LiteralPath $script:SettingsPath -Algorithm SHA256).Hash).ToLowerInvariant()
-        $stage="TRANSACTION"; $dir=Split-Path $script:SettingsPath -Parent; $script:backupPath=Join-Path $dir ("settings.backup."+[DateTime]::UtcNow.ToString("yyyyMMddHHmmssfff")+"."+[guid]::NewGuid().ToString("N")+".json"); [IO.File]::Copy($script:SettingsPath,$script:backupPath,$false)
+        $stage="TRANSACTION"; $dir=Split-Path $script:SettingsPath -Parent; $backupDir=Join-Path $dir "backup"; if(!(Test-Path -LiteralPath $backupDir -PathType Container)){New-Item -ItemType Directory -Path $backupDir -Force|Out-Null}; $script:backupPath=Join-Path $backupDir ("settings.backup."+[DateTime]::UtcNow.ToString("yyyyMMddHHmmssfff")+"."+[guid]::NewGuid().ToString("N")+".json"); [IO.File]::Copy($script:SettingsPath,$script:backupPath,$false)
         if($TestFailureStage-eq "AfterBackup"){Fail "synthetic failure after backup"}
         $tempPath=Join-Path $dir (".bdf-transaction-"+[guid]::NewGuid().ToString("N")+".tmp")
         $outputBytes=New-SettingsOutputBytes -Document $settingsDoc -Text $newText

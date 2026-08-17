@@ -18,6 +18,20 @@ Copy this block into Entries when a fix lands:
 
 ## Entries
 
+### 2026-08-17 - settings.json backups were written next to settings.json instead of a backup folder
+
+- **Symptom:** Applying any Claude route wrote `settings.backup.*.json` directly inside `~/.claude/` (cluttered next to `settings.json`), and the owner could not find them in a backup folder.
+- **Root cause:** The backup destination was the settings target's parent directory (`~/.claude`) in both the builder core (`claude-routing-core.psm1`) and the adapter's recovery/restore paths.
+- **Fix:** Backups now go to a `backup` subfolder: `~/.claude/backup/settings.backup.*.json`. Builder core `Invoke-ClaudeRoutingApply` creates the folder + writes there; the adapter's apply recovery copy, apply-output validation, restore endpoint, manifest prune, and rollback all resolve `settings.backup.*` under `backup/`. The 18 existing backups in `~/.claude/` were moved into `~/.claude/backup/`.
+- **Verified:** Gate 2 73/73 (backup-count assertions now check the subfolder), full Python 252 (2 accepted baselines only), focused Python 168/168; live apply created a new backup in `~/.claude/backup/` and restore works.
+
+### 2026-08-17 - Applying a route failed "referenced secret missing" after a previous failed apply (stranded credential)
+
+- **Symptom:** Applying the freecc route failed twice with 400 "The route could not be applied to the Claude settings target." The FREE_CLAUDE env var disappeared from the registry after the first failure, so every retry failed.
+- **Root cause:** The credential migration was non-atomic. `_resolve_route_credential` migrated a legacy app-created env var into the DPAPI store AND deleted the env var during resolution — before the apply commit. When the apply then failed for another reason, the route stayed legacy-backed but the env var was gone, and legacy resolution never consulted the store, so the key could not be resolved on retry ("referenced secret missing"). The builder itself is fine (repro: succeeds when the secret is in the process env).
+- **Fix:** (1) `_resolve_route_credential` now also consults the DPAPI store as a fallback for legacy routes, so a stranded key resolves from the store; (2) the env-var deletion is deferred until AFTER a successful apply commit (the apply handler deletes it), so a failed apply never strands the credential and retries always work.
+- **Verified:** Repro now applies cleanly; live freecc apply returned 200; FREE_CLAUDE migrated into the store, env var deleted after commit; new tests `test_apply_resolves_legacy_from_store_when_env_var_already_gone` + updated migration test; focused Python 168/168.
+
 ### 2026-08-17 - Route save rejected when the main Model ID was blank despite role models
 
 - **Symptom:** Editing a route, clearing the main Model ID and leaving only Sonnet/Haiku role models filled, the save failed with "you have to fill this" even though role models were provided.

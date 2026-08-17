@@ -408,7 +408,7 @@ class ApplyRestoreTests(ClaudeAdapterBase):
         self.assertEqual(target["unknownRoot"]["array"][0], "first")
         self.assertEqual(target["env"]["UNKNOWN_NESTED"]["array"][0], 3)
         self.assertEqual(target["enabledPlugins"], ["x"])
-        backups = list((self.profile_root / ".claude").glob("settings.backup.*.json"))
+        backups = list((self.profile_root / ".claude" / "backup").glob("settings.backup.*.json"))
         self.assertEqual(len(backups), 1)
         manifest = self.manifest()
         self.assertEqual(len(manifest), 1)
@@ -537,7 +537,7 @@ class ApplyRestoreTests(ClaudeAdapterBase):
         self.assertEqual(ctx.exception.status_code, 409)
 
         entry = self.manifest()[-1]
-        backup = self.profile_root / ".claude" / entry["backupName"]
+        backup = self.profile_root / ".claude" / "backup" / entry["backupName"]
         backup_bytes = backup.read_bytes()
 
         foreign_entry = dict(entry, backupName="settings.backup.20260814000000000.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.json")
@@ -577,7 +577,7 @@ class ApplyRestoreTests(ClaudeAdapterBase):
             expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
         self.assertNotEqual(self.target_hash(), before_apply)
         entry = self.manifest()[-1]
-        backup = self.profile_root / ".claude" / entry["backupName"]
+        backup = self.profile_root / ".claude" / "backup" / entry["backupName"]
         backup_bytes = backup.read_bytes()
         result = claude_adapter.claude_restore(claude_adapter.RestoreBody(
             expectedRevision=claude_adapter._target_revision(self.profile_root),
@@ -648,7 +648,7 @@ class TransactionAndManifestTests(ClaudeAdapterBase):
                 expectedRoutesRevision=claude_adapter.claude_routes()["routesRevision"]))
         manifest = self.manifest()
         self.assertLessEqual(len(manifest), claude_adapter.MANIFEST_CAP)
-        backups = list((self.profile_root / ".claude").glob("settings.backup.*.json"))
+        backups = list((self.profile_root / ".claude" / "backup").glob("settings.backup.*.json"))
         self.assertLessEqual(len(backups), claude_adapter.MANIFEST_CAP + 1)
 
     def test_activity_capped_and_redacted(self):
@@ -889,7 +889,7 @@ class RestoreEligibilityAndRollbackTests(ClaudeAdapterBase):
     def test_malformed_target_backup_rejected_before_mutation(self):
         self._applied()
         entry = self.manifest()[-1]
-        backup = self.profile_root / ".claude" / entry["backupName"]
+        backup = self.profile_root / ".claude" / "backup" / entry["backupName"]
         backup.write_text("{not json", encoding="utf-8")
         before = self.target_hash()
         with self.assertRaises(HTTPException) as ctx:
@@ -902,7 +902,7 @@ class RestoreEligibilityAndRollbackTests(ClaudeAdapterBase):
     def test_duplicate_key_target_backup_rejected_before_mutation(self):
         self._applied()
         entry = self.manifest()[-1]
-        backup = self.profile_root / ".claude" / entry["backupName"]
+        backup = self.profile_root / ".claude" / "backup" / entry["backupName"]
         backup.write_text('{"model":"a","model":"b"}', encoding="utf-8")
         before = self.target_hash()
         with self.assertRaises(HTTPException) as ctx:
@@ -971,7 +971,7 @@ class RestoreBoundaryStageTests(ClaudeAdapterBase):
             expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
         entry = self.manifest()[-1]
         target = self.profile_root / ".claude" / "settings.json"
-        backup = self.profile_root / ".claude" / entry["backupName"]
+        backup = self.profile_root / ".claude" / "backup" / entry["backupName"]
         binding = claude_adapter._binding_sha(self.profile_root)
         for stage, expected_exit in (("AfterBackup", 1), ("AfterTempWrite", 1), ("AfterReplace", 1), ("AfterRecoveryCopy", 2), ("AfterRecoveryReplace", 2)):
             before = self.target_hash()
@@ -1076,7 +1076,7 @@ class ProductionCliContractTests(ClaudeAdapterBase):
             expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
         entry = self.manifest()[-1]
         target = self.profile_root / ".claude" / "settings.json"
-        backup = self.profile_root / ".claude" / entry["backupName"]
+        backup = self.profile_root / ".claude" / "backup" / entry["backupName"]
         binding = claude_adapter._binding_sha(self.profile_root)
         profile = claude_adapter._routing_profile(route)
         profile_path = self.tmp / "profile.json"
@@ -1099,7 +1099,7 @@ class ProductionCliContractTests(ClaudeAdapterBase):
             expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
         entry = self.manifest()[-1]
         target = self.profile_root / ".claude" / "settings.json"
-        backup = self.profile_root / ".claude" / entry["backupName"]
+        backup = self.profile_root / ".claude" / "backup" / entry["backupName"]
         before = self.target_hash()
         cmd = [claude_adapter.PS1, *claude_adapter.PS1_ARGS, str(claude_adapter.PRODUCTION_ENTRY),
                "-Operation", "Restore", "-ProfileRoot", str(self.profile_root), "-SettingsPath", str(target),
@@ -1287,15 +1287,27 @@ class EnvVarLifecycleTests(ClaudeAdapterBase):
         route = claude_adapter.claude_routes()["routes"][0]
         route["envVarManaged"] = True
         route.pop("credentialBackend", None)
-        with patch.object(claude_adapter.claude_envvars, "user_env_get", return_value="sk-legacy"), \
+        with patch.object(claude_adapter.claude_envvars, "user_env_get", return_value="sk-legacy") as getter, \
              patch.object(claude_adapter.claude_envvars, "delete_user_env") as deleter, \
              patch.dict(os.environ, {}, clear=False):
             claude_adapter.claude_envvars.os.environ.pop("BDF_GATE4A_API_KEY_REF", None)
             value = claude_adapter._resolve_route_credential(route)
         self.assertEqual(value, "sk-legacy")
         self.assertEqual(claude_adapter.claude_credentials.resolve("BDF_GATE4A_API_KEY_REF"), "sk-legacy")
-        deleter.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
+        deleter.assert_not_called()
         self.assertEqual(route["credentialBackend"], "store")
+
+    def test_apply_resolves_legacy_from_store_when_env_var_already_gone(self):
+        claude_adapter.claude_route_create(self.create_body(secret_value=""))
+        route = claude_adapter.claude_routes()["routes"][0]
+        route["envVarManaged"] = True
+        route.pop("credentialBackend", None)
+        claude_adapter.claude_credentials.store("BDF_GATE4A_API_KEY_REF", "sk-stranded")
+        with patch.object(claude_adapter.claude_envvars, "user_env_get", return_value=None), \
+             patch.dict(os.environ, {}, clear=False):
+            claude_adapter.claude_envvars.os.environ.pop("BDF_GATE4A_API_KEY_REF", None)
+            value = claude_adapter._resolve_route_credential(route)
+        self.assertEqual(value, "sk-stranded")
 
 class CredentialsEndpointTests(ClaudeAdapterBase):
     def _create_route(self, ref="BDF_GATE4A_API_KEY_REF", secret="", name="Cred"):
@@ -1430,7 +1442,7 @@ class ApplyCommitBoundaryTests(ClaudeAdapterBase):
             leftover_prune = [p.name for p in self.routes_file.parent.glob(".bdf-prune-*.tmp")]
             self.assertEqual(leftover_prune, [], f"{target_point}: prune temps")
             self.assertNotIn("route_applied", self.activity_types())
-            self.assertEqual(len(list((self.profile_root / ".claude").glob("settings.backup.*.json"))), index + 1, f"{target_point}: apply backup kept per contract")
+            self.assertEqual(len(list((self.profile_root / ".claude" / "backup").glob("settings.backup.*.json"))), index + 1, f"{target_point}: apply backup kept per contract")
 
     def test_prune_rollback_keeps_oldest_backups_referenced(self):
         route = self.create_route()
@@ -1441,7 +1453,7 @@ class ApplyCommitBoundaryTests(ClaudeAdapterBase):
                 expectedRoutesRevision=claude_adapter.claude_routes()["routesRevision"]))
         before = self.manifest()
         oldest = before[0]
-        oldest_target = self.profile_root / ".claude" / oldest["backupName"]
+        oldest_target = self.profile_root / ".claude" / "backup" / oldest["backupName"]
         self.assertTrue(oldest_target.is_file())
         with patch.object(claude_adapter, "_write_manifest", side_effect=OSError("boom")):
             route = self.create_route(name="Final")
@@ -1462,7 +1474,7 @@ class ApplyCommitBoundaryTests(ClaudeAdapterBase):
             with self.assertRaises(HTTPException):
                 claude_adapter.claude_route_apply(route["id"], claude_adapter.RouteApplyBody(
                     expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
-        backups = list((self.profile_root / ".claude").glob("settings.backup.*.json"))
+        backups = list((self.profile_root / ".claude" / "backup").glob("settings.backup.*.json"))
         self.assertEqual(len(backups), 1)
 
 
@@ -1477,7 +1489,9 @@ class RoundTwoDefectTests(ClaudeAdapterBase):
             if "-Operation" in args and "Apply" in args:
                 target = Path(args[args.index("-SettingsPath") + 1])
                 stamp = datetime_now_17()
-                backup = target.parent / ("settings.backup." + stamp + "." + "d" * 32 + ".json")
+                backup_dir = target.parent / "backup"
+                backup_dir.mkdir(parents=True, exist_ok=True)
+                backup = backup_dir / ("settings.backup." + stamp + "." + "d" * 32 + ".json")
                 shutil.copy2(str(target), str(backup))
                 content = json.loads(target.read_text(encoding="utf-8"))
                 content["model"] = "mutated-by-fake"
@@ -1525,7 +1539,7 @@ class RoundTwoDefectTests(ClaudeAdapterBase):
             self.assertEqual(self.routes_file.read_bytes(), before_store)
             self.assertEqual(self.manifest(), [])
             self.assertNotIn("route_applied", self.activity_types())
-            self.assertEqual(len(list((self.profile_root / ".claude").glob("settings.backup.*.json"))), index + 1, "only apply-owned backups remain as evidence")
+            self.assertEqual(len(list((self.profile_root / ".claude" / "backup").glob("settings.backup.*.json"))), index + 1, "only apply-owned backups remain as evidence")
 
     def test_production_exit_2_is_hard_failure_with_recovery(self):
         route = self.create_route()
@@ -1563,7 +1577,7 @@ class RoundTwoDefectTests(ClaudeAdapterBase):
                 expectedRevision=claude_adapter._target_revision(self.profile_root),
                 expectedRoutesRevision=claude_adapter.claude_routes()["routesRevision"]))
         oldest = self.manifest()[0]
-        oldest_target = self.profile_root / ".claude" / oldest["backupName"]
+        oldest_target = self.profile_root / ".claude" / "backup" / oldest["backupName"]
         oldest_store = self.routes_file.parent / oldest["previousStoreBackupName"]
         self.assertTrue(oldest_target.is_file())
         self.assertTrue(oldest_store.is_file())
@@ -1586,7 +1600,7 @@ class RoundTwoDefectTests(ClaudeAdapterBase):
                 expectedRevision=claude_adapter._target_revision(self.profile_root),
                 expectedRoutesRevision=claude_adapter.claude_routes()["routesRevision"]))
         oldest = self.manifest()[0]
-        oldest_target = self.profile_root / ".claude" / oldest["backupName"]
+        oldest_target = self.profile_root / ".claude" / "backup" / oldest["backupName"]
         sentinel = self.routes_file.parent / ".bdf-sentinel.tmp"
         sentinel.write_text("do not overwrite", encoding="utf-8")
         with patch.object(claude_adapter, "_new_staging_name", return_value=sentinel):
@@ -1604,7 +1618,7 @@ class RoundTwoDefectTests(ClaudeAdapterBase):
                 expectedRevision=claude_adapter._target_revision(self.profile_root),
                 expectedRoutesRevision=claude_adapter.claude_routes()["routesRevision"]))
         oldest = self.manifest()[0]
-        oldest_target = self.profile_root / ".claude" / oldest["backupName"]
+        oldest_target = self.profile_root / ".claude" / "backup" / oldest["backupName"]
         real_link = os.link
         real_unlink = os.unlink
         calls = {"moves": 0}
@@ -1654,7 +1668,7 @@ class RoundTwoDefectTests(ClaudeAdapterBase):
         self.assertTrue(store_backup.is_file())
         self.assertEqual(len(self.manifest()), 1)
         self.assertFalse([p for p in self.routes_file.parent.glob(".bdf-consume-*.tmp")])
-        self.assertFalse([p for p in (self.profile_root / ".claude").glob("settings.backup.*.json") if p.name != entry["backupName"]])
+        self.assertFalse([p for p in (self.profile_root / ".claude" / "backup").glob("settings.backup.*.json") if p.name != entry["backupName"]])
 
     def test_restore_consumed_backup_finalize_failure_commits_consistently(self):
         route = self.create_route()
@@ -1722,7 +1736,9 @@ class RoundThreeTransactionTests(ClaudeAdapterBase):
             if "-Operation" in args and "Apply" in args:
                 target = Path(args[args.index("-SettingsPath") + 1])
                 stamp = datetime_now_17()
-                backup = target.parent / ("settings.backup." + stamp + "." + "d" * 32 + ".json")
+                backup_dir = target.parent / "backup"
+                backup_dir.mkdir(parents=True, exist_ok=True)
+                backup = backup_dir / ("settings.backup." + stamp + "." + "d" * 32 + ".json")
                 shutil.copy2(str(target), str(backup))
                 data = json.loads(target.read_text(encoding="utf-8"))
                 data["model"] = "mutated-by-fake"
@@ -1771,7 +1787,9 @@ class RoundThreeTransactionTests(ClaudeAdapterBase):
             if "-Operation" in args and "Apply" in args:
                 target = Path(args[args.index("-SettingsPath") + 1])
                 stamp = datetime_now_17()
-                backup = target.parent / ("settings.backup." + stamp + "." + "e" * 32 + ".json")
+                backup_dir = target.parent / "backup"
+                backup_dir.mkdir(parents=True, exist_ok=True)
+                backup = backup_dir / ("settings.backup." + stamp + "." + "d" * 32 + ".json")
                 shutil.copy2(str(target), str(backup))
                 return 0, json.dumps({"ok": True, "backupName": backup.name, "backupSha256": claude_adapter._sha256_file(backup), "preWriteTargetSha256": claude_adapter._target_revision(self.profile_root), "postWriteTargetSha256": claude_adapter._sha256_file(target), "coreVersion": "0.2.0", "schemaIdentity": schema}), ""
             raise AssertionError("unexpected production call")
@@ -1788,7 +1806,7 @@ class RoundThreeTransactionTests(ClaudeAdapterBase):
         self.assertEqual(len(self.manifest()), 1)
         self.assertEqual(self.manifest()[0]["appliedRouteId"], route["id"])
         json.loads(self.target.read_text(encoding="utf-8"))
-        leftovers = [p for p in (self.profile_root / ".claude").glob("settings.backup.*.json")]
+        leftovers = [p for p in (self.profile_root / ".claude" / "backup").glob("settings.backup.*.json")]
         self.assertGreaterEqual(len(leftovers), 2, "apply backup + preserved recovery evidence")
 
     def test_restore_recovery_cleanup_false_is_hard_failure_never_success(self):
@@ -1827,13 +1845,13 @@ class RoundThreeTransactionTests(ClaudeAdapterBase):
         rev = claude_adapter.claude_routes()["routesRevision"]
         claude_adapter.claude_route_apply(route["id"], claude_adapter.RouteApplyBody(
             expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
-        backups = [p.name for p in (self.profile_root / ".claude").glob("settings.backup.*.json")]
+        backups = [p.name for p in (self.profile_root / ".claude" / "backup").glob("settings.backup.*.json")]
         self.assertEqual(len(backups), 1, "only the apply-owned backup remains")
         self.assertFalse([p for p in self.routes_file.parent.glob(".bdf-*")])
         rev2 = claude_adapter.claude_routes()["routesRevision"]
         claude_adapter.claude_restore(claude_adapter.RestoreBody(
             expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev2))
-        backups_after = [p.name for p in (self.profile_root / ".claude").glob("settings.backup.*.json")]
+        backups_after = [p.name for p in (self.profile_root / ".claude" / "backup").glob("settings.backup.*.json")]
         self.assertEqual(len(backups_after), 1, "only the apply-owned backup remains after restore")
         self.assertFalse([p for p in self.routes_file.parent.glob(".bdf-*")])
 
