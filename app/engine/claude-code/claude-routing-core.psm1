@@ -2,11 +2,12 @@
 # Dot-sourced by build-claude-code.ps1 (fixture, human output) and
 # build-claude-code-production.ps1 (production, JSON output).
 # Version authority for the adapter implementation.
-# Version 0.2.0: env-only surgical scope correction. The builder patches only
-# the top-level `env` object of .claude/settings.json using exact character
-# spans; top-level `model` and every unrelated byte are preserved.
+# Version 0.3.0: env-only surgical scope + model roles. The builder patches
+# the top-level `env` object and two managed top-level keys (availableModels,
+# enforceAvailableModels) using exact character spans; every unrelated byte is
+# preserved. Managed env fields gain ANTHROPIC_DEFAULT_OPUS/SONNET/HAIKU/FABLE_MODEL.
 
-$script:CLAUDE_ROUTING_CORE_VERSION = "0.2.0"
+$script:CLAUDE_ROUTING_CORE_VERSION = "0.3.0"
 
 function Fail { param([string]$Reason) throw $Reason }
 function Get-Canonical { param([string]$Path) [IO.Path]::GetFullPath($Path) }
@@ -55,18 +56,21 @@ function Test-SchemaValue { param([object]$Value,[object]$Node,[string]$Path,[Co
 function Assert-SchemaCompliance { param([object]$Route,[object]$Schema) $errors=New-Object Collections.ArrayList;Test-SchemaValue $Route $Schema '(root)' $errors;if($errors.Count){Fail ("schema validation failed: "+($errors-join '; '))} }
 function Validate-Inputs { param([object]$Route,[object]$Settings)
     function Assert-PropertySet { param([object]$Object,[string[]]$Allowed,[string]$Label) foreach($p in $Object.PSObject.Properties){if($Allowed-notcontains $p.Name){Fail "$Label unsupported property"}} }
-    Assert-PropertySet $Route @("target","scope","endpoint","model","envPolicy") "routing"
+    Assert-PropertySet $Route @("target","scope","endpoint","model","modelRoles","restrictModelPicker","envPolicy") "routing"
     if($Route.target-cne "claude-code"){Fail "unsupported target"}; if($Route.scope-cne "user"){Fail "unsupported scope"}
-    foreach($n in @("endpoint","model","envPolicy")){if(!(Has-Property $Route $n)){Fail "missing routing property"}}
+    foreach($n in @("endpoint","model","modelRoles","restrictModelPicker","envPolicy")){if(!(Has-Property $Route $n)){Fail "missing routing property"}}
     Require-Type $Route.endpoint ([Management.Automation.PSCustomObject]) "endpoint"; Require-Type $Route.endpoint.auth ([Management.Automation.PSCustomObject]) "auth"
     Assert-PropertySet $Route.endpoint @("baseUrl","auth") "endpoint"; Assert-PropertySet $Route.endpoint.auth @("apiKeySecretRef","authTokenSecretRef") "auth"; Assert-PropertySet $Route.model @("value","source") "model"; Assert-PropertySet $Route.envPolicy @("gatewayDiscovery","disableExperimentalBetas","autoCompactWindow","disableNonessentialTraffic") "policy"
+    Require-Type $Route.modelRoles ([Management.Automation.PSCustomObject]) "modelRoles"; Assert-PropertySet $Route.modelRoles @("opus","sonnet","haiku","fable") "modelRoles"
+    foreach($role in @("opus","sonnet","haiku","fable")){if(Has-Property $Route.modelRoles $role){if(!($Route.modelRoles.$role-is [string])-or [string]::IsNullOrWhiteSpace($Route.modelRoles.$role)){Fail "model role invalid"}}}
+    if(!($Route.restrictModelPicker-is [bool])){Fail "restrictModelPicker invalid"}
     $hasApi=Has-Property $Route.endpoint.auth "apiKeySecretRef"; $hasToken=Has-Property $Route.endpoint.auth "authTokenSecretRef"
     if($hasApi-eq $hasToken){Fail "exactly one auth strategy required"}; $ref=if($hasApi){$Route.endpoint.auth.apiKeySecretRef}else{$Route.endpoint.auth.authTokenSecretRef}
     if(!($ref-is [string])-or $ref-notmatch '^[A-Za-z_][A-Za-z0-9_]*$'){Fail "invalid secret reference"}
     $secret=[Environment]::GetEnvironmentVariable($ref,"Process"); if([string]::IsNullOrEmpty($secret)){Fail "referenced secret missing"}
     if(!($Route.endpoint.baseUrl-is [string])){Fail "base URL invalid"}; $uri=$null; $uriValid=[Uri]::TryCreate($Route.endpoint.baseUrl,[UriKind]::Absolute,[ref]$uri); if(!$uriValid-or (@("http","https")-notcontains $uri.Scheme)-or [string]::IsNullOrEmpty($uri.Host)-or ![string]::IsNullOrEmpty($uri.UserInfo)-or ![string]::IsNullOrEmpty($uri.Query)-or ![string]::IsNullOrEmpty($uri.Fragment)){Fail "base URL invalid"}
     if(!($Route.model.value-is [string])-or [string]::IsNullOrWhiteSpace($Route.model.value)){Fail "model invalid"}; if($Route.model.source-cne "environment"){Fail "model source invalid"}
-    $w=$Route.envPolicy.autoCompactWindow; if(!($w-is [int])-and !($w-is [long])){Fail "auto compact must be integer"}; if($w-lt 100000-or $w-gt 1000000){Fail "auto compact out of range"}
+    if(Has-Property $Route.envPolicy "autoCompactWindow"){$w=$Route.envPolicy.autoCompactWindow; if(!($w-is [int])-and !($w-is [long])){Fail "auto compact must be integer"}; if($w-lt 100000-or $w-gt 1000000){Fail "auto compact out of range"}}
     foreach($n in @("gatewayDiscovery","disableExperimentalBetas","disableNonessentialTraffic")){if(!(Has-Property $Route.envPolicy $n)-or !($Route.envPolicy.$n-is [bool])){Fail "policy invalid"}}
     if($Route.envPolicy.gatewayDiscovery-and $Route.envPolicy.disableNonessentialTraffic){Fail "Gateway model discovery cannot be combined with disabled nonessential traffic."}
     if(Has-Property $Settings "env"){Require-Type $Settings.env ([Management.Automation.PSCustomObject]) "settings env"}
@@ -78,16 +82,42 @@ function Convert-Semantic { param([object]$Value)
     if($Value-is [Management.Automation.PSCustomObject]){$parts=@(); foreach($p in @($Value.PSObject.Properties|Sort-Object Name)){$parts+=$p.Name.Length.ToString()+":"+$p.Name+"="+(Convert-Semantic $p.Value)}; return "O{"+($parts-join "|")+"}"}; Fail "unsupported semantic type"
 }
 function Get-UnsupportedSnapshot { param([object]$Settings)
-    $root=[ordered]@{}; foreach($p in $Settings.PSObject.Properties){if($p.Name-cne "env"){$root[$p.Name]=$p.Value}}
-    $env=[ordered]@{}; $managed=@("ANTHROPIC_BASE_URL","ANTHROPIC_API_KEY","ANTHROPIC_AUTH_TOKEN","ANTHROPIC_MODEL","CLAUDE_CODE_AUTO_COMPACT_WINDOW","CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY","CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS","CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC"); if(Has-Property $Settings "env"){foreach($p in $Settings.env.PSObject.Properties){if($managed-notcontains $p.Name){$env[$p.Name]=$p.Value}}}
+    $root=[ordered]@{}; foreach($p in $Settings.PSObject.Properties){if($p.Name-notin @("env","availableModels","enforceAvailableModels")){$root[$p.Name]=$p.Value}}
+    $env=[ordered]@{}; $managed=@("ANTHROPIC_BASE_URL","ANTHROPIC_API_KEY","ANTHROPIC_AUTH_TOKEN","ANTHROPIC_MODEL","CLAUDE_CODE_AUTO_COMPACT_WINDOW","CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY","CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS","CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC","ANTHROPIC_DEFAULT_OPUS_MODEL","ANTHROPIC_DEFAULT_SONNET_MODEL","ANTHROPIC_DEFAULT_HAIKU_MODEL","ANTHROPIC_DEFAULT_FABLE_MODEL"); if(Has-Property $Settings "env"){foreach($p in $Settings.env.PSObject.Properties){if($managed-notcontains $p.Name){$env[$p.Name]=$p.Value}}}
     Convert-Semantic ([pscustomobject]@{root=[pscustomobject]$root;env=[pscustomobject]$env})
+}
+function Get-RouteAllowList { param([object]$Route)
+    # Derived /model picker allowlist: main model first, then the four role
+    # models in fixed alias order, deduplicated (first occurrence wins).
+    $list=New-Object System.Collections.ArrayList
+    $candidates=New-Object System.Collections.ArrayList
+    [void]$candidates.Add($Route.model.value)
+    foreach($role in @("opus","sonnet","haiku","fable")){if(Has-Property $Route.modelRoles $role){[void]$candidates.Add($Route.modelRoles.$role)}}
+    foreach($candidate in $candidates){if($candidate-and ($list-notcontains $candidate)){[void]$list.Add($candidate)}}
+    return ,$list
+}
+function ConvertTo-JsonValueLiteral { param([object]$Value)
+    # String, boolean, and array-of-strings literal writer with round-trip check.
+    if($Value-is [bool]){return ([string]$Value).ToLowerInvariant()}
+    if($Value-is [string]){return ConvertTo-JsonStringLiteral $Value}
+    if($Value-is [Collections.IEnumerable]-and !($Value-is [string])){$parts=@(); foreach($item in $Value){$parts+=ConvertTo-JsonStringLiteral ([string]$item)}; $literal='['+($parts-join ',')+']'; try{$round=$literal|ConvertFrom-Json}catch{Fail "array literal serialization failed"}; if(@($round).Count-ne @($Value).Count){Fail "array literal round-trip mismatch"}; return $literal}
+    Fail "unsupported managed value literal"
 }
 function Verify-Contract { param([object]$Settings,[object]$Route,[object]$Auth,[string]$Unsupported)
     if((Get-UnsupportedSnapshot $Settings)-cne $Unsupported){Fail "unsupported values changed"}
     if($Settings.env.ANTHROPIC_MODEL-cne $Route.model.value-or $Settings.env.ANTHROPIC_BASE_URL-cne $Route.endpoint.baseUrl){Fail "route verification failed"}
     $selected=if($Auth.HasApi){"ANTHROPIC_API_KEY"}else{"ANTHROPIC_AUTH_TOKEN"}; $opposite=if($Auth.HasApi){"ANTHROPIC_AUTH_TOKEN"}else{"ANTHROPIC_API_KEY"}; if(($Settings.env.$selected-cne $Auth.Secret)-or (Has-Property $Settings.env $opposite)){Fail "auth verification failed"}
-    if($Settings.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW-cne ([string]$Route.envPolicy.autoCompactWindow)){Fail "auto compact verification failed"}
+    if(Has-Property $Route.envPolicy "autoCompactWindow"){if($Settings.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW-cne ([string]$Route.envPolicy.autoCompactWindow)){Fail "auto compact verification failed"}}elseif(Has-Property $Settings.env "CLAUDE_CODE_AUTO_COMPACT_WINDOW"){Fail "auto compact absence verification failed"}
     foreach($pair in @(@("CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY","gatewayDiscovery"),@("CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS","disableExperimentalBetas"),@("CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC","disableNonessentialTraffic"))){$present=Has-Property $Settings.env $pair[0];if($Route.envPolicy.($pair[1])){if(!$present-or $Settings.env.($pair[0])-cne "1"){Fail "policy verification failed"}}elseif($present){Fail "policy absence verification failed"}}
+    foreach($role in @("opus","sonnet","haiku","fable")){$envName="ANTHROPIC_DEFAULT_"+$role.ToUpper()+"_MODEL";$present=Has-Property $Settings.env $envName;if(Has-Property $Route.modelRoles $role){if(!$present-or $Settings.env.$envName-cne $Route.modelRoles.$role){Fail "model role verification failed"}}elseif($present){Fail "model role absence verification failed"}}
+    $allow=Get-RouteAllowList $Route
+    if($Route.restrictModelPicker){
+        if(!(Has-Property $Settings "availableModels")-or (@($Settings.availableModels)-join '|')-ne (@($allow)-join '|')){Fail "allowlist verification failed"}
+        if(!(Has-Property $Settings "enforceAvailableModels")-or $Settings.enforceAvailableModels-cne $true){Fail "enforce allowlist verification failed"}
+    }else{
+        if(Has-Property $Settings "availableModels"){Fail "allowlist absence verification failed"}
+        if(Has-Property $Settings "enforceAvailableModels"){Fail "enforce allowlist absence verification failed"}
+    }
 }
 function Write-Utf8File { param([string]$Path,[string]$Text) $stream=[IO.File]::Open($Path,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None); try{$bytes=[Text.UTF8Encoding]::new($false).GetBytes($Text);$stream.Write($bytes,0,$bytes.Length);$stream.Flush($true)}finally{$stream.Dispose()} }
 function Restore-Backup { $restore=Join-Path (Split-Path $script:SettingsPath -Parent) (".bdf-transaction-restore-"+[guid]::NewGuid().ToString("N")+".tmp"); $discard=$restore+".old"; try{[IO.File]::Copy($script:backupPath,$restore,$false); [IO.File]::Replace($restore,$script:SettingsPath,$discard); if(Test-Path $discard){Remove-Item $discard -Force}; $a=[IO.File]::ReadAllBytes($script:backupPath);$b=[IO.File]::ReadAllBytes($script:SettingsPath);if((Convert-Semantic $a)-cne(Convert-Semantic $b)){Fail "restore bytes differ"}; Read-Json $script:SettingsPath "restored target"|Out-Null}finally{if(Test-Path $restore){Remove-Item $restore -Force};if(Test-Path $discard){Remove-Item $discard -Force}} }
@@ -289,10 +319,14 @@ function New-SettingsEnvEdits {
     $managed=@(
         @{Name='ANTHROPIC_BASE_URL';Value=$Route.endpoint.baseUrl;Action='set'},
         @{Name='ANTHROPIC_MODEL';Value=$Route.model.value;Action='set'},
-        @{Name='CLAUDE_CODE_AUTO_COMPACT_WINDOW';Value=([string]$Route.envPolicy.autoCompactWindow);Action='set'},
+        @{Name='CLAUDE_CODE_AUTO_COMPACT_WINDOW';Value=([string]$Route.envPolicy.autoCompactWindow);Action=if(Has-Property $Route.envPolicy "autoCompactWindow"){'set'}else{'remove'}},
         @{Name='CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY';Value='1';Action=if($Route.envPolicy.gatewayDiscovery){'set'}else{'remove'}},
         @{Name='CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS';Value='1';Action=if($Route.envPolicy.disableExperimentalBetas){'set'}else{'remove'}},
-        @{Name='CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC';Value='1';Action=if($Route.envPolicy.disableNonessentialTraffic){'set'}else{'remove'}}
+        @{Name='CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC';Value='1';Action=if($Route.envPolicy.disableNonessentialTraffic){'set'}else{'remove'}},
+        @{Name='ANTHROPIC_DEFAULT_OPUS_MODEL';Value=$Route.modelRoles.opus;Action=if(Has-Property $Route.modelRoles "opus"){'set'}else{'remove'}},
+        @{Name='ANTHROPIC_DEFAULT_SONNET_MODEL';Value=$Route.modelRoles.sonnet;Action=if(Has-Property $Route.modelRoles "sonnet"){'set'}else{'remove'}},
+        @{Name='ANTHROPIC_DEFAULT_HAIKU_MODEL';Value=$Route.modelRoles.haiku;Action=if(Has-Property $Route.modelRoles "haiku"){'set'}else{'remove'}},
+        @{Name='ANTHROPIC_DEFAULT_FABLE_MODEL';Value=$Route.modelRoles.fable;Action=if(Has-Property $Route.modelRoles "fable"){'set'}else{'remove'}}
     )
     $authName=if($Auth.HasApi){'ANTHROPIC_API_KEY'}else{'ANTHROPIC_AUTH_TOKEN'}
     $oppositeAuth=if($Auth.HasApi){'ANTHROPIC_AUTH_TOKEN'}else{'ANTHROPIC_API_KEY'}
@@ -408,7 +442,96 @@ function New-SettingsEnvEdits {
             [void]$coalesced.Add($edit)
         }
     }
-    return $coalesced
+    return (Repair-DanglingRemovalCommas -Raw $raw -Edits $coalesced)
+}
+
+function Repair-DanglingRemovalCommas {
+    param([string]$Raw,[array]$Edits)
+    # A removal span that ends at the object's closing brace and starts right
+    # after a comma leaves that comma dangling (e.g. removing the trailing run
+    # of members). Extend such spans back over the comma so the JSON stays
+    # valid and no blank-member line remains.
+    $out=New-Object System.Collections.ArrayList
+    foreach($edit in $Edits){
+        if($edit.Replacement.Length-ne 0-or $edit.Length-le 0){[void]$out.Add($edit);continue}
+        $s=$edit.Start; $e=$edit.Start+$edit.Length
+        if($s-gt 0-and $Raw[$s-1]-eq ','){
+            $j=$e; while($j-lt $Raw.Length-and [char]::IsWhiteSpace($Raw[$j])){$j++}
+            if($j-lt $Raw.Length-and $Raw[$j]-eq '}'){$s=$s-1}
+        }
+        [void]$out.Add([pscustomobject]@{Start=$s;Length=($e-$s);Replacement='';ManagedName=$edit.ManagedName})
+    }
+    return $out
+}
+
+function New-SettingsRootValueEdits {
+    param([object]$Document,[object]$Route)
+    # Manages the two top-level settings keys availableModels (array of model
+    # IDs derived from the route) and enforceAvailableModels (true). Set case:
+    # write both when restrictModelPicker is on; remove case: drop both when
+    # off. Missing members are inserted together as one edit so no two edits
+    # share an insertion point.
+    $raw=$Document.RawText
+    $layout=Get-SettingsJsonLayout -Raw $raw
+    $lineEnding=if($Document.LineEnding-eq "CRLF"){"`r`n"}elseif($Document.LineEnding-eq "LF"){"`n"}else{""}
+    $rootIndent=$layout.RootIndent
+    $edits=New-Object System.Collections.ArrayList
+
+    $managedRoot=New-Object System.Collections.ArrayList
+    if($Route.restrictModelPicker){
+        [void]$managedRoot.Add(@{Name='availableModels';Literal=(ConvertTo-JsonValueLiteral (Get-RouteAllowList $Route));Action='set'})
+        [void]$managedRoot.Add(@{Name='enforceAvailableModels';Literal='true';Action='set'})
+    }else{
+        [void]$managedRoot.Add(@{Name='availableModels';Literal='';Action='remove'})
+        [void]$managedRoot.Add(@{Name='enforceAvailableModels';Literal='';Action='remove'})
+    }
+
+    $replace=New-Object System.Collections.ArrayList; $insert=New-Object System.Collections.ArrayList
+    foreach($spec in $managedRoot){
+        $match=$null
+        foreach($rm in $layout.RootMembers){if($rm.KeyName-ceq $spec.Name){$match=$rm;break}}
+        if($null-ne $match){
+            if($spec.Action-eq 'set'){
+                [void]$replace.Add(@{Match=$match;Literal=$spec.Literal;Name=$spec.Name})
+            }else{
+                $removeStart=$match.KeyStart
+                $removeEnd=$match.ValueStart+$match.ValueLength
+                if($match.HasCommaAfter){
+                    if($match.PrevCommaStart-ge 0){$removeStart=$match.PrevCommaStart+1}
+                    $removeEnd=$match.CommaStart+1
+                }else{
+                    $previous=$null
+                    foreach($rm in $layout.RootMembers){if($rm.KeyStart-lt $match.KeyStart){$previous=$rm}}
+                    if($null-ne $previous-and $previous.CommaStart-ge 0){$removeStart=$previous.CommaStart}
+                }
+                [void]$edits.Add([pscustomobject]@{Start=$removeStart;Length=($removeEnd-$removeStart);Replacement='';ManagedName=$spec.Name})
+            }
+        }elseif($spec.Action-eq 'set'){
+            [void]$insert.Add($spec)
+        }
+    }
+    foreach($m in $replace){
+        [void]$edits.Add([pscustomobject]@{Start=$m.Match.ValueStart;Length=$m.Match.ValueLength;Replacement=$m.Literal;ManagedName=$m.Name})
+    }
+    if($insert.Count){
+        $parts=@()
+        foreach($spec in $insert){$parts+=('"'+$spec.Name+'"'+':'+$(if($lineEnding){" "}else{""})+$spec.Literal)}
+        $memberSep=if($lineEnding){','+$lineEnding+$rootIndent}else{","}
+        $insertMembers=($parts-join $memberSep)
+        if($layout.RootMembers.Count){
+            if($lineEnding){
+                $lastRoot=$layout.RootMembers[$layout.RootMembers.Count-1]
+                $insertText=','+$lineEnding+$rootIndent+$insertMembers
+                [void]$edits.Add([pscustomobject]@{Start=($lastRoot.ValueStart+$lastRoot.ValueLength);Length=0;Replacement=$insertText;ManagedName=(($insert|ForEach-Object Name)-join ';')})
+            }else{
+                $insertText=','+$insertMembers
+                [void]$edits.Add([pscustomobject]@{Start=$layout.RootClose;Length=0;Replacement=$insertText;ManagedName=(($insert|ForEach-Object Name)-join ';')})
+            }
+        }else{
+            [void]$edits.Add([pscustomobject]@{Start=$layout.RootClose;Length=0;Replacement=$insertMembers;ManagedName=(($insert|ForEach-Object Name)-join ';')})
+        }
+    }
+    return (Repair-DanglingRemovalCommas -Raw $raw -Edits $edits)
 }
 
 function Apply-SettingsTextEdits {
@@ -511,8 +634,10 @@ function Invoke-ClaudeRoutingApply {
         $auth=Validate-Inputs $routeDoc.Object $settingsDoc.ParsedObject
         $unsupported=Get-UnsupportedSnapshot $settingsDoc.ParsedObject
         $edits=New-SettingsEnvEdits -Document $settingsDoc -Route $routeDoc.Object -Auth $auth
-        $newText=Apply-SettingsTextEdits -Raw $settingsDoc.RawText -Edits $edits
-        Assert-SettingsTextPreserved -Before $settingsDoc.RawText -After $newText -Edits $edits
+        $rootEdits=New-SettingsRootValueEdits -Document $settingsDoc -Route $routeDoc.Object
+        $allEdits=@($edits)+@($rootEdits)
+        $newText=Apply-SettingsTextEdits -Raw $settingsDoc.RawText -Edits $allEdits
+        Assert-SettingsTextPreserved -Before $settingsDoc.RawText -After $newText -Edits $allEdits
         $tempObject=ConvertFrom-SettingsText $newText "surgical output"
         Verify-Contract $tempObject $routeDoc.Object $auth $unsupported
         $preHash=((Get-FileHash -LiteralPath $script:SettingsPath -Algorithm SHA256).Hash).ToLowerInvariant()
@@ -629,4 +754,4 @@ function Invoke-ClaudeRoutingRestore {
     }
 }
 
-Export-ModuleMember -Function Invoke-ClaudeRoutingApply,Invoke-ClaudeRoutingRestore,Fail,Get-Canonical,Assert-NoReparseComponent,Read-Json,Assert-NoDuplicateKeys,Get-UnsupportedSnapshot,Verify-Contract,Write-Utf8File,Restore-Backup,Read-SettingsDocument,Get-SettingsJsonLayout,ConvertTo-JsonStringLiteral,New-SettingsEnvEdits,Apply-SettingsTextEdits,Assert-SettingsTextPreserved,Write-NewBytes,ConvertFrom-SettingsText -Variable CLAUDE_ROUTING_CORE_VERSION
+Export-ModuleMember -Function Invoke-ClaudeRoutingApply,Invoke-ClaudeRoutingRestore,Fail,Get-Canonical,Assert-NoReparseComponent,Read-Json,Assert-NoDuplicateKeys,Get-UnsupportedSnapshot,Get-RouteAllowList,ConvertTo-JsonValueLiteral,Verify-Contract,Write-Utf8File,Restore-Backup,Read-SettingsDocument,Get-SettingsJsonLayout,ConvertTo-JsonStringLiteral,New-SettingsEnvEdits,New-SettingsRootValueEdits,Apply-SettingsTextEdits,Assert-SettingsTextPreserved,Write-NewBytes,ConvertFrom-SettingsText -Variable CLAUDE_ROUTING_CORE_VERSION

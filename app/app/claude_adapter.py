@@ -33,8 +33,10 @@ from .config import (
 
 router = APIRouter(prefix="/api/claude")
 
-# HTTP-layer real-target lock. Gate 4 never flips this.
-ALLOW_REAL_CLAUDE_TARGET = False
+# HTTP-layer real-target lock. Owner-opened 2026-08-17 (session 48) after
+# Gate 5B PASS + Gate 5C sync: apply/restore now work against the real target
+# from the app UI. Set back to False to re-lock.
+ALLOW_REAL_CLAUDE_TARGET = True
 
 CLAUDE_SCHEMA = ENGINE_SCHEMAS / "claude-code-routing.schema.json"
 
@@ -143,9 +145,10 @@ def _generate_route_id(store):
 
 def _route_view(route):
     """Derived, non-persisted route view: adds the canonical config fingerprint
-    (64-hex SHA-256) so the frontend can compare against the applied fingerprint
-    without reimplementing the algorithm. Never persisted in claude-routes.json."""
-    return dict(route, configSha256=_fingerprint(route))
+    (64-hex SHA-256) and the effective (possibly role-derived) main model so the
+    frontend can compare against the applied fingerprint and display what would
+    actually run. Never persisted in claude-routes.json."""
+    return dict(route, configSha256=_fingerprint(route), effectiveModel=_effective_model(route))
 
 
 def _fingerprint(route):
@@ -153,11 +156,13 @@ def _fingerprint(route):
         "baseUrl": route["baseUrl"],
         "authKind": route["authKind"],
         "secretEnvRef": route["secretEnvRef"],
-        "model": route["model"],
+        "model": _effective_model(route),
         "gatewayDiscovery": route["gatewayDiscovery"],
         "disableExperimentalBetas": route["disableExperimentalBetas"],
-        "autoCompactWindow": route["autoCompactWindow"],
+        "autoCompactWindow": route.get("autoCompactWindow"),
         "disableNonessentialTraffic": route["disableNonessentialTraffic"],
+        "modelRoles": route.get("modelRoles") or {},
+        "restrictModelPicker": route.get("restrictModelPicker", True),
     }
     text = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -182,8 +187,10 @@ class RouteCreateBody(BaseModel):
     model: str
     gatewayDiscovery: bool
     disableExperimentalBetas: bool
-    autoCompactWindow: int
+    autoCompactWindow: int | None = None
     disableNonessentialTraffic: bool
+    modelRoles: dict[str, str] = {}
+    restrictModelPicker: bool = True
     secretValue: str = ""
 
 
@@ -210,6 +217,7 @@ class RestoreBody(BaseModel):
 
 
 def _route_dict(body):
+    roles = {role: str(value).strip() for role, value in (body.modelRoles or {}).items()}
     return {
         "baseUrl": body.baseUrl.strip(),
         "authKind": body.authKind,
@@ -217,9 +225,27 @@ def _route_dict(body):
         "model": body.model.strip(),
         "gatewayDiscovery": bool(body.gatewayDiscovery),
         "disableExperimentalBetas": bool(body.disableExperimentalBetas),
-        "autoCompactWindow": int(body.autoCompactWindow),
+        "autoCompactWindow": int(body.autoCompactWindow) if body.autoCompactWindow is not None else None,
         "disableNonessentialTraffic": bool(body.disableNonessentialTraffic),
+        "modelRoles": {k: v for k, v in roles.items() if v},
+        "restrictModelPicker": bool(body.restrictModelPicker),
     }
+
+
+def _effective_model(route):
+    """The model that actually drives ANTHROPIC_MODEL. When the main model is
+    blank but role models are assigned, derive it from the roles (Sonnet, the
+    coding default, first; then Haiku, Opus, Fable) so the route still applies
+    a concrete active model."""
+    model = str(route.get("model", "") or "").strip()
+    if model:
+        return model
+    roles = route.get("modelRoles") or {}
+    for role in ("sonnet", "haiku", "opus", "fable"):
+        value = roles.get(role)
+        if value and str(value).strip():
+            return str(value).strip()
+    return ""
 
 
 def _validate_route(route, store, exclude_id=None):
@@ -239,16 +265,29 @@ def _validate_route(route, store, exclude_id=None):
     except ValueError:
         raise HTTPException(400, "The endpoint base URL is invalid.")
     model = str(route.get("model", "")).strip()
-    if not model or len(model) > 256:
-        raise HTTPException(400, "The model ID is required.")
+    roles = route.get("modelRoles") or {}
+    if model:
+        if len(model) > 256:
+            raise HTTPException(400, "The model ID is required.")
+    elif not any(str(v or "").strip() for v in roles.values()):
+        raise HTTPException(400, "Add a model ID or assign at least one role model.")
     if route.get("authKind") not in ("apiKey", "authToken"):
         raise HTTPException(400, "Choose exactly one auth strategy.")
     ref = str(route.get("secretEnvRef", "")).strip()
     if not ref or len(ref) > 128 or not SECRET_REF_RE.match(ref):
         raise HTTPException(400, "The environment-variable reference name is invalid.")
     window = route.get("autoCompactWindow")
-    if not isinstance(window, int) or isinstance(window, bool) or not (100000 <= window <= 1000000):
+    if window is not None and (not isinstance(window, int) or isinstance(window, bool) or not (100000 <= window <= 1000000)):
         raise HTTPException(400, "Auto-compact window must be an integer from 100000 to 1000000.")
+    if not isinstance(roles, dict):
+        raise HTTPException(400, "Model roles must be an object.")
+    for role, value in roles.items():
+        if role not in ("opus", "sonnet", "haiku", "fable"):
+            raise HTTPException(400, "Unknown model role.")
+        if not isinstance(value, str) or not value.strip() or len(value.strip()) > 256:
+            raise HTTPException(400, "Each model role needs a model ID.")
+    if route.get("restrictModelPicker") is not None and not isinstance(route.get("restrictModelPicker"), bool):
+        raise HTTPException(400, "Restrict-model-picker must be a boolean.")
     if route.get("gatewayDiscovery") and route.get("disableNonessentialTraffic"):
         raise HTTPException(400, "Gateway model discovery cannot be combined with disabled nonessential traffic.")
 
@@ -332,6 +371,8 @@ def _commit_store_and_activity(store, event_type, route_id):
 
 
 def _run_production(args, timeout=120):
+    if ALLOW_REAL_CLAUDE_TARGET:
+        args = ["-AllowRealTarget", *args]
     command = [PS1, *PS1_ARGS, str(PRODUCTION_ENTRY), *args]
     try:
         proc = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout)
@@ -518,17 +559,21 @@ def _routing_profile(route):
         auth["apiKeySecretRef"] = route["secretEnvRef"]
     else:
         auth["authTokenSecretRef"] = route["secretEnvRef"]
+    env_policy = {
+        "gatewayDiscovery": route["gatewayDiscovery"],
+        "disableExperimentalBetas": route["disableExperimentalBetas"],
+        "disableNonessentialTraffic": route["disableNonessentialTraffic"],
+    }
+    if route.get("autoCompactWindow") is not None:
+        env_policy["autoCompactWindow"] = route["autoCompactWindow"]
     return {
         "target": "claude-code",
         "scope": "user",
         "endpoint": {"baseUrl": route["baseUrl"], "auth": auth},
-        "model": {"value": route["model"], "source": "environment"},
-        "envPolicy": {
-            "gatewayDiscovery": route["gatewayDiscovery"],
-            "disableExperimentalBetas": route["disableExperimentalBetas"],
-            "autoCompactWindow": route["autoCompactWindow"],
-            "disableNonessentialTraffic": route["disableNonessentialTraffic"],
-        },
+        "model": {"value": _effective_model(route), "source": "environment"},
+        "modelRoles": {k: v for k, v in (route.get("modelRoles") or {}).items()},
+        "restrictModelPicker": route.get("restrictModelPicker", True),
+        "envPolicy": env_policy,
     }
 
 
@@ -936,6 +981,7 @@ def claude_route_apply(route_id: str, body: RouteApplyBody):
             recovery_path = target.parent / recovery_name
             shutil.copy2(str(target), str(recovery_path))
             recovery_sha = _sha256_file(recovery_path)
+            claude_envvars.ensure_process_env(route["secretEnvRef"])
             code, stdout, stderr = _run_production([
                 "-Operation", "Apply",
                 "-ProfileRoot", str(root),

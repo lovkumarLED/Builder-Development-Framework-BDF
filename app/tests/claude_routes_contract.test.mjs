@@ -242,3 +242,43 @@ test("assistant: mobile-scoped classes exist in CSS", async () => {
   assert.match(cssSource, /@media \(max-width: 560px\)/);
   assert.match(cssSource, /\.claude-compat-actions/);
 });
+
+test("route editor exposes Claude model roles for the four aliases", () => {
+  assert.match(routesSource, /Claude model roles/);
+  assert.match(routesSource, /data-role-model="\$\{role\}"/);
+  assert.match(routesSource, /\["opus","sonnet","haiku","fable"\]/);
+  assert.match(routesSource, /Each role holds one model ID/);
+});
+
+test("route editor exposes the picker restrict toggle", () => {
+  assert.match(routesSource, /claudeRouteRestrict/);
+  assert.match(routesSource, /Restrict the \/model picker to this route's models/);
+  assert.match(routesSource, /availableModels/);
+  assert.match(routesSource, /enforceAvailableModels/);
+});
+
+test("auto-compact window is optional via an enable checkbox", () => {
+  assert.match(routesSource, /claudeRouteCompactOn/);
+  assert.match(routesSource, /autoCompactWindow: compactOn \? Number\(dialog\.querySelector\("#claudeRouteCompact"\)\.value\) : null/);
+  assert.match(routesSource, /compactInput\.disabled = !compactOn\.checked/);
+});
+
+test("main model ID is optional when role models are assigned", () => {
+  assert.doesNotMatch(routesSource, /id="claudeRouteModel"[^>]*required/);
+  assert.match(routesSource, /derived from your Sonnet role/);
+  assert.match(routesSource, /route\.effectiveModel \|\| route\.model/);
+  assert.match(routesSource, /from roles/);
+});
+
+test("values reader collects non-empty model roles into the payload", () => {
+  assert.match(routesSource, /roles\[input\.dataset\.roleModel\] = value/);
+  assert.match(routesSource, /modelRoles: roles/);
+  assert.match(routesSource, /restrictModelPicker: dialog\.querySelector\("#claudeRouteRestrict"\)\.checked/);
+});
+
+test("details view renders assigned roles and picker state", () => {
+  const withRoles = { ...route, modelRoles: { opus: "gateway/role-opus", haiku: "gateway/role-haiku" }, restrictModelPicker: true };
+  const source = routesSource;
+  assert.match(source, /role\[0\]\.toUpperCase\(\) \+ role\.slice\(1\)/);
+  assert.match(source, /Picker \$\{route\.restrictModelPicker === false \? "unrestricted" : "restricted to route models"\}/);
+});

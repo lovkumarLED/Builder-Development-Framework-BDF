@@ -6,6 +6,13 @@
     "auth": { "apiKeySecretRef": "BDF_CLAUDE_GATE2_API_KEY" }
   },
   "model": { "value": "gateway/native-model-id", "source": "environment" },
+  "modelRoles": {
+    "opus": "gateway/role-opus",
+    "sonnet": "gateway/role-sonnet",
+    "haiku": "gateway/role-haiku",
+    "fable": "gateway/role-fable"
+  },
+  "restrictModelPicker": true,
   "envPolicy": {
     "gatewayDiscovery": true,
     "disableExperimentalBetas": true,

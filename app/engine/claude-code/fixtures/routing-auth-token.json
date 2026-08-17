@@ -6,6 +6,8 @@
     "auth": { "authTokenSecretRef": "BDF_CLAUDE_GATE2_AUTH_TOKEN" }
   },
   "model": { "value": "gateway/opaque-token-model", "source": "environment" },
+  "modelRoles": {},
+  "restrictModelPicker": false,
   "envPolicy": {
     "gatewayDiscovery": false,
     "disableExperimentalBetas": false,

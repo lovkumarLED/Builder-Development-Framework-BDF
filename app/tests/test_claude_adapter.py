@@ -299,6 +299,79 @@ class FingerprintTests(ClaudeAdapterBase):
         self.assertNotEqual(store_after["appliedRouteConfigSha256"], claude_adapter._fingerprint(edited["route"]))
 
 
+class ModelRolesTests(ClaudeAdapterBase):
+    def _roles(self, model="main/model", **roles):
+        return claude_adapter.RouteCreateBody(
+            name="Roles", baseUrl="https://api.example.test/v1", authKind="apiKey",
+            secretEnvRef="BDF_GATE4A_API_KEY_REF", model=model,
+            gatewayDiscovery=False, disableExperimentalBetas=False,
+            autoCompactWindow=None, disableNonessentialTraffic=False,
+            modelRoles=roles, restrictModelPicker=True)
+
+    def test_create_with_model_roles_round_trips(self):
+        route = claude_adapter.claude_route_create(self._roles(opus="gateway/role-opus", haiku="gateway/role-haiku"))["route"]
+        self.assertEqual(route["modelRoles"], {"opus": "gateway/role-opus", "haiku": "gateway/role-haiku"})
+        self.assertTrue(route["restrictModelPicker"])
+
+    def test_create_without_roles_defaults_empty_and_restrict_on(self):
+        route = self.create_route()
+        self.assertEqual(route.get("modelRoles") or {}, {})
+        self.assertTrue(route.get("restrictModelPicker", True))
+
+    def test_unknown_role_rejected(self):
+        with self.assertRaises(HTTPException) as ctx:
+            claude_adapter.claude_route_create(self._roles(extrasmart="gateway/x"))
+        self.assertEqual(ctx.exception.status_code, 400)
+
+    def test_empty_role_value_dropped(self):
+        route = claude_adapter.claude_route_create(self._roles(opus="  ", haiku="gateway/h"))["route"]
+        self.assertEqual(route["modelRoles"], {"haiku": "gateway/h"})
+
+    def test_auto_compact_optional(self):
+        route = claude_adapter.claude_route_create(self._roles())["route"]
+        self.assertIsNone(route["autoCompactWindow"])
+        self.assertNotIn("autoCompactWindow", claude_adapter._routing_profile(route)["envPolicy"])
+
+    def test_routing_profile_includes_roles_and_allowlist(self):
+        route = claude_adapter.claude_route_create(self._roles(opus="gateway/o", fable="gateway/f"))["route"]
+        profile = claude_adapter._routing_profile(route)
+        self.assertEqual(profile["modelRoles"], {"opus": "gateway/o", "fable": "gateway/f"})
+        self.assertTrue(profile["restrictModelPicker"])
+        self.assertNotIn("autoCompactWindow", profile["envPolicy"])
+
+    def test_fingerprint_sensitive_to_roles_and_allowlist(self):
+        base = claude_adapter.claude_route_create(self._roles(haiku="gateway/h"))["route"]
+        fp = claude_adapter._fingerprint(base)
+        self.assertNotEqual(claude_adapter._fingerprint(dict(base, modelRoles={**base["modelRoles"], "opus": "gateway/o"})), fp)
+        self.assertNotEqual(claude_adapter._fingerprint(dict(base, restrictModelPicker=False)), fp)
+        self.assertEqual(claude_adapter._fingerprint(dict(base, name="Renamed")), fp)
+
+    def test_existing_route_without_roles_backward_compatible(self):
+        route = self.create_route()
+        self.assertEqual(claude_adapter._routing_profile(route)["modelRoles"], {})
+        self.assertIn("restrictModelPicker", claude_adapter._routing_profile(route))
+
+    def test_main_model_optional_when_roles_assigned(self):
+        route = claude_adapter.claude_route_create(self._roles(sonnet="gateway/s", haiku="gateway/h", model=""))["route"]
+        self.assertEqual(route["model"], "")
+
+    def test_main_model_and_roles_both_absent_rejected(self):
+        with self.assertRaises(HTTPException) as ctx:
+            claude_adapter.claude_route_create(self._roles(model=""))
+        self.assertEqual(ctx.exception.status_code, 400)
+        self.assertIn("Add a model ID or assign at least one role model", str(ctx.exception.detail))
+
+    def test_effective_model_derives_from_sonnet_when_main_blank(self):
+        route = claude_adapter.claude_route_create(self._roles(sonnet="gateway/s", haiku="gateway/h", model=""))["route"]
+        self.assertEqual(claude_adapter._effective_model(route), "gateway/s")
+        self.assertEqual(claude_adapter._routing_profile(route)["model"]["value"], "gateway/s")
+
+    def test_effective_model_precedence_sonnet_haiku_opus_fable(self):
+        route = claude_adapter.claude_route_create(self._roles(haiku="gateway/h", opus="gateway/o", fable="gateway/f", model=""))["route"]
+        self.assertEqual(claude_adapter._effective_model(route), "gateway/h")
+        self.assertIn("effectiveModel", claude_adapter.claude_routes()["routes"][0])
+
+
 class ApplyRestoreTests(ClaudeAdapterBase):
     def test_apply_stale_revisions_409(self):
         route = self.create_route()
@@ -338,7 +411,7 @@ class ApplyRestoreTests(ClaudeAdapterBase):
         entry = manifest[0]
         for field in ("backupName", "backupSha256", "preWriteTargetSha256", "postWriteTargetSha256", "targetBindingSha256", "appliedRouteId", "appliedRouteConfigSha256", "previousAppliedRouteId", "previousAppliedRouteConfigSha256", "previousStorePresent", "previousStoreBackupName", "previousStoreSha256", "createdAt", "coreVersion", "schemaIdentity"):
             self.assertIn(field, entry)
-        self.assertEqual(entry["coreVersion"], "0.2.0")
+        self.assertEqual(entry["coreVersion"], "0.3.0")
         self.assertEqual(entry["schemaIdentity"], claude_adapter._sha256_file(claude_adapter.CLAUDE_SCHEMA))
         self.assertIn("route_applied", self.activity_types())
 
@@ -698,7 +771,7 @@ class StaticSafetyTests(ClaudeAdapterBase):
         claude_adapter.claude_route_apply(route["id"], claude_adapter.RouteApplyBody(
             expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
         entry = self.manifest()[0]
-        self.assertEqual(entry["coreVersion"], "0.2.0")
+        self.assertEqual(entry["coreVersion"], "0.3.0")
         self.assertEqual(entry["schemaIdentity"], claude_adapter._sha256_file(claude_adapter.CLAUDE_SCHEMA))
 
 
@@ -1196,6 +1269,39 @@ class EnvVarLifecycleTests(ClaudeAdapterBase):
         edited = claude_adapter.claude_route_edit(route["id"], self.edit_body(ref="BDF_GATE4A_TOKEN_REF", secret_value=""))["route"]
         claude_adapter.claude_envvars.delete_user_env.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
         self.assertFalse(edited["envVarManaged"])
+
+    def test_apply_ensures_credential_in_process_env(self):
+        route = claude_adapter.claude_route_create(self.create_body(secret_value=""))["route"]
+        rev = claude_adapter.claude_routes()["routesRevision"]
+        with patch.object(claude_adapter.claude_envvars, "ensure_process_env") as ensure:
+            claude_adapter.claude_route_apply(route["id"], claude_adapter.RouteApplyBody(
+                expectedRevision=claude_adapter._target_revision(self.profile_root), expectedRoutesRevision=rev))
+        ensure.assert_called_once_with("BDF_GATE4A_API_KEY_REF")
+
+
+class EnsureProcessEnvTests(unittest.TestCase):
+    def test_missing_from_process_resolves_from_user_scope(self):
+        with patch.object(claude_adapter.claude_envvars, "user_env_get", return_value="sk-registry-value") as getter, \
+             patch.dict(os.environ, {}, clear=False):
+            claude_adapter.claude_envvars.os.environ.pop("RELOAD_ME_VAR", None)
+            value = claude_adapter.claude_envvars.ensure_process_env("RELOAD_ME_VAR")
+            self.assertEqual(claude_adapter.claude_envvars.os.environ.get("RELOAD_ME_VAR"), "sk-registry-value")
+        getter.assert_called_once_with("RELOAD_ME_VAR")
+        self.assertEqual(value, "sk-registry-value")
+
+    def test_present_in_process_never_queries_registry(self):
+        with patch.object(claude_adapter.claude_envvars, "user_env_get") as getter, \
+             patch.dict(os.environ, {"ALREADY_SET_VAR": "sk-existing"}, clear=False):
+            value = claude_adapter.claude_envvars.ensure_process_env("ALREADY_SET_VAR")
+        getter.assert_not_called()
+        self.assertEqual(value, "sk-existing")
+
+    def test_absent_from_both_returns_none(self):
+        with patch.object(claude_adapter.claude_envvars, "user_env_get", return_value=None), \
+             patch.dict(os.environ, {}, clear=False):
+            claude_adapter.claude_envvars.os.environ.pop("MISSING_BOTH_VAR", None)
+            value = claude_adapter.claude_envvars.ensure_process_env("MISSING_BOTH_VAR")
+        self.assertIsNone(value)
 
 
 class HttpHostOriginTests(ClaudeAdapterBase):

@@ -41,6 +41,33 @@ def user_env_exists(name):
         return False
 
 
+def user_env_get(name):
+    """Read the value of a user-scope registry environment variable, or None
+    when it is absent. Used to reload app-managed credentials into a server
+    process that restarted after the variable was created."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, _ENV_KEY) as key:
+            value, _ = winreg.QueryValueEx(key, name)
+        if isinstance(value, bytes):
+            value = value.decode("utf-8", errors="replace")
+        return value if isinstance(value, str) else None
+    except OSError:
+        return None
+
+
+def ensure_process_env(name):
+    """Ensure the named credential resolves in the current process environment
+    so the production builder child can find it. When a restarted server no
+    longer inherits an app-managed variable, resolve it from the user-scope
+    registry into os.environ (the registry is the app's persistent store)."""
+    if not name or name in os.environ:
+        return os.environ.get(name)
+    value = user_env_get(name)
+    if value is not None:
+        os.environ[name] = value
+    return os.environ.get(name)
+
+
 def set_user_env(name, value):
     """Persist the variable in the user-scope registry environment and apply
     it to the current process immediately."""

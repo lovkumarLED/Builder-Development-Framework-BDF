@@ -270,7 +270,7 @@ Run-Test "G2-7 top-level model corruption detected" { $root=New-TestRoot; try {
     $mutant=New-MutantWrapper $root "model-mutant-builder.ps1"
     $mutantCore=Join-Path $root "claude-routing-core.psm1"
     $source=[IO.File]::ReadAllText($CorePath)
-    $needle='$newText=Apply-SettingsTextEdits -Raw $settingsDoc.RawText -Edits $edits'
+    $needle='$newText=Apply-SettingsTextEdits -Raw $settingsDoc.RawText -Edits $allEdits'
     $injection='`r`n        `$newText=`$newText.Replace([char]34+''old/model''+[char]34,[char]34+''hacked-model''+[char]34)'
     $replacement=$needle+$injection
     Assert-True ($source.Contains($needle)) "model seam absent"
@@ -289,7 +289,7 @@ Run-Test "G2-7 unmanaged-byte corruption detected" { $root=New-TestRoot; try {
     $mutant=New-MutantWrapper $root "unmanaged-mutant-builder.ps1"
     $mutantCore=Join-Path $root "claude-routing-core.psm1"
     $source=[IO.File]::ReadAllText($CorePath)
-    $needle='$newText=Apply-SettingsTextEdits -Raw $settingsDoc.RawText -Edits $edits'
+    $needle='$newText=Apply-SettingsTextEdits -Raw $settingsDoc.RawText -Edits $allEdits'
     $injection='`r`n        `$newText=`$newText.Replace(''preserve-me'',''corrupted'')'
     $replacement=$needle+$injection
     Assert-True ($source.Contains($needle)) "unmanaged seam absent"
@@ -301,6 +301,77 @@ Run-Test "G2-7 unmanaged-byte corruption detected" { $root=New-TestRoot; try {
     Assert-True ((Get-Hash $target)-eq $before) "unmanaged corruption replaced target"
     $o=Get-Content $target -Raw|ConvertFrom-Json
     Assert-True ($o.env.UNKNOWN_TEXT-eq "preserve-me") "unmanaged value changed after recovery"
+}finally{Remove-TestRoot $root} }
+
+Run-Test "G2-8 tier models applied" { $root=New-TestRoot; try {
+    Initialize-Root $root
+    $r=Invoke-Builder $root
+    Assert-True ($r.Code-eq 0) "build failed"
+    Assert-RawManaged $root -Values @{"ANTHROPIC_DEFAULT_OPUS_MODEL"="gateway/role-opus";"ANTHROPIC_DEFAULT_SONNET_MODEL"="gateway/role-sonnet";"ANTHROPIC_DEFAULT_HAIKU_MODEL"="gateway/role-haiku";"ANTHROPIC_DEFAULT_FABLE_MODEL"="gateway/role-fable"}
+}finally{Remove-TestRoot $root} }
+
+Run-Test "G2-8 stale tier models removed" { $root=New-TestRoot; try {
+    $raw='{ "model": "old/model", "env": { "ANTHROPIC_BASE_URL": "http://old.invalid/v1", "ANTHROPIC_DEFAULT_OPUS_MODEL": "stale/opus", "ANTHROPIC_DEFAULT_SONNET_MODEL": "stale/sonnet", "ANTHROPIC_DEFAULT_HAIKU_MODEL": "stale/haiku", "ANTHROPIC_DEFAULT_FABLE_MODEL": "stale/fable" } }'
+    Initialize-RawRoot $root $raw "routing-auth-token.json"
+    $r=Invoke-Builder $root
+    Assert-True ($r.Code-eq 0) "build failed"
+    Assert-RawManaged $root -Absent @("ANTHROPIC_DEFAULT_OPUS_MODEL","ANTHROPIC_DEFAULT_SONNET_MODEL","ANTHROPIC_DEFAULT_HAIKU_MODEL","ANTHROPIC_DEFAULT_FABLE_MODEL")
+}finally{Remove-TestRoot $root} }
+
+Run-Test "G2-8 allowlist written" { $root=New-TestRoot; try {
+    Initialize-Root $root
+    $r=Invoke-Builder $root
+    Assert-True ($r.Code-eq 0) "build failed"
+    $o=Get-Content (Join-Path $root "settings.json") -Raw|ConvertFrom-Json
+    Assert-True ($o.enforceAvailableModels-eq $true) "enforce missing"
+    Assert-True ((@($o.availableModels)-join '|')-eq "gateway/native-model-id|gateway/role-opus|gateway/role-sonnet|gateway/role-haiku|gateway/role-fable") "allowlist mismatch"
+}finally{Remove-TestRoot $root} }
+
+Run-Test "G2-8 allowlist removed when off" { $root=New-TestRoot; try {
+    $raw='{ "model": "old/model", "availableModels": [ "old/a", "old/b" ], "enforceAvailableModels": true, "env": { "ANTHROPIC_BASE_URL": "http://old.invalid/v1" } }'
+    Initialize-RawRoot $root $raw "routing-auth-token.json"
+    $r=Invoke-Builder $root
+    Assert-True ($r.Code-eq 0) "build failed"
+    $o=Get-Content (Join-Path $root "settings.json") -Raw|ConvertFrom-Json
+    Assert-True ($null-eq $o.PSObject.Properties["availableModels"]) "allowlist survived"
+    Assert-True ($null-eq $o.PSObject.Properties["enforceAvailableModels"]) "enforce survived"
+}finally{Remove-TestRoot $root} }
+
+Run-Test "G2-8 allowlist deduplicated" { $root=New-TestRoot; try {
+    Initialize-Root $root
+    Set-Route $root { $args[0].modelRoles.opus=$args[0].model.value }
+    $r=Invoke-Builder $root
+    Assert-True ($r.Code-eq 0) "build failed"
+    $o=Get-Content (Join-Path $root "settings.json") -Raw|ConvertFrom-Json
+    Assert-True ((@($o.availableModels)-join '|')-eq "gateway/native-model-id|gateway/role-sonnet|gateway/role-haiku|gateway/role-fable") "dedup mismatch"
+}finally{Remove-TestRoot $root} }
+
+Run-Test "G2-8 auto-compact optional removed" { $root=New-TestRoot; try {
+    Initialize-Root $root "settings-preservation.json" "routing-auth-token.json"
+    Set-Route $root { $args[0].envPolicy.PSObject.Properties.Remove("autoCompactWindow") }
+    $r=Invoke-Builder $root
+    Assert-True ($r.Code-eq 0) "build failed"
+    Assert-RawManaged $root -Absent @("CLAUDE_CODE_AUTO_COMPACT_WINDOW")
+}finally{Remove-TestRoot $root} }
+
+Run-Test "G2-8 unknown role rejected" { $root=New-TestRoot; try {
+    Initialize-Root $root
+    Set-Route $root { $args[0].modelRoles|Add-Member extrasmart "gateway/extra" }
+    $r=Invoke-Builder $root
+    Assert-True ($r.Code-ne 0) "unknown role accepted"
+    Assert-True ($r.Output-match "VALIDATION") "stage absent"
+}finally{Remove-TestRoot $root} }
+
+Run-Test "G2-8 allowlist surgical preserve" { $root=New-TestRoot; try {
+    $raw='{ "model": "old/model", "theme": { "x": 1 }, "env": { "ANTHROPIC_BASE_URL": "http://old.invalid/v1" } }'
+    Initialize-RawRoot $root $raw
+    $r=Invoke-Builder $root
+    Assert-True ($r.Code-eq 0) "build failed"
+    $out=Get-Content (Join-Path $root "settings.json") -Raw
+    Assert-True ($out.Contains('"theme": { "x": 1 }')) "unmanaged root bytes changed"
+    Assert-True ($out.Contains('"availableModels"')) "allowlist missing"
+    Assert-True ($out -match '"enforceAvailableModels"\s*:\s*true') "enforce missing"
+    Assert-True ($out.IndexOf('"theme"')-lt $out.IndexOf('"availableModels"')) "root order changed"
 }finally{Remove-TestRoot $root} }
 
 Run-Test "G2-7 no full-document serializer" { $source=[IO.File]::ReadAllText($CorePath)

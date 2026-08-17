@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema#",
   "title": "Claude Code Fixture Routing Profile",
   "type": "object",
-  "required": ["target", "scope", "endpoint", "model", "envPolicy"],
+  "required": ["target", "scope", "endpoint", "model", "envPolicy", "modelRoles", "restrictModelPicker"],
   "properties": {
     "target": { "type": "string" },
     "scope": { "type": "string" },
@@ -31,9 +31,20 @@
       },
       "additionalProperties": false
     },
+    "modelRoles": {
+      "type": "object",
+      "properties": {
+        "opus": { "type": "string", "minLength": 1 },
+        "sonnet": { "type": "string", "minLength": 1 },
+        "haiku": { "type": "string", "minLength": 1 },
+        "fable": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "restrictModelPicker": { "type": "boolean" },
     "envPolicy": {
       "type": "object",
-      "required": ["gatewayDiscovery", "disableExperimentalBetas", "autoCompactWindow", "disableNonessentialTraffic"],
+      "required": ["gatewayDiscovery", "disableExperimentalBetas", "disableNonessentialTraffic"],
       "properties": {
         "gatewayDiscovery": { "type": "boolean" },
         "disableExperimentalBetas": { "type": "boolean" },
