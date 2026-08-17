@@ -457,6 +457,7 @@ function Assert-InputFilesExist {
         if (Test-Path $ModelsFile)  { $RequiredSchemas += (Join-Path $SchemaDir "models.schema.json") }
         if (Test-Path $PluginsFile) { $RequiredSchemas += (Join-Path $SchemaDir "plugins.schema.json") }
         if (Test-Path $McpFile)     { $RequiredSchemas += (Join-Path $SchemaDir "mcp.schema.json") }
+        if (Test-Path $LspFile)     { $RequiredSchemas += (Join-Path $SchemaDir "lsp.schema.json") }
         if (Test-Path $TargetFile)  { $RequiredSchemas += (Join-Path $SchemaDir "targets.schema.json") }
 
         foreach ($SchemaFile in $RequiredSchemas) {
@@ -480,6 +481,7 @@ function Get-CurrentSources {
     if (Test-Path $ModelsFile)  { [void]$Sources.Add(@{ File = $ModelsFile;  Schema = "models.schema.json";  Required = $false }) }
     if (Test-Path $PluginsFile) { [void]$Sources.Add(@{ File = $PluginsFile; Schema = "plugins.schema.json"; Required = $false }) }
     if (Test-Path $McpFile)     { [void]$Sources.Add(@{ File = $McpFile;     Schema = "mcp.schema.json";     Required = $false }) }
+    if (Test-Path $LspFile)     { [void]$Sources.Add(@{ File = $LspFile;     Schema = "lsp.schema.json";     Required = $false }) }
     if (Test-Path $TargetFile)  { [void]$Sources.Add(@{ File = $TargetFile;  Schema = "targets.schema.json"; Required = $false }) }
 
     foreach ($ProviderName in $ActiveProviders) {
@@ -1289,21 +1291,41 @@ function Merge-Mcp {
     return $null
 }
 
+function Merge-Lsp {
+
+    param(
+        [object]$Lsp
+    )
+
+    if ($null -eq $Lsp) { return $null }
+
+    if ($Lsp.enabled) {
+
+        if ($null -ne $Lsp.lsp) { return $Lsp.lsp }
+
+        return $true
+    }
+
+    return $false
+}
+
 function Merge-Final {
 
     param(
         [object]$Settings,
         [object]$ProviderRoot,
         [object]$Plugins,
-        [object]$MCP
+        [object]$MCP,
+        [object]$Lsp
     )
 
     $Final = Merge-Settings $Settings
 
     $Final.provider = $ProviderRoot
 
-    if ($Plugins) { $Final.plugin = $Plugins }
-    if ($MCP)     { $Final.mcp     = $MCP }
+    if ($Plugins)     { $Final.plugin = $Plugins }
+    if ($null -ne $Lsp) { $Final.lsp   = $Lsp }
+    if ($MCP)         { $Final.mcp     = $MCP }
 
     return $Final
 }
@@ -1416,7 +1438,8 @@ function Verify-FinalOutput {
         [object]$Settings,
         [object]$ExpectedModels,
         [object]$Plugins,
-        [object]$MCP
+        [object]$MCP,
+        [object]$Lsp
     )
 
     Verify-Json $Final
@@ -1424,6 +1447,11 @@ function Verify-FinalOutput {
     Verify-Models $Final $ExpectedModels
     Verify-Plugins $Final $Plugins
     Verify-Mcp $Final $MCP
+
+    if ($Lsp -and $Lsp.enabled -and $Lsp.lsp -and -not $Final.lsp) {
+
+        throw "Verification failed: lsp section is missing from the generated configuration."
+    }
 
     Write-Success "Generated configuration verified."
 }
@@ -1667,6 +1695,12 @@ function Compare-BackupDiff {
     foreach ($Id in ($PriorPlugins | Sort-Object)) {
 
         if ($CurrentPlugins -notcontains $Id) { [void]$Lines.Add("Removed plugin: $Id") }
+    }
+
+    $CurrentLspEnabled = @(Get-ObjectKeys $Final) -contains "lsp"
+    $PriorLspEnabled   = @(Get-ObjectKeys $Prior) -contains "lsp"
+    if ($CurrentLspEnabled -ne $PriorLspEnabled) {
+        [void]$Lines.Add("$(if ($CurrentLspEnabled) { "Added" } else { "Removed" }) LSP servers")
     }
 
     if ($Lines.Count -eq 0) {
@@ -2042,6 +2076,7 @@ $SettingsFile = Join-Path $ProfilePath "settings.json"
 $ModelsFile   = Join-Path $ProfilePath "models.json"
 $PluginsFile  = Join-Path $ProfilePath "plugins.json"
 $McpFile      = Join-Path $ProfilePath "mcp.json"
+$LspFile      = Join-Path $ProfilePath "lsp.json"
 
 if ($Doctor) {
 
@@ -2076,6 +2111,13 @@ $Settings = Load-Json $SettingsFile
 $Models   = Load-OptionalJson $ModelsFile
 $Plugins  = Load-OptionalJson $PluginsFile
 $MCP      = Load-OptionalJson $McpFile
+
+$LspFile = Join-Path $ProfilePath "lsp.json"
+$Lsp = $null
+if (Test-Path $LspFile) {
+    Assert-NoDuplicateKeys $LspFile "lsp"
+    $Lsp = Load-Json $LspFile
+}
 
 Write-Success "settings.json"
 
@@ -2238,6 +2280,29 @@ else {
     Write-Detail "No plugins to merge."
 }
 
+if ($Lsp) {
+    Write-Step "LSP..."
+    if (-not $NonInteractive) {
+        $Prompt = "LSP servers: [1] enabled  [2] disabled  (Enter keeps current)"
+        $Answer = Read-Host $Prompt
+        if ($Answer -eq "1") { $Lsp.enabled = $true }
+        elseif ($Answer -eq "2") { $Lsp.enabled = $false }
+        if ($Answer -eq "1" -or $Answer -eq "2") {
+            if (-not $WhatIf) {
+                if (!(Test-Path $BackupDir)) { New-Item -ItemType Directory -Path $BackupDir | Out-Null }
+                $Time = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+                Copy-Item $LspFile (Join-Path $BackupDir "lsp_$Time.json")
+                $LspJson = @{ lsp = $Lsp.lsp; enabled = $Lsp.enabled } | ConvertTo-Json -Depth 10
+                [System.IO.File]::WriteAllText($LspFile, $LspJson, (New-Object System.Text.UTF8Encoding($false)))
+                Write-Success "lsp.json updated (enabled: $($Lsp.enabled))"
+            }
+        }
+    }
+    Write-Success "lsp $((Merge-Lsp $Lsp))"
+} else {
+    Write-Detail "No lsp.json - lsp section will be skipped"
+}
+
 Write-Step "Merging mcp..."
 
 $McpList = Merge-Mcp $MCP
@@ -2253,7 +2318,8 @@ else {
 
 Write-Step "Generating final configuration..."
 
-$Final = Merge-Final $Settings $ProviderRoot $PluginList $McpList
+$LspList = Merge-Lsp $Lsp
+$Final = Merge-Final $Settings $ProviderRoot $PluginList $McpList $LspList
 
 Write-Success "Configuration merged."
 
@@ -2263,7 +2329,7 @@ Write-Success "Configuration merged."
 
 Write-Step "Verifying generated configuration..."
 
-Verify-FinalOutput $Final $Settings $ExpectedModels $Plugins $MCP
+Verify-FinalOutput $Final $Settings $ExpectedModels $Plugins $MCP $Lsp
 
 if ($WhatIf) {
 

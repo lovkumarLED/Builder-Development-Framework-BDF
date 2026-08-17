@@ -18,6 +18,7 @@ from app.claude_adapter import router as claude_router
 from app.discovery import router as discovery_router
 from app.engine import router as engine_router
 from app.mcp import router as mcp_router
+from app.lsp import router as lsp_router
 from app.plugins import router as plugins_router
 from app.preferences import router as preferences_router
 from app.profiles import router as profiles_router
@@ -58,6 +59,7 @@ app.include_router(engine_router)
 app.include_router(testing_router)
 app.include_router(plugins_router)
 app.include_router(mcp_router)
+app.include_router(lsp_router)
 app.include_router(preferences_router)
 app.include_router(profiles_router)
 app.include_router(activity_router)

@@ -440,6 +440,32 @@ def write_mcp(agent_dir, name, config, profile=MODEL_PROFILE):
     return mcps
 
 
+def lsp_file(agent_dir, profile=MODEL_PROFILE):
+    return agent_dir / "profiles" / profile / "lsp.json"
+
+
+def read_lsp(agent_dir, profile=MODEL_PROFILE):
+    data = _read_json(lsp_file(agent_dir, profile), {})
+    value = data.get("lsp", True)
+    enabled = data.get("enabled", False)
+    if not isinstance(value, (bool, dict)):
+        value = True
+    return {"lsp": value, "enabled": bool(enabled)}
+
+
+def write_lsp(agent_dir, value, enabled, profile=MODEL_PROFILE):
+    path = lsp_file(agent_dir, profile)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = _read_json(path, {})
+    _backup(path)
+    if not isinstance(value, (bool, dict)):
+        raise ValueError("lsp must be a boolean or an object.")
+    data["lsp"] = value
+    data["enabled"] = bool(enabled)
+    _write_json(path, data)
+    return read_lsp(agent_dir, profile)
+
+
 def remove_mcp(agent_dir, name, profile=MODEL_PROFILE):
     path = mcp_file(agent_dir, profile)
     data = _read_json(path, {})

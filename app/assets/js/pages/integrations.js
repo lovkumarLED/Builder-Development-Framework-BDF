@@ -1,5 +1,5 @@
 import { api, optional } from "../core/api.js";
-import { confirmAction, notify, openDialog } from "../core/dialog.js";
+import { confirmAction, escapeHtml, notify, openDialog } from "../core/dialog.js";
 import { integrationWorkspaceMarkup } from "./integration-workspace.js";
 
 function openPluginDialog(trigger, onSaved) {
@@ -52,22 +52,46 @@ function openMcpDialog(trigger, onSaved) {
   });
 }
 
+function openLspJsonDialog(lsp, onSaved) {
+  const content = `<form id="lspForm" class="stack"><div class="field"><label for="lspJson">LSP configuration</label><textarea id="lspJson">${escapeHtml(JSON.stringify(lsp.lsp, null, 2))}</textarea><p class="field-note">Use <code>true</code> for built-in servers or a JSON object mapping server names to configurations.</p></div><p id="lspMessage" class="field-error" role="alert"></p></form>`;
+  const { dialog, close } = openDialog({ title: "Edit LSP configuration", content, actions: `<button class="button button--quiet" type="button" data-dialog-close>Cancel</button><button class="button button--primary" type="submit" form="lspForm">Save configuration</button>` });
+  dialog.querySelector("#lspForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const message = dialog.querySelector("#lspMessage");
+    let parsed;
+    try { parsed = JSON.parse(dialog.querySelector("#lspJson").value); }
+    catch (error) { message.textContent = "LSP configuration must be valid JSON."; return; }
+    if (typeof parsed !== "boolean" && (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))) { message.textContent = "LSP value must be true, false, or a JSON object."; return; }
+    try { await api.setLsp(parsed, lsp.enabled); close(); notify("LSP configuration saved.", "success"); onSaved(); }
+    catch (error) { message.textContent = error.message; }
+  });
+}
+
 export async function renderIntegrations(workspace) {
   workspace.innerHTML = `<section class="integration-workspace"><div class="card card--padded skeleton"></div><div class="card card--padded skeleton"></div></section>`;
-  const [pluginData, mcpData, providerData, statusData] = await Promise.all([
+  const [pluginData, mcpData, providerData, statusData, lspData] = await Promise.all([
     optional(() => api.plugins(), { plugins: [] }), optional(() => api.mcp(), { mcps: {} }),
     optional(() => api.providers(), { providers: [], activeProvider: null }), optional(() => api.status(), { agent: null }),
+    optional(() => api.lsp(), { lsp: false, enabled: false }),
   ]);
   const plugins = pluginData.plugins || [];
   const mcps = mcpData.mcps || {};
   const providers = (providerData.providers || []).filter(provider => !provider.suggested);
   const names = { opencode: "OpenCode", kilo: "KiloCode", kilocode: "KiloCode", claude: "ClaudeCode", claudecode: "ClaudeCode" };
   const agentName = names[String(statusData.agent || "").toLowerCase()] || statusData.agent || "your agent";
-  workspace.innerHTML = integrationWorkspaceMarkup({ plugins, mcps, providers, agentName });
+  const configNames = { opencode: "opencode.json", kilo: "kilo.json", kilocode: "kilo.json", claude: "settings.json", claudecode: "settings.json" };
+  const configName = configNames[String(statusData.agent || "").toLowerCase()] || "config.json";
+  const currentLsp = lspData;
+  workspace.innerHTML = integrationWorkspaceMarkup({ plugins, mcps, providers, agentName, lsp: currentLsp, configName });
 
   const refresh = () => renderIntegrations(workspace);
   workspace.querySelector("#addPlugin").addEventListener("click", event => openPluginDialog(event.currentTarget, refresh));
   workspace.querySelector("#addMcp").addEventListener("click", event => openMcpDialog(event.currentTarget, refresh));
+  workspace.querySelector("#lspToggle").addEventListener("change", async event => {
+    try { await api.setLsp(currentLsp.lsp, event.target.checked); notify(`LSP ${event.target.checked ? "enabled" : "disabled"} for the next build.`, "success"); refresh(); }
+    catch (error) { notify(error.message, "error"); event.target.checked = !event.target.checked; }
+  });
+  workspace.querySelector("#editLspJson").addEventListener("click", event => openLspJsonDialog(currentLsp, refresh));
   workspace.querySelectorAll("[data-remove-plugin]").forEach(button => button.addEventListener("click", async () => {
     if (!await confirmAction({ title: "Remove plugin identifier?", message: "This removes the identifier from the active profile after keeping a backup.", confirmLabel: "Remove", danger: true, trigger: button })) return;
     try { await api.removePlugin(button.dataset.removePlugin); notify("Plugin identifier removed.", "success"); refresh(); } catch (error) { notify(error.message, "error"); }

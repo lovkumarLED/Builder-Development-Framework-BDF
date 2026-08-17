@@ -20,6 +20,21 @@ function mcpRows(mcps) {
   return `<div class="integration-table" role="table" aria-label="MCP servers"><div class="integration-table-head" role="row"><span>Name</span><span>Status</span><span>Type</span><span></span></div>${entries.map(([name, config]) => `<div class="integration-table-row" role="row"><strong>${escapeHtml(name)}</strong><span>Configured</span><span>${escapeHtml(config?.type === "remote" ? "Remote" : "Local")}</span><span class="integration-row-actions"><button class="integration-icon-button" type="button" aria-label="More options for ${escapeHtml(name)}">${icon.more}</button><button class="integration-icon-button" type="button" data-remove-mcp="${escapeHtml(name)}" aria-label="Remove ${escapeHtml(name)}">${icon.trash}</button></span></div>`).join("")}</div>`;
 }
 
+function lspRows(lsp, configName) {
+  if (!lsp.enabled) return `<div class="integration-empty"><strong>LSP is off</strong><span>${escapeHtml(configName)} will carry "lsp": false. Turn the toggle on to include language servers.</span></div>`;
+  if (typeof lsp.lsp === "object" && lsp.lsp !== null) {
+    const names = Object.keys(lsp.lsp);
+    if (!names.length) return `<div class="integration-empty"><strong>No LSP servers configured</strong><span>Add a server with the expert JSON editor or set LSP to true for built-ins.</span></div>`;
+    return `<div class="integration-chips">${names.map(name => `<span class="integration-chip">${escapeHtml(name)}</span>`).join("")}</div>`;
+  }
+  if (lsp.lsp === false) return `<div class="integration-empty"><strong>LSP disabled</strong><span>${escapeHtml(configName)} will carry "lsp": false. Set the value to true (built-ins) or an object (custom servers).</span></div>`;
+  return `<div class="integration-empty"><strong>Built-in servers enabled</strong><span>${escapeHtml(configName)} will carry "lsp": true.</span></div>`;
+}
+
+export function lspCard(lsp, configName) {
+  return `<article class="card integration-card integration-lsp"><div class="integration-card-head"><div><h2>LSP servers</h2><p>Controls whether language servers are included when building your agent config.</p></div><button id="editLspJson" class="button integration-outline-button" type="button">Edit JSON</button></div><div class="integration-lsp-toggle"><span class="integration-toggle-label">Include LSP when building</span><label class="integration-toggle"><input id="lspToggle" type="checkbox" ${lsp.enabled ? "checked" : ""}><span class="integration-toggle-track"></span></label></div>${lspRows(lsp, configName)}</article>`;
+}
+
 function providerRows(providers) {
   if (!providers.length) return `<p class="integration-connection" role="status">Provider required</p>`;
   return `<div class="integration-provider-list">${providers.map((provider, index) => `
@@ -30,7 +45,7 @@ function providerRows(providers) {
     </div>`).join("")}</div>`;
 }
 
-export function integrationWorkspaceMarkup({ plugins, mcps, providers, agentName }) {
+export function integrationWorkspaceMarkup({ plugins, mcps, lsp, providers, agentName, configName }) {
   const providerList = providers || [];
   return `<section class="integration-workspace">
     <header class="integration-header"><div><h1 class="page-title">Integrations</h1><p>Add tools and extensions to ${escapeHtml(agentName)}.</p></div><span class="integration-managing">Managing: <strong>${escapeHtml(agentName)}</strong></span></header>
@@ -38,6 +53,7 @@ export function integrationWorkspaceMarkup({ plugins, mcps, providers, agentName
     <div class="integration-columns">
       <div class="integration-column integration-column--main">
         <article class="card integration-card integration-plugins"><div class="integration-card-head"><div><h2>Plugins</h2><p>Extensions your agent loads from its coding profile.</p></div><button id="addPlugin" class="button integration-outline-button" type="button">${icon.plus}Add plugin</button></div>${pluginRows(plugins)}</article>
+        ${lspCard(lsp, configName)}
         <article class="card integration-card integration-mcp"><div class="integration-card-head"><div><h2>MCP servers</h2><p>Tools your agent can use through Model Context Protocol.</p></div><button id="addMcp" class="button integration-outline-button" type="button">${icon.plus}Add MCP server</button></div>${mcpRows(mcps)}</article>
       </div>
       <div class="integration-column integration-column--side">

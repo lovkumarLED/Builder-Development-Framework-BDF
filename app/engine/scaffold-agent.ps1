@@ -220,6 +220,7 @@ $MergedMcp       = [ordered]@{}
 $MergedPlugins   = [System.Collections.Generic.List[string]]::new()
 $MergedProviders = [ordered]@{}   # provider id -> full provider object (incl. models)
 $ProviderSeen    = [System.Collections.Generic.List[string]]::new()
+$MergedLsp       = $true
 
 foreach ($TF in $MainFiles) {
     Write-Host "[*] Scanning main config: $TF"
@@ -233,6 +234,8 @@ foreach ($TF in $MainFiles) {
         foreach ($Seg in $Split) { if ($null -ne $Node) { $Node = $Node.$Seg } }
         foreach ($P in @($Node)) { if ($P) { $MergedPlugins.Add([string]$P) } }
     }
+    # lsp section (boolean true/false or object keyed by server name)
+    if ($Main.PSObject.Properties['lsp']) { $MergedLsp = $Main.lsp }
     # provider section: collect FULL provider objects (name + options + models)
     foreach ($P in @($Main.provider.PSObject.Properties)) {
         if ($P) {
@@ -329,12 +332,15 @@ foreach ($Profile in $Profiles) {
         } else {
             Seed-IfMissing (Join-Path $Dir "plugins.json") "plugins.json" '{ "plugin": [ ] }'
         }
+        $LspJson = @{ lsp = $MergedLsp; enabled = $false } | ConvertTo-Json -Depth 10
+        Seed-IfMissing (Join-Path $Dir "lsp.json") "lsp.json" $LspJson
     }
     else {
         # experimental / minimal: create EMPTY mcp/plugins - NEVER filled by the
         # framework. The user owns the content of these files (V3 rule 6).
         Seed-IfMissing (Join-Path $Dir "mcp.json") "mcp.json" '{ "mcp": { } }'
         Seed-IfMissing (Join-Path $Dir "plugins.json") "plugins.json" '{ "plugin": [ ] }'
+        Seed-IfMissing (Join-Path $Dir "lsp.json") "lsp.json" '{ "lsp": true, "enabled": false }'
     }
     Merge-SettingsSections (Join-Path $Dir "settings.json")
 }

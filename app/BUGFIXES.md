@@ -18,6 +18,27 @@ Copy this block into Entries when a fix lands:
 
 ## Entries
 
+### 2026-08-17 - LSP card status line ignored the toggle state
+
+- **Symptom:** With the LSP toggle OFF, the Integrations page still read "Built-in servers enabled — kilo.json will carry "lsp": true." even though the builder writes `"lsp": false` when the toggle is off. The status line contradicted the actual build output.
+- **Root cause:** `lspRows` described only the stored `lsp` value (`true`/object/false) and never consulted `enabled` — so a disabled toggle with a `true` value displayed "Built-in servers enabled".
+- **Fix:** `lspRows` (integration-workspace.js) now checks `enabled` first: toggle OFF → "LSP is off — <config> will carry "lsp": false."; toggle ON → value-aware copy (built-ins / server chips / disabled). The status line now always matches what the builder will emit.
+- **Verified:** `integrations_visual_contract.test.mjs` renders enabled and disabled states and asserts the copy names the right config file with the right `lsp` value (true when on, false when off); focused suite 5/5; diff check clean.
+
+### 2026-08-17 - LSP toggle OFF removed the lsp key from the generated config
+
+- **Symptom:** With LSP toggled OFF in the app, running the builder produced a main config with **no** `lsp` key at all — the key silently vanished instead of being explicitly `false`. On OpenCode that reads as "no configuration", which is indistinguishable from a broken build to someone scanning the JSON.
+- **Root cause:** The builders' `Merge-Lsp` returned `$null` when `lsp.json` had `enabled: false`, and `Merge-Final` only wrote `$Final.lsp` when the merged value was truthy — so a disabled LSP was dropped from the output entirely.
+- **Fix:** `Merge-Lsp` (build-opencode-v2.7.ps1 + kilo build-kilo-v1.ps1) now returns `$false` when `enabled` is false (and the literal `lsp` value when enabled); `Merge-Final` writes the key whenever the merged value is non-null (`if ($null -ne $Lsp) { $Final.lsp = $Lsp }`). Disabled now emits `"lsp": false`; enabled emits `true`/the object — the key is always present and flips cleanly.
+- **Verified:** Both harnesses green (opencode 40/40, kilo 37/37 — "LSP disabled emits false" + "LSP false value emits false" tests); live through the app: toggle ON → build → `"lsp": true`; toggle OFF → build → `"lsp": false`.
+
+### 2026-08-17 - LSP card always said "opencode.json will carry lsp: true"
+
+- **Symptom:** On the KiloCode agent the Integrations page's LSP block read "opencode.json will carry "lsp": true." — it named the wrong config file for the active agent.
+- **Root cause:** The copy in `lspRows` was a hardcoded string ("opencode.json") that never looked at which agent was active.
+- **Fix:** The active agent's config filename is now passed through the markup: `integrationWorkspaceMarkup({ ..., configName })` → `lspCard(lsp, configName)` → `lspRows(lsp, configName)`. `integrations.js` derives `configName` from the agent id (`opencode.json` / `kilo.json` / `settings.json` for Claude / `config.json` fallback). The LSP block now names the right file per agent.
+- **Verified:** `integrations_visual_contract.test.mjs` renders the markup for both OpenCode and KiloCode and asserts the copy names the correct config file; focused + full frontend suites green; live render verified in Node.
+
 ### 2026-08-16 - Claude route form checkboxes rendered huge
 
 - **Symptom:** Every checkbox in the Add-route dialog (gateway discovery, disable betas, suppress nonessential traffic, confirmation box) rendered as a giant full-width box with an enormous checkmark.

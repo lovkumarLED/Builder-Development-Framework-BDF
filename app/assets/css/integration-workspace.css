@@ -28,6 +28,17 @@
 .integration-table-row strong { color: var(--ink); }
 .integration-empty { display: grid; gap: 4px; min-height: 92px; place-content: center start; padding: 18px; border: 1px dashed var(--border); border-radius: 8px; color: var(--muted); }
 .integration-empty strong { color: var(--ink); }
+.integration-lsp-toggle { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 66px; margin-bottom: 20px; padding: 0 18px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); }
+.integration-toggle-label { color: var(--ink); font-weight: 650; }
+.integration-toggle { position: relative; display: inline-flex; align-items: center; flex: 0 0 auto; cursor: pointer; }
+.integration-toggle input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.integration-toggle-track { display: block; width: 42px; height: 24px; border-radius: 999px; background: #cbc7c5; transition: background 160ms var(--ease-out); }
+.integration-toggle-track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 18%); transition: transform 160ms var(--ease-out); }
+.integration-toggle input:checked + .integration-toggle-track { background: var(--plum); }
+.integration-toggle input:checked + .integration-toggle-track::after { transform: translateX(18px); }
+.integration-toggle input:focus-visible + .integration-toggle-track { outline: 3px solid rgb(119 80 189 / 25%); outline-offset: 2px; }
+.integration-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 18px; border: 1px solid var(--border); border-radius: 8px; }
+.integration-chip { display: inline-flex; align-items: center; min-height: 26px; padding: 0 12px; border: 1px solid #d9caeb; border-radius: 999px; background: var(--surface); color: var(--plum); font-family: var(--mono); font-size: .72rem; font-weight: 600; }
 .integration-provider-name { display: block; margin: 5px 0 17px; font-size: 1.45rem; }
 .integration-label { margin-top: 18px !important; }
 .integration-provider-list { display: grid; gap: 14px; max-height: 320px; margin: 14px 0 4px; overflow-y: auto; padding-right: 2px; scrollbar-width: none; -ms-overflow-style: none; }

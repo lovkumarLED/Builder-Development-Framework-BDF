@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "LSP Configuration",
+  "description": "Modular LSP source for the generated agent config. 'enabled' controls whether the builder emits the top-level 'lsp' key; 'lsp' is the value emitted (boolean or object keyed by server name).",
+  "type": "object",
+  "properties": {
+    "lsp": {
+      "type": ["boolean", "object"],
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "command": { "type": "array", "items": { "type": "string" } },
+          "extensions": { "type": "array", "items": { "type": "string" } },
+          "disabled": { "type": "boolean" },
+          "env": { "type": "object" },
+          "initialization": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "enabled": { "type": "boolean" }
+  },
+  "required": ["lsp", "enabled"]
+}

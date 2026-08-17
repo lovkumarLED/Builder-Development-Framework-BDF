@@ -37,6 +37,12 @@
 # 26. Provenance: sidecar fields + sha correct
 # 27. Diff summary: Added/Removed lines; identical input silent
 # 28. Builder spec covers V2.7 tokens (F1-F7)
+# New (LSP group):
+# 29. LSP enabled true -> generated lsp key
+# 30. LSP enabled object -> lsp object round-trips
+# 31. LSP disabled omits the lsp section
+# 32. No lsp.json omits the lsp section
+# 33. LSP false value omits the lsp section
 # ============================================================
 
 $BuilderPath = Join-Path $PSScriptRoot "build-kilo-v1.ps1"
@@ -1615,6 +1621,140 @@ function Test-SourceVariantParity {
 }
 
 # ------------------------------------------------------------
+# LSP group: lsp.json -> generated lsp key
+# ------------------------------------------------------------
+
+function Write-LspFixture {
+
+    # Minimal valid profile fixture shared by the LSP tests:
+    # one active provider with models so the build reaches the
+    # merge/verification stages, plus profiles\<profile>\lsp.json.
+
+    param(
+        [string]$Root,
+        [string]$LspJson
+    )
+
+    Write-ProfileSettings $Root -Active @("omniroute")
+    Write-ValidProvider $Root "omniroute" "OmniRoute"
+    Write-ProfileProviderModels $Root "default" "omniroute" @{ "m-1" = @{ name = "Model One" } }
+
+    Write-JsonFile $Root "profiles\default\lsp.json" $LspJson
+}
+
+function Test-LspEnabledTrue {
+
+    $Root = New-V25Root
+
+    try {
+
+        Write-LspFixture $Root '{ "lsp": true, "enabled": true }'
+
+        $Run = Invoke-Builder $Root -NonInteractive
+
+        Assert-True ($Run.ExitCode -eq 0) "builder failed: $($Run.Output)"
+
+        $Out = Read-Generated $Root
+
+        Assert-True ($Out.lsp -eq $true) "lsp true not emitted"
+    }
+    finally {
+
+        Remove-TestRoot $Root
+    }
+}
+
+function Test-LspEnabledObject {
+
+    $Root = New-V25Root
+
+    try {
+
+        Write-LspFixture $Root '{ "lsp": { "typescript": { "command": ["typescript-language-server","--stdio"], "extensions": [".ts"] } }, "enabled": true }'
+
+        $Run = Invoke-Builder $Root -NonInteractive
+
+        Assert-True ($Run.ExitCode -eq 0) "builder failed: $($Run.Output)"
+
+        $Out = Read-Generated $Root
+
+        Assert-True ($Out.lsp.typescript.command -join " " -eq "typescript-language-server --stdio") "lsp object not round-tripped"
+    }
+    finally {
+
+        Remove-TestRoot $Root
+    }
+}
+
+function Test-LspDisabled {
+
+    $Root = New-V25Root
+
+    try {
+
+        Write-LspFixture $Root '{ "lsp": true, "enabled": false }'
+
+        $Run = Invoke-Builder $Root -NonInteractive
+
+        Assert-True ($Run.ExitCode -eq 0) "builder failed: $($Run.Output)"
+
+        $Out = Read-Generated $Root
+
+        Assert-True ($Out.PSObject.Properties['lsp'] -and $Out.lsp -eq $false) "lsp must be present as false while disabled"
+    }
+    finally {
+
+        Remove-TestRoot $Root
+    }
+}
+
+function Test-LspFileAbsent {
+
+    $Root = New-V25Root
+
+    try {
+
+        Write-ProfileSettings $Root -Active @("omniroute")
+        Write-ValidProvider $Root "omniroute" "OmniRoute"
+        Write-ProfileProviderModels $Root "default" "omniroute" @{ "m-1" = @{ name = "Model One" } }
+
+        $Run = Invoke-Builder $Root -NonInteractive
+
+        Assert-True ($Run.ExitCode -eq 0) "builder failed: $($Run.Output)"
+
+        $Out = Read-Generated $Root
+
+        Assert-True ($null -eq $Out.PSObject.Properties['lsp']) "lsp emitted without lsp.json"
+    }
+    finally {
+
+        Remove-TestRoot $Root
+    }
+}
+
+function Test-LspFalseValue {
+
+    $Root = New-V25Root
+
+    try {
+
+        Write-LspFixture $Root '{ "lsp": false, "enabled": true }'
+
+        $Run = Invoke-Builder $Root -NonInteractive
+
+        Assert-True ($Run.ExitCode -eq 0) "builder failed: $($Run.Output)"
+
+        $Out = Read-Generated $Root
+
+        Assert-True ($Out.PSObject.Properties['lsp'] -and $Out.lsp -eq $false) "explicit false value must emit lsp false"
+    }
+    finally {
+
+        Remove-TestRoot $Root
+    }
+}
+
+# ------------------------------------------------------------
 # Run tests
 # ------------------------------------------------------------
 
@@ -1658,6 +1798,11 @@ Run-Test "Dynamic target artifact"              { Test-DynamicTargetArtifact }
 Run-Test "No literal keys in output"            { Test-NoLiteralKeysInOutput }
 Run-Test "Dual-key options mirror"              { Test-DualKeyOptionsMirrored }
 Run-Test "Output parity: source variants survive" { Test-SourceVariantParity }
+Run-Test "LSP enabled true"                   { Test-LspEnabledTrue }
+Run-Test "LSP enabled object round-trip"      { Test-LspEnabledObject }
+Run-Test "LSP disabled emits false"           { Test-LspDisabled }
+Run-Test "No lsp.json omits section"          { Test-LspFileAbsent }
+Run-Test "LSP false value emits false"        { Test-LspFalseValue }
 
 $Stopwatch.Stop()
 

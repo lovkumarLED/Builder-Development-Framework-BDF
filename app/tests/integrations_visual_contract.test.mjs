@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
+import { integrationWorkspaceMarkup } from "../assets/js/pages/integration-workspace.js";
+
 const page = fs.readFileSync(new URL("../assets/js/pages/integrations.js", import.meta.url), "utf8");
 const view = fs.readFileSync(new URL("../assets/js/pages/integration-workspace.js", import.meta.url), "utf8");
 const css = fs.readFileSync(new URL("../assets/css/integration-workspace.css", import.meta.url), "utf8");
@@ -31,4 +33,30 @@ test("integrations keeps real actions wired", () => {
 test("active provider connections scroll without visible scrollbar chrome", () => {
   assert.match(css, /\.integration-provider-list\s*\{[^}]*overflow-y:\s*auto[^}]*scrollbar-width:\s*none/is);
   assert.match(css, /\.integration-provider-list::-webkit-scrollbar\s*\{[^}]*display:\s*none/is);
+});
+
+test("integrations carries an LSP block with a build toggle between plugins and mcp", () => {
+  assert.match(view, /integration-lsp/);
+  assert.match(view, /LSP servers/);
+  assert.match(view, /lspToggle/);
+  assert.match(view, /editLspJson/);
+  const rendered = integrationWorkspaceMarkup({ plugins: [], mcps: {}, providers: [], agentName: "OpenCode", lsp: { lsp: true, enabled: true }, configName: "opencode.json" });
+  const plugins = rendered.indexOf("integration-plugins");
+  const lsp = rendered.indexOf("integration-lsp");
+  const mcp = rendered.indexOf("integration-mcp");
+  assert.ok(plugins < lsp && lsp < mcp, "LSP card must sit between Plugins and MCP");
+  assert.ok(rendered.includes('id="lspToggle"'), "LSP toggle must be rendered");
+  assert.ok(rendered.includes('id="editLspJson"'), "LSP edit button must be rendered");
+  assert.ok(rendered.includes("opencode.json will carry \"lsp\": true"), "enabled copy must name the agent's config file");
+  const kiloRendered = integrationWorkspaceMarkup({ plugins: [], mcps: {}, providers: [], agentName: "KiloCode", lsp: { lsp: true, enabled: true }, configName: "kilo.json" });
+  assert.ok(kiloRendered.includes("kilo.json will carry \"lsp\": true"), "copy must name kilo.json for KiloCode");
+  const offRendered = integrationWorkspaceMarkup({ plugins: [], mcps: {}, providers: [], agentName: "KiloCode", lsp: { lsp: true, enabled: false }, configName: "kilo.json" });
+  assert.ok(offRendered.includes("LSP is off"), "disabled copy must not claim built-ins are enabled");
+  assert.ok(offRendered.includes("kilo.json will carry \"lsp\": false"), "disabled copy must say lsp false");
+  assert.match(page, /api\.setLsp/);
+});
+
+test("lsp expert json dialog is wired", () => {
+  assert.match(page, /openLspJsonDialog/);
+  assert.match(page, /JSON\.parse/);
 });
